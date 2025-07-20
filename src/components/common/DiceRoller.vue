@@ -1,8 +1,9 @@
 <template>
   <div class="dice-roller p-6 bg-gray-800 rounded-lg border border-gray-700">
     <div class="text-center mb-6">
-      <h3 class="text-xl font-semibold text-amber-400 mb-2">
-        🎲 Rolador de Dados
+      <h3 class="text-xl font-semibold text-amber-400 mb-2 flex items-center justify-center gap-2">
+        <font-awesome-icon icon="dice" class="text-amber-400" />
+        Rolador de Dados
       </h3>
       <p class="text-sm text-gray-400">
         Sistema completo de rolagem para RPG
@@ -15,8 +16,9 @@
         <input v-model="diceNotation" @keyup.enter="rollDice" type="text" placeholder="Ex: 1d20, 2d6+3, 1d8-1"
           class="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:border-amber-500" />
         <button @click="rollDice" :disabled="isRolling || !isValidNotation"
-          class="px-4 py-2 bg-amber-600 hover:bg-amber-700 disabled:bg-gray-600 text-white rounded font-medium transition-colors min-w-[80px]">
-          {{ isRolling ? '...' : 'Rolar' }}
+          class="px-4 py-2 bg-amber-600 hover:bg-amber-700 disabled:bg-gray-600 text-white rounded font-medium transition-colors min-w-[80px] flex items-center gap-2">
+          <font-awesome-icon icon="dice" v-if="!isRolling" />
+          {{ isRolling ? 'Rolando...' : 'Rolar' }}
         </button>
       </div>
 
@@ -61,17 +63,23 @@
         </div>
       </div>
       <button @click="reroll"
-        class="mt-2 px-3 py-1 text-xs bg-amber-600 hover:bg-amber-700 text-white rounded transition-colors">
-        🔄 Rolar Novamente
+        class="mt-2 px-3 py-1 text-xs bg-amber-600 hover:bg-amber-700 text-white rounded transition-colors flex items-center gap-1">
+        <font-awesome-icon icon="arrows-rotate" />
+        Rolar Novamente
       </button>
     </div>
 
     <!-- Roll History -->
     <div v-if="rollHistory.length > 0">
       <div class="flex items-center justify-between mb-3">
-        <h4 class="text-lg font-semibold text-amber-400">Histórico</h4>
-        <button @click="clearHistory" class="text-xs text-red-400 hover:text-red-300 transition-colors">
-          🗑️ Limpar
+        <h4 class="text-lg font-semibold text-amber-400 flex items-center gap-2">
+          <font-awesome-icon icon="history" />
+          Histórico
+        </h4>
+        <button @click="clearHistory"
+          class="text-xs text-red-400 hover:text-red-300 transition-colors flex items-center gap-1">
+          <font-awesome-icon icon="trash" />
+          Limpar
         </button>
       </div>
 
@@ -185,7 +193,7 @@ const rollDice = async () => {
     // Update history
     updateHistory()
   } catch (error) {
-    console.error('❌ Error rolling dice:', error)
+    console.error('[DICE ROLLER] Error rolling dice:', error)
     validationError.value = error instanceof Error ? error.message : 'Erro desconhecido'
   } finally {
     isRolling.value = false
@@ -218,7 +226,7 @@ const formatTime = (date: Date): string => {
 // Initialize history
 updateHistory()
 
-console.log('🎲 Advanced DiceRoller component loaded')
+console.log('[DICE ROLLER] Advanced DiceRoller component loaded')
 </script>
 
 <style scoped>

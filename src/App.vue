@@ -2,28 +2,24 @@
   <div id="app" class="min-h-screen bg-gray-900 text-white">
     <!-- PWA Manager -->
     <PWAManager />
-    
+
     <!-- Navigation Header -->
     <nav class="bg-guild-800 shadow-lg">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
           <div class="flex items-center">
             <div class="flex-shrink-0">
-              <h1 class="text-xl font-medieval font-bold text-gold-400">
-                ⚔️ Gerador de Guildas
+              <h1 class="text-xl font-medieval font-bold text-gold-400 flex items-center gap-2">
+                <font-awesome-icon :icon="['fas', 'wand-magic-sparkles']" class="text-gold-400" />
+                Gerador de Guildas
               </h1>
             </div>
             <div class="hidden md:block">
               <div class="ml-10 flex items-baseline space-x-4">
-                <router-link
-                  v-for="item in navigation"
-                  :key="item.name"
-                  :to="item.href"
-                  class="px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                  :class="isCurrentRoute(item.href) 
-                    ? 'bg-guild-900 text-guild-100' 
-                    : 'text-guild-200 hover:bg-guild-700 hover:text-white'"
-                >
+                <router-link v-for="item in navigation" :key="item.name" :to="item.href"
+                  class="px-3 py-2 rounded-md text-sm font-medium transition-colors" :class="isCurrentRoute(item.href)
+                    ? 'bg-guild-900 text-guild-100'
+                    : 'text-guild-200 hover:bg-guild-700 hover:text-white'">
                   {{ item.name }}
                 </router-link>
               </div>

@@ -33,13 +33,15 @@
     <!-- Roll Actions -->
     <div v-if="showActions" class="flex gap-2 mt-3">
       <button v-if="canReroll" @click="$emit('reroll')"
-        class="text-xs px-2 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded transition-colors">
-        🔄 Rolar Novamente
+        class="text-xs px-2 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded transition-colors flex items-center gap-1">
+        <font-awesome-icon icon="arrows-rotate" />
+        Rolar Novamente
       </button>
 
       <button v-if="canCopy" @click="copyResult"
-        class="text-xs px-2 py-1 bg-gray-600 hover:bg-gray-700 text-white rounded transition-colors">
-        📋 Copiar
+        class="text-xs px-2 py-1 bg-gray-600 hover:bg-gray-700 text-white rounded transition-colors flex items-center gap-1">
+        <font-awesome-icon icon="copy" />
+        Copiar
       </button>
     </div>
 
@@ -131,7 +133,7 @@ const copyResult = async () => {
   try {
     await navigator.clipboard.writeText(text)
     emit('copy', text)
-    console.log('📋 Result copied to clipboard:', text)
+    console.log('[ROLL RESULT] Result copied to clipboard:', text)
   } catch (error) {
     console.warn('Failed to copy to clipboard:', error)
     // Fallback for older browsers
@@ -145,7 +147,7 @@ const copyResult = async () => {
   }
 }
 
-console.log('📊 RollResult component loaded')
+console.log('[ROLL RESULT] RollResult component loaded')
 </script>
 
 <style scoped>
