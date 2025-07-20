@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline - Gerador de Guildas</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Crimson Text', Georgia, serif;
+      background: linear-gradient(135deg, #1f2937 0%, #4c1d95 100%);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .offline-container {
+      max-width: 500px;
+      padding: 2rem;
+    }
+    .offline-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+    .offline-title {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #fbbf24;
+      margin-bottom: 1rem;
+    }
+    .offline-message {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+    .retry-button {
+      background: #7c3aed;
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .retry-button:hover {
+      background: #6d28d9;
+    }
+    .features {
+      margin-top: 2rem;
+      text-align: left;
+    }
+    .feature-item {
+      margin: 0.5rem 0;
+      padding-left: 1.5rem;
+      position: relative;
+    }
+    .feature-item::before {
+      content: "⚔️";
+      position: absolute;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-container">
+    <div class="offline-icon">🏰</div>
+    <h1 class="offline-title">Sem Conexão</h1>
+    <p class="offline-message">
+      Você está offline, mas ainda pode usar muitas funcionalidades do Gerador de Guildas! 
+      Os dados já carregados permanecem disponíveis.
+    </p>
+    
+    <button class="retry-button" onclick="location.reload()">
+      Tentar Novamente
+    </button>
+    
+    <div class="features">
+      <h3>Funcionalidades Offline:</h3>
+      <div class="feature-item">Visualizar guildas já geradas</div>
+      <div class="feature-item">Usar contratos em cache</div>
+      <div class="feature-item">Consultar membros salvos</div>
+      <div class="feature-item">Acessar sistema de renome</div>
+    </div>
+  </div>
+
+  <script>
+    // Tenta reconectar quando voltar online
+    window.addEventListener('online', () => {
+      location.reload();
+    });
+    
+    // Mostra status da conexão
+    window.addEventListener('load', () => {
+      if (navigator.onLine) {
+        location.href = '/';
+      }
+    });
+  </script>
+</body>
+</html>
