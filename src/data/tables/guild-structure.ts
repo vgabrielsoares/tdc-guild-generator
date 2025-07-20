@@ -1,5 +1,10 @@
 import type { TableEntry } from "@/types/tables";
 
+export interface DiceNotation {
+  dice: string;
+  modifier: number;
+}
+
 // Interface para estrutura da guilda
 export interface GuildStructureResult {
   headquarters: {
@@ -480,26 +485,46 @@ export const VISITOR_FREQUENCY_MODIFIERS = {
 // Dados por tipo de assentamento
 export const SETTLEMENT_DICE = {
   structure: {
-    'Lugarejo': 'd8',
-    'Povoado': 'd8',
-    'Aldeia': 'd8',
-    'Vilarejo': 'd12',
-    'Vila grande': 'd12',
-    'Cidadela': 'd20',
-    'Cidade grande': 'd20+4',
-    'Metrópole': 'd20+8'
+    'Lugarejo': { dice: 'd8', modifier: 0 },
+    'Povoado': { dice: 'd8', modifier: 0 },
+    'Aldeia': { dice: 'd8', modifier: 0 },
+    'Vilarejo': { dice: 'd12', modifier: 0 },
+    'Vila grande': { dice: 'd12', modifier: 0 },
+    'Cidadela': { dice: 'd20', modifier: 0 },
+    'Cidade grande': { dice: 'd20', modifier: 4 },
+    'Metrópole': { dice: 'd20', modifier: 8 }
   },
   visitors: {
-    'Lugarejo': 'd8',
-    'Povoado': 'd8',
-    'Aldeia': 'd8',
-    'Vilarejo': 'd10',
-    'Vila grande': 'd10',
-    'Cidadela': 'd12',
-    'Cidade grande': 'd20',
-    'Metrópole': 'd20+5'
+    'Lugarejo': { dice: 'd8', modifier: 0 },
+    'Povoado': { dice: 'd8', modifier: 0 },
+    'Aldeia': { dice: 'd8', modifier: 0 },
+    'Vilarejo': { dice: 'd10', modifier: 0 },
+    'Vila grande': { dice: 'd10', modifier: 0 },
+    'Cidadela': { dice: 'd12', modifier: 0 },
+    'Cidade grande': { dice: 'd20', modifier: 0 },
+    'Metrópole': { dice: 'd20', modifier: 5 }
   }
-};
+} as const;
+
+export function getDiceNotationString(settlementType: string, category: 'structure' | 'visitors'): string {
+  const diceNotation = SETTLEMENT_DICE[category][settlementType as keyof typeof SETTLEMENT_DICE[typeof category]];
+  if (!diceNotation) return '1d20';
+  
+  const modifierStr = diceNotation.modifier === 0 ? '' : 
+                     diceNotation.modifier > 0 ? `+${diceNotation.modifier}` : 
+                     `${diceNotation.modifier}`;
+  return `1${diceNotation.dice}${modifierStr}`;
+}
+
+export function validateSimpleDiceNotation(notation: DiceNotation): boolean {
+  // Basic validation for dice string format (e.g., 'd8', 'd20')
+  const dicePattern = /^d\d+$/;
+  return (
+    dicePattern.test(notation.dice) &&
+    notation.modifier >= -1000 && 
+    notation.modifier <= 1000
+  );
+}
 
 // Tabela de existência de sede
 export const HEADQUARTERS_EXISTENCE_TABLE = {
