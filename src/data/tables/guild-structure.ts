@@ -22,30 +22,18 @@ export interface GuildStructureResult {
 
 // Tamanho da Sede (1d20)
 export const HEADQUARTERS_SIZE_TABLE: TableEntry<string>[] = [
-  {
-    min: 1,
-    max: 8,
-    result: "Pequena",
-    description: "Sede pequena - modificador -2 para recursos",
-  },
-  {
-    min: 9,
-    max: 15,
-    result: "Média",
-    description: "Sede média - sem modificadores",
-  },
-  {
-    min: 16,
-    max: 19,
-    result: "Grande",
-    description: "Sede grande - modificador +2 para recursos",
-  },
-  {
-    min: 20,
-    max: 20,
-    result: "Enorme",
-    description: "Sede enorme - modificador +4 para recursos",
-  },
+  { min: 1, max: 2, result: 'Minúsculo (3m x 1,5m)' },
+  { min: 3, max: 5, result: 'Muito pequeno (4,5m x 3m)' },
+  { min: 6, max: 6, result: 'Pequeno e modesto (6m x 6m)' },
+  { min: 7, max: 8, result: 'Pequeno e confortável (7,5m x 6m, +1 andar)' },
+  { min: 9, max: 9, result: 'Mediano e comum (9m x 9m)' },
+  { min: 10, max: 14, result: 'Mediano em dobro (10,5m x 9m, +1 andar)' },
+  { min: 15, max: 16, result: 'Grande (12m x 12m)' },
+  { min: 17, max: 17, result: 'Luxuosamente grande (12m x 12m, +2 andares)' },
+  { min: 18, max: 18, result: 'Enorme (15m x 15m, +1 andar)' },
+  { min: 19, max: 19, result: 'Enorme e confortável (15m x 15m, +2 andares)' },
+  { min: 20, max: 20, result: 'Colossal (20m x 20m, +1 andar)' },
+  { min: 21, max: 25, result: 'Colossal e primorosa (20m x 20m, +2 andares)' }
 ];
 
 // Características da Sede (2d6 para número de características)
@@ -58,126 +46,18 @@ export const HEADQUARTERS_COUNT_TABLE: TableEntry<number>[] = [
 
 // Características Específicas da Sede (1d20)
 export const HEADQUARTERS_CHARACTERISTICS_TABLE: TableEntry<string>[] = [
-  {
-    min: 1,
-    max: 1,
-    result: "Biblioteca Arcana",
-    description: "Acesso a conhecimentos mágicos raros",
-  },
-  {
-    min: 2,
-    max: 2,
-    result: "Forja Mágica",
-    description: "Facilita criação de itens mágicos",
-  },
-  {
-    min: 3,
-    max: 3,
-    result: "Sala de Treinamento",
-    description: "Melhora habilidades de combate",
-  },
-  {
-    min: 4,
-    max: 4,
-    result: "Laboratório de Alquimia",
-    description: "Criação de poções e elixires",
-  },
-  {
-    min: 5,
-    max: 5,
-    result: "Estábulos Especiais",
-    description: "Montarias exóticas disponíveis",
-  },
-  {
-    min: 6,
-    max: 6,
-    result: "Torre de Observação",
-    description: "Vantagem em vigilância e defesa",
-  },
-  {
-    min: 7,
-    max: 7,
-    result: "Cofres Protegidos",
-    description: "Armazenamento ultra-seguro",
-  },
-  {
-    min: 8,
-    max: 8,
-    result: "Portal de Transporte",
-    description: "Viagem rápida para locais conhecidos",
-  },
-  {
-    min: 9,
-    max: 9,
-    result: "Jardim Medicinal",
-    description: "Suprimento de ervas curativas",
-  },
-  {
-    min: 10,
-    max: 10,
-    result: "Sala de Reuniões Encantada",
-    description: "Comunicação mágica à distância",
-  },
-  {
-    min: 11,
-    max: 11,
-    result: "Arsenal Avançado",
-    description: "Equipamentos de qualidade superior",
-  },
-  {
-    min: 12,
-    max: 12,
-    result: "Quartos de Hóspedes",
-    description: "Acomoda clientes importantes",
-  },
-  {
-    min: 13,
-    max: 13,
-    result: "Cozinha Encantada",
-    description: "Produz alimentos especiais",
-  },
-  {
-    min: 14,
-    max: 14,
-    result: "Santuário Divino",
-    description: "Serviços de cura e bênçãos",
-  },
-  {
-    min: 15,
-    max: 15,
-    result: "Rede de Informantes",
-    description: "Acesso a informações privilegiadas",
-  },
-  {
-    min: 16,
-    max: 16,
-    result: "Sistema de Defesa",
-    description: "Proteções mágicas e armadilhas",
-  },
-  {
-    min: 17,
-    max: 17,
-    result: "Loja de Suprimentos",
-    description: "Equipamentos básicos sempre disponíveis",
-  },
-  {
-    min: 18,
-    max: 18,
-    result: "Centro de Mensagens",
-    description: "Comunicação rápida com outras guildas",
-  },
-  {
-    min: 19,
-    max: 19,
-    result: "Arquivo de Contratos",
-    description: "Histórico detalhado de missões",
-  },
-  {
-    min: 20,
-    max: 20,
-    result: "Característica Única",
-    description: "Role novamente ou invente algo especial",
-  },
+  { min: 1, max: 2, result: 'Antiga e mal conservada' },
+  { min: 3, max: 4, result: 'Suja e desorganizada' },
+  { min: 5, max: 8, result: 'Bem organizada e limpa' },
+  { min: 9, max: 9, result: 'Recém-construída' },
+  { min: 10, max: 10, result: 'Dentro de um calabouço' },
+  { min: 11, max: 13, result: 'Junto à sede do governo local' },
+  { min: 14, max: 15, result: 'Elegante, funcionários arrogantes' },
+  { min: 16, max: 17, result: 'Afastada do assentamento' },
+  { min: 18, max: 18, result: 'Também usada como museu' },
+  { min: 19, max: 19, result: 'Junto a um acervo de conhecimento' },
+  { min: 20, max: 20, result: 'Engenhosamente moderna' },
+  { min: 21, max: 25, result: 'Modernidade mágica' }
 ];
 
 // Relações com o Governo (1d12)
@@ -539,6 +419,100 @@ export function getResourceSpecialtiesCount(level: string): number {
       return 2;
   }
 }
+
+// Funcionários da Guilda
+export const EMPLOYEES_TABLE: TableEntry<string>[] = [
+  { min: 1, max: 1, result: '1 funcionário despreparado' },
+  { min: 2, max: 4, result: '1d4 funcionários despreparados' },
+  { min: 5, max: 6, result: '1d4+2 funcionários despreparados' },
+  { min: 7, max: 9, result: '1 funcionário experiente' },
+  { min: 10, max: 10, result: '1d4+1 membros do clero' },
+  { min: 11, max: 12, result: '1d4+1 ex-membros da guilda' },
+  { min: 13, max: 14, result: '1 nobre e seus serviçais' },
+  { min: 15, max: 15, result: '1 aventureiro pagando dívidas' },
+  { min: 16, max: 18, result: '1 experiente explorador' },
+  { min: 19, max: 19, result: '1 animal falante' },
+  { min: 20, max: 20, result: '1d4 ex-aventureiros' },
+  { min: 21, max: 25, result: '1d6+3 funcionários experientes' }
+];
+
+// Frequentadores da Guilda - Quantidade
+export const VISITORS_FREQUENCY_TABLE: TableEntry<string>[] = [
+  { min: 1, max: 5, result: 'Vazia' },
+  { min: 6, max: 9, result: 'Quase deserta' },
+  { min: 10, max: 12, result: 'Pouco movimentada' },
+  { min: 13, max: 16, result: 'Nem muito nem pouco' },
+  { min: 17, max: 18, result: 'Muito frequentada' },
+  { min: 19, max: 19, result: 'Abarrotada' },
+  { min: 20, max: 25, result: 'Lotada' }
+];
+
+// Modificadores para recursos
+export const RESOURCE_MODIFIERS = {
+  byRelation: {
+    'Péssima': -3,
+    'Ruim': -2,
+    'Diplomática': -1,
+    'Opinião dividida': -1,
+    'Boa': +1,
+    'Muito boa': +2,
+    'Excelente': +3
+  }
+};
+
+// Modificadores para frequentadores
+export const VISITOR_FREQUENCY_MODIFIERS = {
+  byEmployees: {
+    'despreparados': -1,
+    'experientes': +1
+  },
+  byResources: {
+    'Em débito': -6,
+    'Nenhum': -3,
+    'Escassos': -2,
+    'Limitados': 0,
+    'Suficientes': +2,
+    'Excedentes': +3,
+    'Abundantes': +6
+  }
+};
+
+// Dados por tipo de assentamento
+export const SETTLEMENT_DICE = {
+  structure: {
+    'Lugarejo': 'd8',
+    'Povoado': 'd8',
+    'Aldeia': 'd8',
+    'Vilarejo': 'd12',
+    'Vila grande': 'd12',
+    'Cidadela': 'd20',
+    'Cidade grande': 'd20+4',
+    'Metrópole': 'd20+8'
+  },
+  visitors: {
+    'Lugarejo': 'd8',
+    'Povoado': 'd8',
+    'Aldeia': 'd8',
+    'Vilarejo': 'd10',
+    'Vila grande': 'd10',
+    'Cidadela': 'd12',
+    'Cidade grande': 'd20',
+    'Metrópole': 'd20+5'
+  }
+};
+
+// Tabela de existência de sede
+export const HEADQUARTERS_EXISTENCE_TABLE = {
+  human: [
+    { min: 1, max: 7, value: 'Não' },
+    { min: 8, max: 20, value: 'Sim' },
+    { min: 21, max: 25, value: 'Sede matriz' }
+  ],
+  other: [
+    { min: 1, max: 20, value: 'Não' },
+    { min: 21, max: 25, value: 'Sim' }
+  ]
+};
 
 // Legacy exports for backward compatibility
 export const GUILD_SIZE_TABLE = HEADQUARTERS_SIZE_TABLE;
