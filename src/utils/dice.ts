@@ -145,8 +145,79 @@ export function rollDiceSimple(notation: string): DiceResult {
   };
 }
 
+interface TableEntry<T = unknown> {
+  min: number;
+  max: number;
+  result: T;
+}
+
+const tableLookupCache = new Map<string, Map<number, TableEntry>>();
+
 /**
- * Roll on a table using dice
+ * Create an optimized lookup map for a table
+ * Uses a Map for O(1) average case lookup instead of O(n) array find
+ */
+function createTableLookupMap<T>(table: TableEntry<T>[]): Map<number, TableEntry<T>> {
+  const lookupMap = new Map<number, TableEntry<T>>();
+  
+  for (const entry of table) {
+    // Map each possible roll value to its corresponding entry
+    for (let value = entry.min; value <= entry.max; value++) {
+      lookupMap.set(value, entry);
+    }
+  }
+  
+  return lookupMap;
+}
+
+/**
+ * Get cached lookup map or create new one
+ */
+function getTableLookupMap<T>(table: TableEntry<T>[], cacheKey?: string): Map<number, TableEntry<T>> {
+  if (cacheKey && tableLookupCache.has(cacheKey)) {
+    return tableLookupCache.get(cacheKey)! as Map<number, TableEntry<T>>;
+  }
+  
+  const lookupMap = createTableLookupMap(table);
+  
+  if (cacheKey) {
+    tableLookupCache.set(cacheKey, lookupMap as Map<number, TableEntry>);
+  }
+  
+  return lookupMap;
+}
+
+/**
+ * Binary search for table entry (for very large sparse tables)
+ */
+function binarySearchTable<T>(
+  table: TableEntry<T>[], 
+  value: number
+): TableEntry<T> | null {
+  // Sort table by min value if not already sorted
+  const sortedTable = [...table].sort((a, b) => a.min - b.min);
+  
+  let left = 0;
+  let right = sortedTable.length - 1;
+  
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+    const entry = sortedTable[mid];
+    
+    if (value >= entry.min && value <= entry.max) {
+      return entry;
+    } else if (value < entry.min) {
+      right = mid - 1;
+    } else {
+      left = mid + 1;
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * Roll on a table using dice - optimized for performance
  */
 export function rollOnTable<T>(config: TableRollConfig<T>): TableRoll<T> {
   const { table, modifier = 0, context, logRoll = true } = config;
@@ -189,10 +260,27 @@ export function rollOnTable<T>(config: TableRollConfig<T>): TableRoll<T> {
     logRoll,
   });
 
-  // Find matching table entry
-  const tableEntry = table.find(
-    (entry) => roll.result >= entry.min && roll.result <= entry.max
-  );
+  // Choose lookup strategy based on table characteristics
+  let tableEntry: TableEntry<T> | null = null;
+  
+  const tableRange = maxValue - minValue + 1;
+  const tableSize = table.length;
+  const density = tableSize / tableRange; // How dense is the table
+  
+  if (tableSize >= 50) {
+    // Use binary search for large tables regardless of density
+    tableEntry = binarySearchTable(table, roll.result);
+  } else if (density >= 0.1 && tableSize >= 10 && tableRange <= 1000) {
+    // Use Map lookup for dense tables
+    const cacheKey = context || `table-${tableSize}-${minValue}-${maxValue}`;
+    const lookupMap = getTableLookupMap(table, cacheKey);
+    tableEntry = lookupMap.get(roll.result) || null;
+  } else {
+    // Use linear search for small or very sparse tables
+    tableEntry = table.find(
+      (entry) => roll.result >= entry.min && roll.result <= entry.max
+    ) || null;
+  }
 
   if (!tableEntry) {
     console.warn(
@@ -255,6 +343,28 @@ export function clearRollHistory(): void {
 }
 
 /**
+ * Clear table lookup cache to free memory
+ */
+export function clearTableCache(): void {
+  tableLookupCache.clear();
+}
+
+/**
+ * Get cache statistics for debugging
+ */
+export function getCacheStats(): { cacheSize: number; totalEntries: number } {
+  let totalEntries = 0;
+  for (const cache of tableLookupCache.values()) {
+    totalEntries += cache.size;
+  }
+  
+  return {
+    cacheSize: tableLookupCache.size,
+    totalEntries
+  };
+}
+
+/**
  * Advanced dice rolling with multiple options
  */
 export function rollAdvanced(
@@ -269,14 +379,14 @@ export function rollAdvanced(
     context?: string;
   } = {}
 ): DiceRoll {
-  let config: RollConfig = {
+  const config: RollConfig = {
     notation,
     context: options.context,
     advantage: options.advantage,
     disadvantage: options.disadvantage,
   };
 
-  let result = rollDice(config);
+  const result = rollDice(config);
 
   // Reroll ones
   if (options.rerollOnes) {
