@@ -190,3 +190,34 @@ app.use(createPinia());
 app.use(router);
 
 app.mount("#app");
+
+// Register Service Worker in production
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', async () => {
+    try {
+      const registration = await navigator.serviceWorker.register('/service-worker.js', {
+        scope: '/'
+      });
+      
+      console.log('[SW] Service Worker registered successfully:', registration.scope);
+      
+      // Handle updates
+      registration.addEventListener('updatefound', () => {
+        const newWorker = registration.installing;
+        if (newWorker) {
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              console.log('[PWA] New content available; please refresh.');
+            }
+          });
+        }
+      });
+    } catch (error) {
+      console.warn('[SW] Service Worker registration failed:', error);
+    }
+  });
+} else if (!('serviceWorker' in navigator)) {
+  console.log('[SW] Service Worker not supported in this browser');
+} else {
+  console.log('[SW] Service Worker disabled in development mode');
+}
