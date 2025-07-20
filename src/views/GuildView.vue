@@ -1,8 +1,9 @@
 <template>
   <div class="space-y-8">
     <div class="text-center">
-      <h1 class="text-3xl font-medieval font-bold text-gold-400 mb-4">
-        🏰 Estrutura da Guilda
+      <h1 class="text-3xl font-medieval font-bold text-gold-400 mb-4 flex items-center justify-center gap-3">
+        <font-awesome-icon icon="home" class="text-gold-400" />
+        Estrutura da Guilda
       </h1>
       <p class="text-lg text-gray-300 mb-8">
         Gere e visualize a estrutura completa da sua guilda.
@@ -10,10 +11,11 @@
     </div>
 
     <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
-      <h2 class="text-xl font-semibold text-amber-400 mb-4">
-        🧪 Store Testing (Issue 1.4)
+      <h2 class="text-xl font-semibold text-amber-400 mb-4 flex items-center gap-2">
+        <font-awesome-icon icon="flask" />
+        Store Testing (Issue 1.4)
       </h2>
-      
+
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div class="bg-gray-700 p-4 rounded">
           <h3 class="text-sm font-medium text-gray-300 mb-2">Estado</h3>
@@ -21,14 +23,14 @@
             {{ guildStore.hasCurrentGuild ? 'Com Guilda' : 'Sem Guilda' }}
           </p>
         </div>
-        
+
         <div class="bg-gray-700 p-4 rounded">
           <h3 class="text-sm font-medium text-gray-300 mb-2">Total</h3>
           <p class="text-lg font-bold text-white">
             {{ guildStore.guildCount }} guildas
           </p>
         </div>
-        
+
         <div class="bg-gray-700 p-4 rounded">
           <h3 class="text-sm font-medium text-gray-300 mb-2">Status</h3>
           <p class="text-lg font-bold text-white">
@@ -38,20 +40,16 @@
       </div>
 
       <div class="flex gap-4 mb-6">
-        <button 
-          @click="generateGuild"
-          :disabled="guildStore.isLoading"
-          class="bg-amber-600 hover:bg-amber-700 disabled:bg-gray-600 text-white px-4 py-2 rounded font-medium transition-colors"
-        >
-          {{ guildStore.isLoading ? 'Gerando...' : '🏰 Gerar Guilda' }}
+        <button @click="generateGuild" :disabled="guildStore.isLoading"
+          class="bg-amber-600 hover:bg-amber-700 disabled:bg-gray-600 text-white px-4 py-2 rounded font-medium transition-colors flex items-center gap-2">
+          <font-awesome-icon icon="home" v-if="!guildStore.isLoading" />
+          {{ guildStore.isLoading ? 'Gerando...' : 'Gerar Guilda' }}
         </button>
-        
-        <button 
-          @click="clearGuilds"
-          :disabled="guildStore.isLoading || guildStore.guildCount === 0"
-          class="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white px-4 py-2 rounded font-medium transition-colors"
-        >
-          🧹 Limpar Tudo
+
+        <button @click="clearGuilds" :disabled="guildStore.isLoading || guildStore.guildCount === 0"
+          class="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white px-4 py-2 rounded font-medium transition-colors flex items-center gap-2">
+          <font-awesome-icon icon="trash" />
+          Limpar Tudo
         </button>
       </div>
 
@@ -65,21 +63,15 @@
       <div v-if="guildStore.recentGuilds.length > 0">
         <h3 class="text-lg font-semibold text-amber-400 mb-2">Guildas Recentes:</h3>
         <div class="space-y-2">
-          <div 
-            v-for="guild in guildStore.recentGuilds" 
-            :key="guild.id"
+          <div v-for="guild in guildStore.recentGuilds" :key="guild.id"
             class="flex justify-between items-center bg-gray-700 p-3 rounded cursor-pointer hover:bg-gray-600 transition-colors"
-            @click="selectGuild(guild)"
-          >
+            @click="selectGuild(guild)">
             <div>
               <p class="text-white font-medium">{{ guild.name }}</p>
               <p class="text-gray-300 text-sm">{{ formatDate(guild.createdAt) }}</p>
             </div>
-            <button 
-              @click.stop="removeGuild(guild.id)"
-              class="text-red-400 hover:text-red-300 transition-colors"
-            >
-              🗑️
+            <button @click.stop="removeGuild(guild.id)" class="text-red-400 hover:text-red-300 transition-colors">
+              <font-awesome-icon icon="trash" />
             </button>
           </div>
         </div>
@@ -139,5 +131,5 @@ const formatDate = (date: Date) => {
   }).format(new Date(date))
 }
 
-console.log('🏰 Guild View loaded with store testing')
+console.log('[GUILD VIEW] Guild View loaded with store testing')
 </script>

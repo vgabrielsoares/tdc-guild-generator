@@ -19,5 +19,5 @@
 import ContractList from '@/components/contracts/ContractList.vue'
 
 // Contracts view implementation will be added in Phase 4
-console.log('📋 Contracts View loaded')
+console.log('[CONTRACTS VIEW] Contracts View loaded')
 </script>
