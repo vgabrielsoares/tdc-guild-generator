@@ -1,22 +1,226 @@
 <template>
   <div class="dice-roller p-6 bg-gray-800 rounded-lg border border-gray-700">
-    <div class="text-center">
-      <h3 class="text-xl font-semibold text-amber-400 mb-4">
+    <div class="text-center mb-6">
+      <h3 class="text-xl font-semibold text-amber-400 mb-2">
         🎲 Rolador de Dados
       </h3>
-      <p class="text-gray-300">
-        Componente será implementado na Issue 2.4
+      <p class="text-sm text-gray-400">
+        Sistema completo de rolagem para RPG
       </p>
+    </div>
+
+    <!-- Dice Input Section -->
+    <div class="mb-6">
+      <div class="flex gap-2 mb-3">
+        <input v-model="diceNotation" @keyup.enter="rollDice" type="text" placeholder="Ex: 1d20, 2d6+3, 1d8-1"
+          class="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:border-amber-500" />
+        <button @click="rollDice" :disabled="isRolling || !isValidNotation"
+          class="px-4 py-2 bg-amber-600 hover:bg-amber-700 disabled:bg-gray-600 text-white rounded font-medium transition-colors min-w-[80px]">
+          {{ isRolling ? '...' : 'Rolar' }}
+        </button>
+      </div>
+
+      <!-- Quick Dice Buttons -->
+      <div class="flex flex-wrap gap-2 mb-3">
+        <button v-for="quickDice in quickDiceOptions" :key="quickDice" @click="setQuickDice(quickDice)"
+          class="px-2 py-1 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors">
+          {{ quickDice }}
+        </button>
+      </div>
+
+      <!-- Advanced Options -->
+      <div class="flex flex-wrap gap-3 text-sm">
+        <label class="flex items-center text-gray-300">
+          <input v-model="rollOptions.advantage" type="checkbox" class="mr-1" />
+          Vantagem
+        </label>
+        <label class="flex items-center text-gray-300">
+          <input v-model="rollOptions.disadvantage" type="checkbox" class="mr-1" />
+          Desvantagem
+        </label>
+        <label class="flex items-center text-gray-300">
+          <input v-model="rollOptions.exploding" type="checkbox" class="mr-1" />
+          Explosivo
+        </label>
+      </div>
+    </div>
+
+    <!-- Current Roll Result -->
+    <div v-if="currentRoll" class="mb-6 p-4 bg-gray-700 rounded border-l-4 border-amber-500">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-lg font-bold text-white">{{ currentRoll.notation }}</span>
+        <span class="text-2xl font-bold text-amber-400">{{ currentRoll.result }}</span>
+      </div>
+      <div class="text-sm text-gray-300">
+        <div>Dados: [{{ currentRoll.individual.join(', ') }}]</div>
+        <div v-if="currentRoll.modifier !== 0">
+          Modificador: {{ currentRoll.modifier > 0 ? '+' : '' }}{{ currentRoll.modifier }}
+        </div>
+        <div class="text-xs text-gray-400 mt-1">
+          {{ formatTime(currentRoll.timestamp) }}
+        </div>
+      </div>
+      <button @click="reroll"
+        class="mt-2 px-3 py-1 text-xs bg-amber-600 hover:bg-amber-700 text-white rounded transition-colors">
+        🔄 Rolar Novamente
+      </button>
+    </div>
+
+    <!-- Roll History -->
+    <div v-if="rollHistory.length > 0">
+      <div class="flex items-center justify-between mb-3">
+        <h4 class="text-lg font-semibold text-amber-400">Histórico</h4>
+        <button @click="clearHistory" class="text-xs text-red-400 hover:text-red-300 transition-colors">
+          🗑️ Limpar
+        </button>
+      </div>
+
+      <div class="space-y-2 max-h-48 overflow-y-auto">
+        <div v-for="roll in rollHistory.slice(0, 10)" :key="roll.id"
+          class="flex items-center justify-between p-2 bg-gray-700 rounded text-sm">
+          <div class="flex-1">
+            <span class="text-white font-medium">{{ roll.notation }}</span>
+            <span v-if="roll.context" class="text-gray-400 ml-2">({{ roll.context }})</span>
+          </div>
+          <div class="text-right">
+            <div class="text-amber-400 font-bold">{{ roll.result }}</div>
+            <div class="text-xs text-gray-400">{{ formatTime(roll.timestamp) }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Validation Error -->
+    <div v-if="validationError" class="mt-4 p-3 bg-red-900 border border-red-600 rounded">
+      <p class="text-red-200 text-sm">{{ validationError }}</p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-// DiceRoller component
-// Will be implemented in Issue 2.4
-console.log('🎲 DiceRoller component loaded')
+import { ref, computed, watch } from 'vue'
+import {
+  rollDice as rollDiceUtil,
+  rollAdvanced,
+  parseDiceNotation,
+  getRollHistory,
+  clearRollHistory
+} from '@/utils/dice'
+import type { DiceRoll, RollLog } from '@/types/dice'
+
+// State
+const diceNotation = ref('1d20')
+const currentRoll = ref<DiceRoll | null>(null)
+const isRolling = ref(false)
+const validationError = ref('')
+const rollHistory = ref<RollLog[]>([])
+
+// Roll options
+const rollOptions = ref({
+  advantage: false,
+  disadvantage: false,
+  exploding: false,
+  rerollOnes: false,
+  dropLowest: false,
+  dropHighest: false
+})
+
+// Quick dice options
+const quickDiceOptions = [
+  '1d4', '1d6', '1d8', '1d10', '1d12', '1d20', '1d100',
+  '2d6', '3d6', '4d6', '2d8', '1d6+1', '1d20+5', '1d8-1'
+]
+
+// Computed
+const isValidNotation = computed(() => {
+  if (!diceNotation.value.trim()) return false
+  const validation = parseDiceNotation(diceNotation.value)
+  validationError.value = validation.isValid ? '' : validation.error || ''
+  return validation.isValid
+})
+
+// Watch for advantage/disadvantage conflict
+watch([() => rollOptions.value.advantage, () => rollOptions.value.disadvantage], () => {
+  if (rollOptions.value.advantage && rollOptions.value.disadvantage) {
+    rollOptions.value.disadvantage = false
+  }
+})
+
+// Methods
+const setQuickDice = (notation: string) => {
+  diceNotation.value = notation
+  validationError.value = ''
+}
+
+const rollDice = async () => {
+  if (!isValidNotation.value) return
+
+  isRolling.value = true
+
+  try {
+    // Add a small delay for animation effect
+    await new Promise(resolve => setTimeout(resolve, 300))
+
+    const hasAdvancedOptions = Object.values(rollOptions.value).some(option => option)
+
+    if (hasAdvancedOptions) {
+      currentRoll.value = rollAdvanced(diceNotation.value, {
+        advantage: rollOptions.value.advantage,
+        disadvantage: rollOptions.value.disadvantage,
+        exploding: rollOptions.value.exploding,
+        rerollOnes: rollOptions.value.rerollOnes,
+        dropLowest: rollOptions.value.dropLowest,
+        dropHighest: rollOptions.value.dropHighest,
+        context: 'Manual roll'
+      })
+    } else {
+      currentRoll.value = rollDiceUtil({
+        notation: diceNotation.value,
+        context: 'Manual roll',
+        advantage: rollOptions.value.advantage,
+        disadvantage: rollOptions.value.disadvantage
+      })
+    }
+
+    // Update history
+    updateHistory()
+  } catch (error) {
+    console.error('❌ Error rolling dice:', error)
+    validationError.value = error instanceof Error ? error.message : 'Erro desconhecido'
+  } finally {
+    isRolling.value = false
+  }
+}
+
+const reroll = () => {
+  if (currentRoll.value) {
+    rollDice()
+  }
+}
+
+const updateHistory = () => {
+  rollHistory.value = getRollHistory(20)
+}
+
+const clearHistory = () => {
+  clearRollHistory()
+  rollHistory.value = []
+}
+
+const formatTime = (date: Date): string => {
+  return new Intl.DateTimeFormat('pt-BR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  }).format(new Date(date))
+}
+
+// Initialize history
+updateHistory()
+
+console.log('🎲 Advanced DiceRoller component loaded')
 </script>
 
 <style scoped>
-/* Tailwind classes will be applied directly in template */
+/* Tailwind classes applied directly in template */
 </style>
