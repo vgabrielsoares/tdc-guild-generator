@@ -4,7 +4,9 @@
     <div v-if="showInstallPrompt"
       class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-guild-800 border border-guild-600 rounded-lg p-4 shadow-lg z-50">
       <div class="flex items-start space-x-3">
-        <div class="text-2xl">📱</div>
+        <div class="text-2xl">
+          <font-awesome-icon icon="globe" class="text-blue-400" />
+        </div>
         <div class="flex-1">
           <h3 class="font-semibold text-white mb-1">Instalar Aplicativo</h3>
           <p class="text-sm text-gray-300 mb-3">
