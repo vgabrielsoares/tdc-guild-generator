@@ -152,3 +152,5 @@ pids
 .env.test.local
 .env.production.local
 .env.local
+
+DEVELOPMENT_PLAN.md
