@@ -9,6 +9,70 @@ import type {
 } from "@/types/tables";
 import { rollDice } from "./dice";
 
+const logTable = {
+  warn: (message: string, ...args: unknown[]) => {
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.warn(`[TABLE ROLLER] ${message}`, ...args);
+    }
+  },
+  info: (message: string, ...args: unknown[]) => {
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.log(`[TABLE ROLLER] ${message}`, ...args);
+    }
+  },
+};
+
+// Dice notation selection thresholds
+const DICE_THRESHOLDS = {
+  D6_MAX: 6,
+  D8_MAX: 8,
+  D10_MAX: 10,
+  D12_MAX: 12,
+  D20_MAX: 20,
+  D100_MAX: 100,
+  // For larger ranges using multiple dice
+  MULTI_DICE_2D6_RANGE: 36,
+} as const;
+
+// Dice notation mappings
+const DICE_NOTATIONS = {
+  D6: "1d6",
+  D8: "1d8",
+  D10: "1d10",
+  D12: "1d12",
+  D20: "1d20",
+  D100: "1d100",
+  MULTI_2D6: "2d6",
+  MULTI_2D20: "2d20",
+} as const;
+
+/**
+ * Determine appropriate dice notation based on table range
+ */
+function getDiceNotationForRange(maxValue: number, range: number): string {
+  if (maxValue <= DICE_THRESHOLDS.D6_MAX) {
+    return DICE_NOTATIONS.D6;
+  } else if (maxValue <= DICE_THRESHOLDS.D8_MAX) {
+    return DICE_NOTATIONS.D8;
+  } else if (maxValue <= DICE_THRESHOLDS.D10_MAX) {
+    return DICE_NOTATIONS.D10;
+  } else if (maxValue <= DICE_THRESHOLDS.D12_MAX) {
+    return DICE_NOTATIONS.D12;
+  } else if (maxValue <= DICE_THRESHOLDS.D20_MAX) {
+    return DICE_NOTATIONS.D20;
+  } else if (maxValue <= DICE_THRESHOLDS.D100_MAX) {
+    return DICE_NOTATIONS.D100;
+  } else {
+    if (range <= DICE_THRESHOLDS.MULTI_DICE_2D6_RANGE) {
+      return DICE_NOTATIONS.MULTI_2D6;
+    } else {
+      return DICE_NOTATIONS.MULTI_2D20;
+    }
+  }
+}
+
 /**
  * Roll on a standard range table (e.g., 1-6, 1-20, etc.)
  */
@@ -32,40 +96,20 @@ export function rollOnTable<T>(
   // Determine the range and dice needed
   const minValue = Math.min(...table.map((entry) => entry.min));
   const maxValue = Math.max(...table.map((entry) => entry.max));
+  const range = maxValue - minValue + 1;
 
   // Determine appropriate dice notation
-  let diceNotation: string;
-  if (maxValue <= 6) {
-    diceNotation = "1d6";
-  } else if (maxValue <= 8) {
-    diceNotation = "1d8";
-  } else if (maxValue <= 10) {
-    diceNotation = "1d10";
-  } else if (maxValue <= 12) {
-    diceNotation = "1d12";
-  } else if (maxValue <= 20) {
-    diceNotation = "1d20";
-  } else if (maxValue <= 100) {
-    diceNotation = "1d100";
-  } else {
-    // For larger ranges, calculate appropriate dice
-    const range = maxValue - minValue + 1;
-    if (range <= 36) {
-      diceNotation = "2d6";
-    } else {
-      diceNotation = "2d20";
-    }
-  }
+  const diceNotation = getDiceNotationForRange(maxValue, range);
 
   // Add modifier to dice notation if present
-  if (totalModifier !== 0) {
-    diceNotation +=
-      totalModifier > 0 ? `+${totalModifier}` : `${totalModifier}`;
-  }
+  const finalDiceNotation =
+    totalModifier !== 0
+      ? `${diceNotation}${totalModifier > 0 ? `+${totalModifier}` : `${totalModifier}`}`
+      : diceNotation;
 
   // Roll the dice
   const diceRoll = rollDice({
-    notation: diceNotation,
+    notation: finalDiceNotation,
     context: "Table roll",
     logRoll: true,
   });
@@ -78,8 +122,8 @@ export function rollOnTable<T>(
   );
 
   if (!matchingEntry) {
-    console.warn(
-      `[TABLE ROLLER] No table entry found for roll ${finalRoll} (range: ${minValue}-${maxValue})`
+    logTable.warn(
+      `No table entry found for roll ${finalRoll} (range: ${minValue}-${maxValue})`
     );
     // Use the closest entry as fallback
     const closest = table.reduce((prev, curr) => {
@@ -94,9 +138,7 @@ export function rollOnTable<T>(
       return currDistance < prevDistance ? curr : prev;
     });
 
-    console.log(
-      `[TABLE ROLLER] Using closest entry: ${JSON.stringify(closest.result)}`
-    );
+    logTable.info(`Using closest entry: ${JSON.stringify(closest.result)}`);
 
     return {
       result: closest.result,
@@ -107,8 +149,8 @@ export function rollOnTable<T>(
     };
   }
 
-  console.log(
-    `[TABLE ROLLER] Table roll: ${finalRoll} -> ${JSON.stringify(matchingEntry.result)}`
+  logTable.info(
+    `Table roll: ${finalRoll} -> ${JSON.stringify(matchingEntry.result)}`
   );
 
   return {
@@ -139,8 +181,8 @@ export function rollOnWeightedTable<T>(entries: WeightedEntry<T>[]): T {
   for (const entry of entries) {
     currentWeight += entry.weight;
     if (random <= currentWeight) {
-      console.log(
-        `[TABLE ROLLER] Weighted roll: ${entry.result} (weight: ${entry.weight}/${totalWeight})`
+      logTable.info(
+        `Weighted roll: ${entry.result} (weight: ${entry.weight}/${totalWeight})`
       );
       return entry.result;
     }
@@ -237,11 +279,32 @@ export function createTable<T>(
 }
 
 /**
+ * Parse dice notation to extract maximum range
+ */
+function getDiceMaxRange(diceNotation: string): number {
+  if (diceNotation.includes("d100")) {
+    return DICE_THRESHOLDS.D100_MAX;
+  } else if (diceNotation.includes("d20")) {
+    return DICE_THRESHOLDS.D20_MAX;
+  } else if (diceNotation.includes("d12")) {
+    return DICE_THRESHOLDS.D12_MAX;
+  } else if (diceNotation.includes("d10")) {
+    return DICE_THRESHOLDS.D10_MAX;
+  } else if (diceNotation.includes("d8")) {
+    return DICE_THRESHOLDS.D8_MAX;
+  } else if (diceNotation.includes("d6")) {
+    return DICE_THRESHOLDS.D6_MAX;
+  } else {
+    return DICE_THRESHOLDS.D100_MAX; // Default fallback
+  }
+}
+
+/**
  * Generate table from weighted entries (automatically assigns ranges)
  */
 export function generateTableFromWeights<T>(
   weightedEntries: WeightedEntry<T>[],
-  diceNotation = "1d100"
+  diceNotation = DICE_NOTATIONS.D100
 ): TableEntry<T>[] {
   if (!weightedEntries || weightedEntries.length === 0) {
     throw new Error("No weighted entries provided");
@@ -252,20 +315,8 @@ export function generateTableFromWeights<T>(
     0
   );
 
-  // Determine the range based on dice notation (simplified)
-  const maxRange = diceNotation.includes("d100")
-    ? 100
-    : diceNotation.includes("d20")
-      ? 20
-      : diceNotation.includes("d12")
-        ? 12
-        : diceNotation.includes("d10")
-          ? 10
-          : diceNotation.includes("d8")
-            ? 8
-            : diceNotation.includes("d6")
-              ? 6
-              : 100;
+  // Determine the range based on dice notation
+  const maxRange = getDiceMaxRange(diceNotation);
 
   const entries: TableEntry<T>[] = [];
   let currentMin = 1;
