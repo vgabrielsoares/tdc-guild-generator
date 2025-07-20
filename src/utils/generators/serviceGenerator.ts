@@ -1,0 +1,15 @@
+// Service Generator
+// Will be implemented in Issue 5.3
+import type { Service } from '@/types/service'
+
+/**
+ * Generate services
+ * To be implemented in Issue 5.3
+ */
+export class ServiceGenerator {
+  static generate(): Service {
+    // Placeholder implementation
+    console.log('⚔️ Generate service - to be implemented')
+    return { id: 'placeholder' } as Service
+  }
+}
