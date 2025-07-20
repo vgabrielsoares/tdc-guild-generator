@@ -162,6 +162,12 @@ export function validateTable<T>(table: TableEntry<T>[]): TableValidation {
     return { isValid: false, errors, warnings };
   }
 
+  // Create a map to track original indices for better error reporting
+  const entryIndices = new Map<TableEntry<T>, number>();
+  table.forEach((entry, index) => {
+    entryIndices.set(entry, index);
+  });
+
   // Check for valid min/max values
   for (let i = 0; i < table.length; i++) {
     const entry = table[i];
@@ -182,24 +188,27 @@ export function validateTable<T>(table: TableEntry<T>[]): TableValidation {
     }
   }
 
-  // Check for gaps and overlaps
+  // Sort entries by min value for efficient overlap/gap detection
   const sortedEntries = [...table].sort((a, b) => a.min - b.min);
 
+  // Single pass to detect overlaps and gaps
   for (let i = 0; i < sortedEntries.length - 1; i++) {
     const current = sortedEntries[i];
     const next = sortedEntries[i + 1];
+    const currentIndex = entryIndices.get(current)!;
+    const nextIndex = entryIndices.get(next)!;
 
     // Check for overlaps
     if (current.max >= next.min) {
       errors.push(
-        `Overlap between entries: [${current.min}-${current.max}] and [${next.min}-${next.max}]`
+        `Overlap between entries ${currentIndex} and ${nextIndex}: [${current.min}-${current.max}] and [${next.min}-${next.max}]`
       );
     }
 
     // Check for gaps
     if (current.max + 1 < next.min) {
       warnings.push(
-        `Gap between entries: ${current.max + 1} to ${next.min - 1}`
+        `Gap between entries ${currentIndex} and ${nextIndex}: ${current.max + 1} to ${next.min - 1}`
       );
     }
   }
