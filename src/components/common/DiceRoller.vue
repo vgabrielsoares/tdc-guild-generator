@@ -33,11 +33,11 @@
       <!-- Advanced Options -->
       <div class="flex flex-wrap gap-3 text-sm">
         <label class="flex items-center text-gray-300">
-          <input v-model="rollOptions.advantage" type="checkbox" class="mr-1" />
+          <input v-model="rollOptions.advantage" @change="handleAdvantageChange" type="checkbox" class="mr-1" />
           Vantagem
         </label>
         <label class="flex items-center text-gray-300">
-          <input v-model="rollOptions.disadvantage" type="checkbox" class="mr-1" />
+          <input v-model="rollOptions.disadvantage" @change="handleDisadvantageChange" type="checkbox" class="mr-1" />
           Desvantagem
         </label>
         <label class="flex items-center text-gray-300">
@@ -87,14 +87,14 @@
     </div>
 
     <!-- Validation Error -->
-    <div v-if="validationError" class="mt-4 p-3 bg-red-900 border border-red-600 rounded">
-      <p class="text-red-200 text-sm">{{ validationError }}</p>
+    <div v-if="currentValidationError" class="mt-4 p-3 bg-red-900 border border-red-600 rounded">
+      <p class="text-red-200 text-sm">{{ currentValidationError }}</p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import {
   rollDice as rollDiceUtil,
   rollAdvanced,
@@ -132,21 +132,34 @@ const quickDiceOptions = [
 const isValidNotation = computed(() => {
   if (!diceNotation.value.trim()) return false
   const validation = parseDiceNotation(diceNotation.value)
-  validationError.value = validation.isValid ? '' : validation.error || ''
   return validation.isValid
 })
 
-// Watch for advantage/disadvantage conflict
-watch([() => rollOptions.value.advantage, () => rollOptions.value.disadvantage], () => {
-  if (rollOptions.value.advantage && rollOptions.value.disadvantage) {
-    rollOptions.value.disadvantage = false
-  }
+const currentValidationError = computed(() => {
+  if (!diceNotation.value.trim()) return ''
+  const validation = parseDiceNotation(diceNotation.value)
+  return validation.isValid ? '' : validation.error || ''
 })
+
+// Watch for advantage/disadvantage conflict
 
 // Methods
 const setQuickDice = (notation: string) => {
   diceNotation.value = notation
-  validationError.value = ''
+}
+
+const handleAdvantageChange = () => {
+  // If advantage is selected, disable disadvantage
+  if (rollOptions.value.advantage && rollOptions.value.disadvantage) {
+    rollOptions.value.disadvantage = false
+  }
+}
+
+const handleDisadvantageChange = () => {
+  // If disadvantage is selected, disable advantage
+  if (rollOptions.value.disadvantage && rollOptions.value.advantage) {
+    rollOptions.value.advantage = false
+  }
 }
 
 const rollDice = async () => {
@@ -182,7 +195,6 @@ const rollDice = async () => {
     // Update history
     updateHistory()
   } catch (error) {
-    console.error('[DICE ROLLER] Error rolling dice:', error)
     validationError.value = error instanceof Error ? error.message : 'Erro desconhecido'
   } finally {
     isRolling.value = false
