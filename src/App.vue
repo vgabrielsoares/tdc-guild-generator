@@ -1,5 +1,8 @@
 <template>
   <div id="app" class="min-h-screen bg-gray-900 text-white">
+    <!-- PWA Manager -->
+    <PWAManager />
+    
     <!-- Navigation Header -->
     <nav class="bg-guild-800 shadow-lg">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -50,6 +53,7 @@
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
+import PWAManager from '@/components/common/PWAManager.vue'
 
 const route = useRoute()
 
