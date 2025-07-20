@@ -79,7 +79,7 @@ export function rollOnTable<T>(
 
   if (!matchingEntry) {
     console.warn(
-      `⚠️ No table entry found for roll ${finalRoll} (range: ${minValue}-${maxValue})`
+      `[TABLE ROLLER] No table entry found for roll ${finalRoll} (range: ${minValue}-${maxValue})`
     );
     // Use the closest entry as fallback
     const closest = table.reduce((prev, curr) => {
@@ -94,7 +94,9 @@ export function rollOnTable<T>(
       return currDistance < prevDistance ? curr : prev;
     });
 
-    console.log(`📋 Using closest entry: ${JSON.stringify(closest.result)}`);
+    console.log(
+      `[TABLE ROLLER] Using closest entry: ${JSON.stringify(closest.result)}`
+    );
 
     return {
       result: closest.result,
@@ -106,7 +108,7 @@ export function rollOnTable<T>(
   }
 
   console.log(
-    `📋 Table roll: ${finalRoll} -> ${JSON.stringify(matchingEntry.result)}`
+    `[TABLE ROLLER] Table roll: ${finalRoll} -> ${JSON.stringify(matchingEntry.result)}`
   );
 
   return {
@@ -138,7 +140,7 @@ export function rollOnWeightedTable<T>(entries: WeightedEntry<T>[]): T {
     currentWeight += entry.weight;
     if (random <= currentWeight) {
       console.log(
-        `🎯 Weighted roll: ${entry.result} (weight: ${entry.weight}/${totalWeight})`
+        `[TABLE ROLLER] Weighted roll: ${entry.result} (weight: ${entry.weight}/${totalWeight})`
       );
       return entry.result;
     }

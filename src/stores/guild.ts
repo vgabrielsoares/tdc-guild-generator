@@ -15,10 +15,13 @@ export const useGuildStore = defineStore("guild", () => {
       const storedGuilds = localStorage.getItem("guilds");
       if (storedGuilds) {
         guilds.value = JSON.parse(storedGuilds);
-        console.log("📂 Loaded guilds from storage:", guilds.value.length);
+        console.log(
+          "[GUILD STORE] Loaded guilds from storage:",
+          guilds.value.length
+        );
       }
     } catch (error) {
-      console.error("❌ Error loading guilds from storage:", error);
+      console.error("[GUILD STORE] Error loading guilds from storage:", error);
     }
   };
 
@@ -27,7 +30,7 @@ export const useGuildStore = defineStore("guild", () => {
     try {
       localStorage.setItem("guilds", JSON.stringify(guilds.value));
     } catch (error) {
-      console.error("❌ Error saving guilds to storage:", error);
+      console.error("[GUILD STORE] Error saving guilds to storage:", error);
     }
   };
 
@@ -63,7 +66,7 @@ export const useGuildStore = defineStore("guild", () => {
       currentGuild.value = newGuild;
       lastGenerated.value = new Date();
 
-      console.log("🏰 Generated guild:", newGuild);
+      console.log("[GUILD STORE] Generated guild:", newGuild);
       return newGuild;
     } finally {
       isLoading.value = false;
@@ -72,7 +75,7 @@ export const useGuildStore = defineStore("guild", () => {
 
   const setCurrentGuild = (guild: Guild | null) => {
     currentGuild.value = guild;
-    console.log("🏰 Set current guild:", guild?.name || "None");
+    console.log("[GUILD STORE] Set current guild:", guild?.name || "None");
   };
 
   const saveGuild = (guild: Guild) => {
@@ -81,11 +84,11 @@ export const useGuildStore = defineStore("guild", () => {
     if (existingIndex >= 0) {
       // Update existing guild
       guilds.value[existingIndex] = guild;
-      console.log("💾 Updated guild:", guild.name);
+      console.log("[GUILD STORE] Updated guild:", guild.name);
     } else {
       // Add new guild
       guilds.value.unshift(guild);
-      console.log("💾 Added new guild:", guild.name);
+      console.log("[GUILD STORE] Added new guild:", guild.name);
     }
 
     // Update current guild if it's the same
@@ -98,7 +101,7 @@ export const useGuildStore = defineStore("guild", () => {
     const index = guilds.value.findIndex((g) => g.id === guildId);
     if (index >= 0) {
       const removed = guilds.value.splice(index, 1)[0];
-      console.log("�️ Removed guild:", removed.name);
+      console.log("[GUILD STORE] Removed guild:", removed.name);
 
       // Clear current guild if it was removed
       if (currentGuild.value?.id === guildId) {
@@ -111,7 +114,7 @@ export const useGuildStore = defineStore("guild", () => {
     guilds.value = [];
     currentGuild.value = null;
     lastGenerated.value = null;
-    console.log("🧹 Cleared all guilds");
+    console.log("[GUILD STORE] Cleared all guilds");
   };
 
   // Initialize data from storage

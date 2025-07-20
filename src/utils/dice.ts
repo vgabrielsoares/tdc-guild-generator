@@ -94,12 +94,12 @@ export function rollDice(config: RollConfig): DiceRoll {
     if (config.advantage) {
       individual.push(Math.max(roll1, roll2));
       console.log(
-        `🎲 Advantage roll: ${roll1}, ${roll2} -> took ${Math.max(roll1, roll2)}`
+        `[DICE] Advantage roll: ${roll1}, ${roll2} -> took ${Math.max(roll1, roll2)}`
       );
     } else if (config.disadvantage) {
       individual.push(Math.min(roll1, roll2));
       console.log(
-        `🎲 Disadvantage roll: ${roll1}, ${roll2} -> took ${Math.min(roll1, roll2)}`
+        `[DICE] Disadvantage roll: ${roll1}, ${roll2} -> took ${Math.min(roll1, roll2)}`
       );
     }
   } else {
@@ -126,7 +126,7 @@ export function rollDice(config: RollConfig): DiceRoll {
   }
 
   console.log(
-    `🎲 Rolling ${config.notation}: [${individual.join(", ")}] + ${modifier} = ${result}`
+    `[DICE] Rolling ${config.notation}: [${individual.join(", ")}] + ${modifier} = ${result}`
   );
 
   return diceRoll;
@@ -196,7 +196,7 @@ export function rollOnTable<T>(config: TableRollConfig<T>): TableRoll<T> {
 
   if (!tableEntry) {
     console.warn(
-      `⚠️ No table entry found for roll ${roll.result} (range: ${minValue}-${maxValue})`
+      `[TABLE] No table entry found for roll ${roll.result} (range: ${minValue}-${maxValue})`
     );
     // Return first entry as fallback
     return {
@@ -207,7 +207,7 @@ export function rollOnTable<T>(config: TableRollConfig<T>): TableRoll<T> {
   }
 
   console.log(
-    `📋 Table roll: ${roll.result} -> ${JSON.stringify(tableEntry.result)}`
+    `[TABLE] Table roll: ${roll.result} -> ${JSON.stringify(tableEntry.result)}`
   );
 
   return {
@@ -251,7 +251,7 @@ export function getRollHistory(limit = 20): RollLog[] {
  */
 export function clearRollHistory(): void {
   rollLogs.length = 0;
-  console.log("🧹 Cleared roll history");
+  console.log("[DICE] Cleared roll history");
 }
 
 /**
@@ -287,7 +287,7 @@ export function rollAdvanced(
           parseDiceNotation(notation).parsed!.sides
         );
         rerolled.push(newRoll);
-        console.log(`🎲 Rerolled 1 -> ${newRoll}`);
+        console.log(`[DICE] Rerolled 1 -> ${newRoll}`);
       } else {
         rerolled.push(result.individual[i]);
       }
@@ -306,7 +306,7 @@ export function rollAdvanced(
       if (exploded[i] === sides) {
         const extraRoll = rollSingleDie(sides);
         exploded.push(extraRoll);
-        console.log(`💥 Exploding dice: ${sides} -> +${extraRoll}`);
+        console.log(`[DICE] Exploding dice: ${sides} -> +${extraRoll}`);
       }
     }
 
@@ -322,7 +322,7 @@ export function rollAdvanced(
     result.individual = sorted;
     result.result =
       sorted.reduce((sum, roll) => sum + roll, 0) + result.modifier;
-    console.log(`⬇️ Dropped lowest roll`);
+    console.log(`[DICE] Dropped lowest roll`);
   }
 
   if (options.dropHighest && result.individual.length > 1) {
@@ -331,7 +331,7 @@ export function rollAdvanced(
     result.individual = sorted;
     result.result =
       sorted.reduce((sum, roll) => sum + roll, 0) + result.modifier;
-    console.log(`⬆️ Dropped highest roll`);
+    console.log(`[DICE] Dropped highest roll`);
   }
 
   return result;
