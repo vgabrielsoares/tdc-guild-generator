@@ -1,18 +1,52 @@
-// Types for table system
-// Will be implemented in Phase 2
-
 export interface TableEntry<T = any> {
-  min: number
-  max: number
-  result: T
-  weight?: number
+  min: number;
+  max: number;
+  result: T;
+  weight?: number;
+  description?: string;
+  metadata?: Record<string, any>;
 }
 
 export interface RollModifier {
-  name: string
-  value: number
-  condition?: string
+  name: string;
+  value: number;
+  condition?: string;
+  description?: string;
 }
 
-// Placeholder - to be expanded in Issue 2.2
-export type TableResult<T = any> = T
+export interface TableValidation {
+  isValid: boolean;
+  errors: string[];
+  warnings: string[];
+}
+
+export interface WeightedEntry<T = any> {
+  result: T;
+  weight: number;
+  description?: string;
+}
+
+export interface TableRollResult<T = any> {
+  result: T;
+  entry: TableEntry<T>;
+  roll: number;
+  modifiers: RollModifier[];
+  finalRoll: number;
+}
+
+export interface TableMetadata {
+  name?: string;
+  description?: string;
+  diceNotation?: string;
+  modifiers?: RollModifier[];
+  tags?: string[];
+}
+
+export interface CompleteTable<T = any> {
+  entries: TableEntry<T>[];
+  metadata: TableMetadata;
+  validation: TableValidation;
+}
+
+// Legacy type for backward compatibility
+export type TableResult<T = any> = T;
