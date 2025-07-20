@@ -39,14 +39,18 @@ const CACHE_FIRST = [
 
 // Install event - cache recursos críticos
 self.addEventListener('install', (event) => {
-  console.log('🔧 Service Worker installing...');
+  // Skip waiting to activate immediately
+  self.skipWaiting();
   
   event.waitUntil(
     Promise.all([
       // Cache recursos críticos
       caches.open(CACHE_NAME).then((cache) => {
-        console.log('📦 Caching critical resources');
-        return cache.addAll(CRITICAL_RESOURCES);
+        return cache.addAll(CRITICAL_RESOURCES).catch((error) => {
+          // Ignore errors for resources that might not exist in development
+          console.warn('Some resources could not be cached:', error);
+          return Promise.resolve();
+        });
       }),
       // Pular waiting para ativar imediatamente
       self.skipWaiting()
@@ -56,8 +60,7 @@ self.addEventListener('install', (event) => {
 
 // Activate event - limpar caches antigos
 self.addEventListener('activate', (event) => {
-  console.log('✅ Service Worker activating...');
-  
+  // Immediately claim all clients to avoid InvalidStateError
   event.waitUntil(
     Promise.all([
       // Limpar caches antigos
@@ -65,7 +68,6 @@ self.addEventListener('activate', (event) => {
         return Promise.all(
           cacheNames.map((cacheName) => {
             if (cacheName !== CACHE_NAME && cacheName !== STATIC_CACHE_NAME) {
-              console.log('🗑️ Deleting old cache:', cacheName);
               return caches.delete(cacheName);
             }
           })
@@ -119,7 +121,7 @@ async function networkFirstStrategy(request) {
     
     return networkResponse;
   } catch (error) {
-    console.log('📡 Network failed, trying cache:', request.url);
+    console.log('[SW] Network failed, trying cache:', request.url);
     const cachedResponse = await caches.match(request);
     
     if (cachedResponse) {
@@ -156,7 +158,7 @@ async function cacheFirstStrategy(request) {
     
     return networkResponse;
   } catch (error) {
-    console.log('❌ Failed to fetch resource:', request.url);
+    console.log('[SW] Failed to fetch resource:', request.url);
     throw error;
   }
 }
@@ -172,7 +174,7 @@ async function staleWhileRevalidateStrategy(request) {
     }
     return networkResponse;
   }).catch(() => {
-    console.log('📡 Network failed for:', request.url);
+    console.log('[SW] Network failed for:', request.url);
   });
   
   return cachedResponse || fetchPromise;
@@ -213,7 +215,7 @@ self.addEventListener('message', (event) => {
 
 // Background Sync para quando voltar online
 self.addEventListener('sync', (event) => {
-  console.log('🔄 Background sync triggered:', event.tag);
+  console.log('[SW] Background sync triggered:', event.tag);
   
   if (event.tag === 'guild-data-sync') {
     event.waitUntil(syncGuildData());
@@ -225,7 +227,7 @@ async function syncGuildData() {
   try {
     // Aqui seria implementada a lógica de sync
     // Por enquanto apenas log
-    console.log('📊 Syncing guild data...');
+    console.log('[SW] Syncing guild data...');
     
     // Broadcast para clientes que o sync foi completado
     const clients = await self.clients.matchAll();
@@ -236,8 +238,8 @@ async function syncGuildData() {
       });
     });
   } catch (error) {
-    console.error('❌ Sync failed:', error);
+    console.error('[SW] Sync failed:', error);
   }
 }
 
-console.log('⚔️ Guild Generator Service Worker loaded!');
+console.log('[SW] Guild Generator Service Worker loaded!');
