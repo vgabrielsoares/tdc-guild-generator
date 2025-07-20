@@ -9,14 +9,15 @@
       </p>
     </div>
 
-    <div class="bg-gray-800 rounded-lg p-8 text-center">
-      <p class="text-gray-400">
-        Em construção... Esta seção será implementada na Fase 5.
-      </p>
-    </div>
+    <!-- Service Components -->
+    <ServiceList />
   </div>
 </template>
 
 <script setup lang="ts">
+// Import service components
+import ServiceList from '@/components/services/ServiceList.vue'
+
 // Services view implementation will be added in Phase 5
+console.log('⚔️ Services View loaded')
 </script>

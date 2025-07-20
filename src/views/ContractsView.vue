@@ -9,14 +9,15 @@
       </p>
     </div>
 
-    <div class="bg-gray-800 rounded-lg p-8 text-center">
-      <p class="text-gray-400">
-        Em construção... Esta seção será implementada na Fase 4.
-      </p>
-    </div>
+    <!-- Contract Components -->
+    <ContractList />
   </div>
 </template>
 
 <script setup lang="ts">
+// Import contract components
+import ContractList from '@/components/contracts/ContractList.vue'
+
 // Contracts view implementation will be added in Phase 4
+console.log('📋 Contracts View loaded')
 </script>

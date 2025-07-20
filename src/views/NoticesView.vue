@@ -9,14 +9,15 @@
       </p>
     </div>
 
-    <div class="bg-gray-800 rounded-lg p-8 text-center">
-      <p class="text-gray-400">
-        Em construção... Esta seção será implementada na Fase 7.
-      </p>
-    </div>
+    <!-- Notice Components -->
+    <NoticeBoard />
   </div>
 </template>
 
 <script setup lang="ts">
+// Import notice components
+import NoticeBoard from '@/components/notices/NoticeBoard.vue'
+
 // Notices view implementation will be added in Phase 7
+console.log('📰 Notices View loaded')
 </script>

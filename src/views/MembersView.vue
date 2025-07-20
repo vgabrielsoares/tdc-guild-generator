@@ -9,14 +9,15 @@
       </p>
     </div>
 
-    <div class="bg-gray-800 rounded-lg p-8 text-center">
-      <p class="text-gray-400">
-        Em construção... Esta seção será implementada na Fase 6.
-      </p>
-    </div>
+    <!-- Member Components -->
+    <MemberList />
   </div>
 </template>
 
 <script setup lang="ts">
+// Import member components
+import MemberList from '@/components/members/MemberList.vue'
+
 // Members view implementation will be added in Phase 6
+console.log('👥 Members View loaded')
 </script>

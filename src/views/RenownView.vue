@@ -9,14 +9,15 @@
       </p>
     </div>
 
-    <div class="bg-gray-800 rounded-lg p-8 text-center">
-      <p class="text-gray-400">
-        Em construção... Esta seção será implementada na Fase 8.
-      </p>
-    </div>
+    <!-- Renown Components -->
+    <RenownTracker />
   </div>
 </template>
 
 <script setup lang="ts">
+// Import renown components
+import RenownTracker from '@/components/renown/RenownTracker.vue'
+
 // Renown view implementation will be added in Phase 8
+console.log('⭐ Renown View loaded')
 </script>

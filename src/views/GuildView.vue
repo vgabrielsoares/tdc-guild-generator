@@ -9,14 +9,27 @@
       </p>
     </div>
 
-    <div class="bg-gray-800 rounded-lg p-8 text-center">
-      <p class="text-gray-400">
-        Em construção... Esta seção será implementada na próxima fase.
-      </p>
+    <!-- Guild Components -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <GuildDisplay />
+      <div class="space-y-4">
+        <GuildStructure />
+        <GuildRelations />
+      </div>
     </div>
+
+    <!-- Dice Roller -->
+    <DiceRoller />
   </div>
 </template>
 
 <script setup lang="ts">
-// Guild view implementation will be added in Phase 3
+// Import guild components
+import GuildDisplay from '@/components/guild/GuildDisplay.vue'
+import GuildStructure from '@/components/guild/GuildStructure.vue'
+import GuildRelations from '@/components/guild/GuildRelations.vue'
+import DiceRoller from '@/components/common/DiceRoller.vue'
+
+// Guild store will be used in future issues
+console.log('🏰 Guild View loaded')
 </script>
