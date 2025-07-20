@@ -1,6 +1,6 @@
 // Contract Generator
 // Will be implemented in Issue 4.3
-import type { Contract } from '@/types/contract'
+import type { Contract } from "@/types/contract";
 
 /**
  * Generate contracts
@@ -9,7 +9,7 @@ import type { Contract } from '@/types/contract'
 export class ContractGenerator {
   static generate(): Contract {
     // Placeholder implementation
-    console.log('📋 Generate contract - to be implemented')
-    return { id: 'placeholder' } as Contract
+    console.log("[CONTRACT GENERATOR] Generate contract - to be implemented");
+    return { id: "placeholder" } as Contract;
   }
 }

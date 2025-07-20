@@ -1,6 +1,6 @@
 // Guild Relations Generator
 // Will be implemented in Issue 3.3
-import type { GuildRelations } from '@/types/guild'
+import type { GuildRelations } from "@/types/guild";
 
 /**
  * Generate guild relations and resources
@@ -9,7 +9,9 @@ import type { GuildRelations } from '@/types/guild'
 export class GuildRelationsGenerator {
   static generate(): GuildRelations {
     // Placeholder implementation
-    console.log('🤝 Generate guild relations - to be implemented')
-    return {} as GuildRelations
+    console.log(
+      "[GUILD RELATIONS] Generate guild relations - to be implemented"
+    );
+    return {} as GuildRelations;
   }
 }

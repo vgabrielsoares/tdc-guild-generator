@@ -7,8 +7,8 @@
  */
 export function importFromCSV(file: File): Promise<any[]> {
   // Placeholder implementation
-  console.log('📥 Import from CSV:', file.name)
-  return Promise.resolve([])
+  console.log("[CSV IMPORT] Import from CSV:", file.name);
+  return Promise.resolve([]);
 }
 
 /**
@@ -17,6 +17,6 @@ export function importFromCSV(file: File): Promise<any[]> {
  */
 export function parseCSV(csvString: string): any[] {
   // Placeholder implementation
-  console.log('🔄 Parse CSV string:', csvString.length, 'chars')
-  return []
+  console.log("[CSV IMPORT] Parse CSV string:", csvString.length, "chars");
+  return [];
 }

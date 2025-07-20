@@ -1,6 +1,6 @@
 // Renown Calculator utility
 // Will be implemented in Issue 8.3
-import type { RenownLevel } from '@/types/renown'
+import type { RenownLevel } from "@/types/renown";
 
 /**
  * Calculate renown based on actions
@@ -9,7 +9,7 @@ import type { RenownLevel } from '@/types/renown'
 export class RenownCalculator {
   static calculate(): RenownLevel {
     // Placeholder implementation
-    console.log('⭐ Calculate renown - to be implemented')
-    return {} as RenownLevel
+    console.log("[RENOWN CALCULATOR] Calculate renown - to be implemented");
+    return {} as RenownLevel;
   }
 }

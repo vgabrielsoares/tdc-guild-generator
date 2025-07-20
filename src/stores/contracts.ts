@@ -1,28 +1,28 @@
 // Contracts Store - Basic structure
 // Will be implemented in Phase 4
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import type { Contract } from '@/types/contract'
+import { defineStore } from "pinia";
+import { ref } from "vue";
+import type { Contract } from "@/types/contract";
 
-export const useContractsStore = defineStore('contracts', () => {
+export const useContractsStore = defineStore("contracts", () => {
   // State
-  const contracts = ref<Contract[]>([])
-  const isLoading = ref(false)
+  const contracts = ref<Contract[]>([]);
+  const isLoading = ref(false);
 
   // Actions (placeholder)
   const generateContracts = async () => {
-    isLoading.value = true
+    isLoading.value = true;
     try {
       // Implementation in Issue 4.3
-      console.log('📋 Generate contracts - to be implemented')
+      console.log("[CONTRACTS STORE] Generate contracts - to be implemented");
     } finally {
-      isLoading.value = false
+      isLoading.value = false;
     }
-  }
+  };
 
   return {
     contracts,
     isLoading,
-    generateContracts
-  }
-})
+    generateContracts,
+  };
+});

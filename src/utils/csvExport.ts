@@ -7,7 +7,13 @@
  */
 export function exportToCSV(data: any[], filename: string): void {
   // Placeholder implementation
-  console.log('📄 Export to CSV:', filename, 'with', data.length, 'items')
+  console.log(
+    "[CSV EXPORT] Export to CSV:",
+    filename,
+    "with",
+    data.length,
+    "items"
+  );
   // Implementation will include proper CSV formatting and download
 }
 
@@ -17,6 +23,6 @@ export function exportToCSV(data: any[], filename: string): void {
  */
 export function arrayToCSV(data: any[]): string {
   // Placeholder implementation
-  console.log('🔄 Convert array to CSV:', data.length, 'items')
-  return 'data,placeholder'
+  console.log("[CSV EXPORT] Convert array to CSV:", data.length, "items");
+  return "data,placeholder";
 }

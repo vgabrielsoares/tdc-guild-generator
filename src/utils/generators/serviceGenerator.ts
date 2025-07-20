@@ -1,6 +1,6 @@
 // Service Generator
 // Will be implemented in Issue 5.3
-import type { Service } from '@/types/service'
+import type { Service } from "@/types/service";
 
 /**
  * Generate services
@@ -9,7 +9,7 @@ import type { Service } from '@/types/service'
 export class ServiceGenerator {
   static generate(): Service {
     // Placeholder implementation
-    console.log('⚔️ Generate service - to be implemented')
-    return { id: 'placeholder' } as Service
+    console.log("[SERVICE GENERATOR] Generate service - to be implemented");
+    return { id: "placeholder" } as Service;
   }
 }

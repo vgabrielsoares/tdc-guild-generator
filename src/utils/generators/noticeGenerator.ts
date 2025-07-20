@@ -1,6 +1,6 @@
 // Notice Generator
 // Will be implemented in Issue 7.3
-import type { Notice } from '@/types/notice'
+import type { Notice } from "@/types/notice";
 
 /**
  * Generate notices for the board
@@ -9,7 +9,7 @@ import type { Notice } from '@/types/notice'
 export class NoticeGenerator {
   static generate(): Notice {
     // Placeholder implementation
-    console.log('📰 Generate notice - to be implemented')
-    return { id: 'placeholder' } as Notice
+    console.log("[NOTICE GENERATOR] Generate notice - to be implemented");
+    return { id: "placeholder" } as Notice;
   }
 }
