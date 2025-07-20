@@ -48,26 +48,15 @@
     </div>
 
     <!-- Current Roll Result -->
-    <div v-if="currentRoll" class="mb-6 p-4 bg-gray-700 rounded border-l-4 border-amber-500">
-      <div class="flex items-center justify-between mb-2">
-        <span class="text-lg font-bold text-white">{{ currentRoll.notation }}</span>
-        <span class="text-2xl font-bold text-amber-400">{{ currentRoll.result }}</span>
-      </div>
-      <div class="text-sm text-gray-300">
-        <div>Dados: [{{ currentRoll.individual.join(', ') }}]</div>
-        <div v-if="currentRoll.modifier !== 0">
-          Modificador: {{ currentRoll.modifier > 0 ? '+' : '' }}{{ currentRoll.modifier }}
-        </div>
-        <div class="text-xs text-gray-400 mt-1">
-          {{ formatTime(currentRoll.timestamp) }}
-        </div>
-      </div>
-      <button @click="reroll"
-        class="mt-2 px-3 py-1 text-xs bg-amber-600 hover:bg-amber-700 text-white rounded transition-colors flex items-center gap-1">
-        <font-awesome-icon icon="arrows-rotate" />
-        Rolar Novamente
-      </button>
-    </div>
+    <RollResult 
+      v-if="currentRoll" 
+      :roll="currentRoll"
+      :is-new="true"
+      :show-actions="true"
+      :can-reroll="true"
+      class="mb-6"
+      @reroll="reroll"
+    />
 
     <!-- Roll History -->
     <div v-if="rollHistory.length > 0">
@@ -84,17 +73,16 @@
       </div>
 
       <div class="space-y-2 max-h-48 overflow-y-auto">
-        <div v-for="roll in rollHistory.slice(0, 10)" :key="roll.id"
-          class="flex items-center justify-between p-2 bg-gray-700 rounded text-sm">
-          <div class="flex-1">
-            <span class="text-white font-medium">{{ roll.notation }}</span>
-            <span v-if="roll.context" class="text-gray-400 ml-2">({{ roll.context }})</span>
-          </div>
-          <div class="text-right">
-            <div class="text-amber-400 font-bold">{{ roll.result }}</div>
-            <div class="text-xs text-gray-400">{{ formatTime(roll.timestamp) }}</div>
-          </div>
-        </div>
+        <RollResult
+          v-for="roll in rollHistory.slice(0, 10)" 
+          :key="roll.id"
+          :roll="roll"
+          :is-new="false"
+          :show-actions="true"
+          :can-reroll="true"
+          :size="'sm'"
+          @reroll="rerollFromHistory(roll)"
+        />
       </div>
     </div>
 
@@ -115,6 +103,7 @@ import {
   clearRollHistory
 } from '@/utils/dice'
 import type { DiceRoll, RollLog } from '@/types/dice'
+import RollResult from './RollResult.vue'
 
 // State
 const diceNotation = ref('1d20')
@@ -206,6 +195,11 @@ const reroll = () => {
   }
 }
 
+const rerollFromHistory = (roll: RollLog) => {
+  diceNotation.value = roll.notation
+  rollDice()
+}
+
 const updateHistory = () => {
   rollHistory.value = getRollHistory(20)
 }
@@ -215,18 +209,8 @@ const clearHistory = () => {
   rollHistory.value = []
 }
 
-const formatTime = (date: Date): string => {
-  return new Intl.DateTimeFormat('pt-BR', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
-  }).format(new Date(date))
-}
-
 // Initialize history
 updateHistory()
-
-console.log('[DICE ROLLER] Advanced DiceRoller component loaded')
 </script>
 
 <style scoped>
