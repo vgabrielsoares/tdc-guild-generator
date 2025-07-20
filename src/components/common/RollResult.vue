@@ -15,12 +15,12 @@
 
     <!-- Roll Details -->
     <div class="text-sm text-gray-400 space-y-1">
-      <div v-if="roll.individual.length > 1 || showDetails">
+      <div v-if="(roll.individual && roll.individual.length > 1) || showDetails">
         <span class="mr-1">Dados:</span>
-        <span class="font-mono">[{{ roll.individual.join(', ') }}]</span>
+        <span class="font-mono">[{{ roll.individual?.join(', ') || '-' }}]</span>
       </div>
 
-      <div v-if="roll.modifier !== 0">
+      <div v-if="roll.modifier !== undefined && roll.modifier !== 0">
         <span class="mr-1">Modificador:</span>
         <span class="font-mono">{{ roll.modifier > 0 ? '+' : '' }}{{ roll.modifier }}</span>
       </div>
@@ -52,11 +52,11 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { DiceRoll } from '@/types/dice'
+import type { DiceRoll, RollLog } from '@/types/dice'
 
 // Props
 interface Props {
-  roll: DiceRoll
+  roll: DiceRoll | RollLog
   context?: string
   variant?: 'default' | 'success' | 'warning' | 'danger'
   size?: 'sm' | 'md' | 'lg'
