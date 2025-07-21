@@ -3,6 +3,8 @@ import type {
   GuildResources,
   GuildVisitors,
   SettlementType,
+} from "@/types/guild";
+import {
   RelationLevel,
   ResourceLevel,
   VisitorLevel,
@@ -59,7 +61,7 @@ export function generateGovernmentRelations(
     "GUILD RELATIONS",
     `Government: ${result.result} (rolled ${result.finalRoll})`
   );
-  return result.result as RelationLevel;
+  return stringToRelationLevel(result.result);
 }
 
 /**
@@ -84,7 +86,7 @@ export function generatePopulationRelations(
     "GUILD RELATIONS",
     `Population: ${result.result} (rolled ${result.finalRoll})`
   );
-  return result.result as RelationLevel;
+  return stringToRelationLevel(result.result);
 }
 
 /**
@@ -109,7 +111,7 @@ export function generateResourceLevel(
     "GUILD RESOURCES",
     `Level: ${result.result} (rolled ${result.finalRoll})`
   );
-  return result.result as ResourceLevel;
+  return stringToResourceLevel(result.result);
 }
 
 /**
@@ -145,6 +147,61 @@ export function generateResourceSpecialties(
   }
 
   return specialties;
+}
+
+/**
+ * Convert string result to RelationLevel enum
+ */
+function stringToRelationLevel(value: string): RelationLevel {
+  const mapping: Record<string, RelationLevel> = {
+    'Hostil': RelationLevel.HOSTIL,
+    'Suspeita': RelationLevel.SUSPEITA,
+    'Indiferente': RelationLevel.INDIFERENTE,
+    'Tolerante': RelationLevel.TOLERANTE,
+    'Cooperativa': RelationLevel.COOPERATIVA,
+    'Aliada': RelationLevel.ALIADA,
+    'Temida': RelationLevel.TEMIDA,
+    'Desconfiada': RelationLevel.DESCONFIADA,
+    'Respeitada': RelationLevel.RESPEITADA,
+    'Admirada': RelationLevel.ADMIRADA,
+    'Reverenciada': RelationLevel.REVERENCIADA,
+  };
+  
+  return mapping[value] || RelationLevel.INDIFERENTE;
+}
+
+/**
+ * Convert string result to ResourceLevel enum
+ */
+function stringToResourceLevel(value: string): ResourceLevel {
+  const mapping: Record<string, ResourceLevel> = {
+    'Escassos': ResourceLevel.ESCASSOS,
+    'Limitados': ResourceLevel.LIMITADOS,
+    'Básicos': ResourceLevel.BÁSICOS,
+    'Adequados': ResourceLevel.ADEQUADOS,
+    'Abundantes': ResourceLevel.ABUNDANTES,
+    'Vastos': ResourceLevel.VASTOS,
+    'Lendários': ResourceLevel.LENDARIOS,
+  };
+  
+  return mapping[value] || ResourceLevel.ADEQUADOS;
+}
+
+/**
+ * Convert string result to VisitorLevel enum
+ */
+function stringToVisitorLevel(value: string): VisitorLevel {
+  const mapping: Record<string, VisitorLevel> = {
+    'Vazia': VisitorLevel.VAZIA,
+    'Quase deserta': VisitorLevel.QUASE_DESERTA,
+    'Pouco movimentada': VisitorLevel.POUCO_MOVIMENTADA,
+    'Nem muito nem pouco': VisitorLevel.NEM_MUITO_NEM_POUCO,
+    'Muito frequentada': VisitorLevel.MUITO_FREQUENTADA,
+    'Abarrotada': VisitorLevel.ABARROTADA,
+    'Lotada': VisitorLevel.LOTADA,
+  };
+  
+  return mapping[value] || VisitorLevel.NEM_MUITO_NEM_POUCO;
 }
 
 /**
@@ -185,8 +242,8 @@ export function generateVisitorLevel(
     `Frequency: ${result.result} (rolled ${result.finalRoll})`
   );
 
-  // Return the direct result from the table without mapping
-  return result.result;
+  // Convert string result to VisitorLevel enum
+  return stringToVisitorLevel(result.result);
 }
 
 /**

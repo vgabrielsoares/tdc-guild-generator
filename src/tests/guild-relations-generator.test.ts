@@ -72,7 +72,7 @@ describe("Issue 3.3 - Guild Relations Generator", () => {
     });
 
     it("should generate visitor types based on level", () => {
-      const result = generateVisitorTypes(VisitorLevel.MODERADO);
+      const result = generateVisitorTypes(VisitorLevel.NEM_MUITO_NEM_POUCO);
       expect(Array.isArray(result)).toBe(true);
       expect(result.length).toBeGreaterThan(0);
       expect(result.every((type) => typeof type === "string")).toBe(true);
