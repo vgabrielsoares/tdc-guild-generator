@@ -4,8 +4,8 @@ import {
   generateHeadquartersSize,
   generateHeadquartersCharacteristics,
   generateEmployees,
-  generateGovernmentRelations,
-  generatePopulationRelations,
+  generateStructureGovernmentRelations,
+  generateStructurePopulationRelations,
   generateVisitors,
   generateResources
 } from '../utils/generators/guildStructure';
@@ -48,7 +48,7 @@ describe('Issue 3.2 - Guild Structure Generator', () => {
     });
 
     it('should generate government relations with valid enum', () => {
-      const result = generateGovernmentRelations();
+      const result = generateStructureGovernmentRelations();
       
       expect(Object.values(RelationLevel)).toContain(result.relation);
       expect(result.roll).toBeTypeOf('number');
@@ -57,7 +57,7 @@ describe('Issue 3.2 - Guild Structure Generator', () => {
     });
 
     it('should generate population relations with valid enum', () => {
-      const result = generatePopulationRelations();
+      const result = generateStructurePopulationRelations();
       
       expect(Object.values(RelationLevel)).toContain(result.relation);
       expect(result.roll).toBeTypeOf('number');

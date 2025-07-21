@@ -5,8 +5,6 @@ import type {
 } from "../../types/guild";
 import {
   ResourceLevel,
-  VisitorLevel,
-  RelationLevel,
   SettlementType,
 } from "../../types/guild";
 import { rollDice } from "../dice";
@@ -99,9 +97,9 @@ export function generateEmployees(): { employees: string; roll: number } {
 }
 
 /**
- * Generates government relations
+ * Generates government relations for guild structure
  */
-export function generateGovernmentRelations(modifier: number = 0): {
+export function generateStructureGovernmentRelations(modifier: number = 0): {
   relation: string;
   roll: number;
 } {
@@ -114,9 +112,9 @@ export function generateGovernmentRelations(modifier: number = 0): {
 }
 
 /**
- * Generates population relations
+ * Generates population relations for guild structure
  */
-export function generatePopulationRelations(modifier: number = 0): {
+export function generateStructurePopulationRelations(modifier: number = 0): {
   relation: string;
   roll: number;
 } {
@@ -305,14 +303,14 @@ export function generateGuildStructure(
   );
 
   // Step 5: Generate relations with modifiers
-  const governmentResult = generateGovernmentRelations(
+  const governmentResult = generateStructureGovernmentRelations(
     modifiers.governmentModifier
   );
   logs.push(
     `Government relations: ${governmentResult.roll} -> ${governmentResult.relation}`
   );
 
-  const populationResult = generatePopulationRelations(
+  const populationResult = generateStructurePopulationRelations(
     modifiers.populationModifier
   );
   logs.push(
@@ -330,6 +328,8 @@ export function generateGuildStructure(
 
   // Create the guild object
   const guild: Guild = {
+    id: `temp_${Date.now()}`,
+    name: "Guilda Temporária",
     structure: {
       size: sizeResult.size,
       characteristics: characteristicsResult.characteristics,
