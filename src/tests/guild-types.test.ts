@@ -242,6 +242,8 @@ describe("Issue 3.1 - Guild TypeScript Types", () => {
   describe("Zod Schema Validation", () => {
     it("should validate valid guild with GuildSchema", () => {
       const validGuild = {
+        id: "test-guild-id",
+        name: "Guilda de Teste",
         structure: {
           size: "Pequena (5m x 5m)",
           characteristics: ["Bem conservada"],
@@ -260,6 +262,7 @@ describe("Issue 3.1 - Guild TypeScript Types", () => {
           level: ResourceLevel.ADEQUADOS,
         },
         settlementType: SettlementType.ALDEIA,
+        createdAt: new Date(),
       };
 
       const result = GuildSchema.safeParse(validGuild);
@@ -310,6 +313,8 @@ describe("Issue 3.1 - Guild TypeScript Types", () => {
   describe("Type Guards", () => {
     it("should correctly identify valid Guild objects", () => {
       const validGuild = {
+        id: "test-guild-id",
+        name: "Guilda de Teste",
         structure: {
           size: "Média (10m x 10m)",
           characteristics: ["Moderna"],
@@ -328,6 +333,7 @@ describe("Issue 3.1 - Guild TypeScript Types", () => {
           level: ResourceLevel.ADEQUADOS,
         },
         settlementType: SettlementType.CIDADE_PEQUENA,
+        createdAt: new Date(),
       };
 
       expect(isGuild(validGuild)).toBe(true);
@@ -350,6 +356,8 @@ describe("Issue 3.1 - Guild TypeScript Types", () => {
   describe("Utility Functions", () => {
     it("should create guild with createGuild function", () => {
       const guildData = {
+        id: "test-guild-id",
+        name: "Guilda de Teste",
         structure: {
           size: "Grande (15m x 15m)",
           characteristics: ["Luxuosa", "Segura"],
@@ -368,6 +376,7 @@ describe("Issue 3.1 - Guild TypeScript Types", () => {
           level: ResourceLevel.ABUNDANTES,
         },
         settlementType: SettlementType.METROPOLE,
+        createdAt: new Date(),
       };
 
       const guild = createGuild(guildData);
