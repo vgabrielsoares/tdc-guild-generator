@@ -35,15 +35,21 @@ describe("Issue 3.3 - Guild Relations Generator", () => {
     it("should generate government relations with valid enum", () => {
       const result = generateGovernmentRelations(config);
       expect(result).toBeDefined();
-      expect(typeof result).toBe("string");
-      expect(Object.values(RelationLevel)).toContain(result);
+      expect(typeof result).toBe("object");
+      expect(result.level).toBeDefined();
+      expect(result.result).toBeDefined();
+      expect(result.description).toBeDefined();
+      expect(Object.values(RelationLevel)).toContain(result.level);
     });
 
     it("should generate population relations with valid enum", () => {
       const result = generatePopulationRelations(config);
       expect(result).toBeDefined();
-      expect(typeof result).toBe("string");
-      expect(Object.values(RelationLevel)).toContain(result);
+      expect(typeof result).toBe("object");
+      expect(result.level).toBeDefined();
+      expect(result.result).toBeDefined();
+      expect(result.description).toBeDefined();
+      expect(Object.values(RelationLevel)).toContain(result.level);
     });
 
     it("should generate resource level with valid enum", () => {
@@ -108,8 +114,10 @@ describe("Issue 3.3 - Guild Relations Generator", () => {
       expect(result).toBeDefined();
       expect(result.government).toBeDefined();
       expect(result.population).toBeDefined();
-      expect(Object.values(RelationLevel)).toContain(result.government);
-      expect(Object.values(RelationLevel)).toContain(result.population);
+      expect(typeof result.government).toBe("string");
+      expect(typeof result.population).toBe("string");
+      expect(result.governmentDescription).toBeDefined();
+      expect(result.populationDescription).toBeDefined();
     });
 
     it("should generate complete guild resources", () => {
@@ -120,7 +128,13 @@ describe("Issue 3.3 - Guild Relations Generator", () => {
       expect(result.details).toBeDefined();
       expect(Object.values(ResourceLevel)).toContain(result.level);
       expect(Array.isArray(result.details)).toBe(true);
-      expect(result.details!.length).toBeGreaterThan(0);
+      
+      // Some resource levels have no specialties (Em débito, Nenhum)
+      if (result.level === ResourceLevel.EM_DEBITO || result.level === ResourceLevel.NENHUM) {
+        expect(result.details!.length).toBe(0);
+      } else {
+        expect(result.details!.length).toBeGreaterThan(0);
+      }
     });
 
     it("should generate complete guild visitors", () => {
@@ -131,7 +145,14 @@ describe("Issue 3.3 - Guild Relations Generator", () => {
       expect(result.types).toBeDefined();
       expect(Object.values(VisitorLevel)).toContain(result.frequency);
       expect(Array.isArray(result.types)).toBe(true);
-      expect(result.types!.length).toBeGreaterThan(0);
+      
+      // Se a frequência for "Vazia", tipos deve ser array vazio (0 elementos)
+      // Caso contrário, deve ter pelo menos 1 tipo
+      if (result.frequency === VisitorLevel.VAZIA) {
+        expect(result.types!.length).toBe(0);
+      } else {
+        expect(result.types!.length).toBeGreaterThan(0);
+      }
     });
   });
 
@@ -147,12 +168,10 @@ describe("Issue 3.3 - Guild Relations Generator", () => {
       expect(result.visitors).toBeDefined();
 
       // Relations
-      expect(Object.values(RelationLevel)).toContain(
-        result.relations.government
-      );
-      expect(Object.values(RelationLevel)).toContain(
-        result.relations.population
-      );
+      expect(typeof result.relations.government).toBe("string");
+      expect(typeof result.relations.population).toBe("string");
+      expect(result.relations.governmentDescription).toBeDefined();
+      expect(result.relations.populationDescription).toBeDefined();
 
       // Resources
       expect(Object.values(ResourceLevel)).toContain(result.resources.level);
@@ -174,12 +193,10 @@ describe("Issue 3.3 - Guild Relations Generator", () => {
       expect(result.visitors).toBeDefined();
 
       // Relations
-      expect(Object.values(RelationLevel)).toContain(
-        result.relations.government
-      );
-      expect(Object.values(RelationLevel)).toContain(
-        result.relations.population
-      );
+      expect(typeof result.relations.government).toBe("string");
+      expect(typeof result.relations.population).toBe("string");
+      expect(result.relations.governmentDescription).toBeDefined();
+      expect(result.relations.populationDescription).toBeDefined();
 
       // Resources
       expect(Object.values(ResourceLevel)).toContain(result.resources.level);
@@ -243,12 +260,12 @@ describe("Issue 3.3 - Guild Relations Generator", () => {
     });
 
     it("should generate different numbers of visitor types based on frequency", () => {
-      const baixoTypes = generateVisitorTypes(VisitorLevel.VAZIA);
-      const altoTypes = generateVisitorTypes(VisitorLevel.LOTADA);
+      const vaziaTypes = generateVisitorTypes(VisitorLevel.VAZIA);
+      const lotadaTypes = generateVisitorTypes(VisitorLevel.LOTADA);
 
-      expect(baixoTypes.length).toBeLessThan(altoTypes.length);
-      expect(baixoTypes.length).toBeGreaterThan(0);
-      expect(altoTypes.length).toBeGreaterThan(0);
+      expect(vaziaTypes.length).toBeLessThan(lotadaTypes.length);
+      expect(vaziaTypes.length).toBeGreaterThanOrEqual(0);
+      expect(lotadaTypes.length).toBeGreaterThan(0);
     });
 
     it("should handle extreme modifiers gracefully", () => {

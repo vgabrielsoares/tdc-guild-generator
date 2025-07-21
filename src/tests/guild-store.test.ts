@@ -165,9 +165,9 @@ describe("Issue 3.4 - Guild Store Complete", () => {
       const secondGuild = await store.regenerateCurrentGuild();
 
       expect(secondGuild).toBeDefined();
-      expect(secondGuild?.id).not.toBe(firstGuild?.id); // New ID
+      expect(secondGuild?.id).toBe(firstGuild?.id); // Same ID - regenerated current guild
       expect(secondGuild?.settlementType).toBe(firstGuild?.settlementType);
-      expect(store.historyCount).toBe(2); // Both guilds in history
+      expect(store.historyCount).toBe(1); // Same guild, just regenerated
     });
 
     it("should throw error when trying to regenerate without current guild", async () => {

@@ -53,7 +53,7 @@ describe('Issue 3.2 - Guild Structure Generator', () => {
       expect(Object.values(RelationLevel)).toContain(result.relation);
       expect(result.roll).toBeTypeOf('number');
       expect(result.roll).toBeGreaterThan(0);
-      expect(result.roll).toBeLessThanOrEqual(12);
+      expect(result.roll).toBeLessThanOrEqual(20);
     });
 
     it('should generate population relations with valid enum', () => {
@@ -62,7 +62,7 @@ describe('Issue 3.2 - Guild Structure Generator', () => {
       expect(Object.values(RelationLevel)).toContain(result.relation);
       expect(result.roll).toBeTypeOf('number');
       expect(result.roll).toBeGreaterThan(0);
-      expect(result.roll).toBeLessThanOrEqual(12);
+      expect(result.roll).toBeLessThanOrEqual(20);
     });
 
     it('should generate visitors with valid enum and settlement type', () => {

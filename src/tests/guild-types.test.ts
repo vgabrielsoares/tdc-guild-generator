@@ -49,17 +49,13 @@ describe("Issue 3.1 - Guild TypeScript Types", () => {
     });
 
     it("should have correct RelationLevel values", () => {
-      expect(RelationLevel.HOSTIL).toBe("Hostil");
-      expect(RelationLevel.SUSPEITA).toBe("Suspeita");
-      expect(RelationLevel.INDIFERENTE).toBe("Indiferente");
-      expect(RelationLevel.TOLERANTE).toBe("Tolerante");
-      expect(RelationLevel.COOPERATIVA).toBe("Cooperativa");
-      expect(RelationLevel.ALIADA).toBe("Aliada");
-      expect(RelationLevel.TEMIDA).toBe("Temida");
-      expect(RelationLevel.DESCONFIADA).toBe("Desconfiada");
-      expect(RelationLevel.RESPEITADA).toBe("Respeitada");
-      expect(RelationLevel.ADMIRADA).toBe("Admirada");
-      expect(RelationLevel.REVERENCIADA).toBe("Reverenciada");
+      expect(RelationLevel.PESSIMA).toBe("Péssima");
+      expect(RelationLevel.RUIM).toBe("Ruim");
+      expect(RelationLevel.DIPLOMATICA).toBe("Diplomática");
+      expect(RelationLevel.OPINIAO_DIVIDIDA).toBe("Opinião dividida");
+      expect(RelationLevel.BOA).toBe("Boa");
+      expect(RelationLevel.MUITO_BOA).toBe("Muito boa, cooperam frequentemente");
+      expect(RelationLevel.EXCELENTE).toBe("Excelente, governo e guilda são quase como um");
     });
 
     it("should have correct SettlementType values", () => {
@@ -90,13 +86,13 @@ describe("Issue 3.1 - Guild TypeScript Types", () => {
   describe("Guild Relations Interface", () => {
     it("should create valid GuildRelations object", () => {
       const relations: GuildRelations = {
-        government: RelationLevel.INDIFERENTE,
-        population: RelationLevel.RESPEITADA,
+        government: RelationLevel.DIPLOMATICA,
+        population: RelationLevel.BOA,
         notes: "Relações estáveis",
       };
 
-      expect(relations.government).toBe(RelationLevel.INDIFERENTE);
-      expect(relations.population).toBe(RelationLevel.RESPEITADA);
+      expect(relations.government).toBe(RelationLevel.DIPLOMATICA);
+      expect(relations.population).toBe(RelationLevel.BOA);
       expect(relations.notes).toBe("Relações estáveis");
     });
   });
@@ -153,14 +149,14 @@ describe("Issue 3.1 - Guild TypeScript Types", () => {
           characteristics: ["Bem conservada"],
         },
         relations: {
-          government: RelationLevel.INDIFERENTE,
-          population: RelationLevel.RESPEITADA,
+          government: RelationLevel.DIPLOMATICA,
+          population: RelationLevel.BOA,
         },
         staff: {
           employees: "1d6+2 funcionários",
         },
         visitors: {
-          frequency: VisitorLevel.POUCO_MOVIMENTADA,
+          frequency: VisitorLevel.NEM_MUITO_NEM_POUCO,
         },
         resources: {
           level: ResourceLevel.SUFICIENTES,
@@ -205,8 +201,8 @@ describe("Issue 3.1 - Guild TypeScript Types", () => {
             characteristics: ["Luxuosa", "Fortificada"],
           },
           relations: {
-            government: RelationLevel.ALIADA,
-            population: RelationLevel.ADMIRADA,
+            government: RelationLevel.EXCELENTE,
+            population: RelationLevel.MUITO_BOA,
           },
           staff: {
             employees: "2d6+5 funcionários experientes",
@@ -253,14 +249,14 @@ describe("Issue 3.1 - Guild TypeScript Types", () => {
           characteristics: ["Bem conservada"],
         },
         relations: {
-          government: RelationLevel.INDIFERENTE,
-          population: RelationLevel.RESPEITADA,
+          government: RelationLevel.DIPLOMATICA,
+          population: RelationLevel.BOA,
         },
         staff: {
           employees: "1d4+1 funcionários",
         },
         visitors: {
-          frequency: VisitorLevel.POUCO_MOVIMENTADA,
+          frequency: VisitorLevel.NEM_MUITO_NEM_POUCO,
         },
         resources: {
           level: ResourceLevel.SUFICIENTES,
@@ -281,13 +277,13 @@ describe("Issue 3.1 - Guild TypeScript Types", () => {
         },
         relations: {
           government: "INVALID_RELATION", // Invalid enum value
-          population: RelationLevel.RESPEITADA,
+          population: RelationLevel.BOA,
         },
         staff: {
           employees: "", // Empty employees should fail
         },
         visitors: {
-          frequency: VisitorLevel.POUCO_MOVIMENTADA,
+          frequency: VisitorLevel.NEM_MUITO_NEM_POUCO,
         },
         resources: {
           level: ResourceLevel.SUFICIENTES,
@@ -324,14 +320,14 @@ describe("Issue 3.1 - Guild TypeScript Types", () => {
           characteristics: ["Moderna"],
         },
         relations: {
-          government: RelationLevel.INDIFERENTE,
-          population: RelationLevel.RESPEITADA,
+          government: RelationLevel.DIPLOMATICA,
+          population: RelationLevel.BOA,
         },
         staff: {
           employees: "1d6 funcionários",
         },
         visitors: {
-          frequency: VisitorLevel.POUCO_MOVIMENTADA,
+          frequency: VisitorLevel.NEM_MUITO_NEM_POUCO,
         },
         resources: {
           level: ResourceLevel.SUFICIENTES,
@@ -367,8 +363,8 @@ describe("Issue 3.1 - Guild TypeScript Types", () => {
           characteristics: ["Luxuosa", "Segura"],
         },
         relations: {
-          government: RelationLevel.ALIADA,
-          population: RelationLevel.ADMIRADA,
+          government: RelationLevel.EXCELENTE,
+          population: RelationLevel.MUITO_BOA,
         },
         staff: {
           employees: "2d6+3 funcionários experientes",
@@ -421,3 +417,4 @@ describe("Issue 3.1 - Guild TypeScript Types", () => {
     });
   });
 });
+
