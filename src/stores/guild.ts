@@ -465,6 +465,12 @@ export const useGuildStore = defineStore("guild", () => {
         ) {
           state.currentGuild.createdAt = new Date(state.currentGuild.createdAt);
         }
+        if (
+          state.currentGuild.updatedAt &&
+          typeof state.currentGuild.updatedAt === "string"
+        ) {
+          state.currentGuild.updatedAt = new Date(state.currentGuild.updatedAt);
+        }
       }
 
       // Converte datas no histórico
@@ -472,6 +478,7 @@ export const useGuildStore = defineStore("guild", () => {
         state.guildHistory = state.guildHistory.map((guild) => ({
           ...guild,
           createdAt: guild.createdAt ? new Date(guild.createdAt) : new Date(),
+          updatedAt: guild.updatedAt ? new Date(guild.updatedAt) : undefined,
         }));
       }
 
