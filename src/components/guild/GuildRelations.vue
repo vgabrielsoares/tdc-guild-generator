@@ -16,27 +16,33 @@
     </div>
 
     <div class="space-y-4">
-      <!-- Relações com o Governo -->
+      <!-- Relações com o Governo Local -->
       <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
         <h4 class="font-semibold text-gray-300 mb-2 flex items-center space-x-2">
           <font-awesome-icon :icon="['fas', 'landmark']" class="text-gray-400" />
-          <span>Relação com o Governo</span>
+          <span>Relação com o Governo Local</span>
         </h4>
         <div class="flex items-center space-x-2">
           <span class="inline-block w-3 h-3 rounded-full" :class="getRelationColor(guild.relations.government)"></span>
           <span class="text-white font-medium">{{ guild.relations.government }}</span>
         </div>
+        <div v-if="guild.relations.governmentDescription" class="mt-2">
+          <p class="text-gray-300 text-sm italic">{{ guild.relations.governmentDescription }}</p>
+        </div>
       </div>
 
-      <!-- Relações com a População -->
+      <!-- Reputação com a População Local -->
       <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
         <h4 class="font-semibold text-gray-300 mb-2 flex items-center space-x-2">
           <font-awesome-icon :icon="['fas', 'users']" class="text-gray-400" />
-          <span>Relação com a População</span>
+          <span>Reputação com a População Local</span>
         </h4>
         <div class="flex items-center space-x-2">
           <span class="inline-block w-3 h-3 rounded-full" :class="getRelationColor(guild.relations.population)"></span>
           <span class="text-white font-medium">{{ guild.relations.population }}</span>
+        </div>
+        <div v-if="guild.relations.populationDescription" class="mt-2">
+          <p class="text-gray-300 text-sm italic">{{ guild.relations.populationDescription }}</p>
         </div>
       </div>
 
