@@ -175,16 +175,20 @@ function stringToRelationLevel(value: string): RelationLevel {
  */
 function stringToResourceLevel(value: string): ResourceLevel {
   const mapping: Record<string, ResourceLevel> = {
+    'Em débito': ResourceLevel.EM_DEBITO,
+    'Nenhum': ResourceLevel.NENHUM,
     'Escassos': ResourceLevel.ESCASSOS,
+    'Escassos e obtidos com muito esforço e honestidade': ResourceLevel.ESCASSOS_HONESTOS,
     'Limitados': ResourceLevel.LIMITADOS,
-    'Básicos': ResourceLevel.BÁSICOS,
-    'Adequados': ResourceLevel.ADEQUADOS,
+    'Suficientes': ResourceLevel.SUFICIENTES,
+    'Excedentes': ResourceLevel.EXCEDENTES,
+    'Excedentes mas alimenta fins malignos': ResourceLevel.EXCEDENTES_MALIGNOS,
+    'Abundantes porém quase todo vindo do governo de um assentamento próximo': ResourceLevel.ABUNDANTES_GOVERNO,
     'Abundantes': ResourceLevel.ABUNDANTES,
-    'Vastos': ResourceLevel.VASTOS,
-    'Lendários': ResourceLevel.LENDARIOS,
+    'Abundantes vindos de muitos anos de serviço': ResourceLevel.ABUNDANTES_SERVICO,
   };
   
-  return mapping[value] || ResourceLevel.ADEQUADOS;
+  return mapping[value] || ResourceLevel.LIMITADOS;
 }
 
 /**
