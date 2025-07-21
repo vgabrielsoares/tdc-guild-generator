@@ -79,13 +79,7 @@
     </div>
 
     <!-- Guild Components -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <GuildDisplay />
-      <div class="space-y-4">
-        <GuildStructure />
-        <GuildRelations />
-      </div>
-    </div>
+    <GuildDisplay />
 
     <!-- Dice Roller -->
     <DiceRoller />
@@ -95,8 +89,6 @@
 <script setup lang="ts">
 // Import guild components
 import GuildDisplay from '@/components/guild/GuildDisplay.vue'
-import GuildStructure from '@/components/guild/GuildStructure.vue'
-import GuildRelations from '@/components/guild/GuildRelations.vue'
 import DiceRoller from '@/components/common/DiceRoller.vue'
 
 import { useGuildStore } from '@/stores/guild'
@@ -132,6 +124,4 @@ const formatDate = (date: Date | string | undefined) => {
     minute: '2-digit'
   }).format(dateObj)
 }
-
-console.log('[GUILD VIEW] Guild View loaded with store testing')
 </script>
