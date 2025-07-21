@@ -62,6 +62,33 @@ export const useGuildStore = defineStore("guild", () => {
   const guildCount = computed(() => guildHistory.value.length);
   const recentGuilds = computed(() => guildHistory.value.slice(0, 10));
   const canRegenerate = computed(() => lastConfig.value !== null);
+  
+  /**
+   * Estatísticas do histórico de guildas
+   */
+  const historyStats = computed(() => {
+    const history = guildHistory.value;
+    const settlementCounts = history.reduce((acc, guild) => {
+      acc[guild.settlementType] = (acc[guild.settlementType] || 0) + 1;
+      return acc;
+    }, {} as Record<SettlementType, number>);
+
+    const resourceCounts = history.reduce((acc, guild) => {
+      const level = guild.resources?.level || 'unknown';
+      acc[level] = (acc[level] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return {
+      total: history.length,
+      bySettlement: settlementCounts,
+      byResourceLevel: resourceCounts,
+      oldestDate: history.length > 0 ? 
+        new Date(Math.min(...history.map(g => g.createdAt?.getTime() || 0))) : null,
+      newestDate: history.length > 0 ?
+        new Date(Math.max(...history.map(g => g.createdAt?.getTime() || 0))) : null,
+    };
+  });
 
   /**
    * Gera uma nova guilda completa
@@ -96,7 +123,7 @@ export const useGuildStore = defineStore("guild", () => {
       // Cria guilda completa combinando os resultados
       const guild: Guild = {
         id: generateGuildId(),
-        name: generateGuildName(),
+        name: generateGuildName(options.settlementType),
         settlementType: options.settlementType,
         structure: structureResult.guild.structure,
         relations: relationsResult.relations,
@@ -380,9 +407,29 @@ export const useGuildStore = defineStore("guild", () => {
         lastGenerated: lastGenerated.value,
       };
 
+      const serializedState = JSON.stringify(state);
+      
+      // Verifica se há espaço suficiente no localStorage
+      if (serializedState.length > 5 * 1024 * 1024) { // 5MB limite
+        // Se muito grande, mantém apenas as últimas 10 guildas
+        state.guildHistory = guildHistory.value.slice(0, 10);
+      }
+
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     } catch (error) {
-      // Silently fail - localStorage pode não estar disponível
+      // Em caso de erro (ex: quota excedida), tenta limpar histórico antigo
+      try {
+        const reducedState: GuildStoreState = {
+          currentGuild: currentGuild.value,
+          guildHistory: guildHistory.value.slice(0, 5), // Apenas 5 mais recentes
+          isGenerating: false,
+          lastConfig: lastConfig.value,
+          lastGenerated: lastGenerated.value,
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(reducedState));
+      } catch (secondError) {
+        // Falha silenciosa - localStorage pode não estar disponível
+      }
     }
   }
 
@@ -398,6 +445,21 @@ export const useGuildStore = defineStore("guild", () => {
 
       const state = JSON.parse(storedData) as GuildStoreState;
 
+      // Converte datas que vêm como string do JSON
+      if (state.currentGuild) {
+        if (state.currentGuild.createdAt && typeof state.currentGuild.createdAt === "string") {
+          state.currentGuild.createdAt = new Date(state.currentGuild.createdAt);
+        }
+      }
+
+      // Converte datas no histórico
+      if (state.guildHistory && Array.isArray(state.guildHistory)) {
+        state.guildHistory = state.guildHistory.map(guild => ({
+          ...guild,
+          createdAt: guild.createdAt ? new Date(guild.createdAt) : new Date(),
+        }));
+      }
+
       // Restaura estado
       currentGuild.value = state.currentGuild;
       guildHistory.value = state.guildHistory || [];
@@ -405,9 +467,14 @@ export const useGuildStore = defineStore("guild", () => {
       lastGenerated.value = state.lastGenerated
         ? new Date(state.lastGenerated)
         : null;
+
     } catch (error) {
-      // Limpa dados corrompidos
+      // Limpa dados corrompidos e reinicia com estado limpo
       localStorage.removeItem(STORAGE_KEY);
+      currentGuild.value = null;
+      guildHistory.value = [];
+      lastConfig.value = null;
+      lastGenerated.value = null;
     }
   }
 
@@ -419,25 +486,55 @@ export const useGuildStore = defineStore("guild", () => {
   }
 
   /**
-   * Gera um nome para a guilda (temporário - pode ser expandido depois)
+   * Gera um nome para a guilda baseado no assentamento e recursos
    */
-  function generateGuildName(): string {
+  // TODO: Expand this to include more complex naming logic
+  function generateGuildName(settlementType?: SettlementType): string {
     const prefixes = [
       "Guilda dos",
-      "Irmandade dos",
+      "Irmandade dos", 
       "Companhia dos",
       "Ordem dos",
       "Círculo dos",
+      "Liga dos",
+      "Conselho dos",
+      "União dos",
     ];
+    
     const suffixes = [
       "Artesãos",
-      "Mercadores",
+      "Mercadores", 
       "Ferreiros",
       "Tecelões",
       "Alquimistas",
       "Escribas",
       "Construtores",
+      "Aventureiros",
+      "Exploradores",
+      "Protetores",
+      "Comerciantes",
+      "Mestres",
     ];
+
+    // Nomes especiais para assentamentos grandes
+    const specialNames = [
+      "Rosa Dourada",
+      "Luz Cerúlea", 
+      "Forja Ancestral",
+      "Lâmina Prata",
+      "Escudo de Ferro",
+      "Coroa Imperial",
+      "Torre de Marfim",
+      "Punho de Aço",
+    ];
+
+    // Para metrópoles e cidades grandes, chance de nome especial
+    if (settlementType === SettlementType.METROPOLE || 
+        settlementType === SettlementType.CIDADE_GRANDE) {
+      if (Math.random() < 0.3) {
+        return specialNames[Math.floor(Math.random() * specialNames.length)];
+      }
+    }
 
     const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
     const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
@@ -462,6 +559,7 @@ export const useGuildStore = defineStore("guild", () => {
     guildCount,
     recentGuilds,
     canRegenerate,
+    historyStats,
 
     // Actions
     generateGuild,
