@@ -185,22 +185,8 @@ export function generateVisitorLevel(
     `Frequency: ${result.result} (rolled ${result.finalRoll})`
   );
 
-  // Map frequency results to visitor levels
-  switch (result.result) {
-    case "Vazia":
-    case "Quase deserta":
-      return "Baixo" as VisitorLevel;
-    case "Pouco movimentada":
-    case "Nem muito nem pouco":
-      return "Moderado" as VisitorLevel;
-    case "Muito frequentada":
-    case "Abarrotada":
-      return "Alto" as VisitorLevel;
-    case "Lotada":
-      return "Muito Alto" as VisitorLevel;
-    default:
-      return "Moderado" as VisitorLevel;
-  }
+  // Return the direct result from the table without mapping
+  return result.result;
 }
 
 /**
@@ -261,13 +247,19 @@ export function generateVisitorTypes(visitorLevel: VisitorLevel): string[] {
  */
 function getVisitorTypesCount(level: VisitorLevel): number {
   switch (level) {
-    case "Baixo":
+    case "Vazia":
+      return 1;
+    case "Quase deserta":
+      return 1;
+    case "Pouco movimentada":
       return 2;
-    case "Moderado":
+    case "Nem muito nem pouco":
+      return 2;
+    case "Muito frequentada":
       return 3;
-    case "Alto":
+    case "Abarrotada":
       return 4;
-    case "Muito Alto":
+    case "Lotada":
       return 5;
     default:
       return 3;

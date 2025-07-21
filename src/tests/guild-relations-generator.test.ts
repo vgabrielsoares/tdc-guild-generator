@@ -243,8 +243,8 @@ describe("Issue 3.3 - Guild Relations Generator", () => {
     });
 
     it("should generate different numbers of visitor types based on frequency", () => {
-      const baixoTypes = generateVisitorTypes(VisitorLevel.BAIXO);
-      const altoTypes = generateVisitorTypes(VisitorLevel.MUITO_ALTO);
+      const baixoTypes = generateVisitorTypes(VisitorLevel.VAZIA);
+      const altoTypes = generateVisitorTypes(VisitorLevel.LOTADA);
 
       expect(baixoTypes.length).toBeLessThan(altoTypes.length);
       expect(baixoTypes.length).toBeGreaterThan(0);
