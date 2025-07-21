@@ -34,19 +34,19 @@
         <div class="bg-gray-700 p-4 rounded">
           <h3 class="text-sm font-medium text-gray-300 mb-2">Status</h3>
           <p class="text-lg font-bold text-white">
-            {{ guildStore.isLoading ? 'Gerando...' : 'Pronto' }}
+            {{ guildStore.isGenerating ? 'Gerando...' : 'Pronto' }}
           </p>
         </div>
       </div>
 
       <div class="flex gap-4 mb-6">
-        <button @click="generateGuild" :disabled="guildStore.isLoading"
+        <button @click="generateGuild" :disabled="guildStore.isGenerating"
           class="bg-amber-600 hover:bg-amber-700 disabled:bg-gray-600 text-white px-4 py-2 rounded font-medium transition-colors flex items-center gap-2">
-          <font-awesome-icon icon="home" v-if="!guildStore.isLoading" />
-          {{ guildStore.isLoading ? 'Gerando...' : 'Gerar Guilda' }}
+          <font-awesome-icon icon="home" v-if="!guildStore.isGenerating" />
+          {{ guildStore.isGenerating ? 'Gerando...' : 'Gerar Guilda' }}
         </button>
 
-        <button @click="clearGuilds" :disabled="guildStore.isLoading || guildStore.guildCount === 0"
+        <button @click="clearGuilds" :disabled="guildStore.isGenerating || guildStore.guildCount === 0"
           class="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white px-4 py-2 rounded font-medium transition-colors flex items-center gap-2">
           <font-awesome-icon icon="trash" />
           Limpar Tudo
@@ -60,7 +60,7 @@
         <p class="text-gray-300 text-sm">Criada: {{ formatDate(guildStore.currentGuild.createdAt) }}</p>
       </div>
 
-      <div v-if="guildStore.recentGuilds.length > 0">
+      <div v-if="guildStore.recentGuilds && guildStore.recentGuilds.length > 0">
         <h3 class="text-lg font-semibold text-amber-400 mb-2">Guildas Recentes:</h3>
         <div class="space-y-2">
           <div v-for="guild in guildStore.recentGuilds" :key="guild.id"
@@ -106,7 +106,7 @@ import type { Guild } from '@/types/guild'
 const guildStore = useGuildStore()
 
 const generateGuild = async () => {
-  await guildStore.generateGuild()
+  await guildStore.generateGuildWithDefaults()
 }
 
 const clearGuilds = () => {
@@ -121,14 +121,16 @@ const removeGuild = (guildId: string) => {
   guildStore.removeGuild(guildId)
 }
 
-const formatDate = (date: Date) => {
+const formatDate = (date: Date | string | undefined) => {
+  if (!date) return 'Data não disponível'
+  const dateObj = typeof date === 'string' ? new Date(date) : date
   return new Intl.DateTimeFormat('pt-BR', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit'
-  }).format(new Date(date))
+  }).format(dateObj)
 }
 
 console.log('[GUILD VIEW] Guild View loaded with store testing')
