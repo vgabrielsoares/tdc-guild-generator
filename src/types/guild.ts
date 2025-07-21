@@ -3,7 +3,8 @@ import { z } from "zod";
 // Enums para valores fixos
 export enum ResourceLevel {
   ESCASSOS = "Escassos",
-  BASICOS = "Básicos",
+  LIMITADOS = "Limitados",
+  BÁSICOS = "Básicos",
   ADEQUADOS = "Adequados",
   ABUNDANTES = "Abundantes",
   VASTOS = "Vastos",
@@ -11,10 +12,13 @@ export enum ResourceLevel {
 }
 
 export enum VisitorLevel {
-  BAIXO = "Baixo",
-  MODERADO = "Moderado",
-  ALTO = "Alto",
-  MUITO_ALTO = "Muito Alto",
+  VAZIA = "Vazia",
+  QUASE_DESERTA = "Quase deserta",
+  POUCO_MOVIMENTADA = "Pouco movimentada",
+  NEM_MUITO_NEM_POUCO = "Nem muito nem pouco",
+  MUITO_FREQUENTADA = "Muito frequentada",
+  ABARROTADA = "Abarrotada",
+  LOTADA = "Lotada",
 }
 
 export enum RelationLevel {
@@ -49,8 +53,8 @@ export interface GuildStructure {
 
 // Interface para relações da guilda
 export interface GuildRelations {
-  government: RelationLevel;
-  population: RelationLevel;
+  government: string;
+  population: string;
   notes?: string;
 }
 
@@ -63,14 +67,14 @@ export interface GuildStaff {
 
 // Interface para visitantes
 export interface GuildVisitors {
-  frequency: VisitorLevel;
+  frequency: string;
   description?: string;
   types?: string[];
 }
 
 // Interface para recursos
 export interface GuildResources {
-  level: ResourceLevel;
+  level: string;
   description?: string;
   details?: string[];
 }
@@ -119,9 +123,37 @@ export interface GuildGenerationResult {
 }
 
 // Schemas Zod para validação
-export const ResourceLevelSchema = z.nativeEnum(ResourceLevel);
-export const VisitorLevelSchema = z.nativeEnum(VisitorLevel);
-export const RelationLevelSchema = z.nativeEnum(RelationLevel);
+export const ResourceLevelSchema = z.enum([
+  "Escassos",
+  "Limitados",
+  "Básicos",
+  "Adequados",
+  "Abundantes",
+  "Vastos",
+  "Lendários",
+]);
+export const VisitorLevelSchema = z.enum([
+  "Vazia",
+  "Quase deserta",
+  "Pouco movimentada",
+  "Nem muito nem pouco",
+  "Muito frequentada",
+  "Abarrotada",
+  "Lotada",
+]);
+export const RelationLevelSchema = z.enum([
+  "Hostil",
+  "Suspeita",
+  "Indiferente",
+  "Tolerante",
+  "Cooperativa",
+  "Aliada",
+  "Temida",
+  "Desconfiada",
+  "Respeitada",
+  "Admirada",
+  "Reverenciada",
+]);
 export const SettlementTypeSchema = z.nativeEnum(SettlementType);
 
 export const GuildStructureSchema = z.object({
