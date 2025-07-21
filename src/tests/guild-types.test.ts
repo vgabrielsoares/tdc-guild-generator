@@ -25,13 +25,17 @@ import {
 describe("Issue 3.1 - Guild TypeScript Types", () => {
   describe("Enums", () => {
     it("should have correct ResourceLevel values", () => {
+      expect(ResourceLevel.EM_DEBITO).toBe("Em débito");
+      expect(ResourceLevel.NENHUM).toBe("Nenhum");
       expect(ResourceLevel.ESCASSOS).toBe("Escassos");
+      expect(ResourceLevel.ESCASSOS_HONESTOS).toBe("Escassos e obtidos com muito esforço e honestidade");
       expect(ResourceLevel.LIMITADOS).toBe("Limitados");
-      expect(ResourceLevel.BÁSICOS).toBe("Básicos");
-      expect(ResourceLevel.ADEQUADOS).toBe("Adequados");
+      expect(ResourceLevel.SUFICIENTES).toBe("Suficientes");
+      expect(ResourceLevel.EXCEDENTES).toBe("Excedentes");
+      expect(ResourceLevel.EXCEDENTES_MALIGNOS).toBe("Excedentes mas alimenta fins malignos");
+      expect(ResourceLevel.ABUNDANTES_GOVERNO).toBe("Abundantes porém quase todo vindo do governo de um assentamento próximo");
       expect(ResourceLevel.ABUNDANTES).toBe("Abundantes");
-      expect(ResourceLevel.VASTOS).toBe("Vastos");
-      expect(ResourceLevel.LENDARIOS).toBe("Lendários");
+      expect(ResourceLevel.ABUNDANTES_SERVICO).toBe("Abundantes vindos de muitos anos de serviço");
     });
 
     it("should have correct VisitorLevel values", () => {
@@ -128,12 +132,12 @@ describe("Issue 3.1 - Guild TypeScript Types", () => {
   describe("Guild Resources Interface", () => {
     it("should create valid GuildResources object", () => {
       const resources: GuildResources = {
-        level: ResourceLevel.ADEQUADOS,
+        level: ResourceLevel.SUFICIENTES,
         description: "Recursos suficientes",
         details: ["Cofres bem abastecidos", "Equipamentos básicos"],
       };
 
-      expect(resources.level).toBe(ResourceLevel.ADEQUADOS);
+      expect(resources.level).toBe(ResourceLevel.SUFICIENTES);
       expect(resources.description).toBe("Recursos suficientes");
       expect(resources.details).toHaveLength(2);
     });
@@ -159,7 +163,7 @@ describe("Issue 3.1 - Guild TypeScript Types", () => {
           frequency: VisitorLevel.POUCO_MOVIMENTADA,
         },
         resources: {
-          level: ResourceLevel.ADEQUADOS,
+          level: ResourceLevel.SUFICIENTES,
         },
         settlementType: SettlementType.CIDADE_PEQUENA,
         createdAt: new Date(),
@@ -259,7 +263,7 @@ describe("Issue 3.1 - Guild TypeScript Types", () => {
           frequency: VisitorLevel.POUCO_MOVIMENTADA,
         },
         resources: {
-          level: ResourceLevel.ADEQUADOS,
+          level: ResourceLevel.SUFICIENTES,
         },
         settlementType: SettlementType.ALDEIA,
         createdAt: new Date(),
@@ -286,7 +290,7 @@ describe("Issue 3.1 - Guild TypeScript Types", () => {
           frequency: VisitorLevel.POUCO_MOVIMENTADA,
         },
         resources: {
-          level: ResourceLevel.ADEQUADOS,
+          level: ResourceLevel.SUFICIENTES,
         },
         settlementType: SettlementType.ALDEIA,
       };
@@ -330,7 +334,7 @@ describe("Issue 3.1 - Guild TypeScript Types", () => {
           frequency: VisitorLevel.POUCO_MOVIMENTADA,
         },
         resources: {
-          level: ResourceLevel.ADEQUADOS,
+          level: ResourceLevel.SUFICIENTES,
         },
         settlementType: SettlementType.CIDADE_PEQUENA,
         createdAt: new Date(),

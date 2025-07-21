@@ -54,7 +54,7 @@ describe("Issue 3.3 - Guild Relations Generator", () => {
     });
 
     it("should generate resource specialties based on level", () => {
-      const result = generateResourceSpecialties(ResourceLevel.ADEQUADOS);
+      const result = generateResourceSpecialties(ResourceLevel.SUFICIENTES);
       expect(Array.isArray(result)).toBe(true);
       expect(result.length).toBeGreaterThan(0);
       expect(result.every((spec) => typeof spec === "string")).toBe(true);
@@ -235,7 +235,7 @@ describe("Issue 3.3 - Guild Relations Generator", () => {
 
     it("should generate different numbers of specialties based on resource level", () => {
       const escassosSpecs = generateResourceSpecialties(ResourceLevel.ESCASSOS);
-      const vastosSpecs = generateResourceSpecialties(ResourceLevel.VASTOS);
+      const vastosSpecs = generateResourceSpecialties(ResourceLevel.ABUNDANTES);
 
       expect(escassosSpecs.length).toBeLessThan(vastosSpecs.length);
       expect(escassosSpecs.length).toBeGreaterThan(0);

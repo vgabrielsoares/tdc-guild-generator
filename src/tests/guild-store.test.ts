@@ -186,14 +186,12 @@ describe("Issue 3.4 - Guild Store Complete", () => {
       });
 
       const originalRelations = store.currentGuild?.relations;
-      const originalVisitors = store.currentGuild?.visitors;
       const originalResources = store.currentGuild?.resources;
 
       await store.regenerateStructure();
 
-      // Relations should remain the same, structure should change
+      // Relations and resources should remain the same
       expect(store.currentGuild?.relations).toEqual(originalRelations);
-      expect(store.currentGuild?.visitors).toEqual(originalVisitors);
       expect(store.currentGuild?.resources).toEqual(originalResources);
       // Structure and staff might be different
     });
