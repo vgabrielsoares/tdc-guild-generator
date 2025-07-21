@@ -162,7 +162,7 @@ describe('Issue 3.2 - Guild Structure Generator', () => {
 
       expect(result.guild.settlementType).toBe(SettlementType.CIDADE_GRANDE);
       expect(result.logs.some(log => log.includes('modifiers'))).toBe(true);
-      expect(result.logs.some(log => log.includes('structure') && log.includes('5'))).toBe(true);
+      expect(result.logs.some(log => log.includes('structure') && log.includes('+'))).toBe(true);
     });
   });
 

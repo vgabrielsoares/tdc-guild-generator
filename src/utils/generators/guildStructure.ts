@@ -22,7 +22,6 @@ import {
   SETTLEMENT_DICE,
 } from "../../data/tables/guild-structure";
 
-
 /**
  * Maps SettlementType enum to SETTLEMENT_DICE keys
  */
@@ -103,7 +102,7 @@ export function generateEmployees(): { employees: string; roll: number } {
  * Generates government relations
  */
 export function generateGovernmentRelations(modifier: number = 0): {
-  relation: RelationLevel;
+  relation: string;
   roll: number;
 } {
   const diceRoll = rollDice({
@@ -111,19 +110,14 @@ export function generateGovernmentRelations(modifier: number = 0): {
   });
   const result = rollOnTable(GOVERNMENT_RELATIONS_TABLE);
 
-  // Convert string to enum
-  const relationLevel =
-    Object.values(RelationLevel).find((level) => level === result.result) ||
-    RelationLevel.INDIFERENTE;
-
-  return { relation: relationLevel, roll: diceRoll.result };
+  return { relation: result.result, roll: diceRoll.result };
 }
 
 /**
  * Generates population relations
  */
 export function generatePopulationRelations(modifier: number = 0): {
-  relation: RelationLevel;
+  relation: string;
   roll: number;
 } {
   const diceRoll = rollDice({
@@ -131,12 +125,7 @@ export function generatePopulationRelations(modifier: number = 0): {
   });
   const result = rollOnTable(POPULATION_RELATIONS_TABLE);
 
-  // Convert string to enum
-  const relationLevel =
-    Object.values(RelationLevel).find((level) => level === result.result) ||
-    RelationLevel.INDIFERENTE;
-
-  return { relation: relationLevel, roll: diceRoll.result };
+  return { relation: result.result, roll: diceRoll.result };
 }
 
 /**
@@ -145,7 +134,7 @@ export function generatePopulationRelations(modifier: number = 0): {
 export function generateVisitors(
   settlementType: SettlementType,
   modifier: number = 0
-): { frequency: VisitorLevel; roll: number } {
+): { frequency: string; roll: number } {
   const mappedSettlement = mapSettlementType(settlementType);
   const diceConfig =
     SETTLEMENT_DICE.visitors[
@@ -156,30 +145,7 @@ export function generateVisitors(
   });
   const result = rollOnTable(VISITORS_FREQUENCY_TABLE);
 
-  // Map frequency results to visitor levels
-  let visitorLevel: VisitorLevel;
-  switch (result.result) {
-    case "Vazia":
-    case "Quase deserta":
-      visitorLevel = VisitorLevel.BAIXO;
-      break;
-    case "Pouco movimentada":
-    case "Nem muito nem pouco":
-      visitorLevel = VisitorLevel.MODERADO;
-      break;
-    case "Muito frequentada":
-    case "Abarrotada":
-      visitorLevel = VisitorLevel.ALTO;
-      break;
-    case "Lotada":
-      visitorLevel = VisitorLevel.MUITO_ALTO;
-      break;
-    default:
-      visitorLevel = VisitorLevel.MODERADO;
-      break;
-  }
-
-  return { frequency: visitorLevel, roll: diceRoll.result };
+  return { frequency: result.result, roll: diceRoll.result };
 }
 
 /**
@@ -196,7 +162,7 @@ export function generateResources(): { level: ResourceLevel; roll: number } {
       resourceLevel = ResourceLevel.ESCASSOS;
       break;
     case "Básicos":
-      resourceLevel = ResourceLevel.BASICOS;
+      resourceLevel = ResourceLevel.BÁSICOS;
       break;
     case "Adequados":
       resourceLevel = ResourceLevel.ADEQUADOS;
@@ -253,7 +219,7 @@ function calculateModifiers(
       governmentModifier -= 2;
       populationModifier -= 2;
       break;
-    case ResourceLevel.BASICOS:
+    case ResourceLevel.BÁSICOS:
       visitorsModifier -= 2;
       structureModifier -= 1;
       governmentModifier -= 1;
