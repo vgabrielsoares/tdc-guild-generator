@@ -194,6 +194,8 @@ describe("Issue 3.1 - Guild TypeScript Types", () => {
     it("should create valid GuildGenerationResult object", () => {
       const result: GuildGenerationResult = {
         guild: {
+          id: "test-guild-123",
+          name: "Guilda de Teste",
           structure: {
             size: "Grande (15m x 15m)",
             characteristics: ["Luxuosa", "Fortificada"],
@@ -212,6 +214,7 @@ describe("Issue 3.1 - Guild TypeScript Types", () => {
             level: ResourceLevel.ABUNDANTES,
           },
           settlementType: SettlementType.METROPOLE,
+          createdAt: new Date(),
         },
         rolls: {
           structure: {

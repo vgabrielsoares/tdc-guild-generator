@@ -81,15 +81,15 @@ export interface GuildResources {
 
 // Interface principal da guilda
 export interface Guild {
-  id?: string;
-  name?: string;
+  id: string;
+  name: string;
   structure: GuildStructure;
   relations: GuildRelations;
   staff: GuildStaff;
   visitors: GuildVisitors;
   resources: GuildResources;
   settlementType: SettlementType;
-  createdAt?: Date;
+  createdAt: Date;
   updatedAt?: Date;
 }
 
@@ -190,15 +190,15 @@ export const GuildResourcesSchema = z.object({
 });
 
 export const GuildSchema = z.object({
-  id: z.string().optional(),
-  name: z.string().optional(),
+  id: z.string(),
+  name: z.string(),
   structure: GuildStructureSchema,
   relations: GuildRelationsSchema,
   staff: GuildStaffSchema,
   visitors: GuildVisitorsSchema,
   resources: GuildResourcesSchema,
   settlementType: SettlementTypeSchema,
-  createdAt: z.date().optional(),
+  createdAt: z.date(),
   updatedAt: z.date().optional(),
 });
 
