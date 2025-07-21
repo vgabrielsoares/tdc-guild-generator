@@ -1,41 +1,42 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 // Enums para valores fixos
 export enum ResourceLevel {
-  ESCASSOS = 'Escassos',
-  LIMITADOS = 'Limitados',
-  ADEQUADOS = 'Adequados',
-  ABUNDANTES = 'Abundantes',
-  VASTOS = 'Vastos'
+  ESCASSOS = "Escassos",
+  BASICOS = "Básicos",
+  ADEQUADOS = "Adequados",
+  ABUNDANTES = "Abundantes",
+  VASTOS = "Vastos",
+  LENDARIOS = "Lendários",
 }
 
 export enum VisitorLevel {
-  VAZIA = 'Vazia',
-  POUCOS = 'Poucos visitantes',
-  MODERADA = 'Moderadamente frequentada',
-  MOVIMENTADA = 'Movimentada',
-  LOTADA = 'Lotada'
+  BAIXO = "Baixo",
+  MODERADO = "Moderado",
+  ALTO = "Alto",
+  MUITO_ALTO = "Muito Alto",
 }
 
 export enum RelationLevel {
-  HOSTIL = 'Hostil',
-  TENSA = 'Tensa',
-  FRIA = 'Fria',
-  DESCONHECIDA = 'Desconhecida',
-  NEUTRA = 'Neutra',
-  AMIGAVEL = 'Amigável',
-  ALIADA = 'Aliada',
-  RESPEITADA = 'Respeitada',
-  ADMIRADA = 'Admirada',
-  VENERADA = 'Venerada'
+  HOSTIL = "Hostil",
+  SUSPEITA = "Suspeita",
+  INDIFERENTE = "Indiferente",
+  TOLERANTE = "Tolerante",
+  COOPERATIVA = "Cooperativa",
+  ALIADA = "Aliada",
+  TEMIDA = "Temida",
+  DESCONFIADA = "Desconfiada",
+  RESPEITADA = "Respeitada",
+  ADMIRADA = "Admirada",
+  REVERENCIADA = "Reverenciada",
 }
 
 export enum SettlementType {
-  LUGAREJO = 'Lugarejo',
-  ALDEIA = 'Aldeia',
-  CIDADE_PEQUENA = 'Cidade Pequena',
-  CIDADE_GRANDE = 'Cidade Grande',
-  METROPOLE = 'Metrópole'
+  LUGAREJO = "Lugarejo",
+  ALDEIA = "Aldeia",
+  CIDADE_PEQUENA = "Cidade Pequena",
+  CIDADE_GRANDE = "Cidade Grande",
+  METROPOLE = "Metrópole",
 }
 
 // Interface para a estrutura física da guilda
@@ -124,34 +125,36 @@ export const RelationLevelSchema = z.nativeEnum(RelationLevel);
 export const SettlementTypeSchema = z.nativeEnum(SettlementType);
 
 export const GuildStructureSchema = z.object({
-  size: z.string().min(1, 'Size is required'),
-  characteristics: z.array(z.string()).min(1, 'At least one characteristic is required'),
+  size: z.string().min(1, "Size is required"),
+  characteristics: z
+    .array(z.string())
+    .min(1, "At least one characteristic is required"),
   location: z.string().optional(),
-  description: z.string().optional()
+  description: z.string().optional(),
 });
 
 export const GuildRelationsSchema = z.object({
   government: RelationLevelSchema,
   population: RelationLevelSchema,
-  notes: z.string().optional()
+  notes: z.string().optional(),
 });
 
 export const GuildStaffSchema = z.object({
-  employees: z.string().min(1, 'Employee description is required'),
+  employees: z.string().min(1, "Employee description is required"),
   description: z.string().optional(),
-  count: z.number().int().min(0).optional()
+  count: z.number().int().min(0).optional(),
 });
 
 export const GuildVisitorsSchema = z.object({
   frequency: VisitorLevelSchema,
   description: z.string().optional(),
-  types: z.array(z.string()).optional()
+  types: z.array(z.string()).optional(),
 });
 
 export const GuildResourcesSchema = z.object({
   level: ResourceLevelSchema,
   description: z.string().optional(),
-  details: z.array(z.string()).optional()
+  details: z.array(z.string()).optional(),
 });
 
 export const GuildSchema = z.object({
@@ -164,16 +167,18 @@ export const GuildSchema = z.object({
   resources: GuildResourcesSchema,
   settlementType: SettlementTypeSchema,
   createdAt: z.date().optional(),
-  updatedAt: z.date().optional()
+  updatedAt: z.date().optional(),
 });
 
 export const GuildGenerationConfigSchema = z.object({
   settlementType: SettlementTypeSchema,
   useModifiers: z.boolean().optional().default(true),
-  customModifiers: z.object({
-    structure: z.number().int().optional(),
-    visitors: z.number().int().optional()
-  }).optional()
+  customModifiers: z
+    .object({
+      structure: z.number().int().optional(),
+      visitors: z.number().int().optional(),
+    })
+    .optional(),
 });
 
 export const GuildGenerationResultSchema = z.object({
@@ -181,17 +186,17 @@ export const GuildGenerationResultSchema = z.object({
   rolls: z.object({
     structure: z.object({
       size: z.number().int(),
-      characteristics: z.array(z.number().int())
+      characteristics: z.array(z.number().int()),
     }),
     relations: z.object({
       government: z.number().int(),
-      population: z.number().int()
+      population: z.number().int(),
     }),
     staff: z.number().int(),
     visitors: z.number().int(),
-    resources: z.number().int()
+    resources: z.number().int(),
   }),
-  logs: z.array(z.string())
+  logs: z.array(z.string()),
 });
 
 // Type guards para verificação de tipos em runtime
@@ -199,11 +204,15 @@ export const isGuild = (obj: unknown): obj is Guild => {
   return GuildSchema.safeParse(obj).success;
 };
 
-export const isGuildGenerationConfig = (obj: unknown): obj is GuildGenerationConfig => {
+export const isGuildGenerationConfig = (
+  obj: unknown
+): obj is GuildGenerationConfig => {
   return GuildGenerationConfigSchema.safeParse(obj).success;
 };
 
-export const isGuildGenerationResult = (obj: unknown): obj is GuildGenerationResult => {
+export const isGuildGenerationResult = (
+  obj: unknown
+): obj is GuildGenerationResult => {
   return GuildGenerationResultSchema.safeParse(obj).success;
 };
 
@@ -217,7 +226,9 @@ export const createGuild = (data: unknown): Guild => {
 };
 
 // Função utilitária para validar configuração de geração
-export const createGuildGenerationConfig = (data: unknown): GuildGenerationConfig => {
+export const createGuildGenerationConfig = (
+  data: unknown
+): GuildGenerationConfig => {
   const result = GuildGenerationConfigSchema.safeParse(data);
   if (!result.success) {
     throw new Error(`Invalid generation config: ${result.error.message}`);
