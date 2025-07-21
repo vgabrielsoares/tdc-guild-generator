@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from "vitest";
 import type {
   Guild,
   GuildStructure,
@@ -7,8 +7,8 @@ import type {
   GuildVisitors,
   GuildResources,
   GuildGenerationConfig,
-  GuildGenerationResult
-} from '../types/guild';
+  GuildGenerationResult,
+} from "../types/guild";
 import {
   ResourceLevel,
   VisitorLevel,
@@ -19,163 +19,168 @@ import {
   isGuild,
   isGuildGenerationConfig,
   GuildSchema,
-  GuildGenerationConfigSchema
-} from '../types/guild';
+  GuildGenerationConfigSchema,
+} from "../types/guild";
 
-describe('Issue 3.1 - Guild TypeScript Types', () => {
-  describe('Enums', () => {
-    it('should have correct ResourceLevel values', () => {
-      expect(ResourceLevel.ESCASSOS).toBe('Escassos');
-      expect(ResourceLevel.LIMITADOS).toBe('Limitados');
-      expect(ResourceLevel.ADEQUADOS).toBe('Adequados');
-      expect(ResourceLevel.ABUNDANTES).toBe('Abundantes');
-      expect(ResourceLevel.VASTOS).toBe('Vastos');
+describe("Issue 3.1 - Guild TypeScript Types", () => {
+  describe("Enums", () => {
+    it("should have correct ResourceLevel values", () => {
+      expect(ResourceLevel.ESCASSOS).toBe("Escassos");
+      expect(ResourceLevel.LIMITADOS).toBe("Limitados");
+      expect(ResourceLevel.BÁSICOS).toBe("Básicos");
+      expect(ResourceLevel.ADEQUADOS).toBe("Adequados");
+      expect(ResourceLevel.ABUNDANTES).toBe("Abundantes");
+      expect(ResourceLevel.VASTOS).toBe("Vastos");
+      expect(ResourceLevel.LENDARIOS).toBe("Lendários");
     });
 
-    it('should have correct VisitorLevel values', () => {
-      expect(VisitorLevel.VAZIA).toBe('Vazia');
-      expect(VisitorLevel.POUCOS).toBe('Poucos visitantes');
-      expect(VisitorLevel.MODERADA).toBe('Moderadamente frequentada');
-      expect(VisitorLevel.MOVIMENTADA).toBe('Movimentada');
-      expect(VisitorLevel.LOTADA).toBe('Lotada');
+    it("should have correct VisitorLevel values", () => {
+      expect(VisitorLevel.VAZIA).toBe("Vazia");
+      expect(VisitorLevel.QUASE_DESERTA).toBe("Quase deserta");
+      expect(VisitorLevel.POUCO_MOVIMENTADA).toBe("Pouco movimentada");
+      expect(VisitorLevel.NEM_MUITO_NEM_POUCO).toBe("Nem muito nem pouco");
+      expect(VisitorLevel.MUITO_FREQUENTADA).toBe("Muito frequentada");
+      expect(VisitorLevel.ABARROTADA).toBe("Abarrotada");
+      expect(VisitorLevel.LOTADA).toBe("Lotada");
     });
 
-    it('should have correct RelationLevel values', () => {
-      expect(RelationLevel.HOSTIL).toBe('Hostil');
-      expect(RelationLevel.TENSA).toBe('Tensa');
-      expect(RelationLevel.FRIA).toBe('Fria');
-      expect(RelationLevel.DESCONHECIDA).toBe('Desconhecida');
-      expect(RelationLevel.NEUTRA).toBe('Neutra');
-      expect(RelationLevel.AMIGAVEL).toBe('Amigável');
-      expect(RelationLevel.ALIADA).toBe('Aliada');
-      expect(RelationLevel.RESPEITADA).toBe('Respeitada');
-      expect(RelationLevel.ADMIRADA).toBe('Admirada');
-      expect(RelationLevel.VENERADA).toBe('Venerada');
+    it("should have correct RelationLevel values", () => {
+      expect(RelationLevel.HOSTIL).toBe("Hostil");
+      expect(RelationLevel.SUSPEITA).toBe("Suspeita");
+      expect(RelationLevel.INDIFERENTE).toBe("Indiferente");
+      expect(RelationLevel.TOLERANTE).toBe("Tolerante");
+      expect(RelationLevel.COOPERATIVA).toBe("Cooperativa");
+      expect(RelationLevel.ALIADA).toBe("Aliada");
+      expect(RelationLevel.TEMIDA).toBe("Temida");
+      expect(RelationLevel.DESCONFIADA).toBe("Desconfiada");
+      expect(RelationLevel.RESPEITADA).toBe("Respeitada");
+      expect(RelationLevel.ADMIRADA).toBe("Admirada");
+      expect(RelationLevel.REVERENCIADA).toBe("Reverenciada");
     });
 
-    it('should have correct SettlementType values', () => {
-      expect(SettlementType.LUGAREJO).toBe('Lugarejo');
-      expect(SettlementType.ALDEIA).toBe('Aldeia');
-      expect(SettlementType.CIDADE_PEQUENA).toBe('Cidade Pequena');
-      expect(SettlementType.CIDADE_GRANDE).toBe('Cidade Grande');
-      expect(SettlementType.METROPOLE).toBe('Metrópole');
+    it("should have correct SettlementType values", () => {
+      expect(SettlementType.LUGAREJO).toBe("Lugarejo");
+      expect(SettlementType.ALDEIA).toBe("Aldeia");
+      expect(SettlementType.CIDADE_PEQUENA).toBe("Cidade Pequena");
+      expect(SettlementType.CIDADE_GRANDE).toBe("Cidade Grande");
+      expect(SettlementType.METROPOLE).toBe("Metrópole");
     });
   });
 
-  describe('Guild Structure Interface', () => {
-    it('should create valid GuildStructure object', () => {
+  describe("Guild Structure Interface", () => {
+    it("should create valid GuildStructure object", () => {
       const structure: GuildStructure = {
-        size: 'Pequena (5m x 5m)',
-        characteristics: ['Bem conservada', 'Modernidade mágica'],
-        location: 'Centro da cidade',
-        description: 'Uma guilda acolhedora'
+        size: "Pequena (5m x 5m)",
+        characteristics: ["Bem conservada", "Modernidade mágica"],
+        location: "Centro da cidade",
+        description: "Uma guilda acolhedora",
       };
 
-      expect(structure.size).toBe('Pequena (5m x 5m)');
+      expect(structure.size).toBe("Pequena (5m x 5m)");
       expect(structure.characteristics).toHaveLength(2);
-      expect(structure.location).toBe('Centro da cidade');
-      expect(structure.description).toBe('Uma guilda acolhedora');
+      expect(structure.location).toBe("Centro da cidade");
+      expect(structure.description).toBe("Uma guilda acolhedora");
     });
   });
 
-  describe('Guild Relations Interface', () => {
-    it('should create valid GuildRelations object', () => {
+  describe("Guild Relations Interface", () => {
+    it("should create valid GuildRelations object", () => {
       const relations: GuildRelations = {
-        government: RelationLevel.NEUTRA,
+        government: RelationLevel.INDIFERENTE,
         population: RelationLevel.RESPEITADA,
-        notes: 'Relações estáveis'
+        notes: "Relações estáveis",
       };
 
-      expect(relations.government).toBe(RelationLevel.NEUTRA);
+      expect(relations.government).toBe(RelationLevel.INDIFERENTE);
       expect(relations.population).toBe(RelationLevel.RESPEITADA);
-      expect(relations.notes).toBe('Relações estáveis');
+      expect(relations.notes).toBe("Relações estáveis");
     });
   });
 
-  describe('Guild Staff Interface', () => {
-    it('should create valid GuildStaff object', () => {
+  describe("Guild Staff Interface", () => {
+    it("should create valid GuildStaff object", () => {
       const staff: GuildStaff = {
-        employees: '1d6+3 funcionários experientes',
-        description: 'Equipe qualificada',
-        count: 6
+        employees: "1d6+3 funcionários experientes",
+        description: "Equipe qualificada",
+        count: 6,
       };
 
-      expect(staff.employees).toBe('1d6+3 funcionários experientes');
-      expect(staff.description).toBe('Equipe qualificada');
+      expect(staff.employees).toBe("1d6+3 funcionários experientes");
+      expect(staff.description).toBe("Equipe qualificada");
       expect(staff.count).toBe(6);
     });
   });
 
-  describe('Guild Visitors Interface', () => {
-    it('should create valid GuildVisitors object', () => {
+  describe("Guild Visitors Interface", () => {
+    it("should create valid GuildVisitors object", () => {
       const visitors: GuildVisitors = {
-        frequency: VisitorLevel.MOVIMENTADA,
-        description: 'Muitos aventureiros',
-        types: ['Aventureiros', 'Mercadores', 'Nobres']
+        frequency: VisitorLevel.MUITO_FREQUENTADA,
+        description: "Muitos aventureiros",
+        types: ["Aventureiros", "Mercadores", "Nobres"],
       };
 
-      expect(visitors.frequency).toBe(VisitorLevel.MOVIMENTADA);
-      expect(visitors.description).toBe('Muitos aventureiros');
+      expect(visitors.frequency).toBe(VisitorLevel.MUITO_FREQUENTADA);
+      expect(visitors.description).toBe("Muitos aventureiros");
       expect(visitors.types).toHaveLength(3);
     });
   });
 
-  describe('Guild Resources Interface', () => {
-    it('should create valid GuildResources object', () => {
+  describe("Guild Resources Interface", () => {
+    it("should create valid GuildResources object", () => {
       const resources: GuildResources = {
         level: ResourceLevel.ADEQUADOS,
-        description: 'Recursos suficientes',
-        details: ['Cofres bem abastecidos', 'Equipamentos básicos']
+        description: "Recursos suficientes",
+        details: ["Cofres bem abastecidos", "Equipamentos básicos"],
       };
 
       expect(resources.level).toBe(ResourceLevel.ADEQUADOS);
-      expect(resources.description).toBe('Recursos suficientes');
+      expect(resources.description).toBe("Recursos suficientes");
       expect(resources.details).toHaveLength(2);
     });
   });
 
-  describe('Guild Main Interface', () => {
-    it('should create valid Guild object', () => {
+  describe("Guild Main Interface", () => {
+    it("should create valid Guild object", () => {
       const guild: Guild = {
-        id: 'guild-001',
-        name: 'Guilda dos Aventureiros',
+        id: "guild-001",
+        name: "Guilda dos Aventureiros",
         structure: {
-          size: 'Média (10m x 10m)',
-          characteristics: ['Bem conservada']
+          size: "Média (10m x 10m)",
+          characteristics: ["Bem conservada"],
         },
         relations: {
-          government: RelationLevel.NEUTRA,
-          population: RelationLevel.RESPEITADA
+          government: RelationLevel.INDIFERENTE,
+          population: RelationLevel.RESPEITADA,
         },
         staff: {
-          employees: '1d6+2 funcionários'
+          employees: "1d6+2 funcionários",
         },
         visitors: {
-          frequency: VisitorLevel.MODERADA
+          frequency: VisitorLevel.POUCO_MOVIMENTADA,
         },
         resources: {
-          level: ResourceLevel.ADEQUADOS
+          level: ResourceLevel.ADEQUADOS,
         },
         settlementType: SettlementType.CIDADE_PEQUENA,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
-      expect(guild.id).toBe('guild-001');
-      expect(guild.name).toBe('Guilda dos Aventureiros');
+      expect(guild.id).toBe("guild-001");
+      expect(guild.name).toBe("Guilda dos Aventureiros");
       expect(guild.settlementType).toBe(SettlementType.CIDADE_PEQUENA);
     });
   });
 
-  describe('Guild Generation Config Interface', () => {
-    it('should create valid GuildGenerationConfig object', () => {
+  describe("Guild Generation Config Interface", () => {
+    it("should create valid GuildGenerationConfig object", () => {
       const config: GuildGenerationConfig = {
         settlementType: SettlementType.METROPOLE,
         useModifiers: true,
         customModifiers: {
           structure: 5,
-          visitors: 3
-        }
+          visitors: 3,
+        },
       };
 
       expect(config.settlementType).toBe(SettlementType.METROPOLE);
@@ -185,43 +190,43 @@ describe('Issue 3.1 - Guild TypeScript Types', () => {
     });
   });
 
-  describe('Guild Generation Result Interface', () => {
-    it('should create valid GuildGenerationResult object', () => {
+  describe("Guild Generation Result Interface", () => {
+    it("should create valid GuildGenerationResult object", () => {
       const result: GuildGenerationResult = {
         guild: {
           structure: {
-            size: 'Grande (15m x 15m)',
-            characteristics: ['Luxuosa', 'Fortificada']
+            size: "Grande (15m x 15m)",
+            characteristics: ["Luxuosa", "Fortificada"],
           },
           relations: {
             government: RelationLevel.ALIADA,
-            population: RelationLevel.ADMIRADA
+            population: RelationLevel.ADMIRADA,
           },
           staff: {
-            employees: '2d6+5 funcionários experientes'
+            employees: "2d6+5 funcionários experientes",
           },
           visitors: {
-            frequency: VisitorLevel.LOTADA
+            frequency: VisitorLevel.LOTADA,
           },
           resources: {
-            level: ResourceLevel.ABUNDANTES
+            level: ResourceLevel.ABUNDANTES,
           },
-          settlementType: SettlementType.METROPOLE
+          settlementType: SettlementType.METROPOLE,
         },
         rolls: {
           structure: {
             size: 18,
-            characteristics: [12, 8]
+            characteristics: [12, 8],
           },
           relations: {
             government: 9,
-            population: 11
+            population: 11,
           },
           staff: 15,
           visitors: 23,
-          resources: 16
+          resources: 16,
         },
-        logs: ['Rolling for guild structure...', 'Generated large guild']
+        logs: ["Rolling for guild structure...", "Generated large guild"],
       };
 
       expect(result.guild.settlementType).toBe(SettlementType.METROPOLE);
@@ -231,67 +236,67 @@ describe('Issue 3.1 - Guild TypeScript Types', () => {
     });
   });
 
-  describe('Zod Schema Validation', () => {
-    it('should validate valid guild with GuildSchema', () => {
+  describe("Zod Schema Validation", () => {
+    it("should validate valid guild with GuildSchema", () => {
       const validGuild = {
         structure: {
-          size: 'Pequena (5m x 5m)',
-          characteristics: ['Bem conservada']
+          size: "Pequena (5m x 5m)",
+          characteristics: ["Bem conservada"],
         },
         relations: {
-          government: RelationLevel.NEUTRA,
-          population: RelationLevel.RESPEITADA
+          government: RelationLevel.INDIFERENTE,
+          population: RelationLevel.RESPEITADA,
         },
         staff: {
-          employees: '1d4+1 funcionários'
+          employees: "1d4+1 funcionários",
         },
         visitors: {
-          frequency: VisitorLevel.MODERADA
+          frequency: VisitorLevel.POUCO_MOVIMENTADA,
         },
         resources: {
-          level: ResourceLevel.ADEQUADOS
+          level: ResourceLevel.ADEQUADOS,
         },
-        settlementType: SettlementType.ALDEIA
+        settlementType: SettlementType.ALDEIA,
       };
 
       const result = GuildSchema.safeParse(validGuild);
       expect(result.success).toBe(true);
     });
 
-    it('should reject invalid guild with GuildSchema', () => {
+    it("should reject invalid guild with GuildSchema", () => {
       const invalidGuild = {
         structure: {
-          size: '', // Empty size should fail
-          characteristics: [] // Empty characteristics should fail
+          size: "", // Empty size should fail
+          characteristics: [], // Empty characteristics should fail
         },
         relations: {
-          government: 'INVALID_RELATION', // Invalid enum value
-          population: RelationLevel.RESPEITADA
+          government: "INVALID_RELATION", // Invalid enum value
+          population: RelationLevel.RESPEITADA,
         },
         staff: {
-          employees: '' // Empty employees should fail
+          employees: "", // Empty employees should fail
         },
         visitors: {
-          frequency: VisitorLevel.MODERADA
+          frequency: VisitorLevel.POUCO_MOVIMENTADA,
         },
         resources: {
-          level: ResourceLevel.ADEQUADOS
+          level: ResourceLevel.ADEQUADOS,
         },
-        settlementType: SettlementType.ALDEIA
+        settlementType: SettlementType.ALDEIA,
       };
 
       const result = GuildSchema.safeParse(invalidGuild);
       expect(result.success).toBe(false);
     });
 
-    it('should validate valid generation config with GuildGenerationConfigSchema', () => {
+    it("should validate valid generation config with GuildGenerationConfigSchema", () => {
       const validConfig = {
         settlementType: SettlementType.CIDADE_GRANDE,
         useModifiers: true,
         customModifiers: {
           structure: 2,
-          visitors: -1
-        }
+          visitors: -1,
+        },
       };
 
       const result = GuildGenerationConfigSchema.safeParse(validConfig);
@@ -299,27 +304,27 @@ describe('Issue 3.1 - Guild TypeScript Types', () => {
     });
   });
 
-  describe('Type Guards', () => {
-    it('should correctly identify valid Guild objects', () => {
+  describe("Type Guards", () => {
+    it("should correctly identify valid Guild objects", () => {
       const validGuild = {
         structure: {
-          size: 'Média (10m x 10m)',
-          characteristics: ['Moderna']
+          size: "Média (10m x 10m)",
+          characteristics: ["Moderna"],
         },
         relations: {
-          government: RelationLevel.NEUTRA,
-          population: RelationLevel.RESPEITADA
+          government: RelationLevel.INDIFERENTE,
+          population: RelationLevel.RESPEITADA,
         },
         staff: {
-          employees: '1d6 funcionários'
+          employees: "1d6 funcionários",
         },
         visitors: {
-          frequency: VisitorLevel.MODERADA
+          frequency: VisitorLevel.POUCO_MOVIMENTADA,
         },
         resources: {
-          level: ResourceLevel.ADEQUADOS
+          level: ResourceLevel.ADEQUADOS,
         },
-        settlementType: SettlementType.CIDADE_PEQUENA
+        settlementType: SettlementType.CIDADE_PEQUENA,
       };
 
       expect(isGuild(validGuild)).toBe(true);
@@ -327,10 +332,10 @@ describe('Issue 3.1 - Guild TypeScript Types', () => {
       expect(isGuild(null)).toBe(false);
     });
 
-    it('should correctly identify valid GuildGenerationConfig objects', () => {
+    it("should correctly identify valid GuildGenerationConfig objects", () => {
       const validConfig = {
         settlementType: SettlementType.METROPOLE,
-        useModifiers: true
+        useModifiers: true,
       };
 
       expect(isGuildGenerationConfig(validConfig)).toBe(true);
@@ -339,49 +344,49 @@ describe('Issue 3.1 - Guild TypeScript Types', () => {
     });
   });
 
-  describe('Utility Functions', () => {
-    it('should create guild with createGuild function', () => {
+  describe("Utility Functions", () => {
+    it("should create guild with createGuild function", () => {
       const guildData = {
         structure: {
-          size: 'Grande (15m x 15m)',
-          characteristics: ['Luxuosa', 'Segura']
+          size: "Grande (15m x 15m)",
+          characteristics: ["Luxuosa", "Segura"],
         },
         relations: {
           government: RelationLevel.ALIADA,
-          population: RelationLevel.ADMIRADA
+          population: RelationLevel.ADMIRADA,
         },
         staff: {
-          employees: '2d6+3 funcionários experientes'
+          employees: "2d6+3 funcionários experientes",
         },
         visitors: {
-          frequency: VisitorLevel.LOTADA
+          frequency: VisitorLevel.LOTADA,
         },
         resources: {
-          level: ResourceLevel.ABUNDANTES
+          level: ResourceLevel.ABUNDANTES,
         },
-        settlementType: SettlementType.METROPOLE
+        settlementType: SettlementType.METROPOLE,
       };
 
       const guild = createGuild(guildData);
       expect(guild.settlementType).toBe(SettlementType.METROPOLE);
-      expect(guild.structure.size).toBe('Grande (15m x 15m)');
+      expect(guild.structure.size).toBe("Grande (15m x 15m)");
     });
 
-    it('should throw error for invalid guild data in createGuild', () => {
+    it("should throw error for invalid guild data in createGuild", () => {
       const invalidData = {
         structure: {
-          size: '', // Invalid empty size
-          characteristics: []
-        }
+          size: "", // Invalid empty size
+          characteristics: [],
+        },
       };
 
-      expect(() => createGuild(invalidData)).toThrow('Invalid guild data');
+      expect(() => createGuild(invalidData)).toThrow("Invalid guild data");
     });
 
-    it('should create config with createGuildGenerationConfig function', () => {
+    it("should create config with createGuildGenerationConfig function", () => {
       const configData = {
         settlementType: SettlementType.CIDADE_GRANDE,
-        useModifiers: false
+        useModifiers: false,
       };
 
       const config = createGuildGenerationConfig(configData);
@@ -389,12 +394,14 @@ describe('Issue 3.1 - Guild TypeScript Types', () => {
       expect(config.useModifiers).toBe(false);
     });
 
-    it('should throw error for invalid config data in createGuildGenerationConfig', () => {
+    it("should throw error for invalid config data in createGuildGenerationConfig", () => {
       const invalidConfigData = {
-        settlementType: 'INVALID_TYPE'
+        settlementType: "INVALID_TYPE",
       };
 
-      expect(() => createGuildGenerationConfig(invalidConfigData)).toThrow('Invalid generation config');
+      expect(() => createGuildGenerationConfig(invalidConfigData)).toThrow(
+        "Invalid generation config"
+      );
     });
   });
 });
