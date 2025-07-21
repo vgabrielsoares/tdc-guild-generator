@@ -181,11 +181,43 @@ export const useGuildStore = defineStore("guild", () => {
       throw new Error("Cannot regenerate: no current guild or config");
     }
 
-    return generateGuild({
-      settlementType: currentGuild.value.settlementType,
-      customModifiers: lastConfig.value.customModifiers,
-      saveToHistory: true,
-    });
+    try {
+      isGenerating.value = true;
+
+      // Gera estrutura da guilda
+      const structureResult = generateGuildStructure({
+        settlementType: currentGuild.value.settlementType,
+        useModifiers: lastConfig.value.useModifiers,
+        customModifiers: lastConfig.value.customModifiers,
+      });
+
+      // Gera relações e recursos da guilda
+      const relationsResult = GuildRelationsGenerator.generate({
+        settlementType: currentGuild.value.settlementType,
+        customModifiers: {
+          governmentMod: lastConfig.value.customModifiers?.government,
+          populationMod: lastConfig.value.customModifiers?.population,
+          resourcesMod: lastConfig.value.customModifiers?.resources,
+          visitorsMod: lastConfig.value.customModifiers?.visitors,
+        },
+      });
+
+      // Atualiza a guilda atual com novos dados
+      currentGuild.value = {
+        ...currentGuild.value,
+        structure: structureResult.guild.structure,
+        relations: relationsResult.relations,
+        staff: structureResult.guild.staff,
+        visitors: relationsResult.visitors,
+        resources: relationsResult.resources,
+        updatedAt: new Date(),
+      };
+
+      await saveToStorage();
+      return currentGuild.value;
+    } finally {
+      isGenerating.value = false;
+    }
   }
 
   /**
@@ -318,8 +350,20 @@ export const useGuildStore = defineStore("guild", () => {
    * Gera uma guilda com configuração padrão
    */
   async function generateGuildWithDefaults(): Promise<Guild | null> {
+    // Array com todos os tipos de assentamento
+    const settlementTypes = [
+      SettlementType.LUGAREJO,
+      SettlementType.ALDEIA,
+      SettlementType.CIDADE_PEQUENA,
+      SettlementType.CIDADE_GRANDE,
+      SettlementType.METROPOLE,
+    ];
+    
+    // Seleciona um tipo aleatório
+    const randomSettlement = settlementTypes[Math.floor(Math.random() * settlementTypes.length)];
+    
     return generateGuild({
-      settlementType: SettlementType.CIDADE_PEQUENA,
+      settlementType: randomSettlement,
       saveToHistory: true,
     });
   }

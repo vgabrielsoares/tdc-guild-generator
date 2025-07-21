@@ -17,7 +17,7 @@ export enum ResourceLevel {
 
 export enum VisitorLevel {
   VAZIA = "Vazia",
-  QUASE_DESERTA = "Quase deserta",
+  QUASE_DESERTA = "Quase deserta", 
   POUCO_MOVIMENTADA = "Pouco movimentada",
   NEM_MUITO_NEM_POUCO = "Nem muito nem pouco",
   MUITO_FREQUENTADA = "Muito frequentada",
@@ -26,17 +26,20 @@ export enum VisitorLevel {
 }
 
 export enum RelationLevel {
-  HOSTIL = "Hostil",
-  SUSPEITA = "Suspeita",
-  INDIFERENTE = "Indiferente",
-  TOLERANTE = "Tolerante",
-  COOPERATIVA = "Cooperativa",
-  ALIADA = "Aliada",
-  TEMIDA = "Temida",
-  DESCONFIADA = "Desconfiada",
-  RESPEITADA = "Respeitada",
-  ADMIRADA = "Admirada",
-  REVERENCIADA = "Reverenciada",
+  PESSIMA = "Péssima",
+  RUIM = "Ruim",
+  RUIM_CORDIAL = "Ruim, mas tentam manter a cordialidade",
+  RUIM_PROBLEMAS = "Ruim, só causam problemas",
+  DIPLOMATICA = "Diplomática", 
+  OPINIAO_DIVIDIDA = "Opinião dividida",
+  BOA_TENSAO = "Boa, mas o governo tenta miná-los secretamente",
+  BOA = "Boa",
+  BOA_AJUDAM = "Boa, ajudam com problemas",
+  BOA_SEGUROS = "Boa, nos mantêm seguros",
+  MUITO_BOA = "Muito boa, cooperam frequentemente",
+  MUITO_BOA_PERDIDOS = "Muito boa, sem eles estaríamos perdidos",
+  EXCELENTE = "Excelente, governo e guilda são quase como um",
+  EXCELENTE_FUNCIONAR = "Excelente, a guilda faz o assentamento funcionar",
 }
 
 export enum SettlementType {
@@ -58,7 +61,9 @@ export interface GuildStructure {
 // Interface para relações da guilda
 export interface GuildRelations {
   government: string;
+  governmentDescription?: string;
   population: string;
+  populationDescription?: string;
   notes?: string;
 }
 
@@ -71,7 +76,7 @@ export interface GuildStaff {
 
 // Interface para visitantes
 export interface GuildVisitors {
-  frequency: string;
+  frequency: VisitorLevel;
   description?: string;
   types?: string[];
 }
@@ -145,7 +150,7 @@ export const ResourceLevelSchema = z.enum([
 ]);
 export const VisitorLevelSchema = z.enum([
   "Vazia",
-  "Quase deserta",
+  "Quase deserta", 
   "Pouco movimentada",
   "Nem muito nem pouco",
   "Muito frequentada",
@@ -153,17 +158,22 @@ export const VisitorLevelSchema = z.enum([
   "Lotada",
 ]);
 export const RelationLevelSchema = z.enum([
-  "Hostil",
-  "Suspeita",
-  "Indiferente",
-  "Tolerante",
-  "Cooperativa",
-  "Aliada",
-  "Temida",
-  "Desconfiada",
-  "Respeitada",
-  "Admirada",
-  "Reverenciada",
+  "Péssima",
+  "Ruim",
+  "Ruim, mas tentam manter a cordialidade",
+  "Ruim, só causam problemas",
+  "Ruim, vistos como mercenários",
+  "Péssima, puro ódio",
+  "Diplomática",
+  "Opinião dividida",
+  "Boa, mas o governo tenta miná-los secretamente",
+  "Boa",
+  "Boa, ajudam com problemas",
+  "Boa, nos mantêm seguros",
+  "Muito boa, cooperam frequentemente",
+  "Muito boa, sem eles estaríamos perdidos",
+  "Excelente, governo e guilda são quase como um",
+  "Excelente, a guilda faz o assentamento funcionar",
 ]);
 export const SettlementTypeSchema = z.nativeEnum(SettlementType);
 
