@@ -120,11 +120,22 @@ const resultTextClass = computed(() => {
 
 // Methods
 const formatTime = (date: Date): string => {
-  return new Intl.DateTimeFormat('pt-BR', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
-  }).format(new Date(date))
+  try {
+    const dateObj = new Date(date)
+    
+    // Verifica se a data é válida
+    if (isNaN(dateObj.getTime())) {
+      return '--:--:--'
+    }
+    
+    return new Intl.DateTimeFormat('pt-BR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    }).format(dateObj)
+  } catch {
+    return '--:--:--'
+  }
 }
 
 const copyResult = async () => {

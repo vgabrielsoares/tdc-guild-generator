@@ -152,14 +152,25 @@ const getResourceColor = (level: string): string => {
   return 'bg-gray-400'
 }
 
-const formatDate = (date: Date): string => {
-  return new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  }).format(date)
+const formatDate = (date: Date | string | number): string => {
+  try {
+    const dateObj = new Date(date)
+    
+    // Verifica se a data é válida
+    if (isNaN(dateObj.getTime())) {
+      return 'Data inválida'
+    }
+    
+    return new Intl.DateTimeFormat('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(dateObj)
+  } catch {
+    return 'Data inválida'
+  }
 }
 </script>
 
