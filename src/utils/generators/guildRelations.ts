@@ -2,23 +2,22 @@ import type {
   GuildRelations,
   GuildResources,
   GuildVisitors,
-  SettlementType,
 } from "@/types/guild";
 import {
   RelationLevel,
   ResourceLevel,
   VisitorLevel,
+  SettlementType,
 } from "@/types/guild";
 import { rollOnTable } from "@/utils/tableRoller";
 import {
   GOVERNMENT_RELATIONS_TABLE,
   POPULATION_RELATIONS_TABLE,
-  RESOURCES_LEVEL_TABLE,
-  VISITORS_FREQUENCY_TABLE,
   VISITOR_TYPES_TABLE,
   RESOURCE_SPECIALTIES_TABLE,
   getResourceSpecialtiesCount,
-  SETTLEMENT_DICE,
+  getVisitorFrequencyTable,
+  getResourceLevelTable,
 } from "@/data/tables/guild-structure";
 
 export interface RelationsGenerationConfig {
@@ -44,7 +43,7 @@ function createCustomLog(category: string, message: string): void {
  */
 export function generateGovernmentRelations(
   config: RelationsGenerationConfig
-): RelationLevel {
+): { level: RelationLevel; result: string; description: string } {
   const modifiers = config.customModifiers?.governmentMod
     ? [
         {
@@ -57,11 +56,25 @@ export function generateGovernmentRelations(
 
   const result = rollOnTable(GOVERNMENT_RELATIONS_TABLE, modifiers);
 
+  // Handle 21+ case (Excelente result when roll > 20)
+  let finalResult = result.result;
+  let finalDescription = result.entry.description || "";
+  
+  if (result.finalRoll > 20) {
+    finalResult = "Excelente, governo e guilda são quase como um";
+    finalDescription = "Relação excelente";
+  }
+
   createCustomLog(
     "GUILD RELATIONS",
-    `Government: ${result.result} (rolled ${result.finalRoll})`
+    `Government: ${finalResult} (rolled ${result.finalRoll})`
   );
-  return stringToRelationLevel(result.result);
+  
+  return {
+    level: stringToRelationLevel(finalResult),
+    result: finalResult,
+    description: finalDescription
+  };
 }
 
 /**
@@ -69,7 +82,7 @@ export function generateGovernmentRelations(
  */
 export function generatePopulationRelations(
   config: RelationsGenerationConfig
-): RelationLevel {
+): { level: RelationLevel; result: string; description: string } {
   const modifiers = config.customModifiers?.populationMod
     ? [
         {
@@ -82,11 +95,25 @@ export function generatePopulationRelations(
 
   const result = rollOnTable(POPULATION_RELATIONS_TABLE, modifiers);
 
+  // Handle 21+ case (Excelente result when roll > 20)
+  let finalResult = result.result;
+  let finalDescription = result.entry.description || "";
+  
+  if (result.finalRoll > 20) {
+    finalResult = "Excelente, a guilda faz o assentamento funcionar";
+    finalDescription = "Reputação excelente";
+  }
+
   createCustomLog(
     "GUILD RELATIONS",
-    `Population: ${result.result} (rolled ${result.finalRoll})`
+    `Population: ${finalResult} (rolled ${result.finalRoll})`
   );
-  return stringToRelationLevel(result.result);
+  
+  return {
+    level: stringToRelationLevel(finalResult),
+    result: finalResult,
+    description: finalDescription
+  };
 }
 
 /**
@@ -95,6 +122,18 @@ export function generatePopulationRelations(
 export function generateResourceLevel(
   config: RelationsGenerationConfig
 ): ResourceLevel {
+  // Map settlement type to string for table lookup
+  const settlementMapping: Record<SettlementType, string> = {
+    [SettlementType.LUGAREJO]: "Lugarejo",
+    [SettlementType.ALDEIA]: "Aldeia",
+    [SettlementType.CIDADE_PEQUENA]: "Cidadela",
+    [SettlementType.CIDADE_GRANDE]: "Cidade grande",
+    [SettlementType.METROPOLE]: "Metrópole",
+  };
+
+  const settlementKey = settlementMapping[config.settlementType] || "Aldeia";
+  const resourceTable = getResourceLevelTable(settlementKey);
+
   const modifiers = config.customModifiers?.resourcesMod
     ? [
         {
@@ -105,13 +144,20 @@ export function generateResourceLevel(
       ]
     : [];
 
-  const result = rollOnTable(RESOURCES_LEVEL_TABLE, modifiers);
+  const result = rollOnTable(resourceTable, modifiers);
+
+  // Handle 21+ case (Abundantes vindos de muitos anos de serviço when roll > 20)
+  let finalResult = result.result as string;
+  
+  if (result.finalRoll > 20) {
+    finalResult = "Abundantes vindos de muitos anos de serviço";
+  }
 
   createCustomLog(
     "GUILD RESOURCES",
-    `Level: ${result.result} (rolled ${result.finalRoll})`
+    `Level: ${finalResult} (rolled ${result.finalRoll})`
   );
-  return stringToResourceLevel(result.result);
+  return stringToResourceLevel(finalResult);
 }
 
 /**
@@ -153,21 +199,26 @@ export function generateResourceSpecialties(
  * Convert string result to RelationLevel enum
  */
 function stringToRelationLevel(value: string): RelationLevel {
-  const mapping: Record<string, RelationLevel> = {
-    'Hostil': RelationLevel.HOSTIL,
-    'Suspeita': RelationLevel.SUSPEITA,
-    'Indiferente': RelationLevel.INDIFERENTE,
-    'Tolerante': RelationLevel.TOLERANTE,
-    'Cooperativa': RelationLevel.COOPERATIVA,
-    'Aliada': RelationLevel.ALIADA,
-    'Temida': RelationLevel.TEMIDA,
-    'Desconfiada': RelationLevel.DESCONFIADA,
-    'Respeitada': RelationLevel.RESPEITADA,
-    'Admirada': RelationLevel.ADMIRADA,
-    'Reverenciada': RelationLevel.REVERENCIADA,
+  const exactMapping: Record<string, RelationLevel> = {
+    'Péssima': RelationLevel.PESSIMA,
+    'Ruim': RelationLevel.RUIM,
+    'Ruim, mas tentam manter a cordialidade': RelationLevel.RUIM_CORDIAL,
+    'Ruim, só causam problemas': RelationLevel.RUIM_PROBLEMAS,
+    'Ruim, vistos como mercenários': RelationLevel.RUIM_PROBLEMAS,
+    'Péssima, puro ódio': RelationLevel.PESSIMA,
+    'Diplomática': RelationLevel.DIPLOMATICA,
+    'Opinião dividida': RelationLevel.OPINIAO_DIVIDIDA,
+    'Boa, mas o governo tenta miná-los secretamente': RelationLevel.BOA_TENSAO,
+    'Boa': RelationLevel.BOA,
+    'Boa, ajudam com problemas': RelationLevel.BOA_AJUDAM,
+    'Boa, nos mantêm seguros': RelationLevel.BOA_SEGUROS,
+    'Muito boa, cooperam frequentemente': RelationLevel.MUITO_BOA,
+    'Muito boa, sem eles estaríamos perdidos': RelationLevel.MUITO_BOA_PERDIDOS,
+    'Excelente, governo e guilda são quase como um': RelationLevel.EXCELENTE,
+    'Excelente, a guilda faz o assentamento funcionar': RelationLevel.EXCELENTE_FUNCIONAR,
   };
   
-  return mapping[value] || RelationLevel.INDIFERENTE;
+  return exactMapping[value] || RelationLevel.DIPLOMATICA;
 }
 
 /**
@@ -195,7 +246,8 @@ function stringToResourceLevel(value: string): ResourceLevel {
  * Convert string result to VisitorLevel enum
  */
 function stringToVisitorLevel(value: string): VisitorLevel {
-  const mapping: Record<string, VisitorLevel> = {
+  // Use exact match first, then fallback to contains
+  const exactMapping: Record<string, VisitorLevel> = {
     'Vazia': VisitorLevel.VAZIA,
     'Quase deserta': VisitorLevel.QUASE_DESERTA,
     'Pouco movimentada': VisitorLevel.POUCO_MOVIMENTADA,
@@ -205,7 +257,7 @@ function stringToVisitorLevel(value: string): VisitorLevel {
     'Lotada': VisitorLevel.LOTADA,
   };
   
-  return mapping[value] || VisitorLevel.NEM_MUITO_NEM_POUCO;
+  return exactMapping[value] || VisitorLevel.NEM_MUITO_NEM_POUCO;
 }
 
 /**
@@ -214,20 +266,17 @@ function stringToVisitorLevel(value: string): VisitorLevel {
 export function generateVisitorLevel(
   config: RelationsGenerationConfig
 ): VisitorLevel {
-  // Get settlement-specific dice notation
-  const settlementKey = getSettlementKey(config.settlementType);
-  const visitorDice = SETTLEMENT_DICE.visitors as Record<
-    string,
-    { dice: string; modifier: number }
-  >;
-  const settlementDice = visitorDice[settlementKey];
+  // Map settlement type to string for table lookup
+  const settlementMapping: Record<SettlementType, string> = {
+    [SettlementType.LUGAREJO]: "Lugarejo",
+    [SettlementType.ALDEIA]: "Aldeia",
+    [SettlementType.CIDADE_PEQUENA]: "Cidadela",
+    [SettlementType.CIDADE_GRANDE]: "Cidade grande",
+    [SettlementType.METROPOLE]: "Metrópole",
+  };
 
-  if (!settlementDice) {
-    createCustomLog(
-      "GUILD VISITORS",
-      `Unknown settlement type: ${config.settlementType}, using default d8`
-    );
-  }
+  const settlementKey = settlementMapping[config.settlementType] || "Aldeia";
+  const visitorsTable = getVisitorFrequencyTable(settlementKey);
 
   const modifiers = config.customModifiers?.visitorsMod
     ? [
@@ -239,35 +288,22 @@ export function generateVisitorLevel(
       ]
     : [];
 
-  const result = rollOnTable(VISITORS_FREQUENCY_TABLE, modifiers);
+  const result = rollOnTable(visitorsTable, modifiers);
+
+  // Handle 20+ case (Lotada when roll > 20)
+  let finalResult = result.result as string;
+  
+  if (result.finalRoll > 20) {
+    finalResult = "Lotada";
+  }
 
   createCustomLog(
     "GUILD VISITORS",
-    `Frequency: ${result.result} (rolled ${result.finalRoll})`
+    `Frequency: ${finalResult} (rolled ${result.finalRoll})`
   );
 
   // Convert string result to VisitorLevel enum
-  return stringToVisitorLevel(result.result);
-}
-
-/**
- * Map SettlementType enum to string keys used in tables
- */
-function getSettlementKey(settlementType: SettlementType): string {
-  switch (settlementType) {
-    case "Cidade Pequena":
-      return "Vilarejo";
-    case "Cidade Grande":
-      return "Cidadela";
-    case "Metrópole":
-      return "Metrópole";
-    case "Lugarejo":
-      return "Lugarejo";
-    case "Aldeia":
-      return "Aldeia";
-    default:
-      return "Vilarejo";
-  }
+  return stringToVisitorLevel(finalResult);
 }
 
 /**
@@ -308,22 +344,22 @@ export function generateVisitorTypes(visitorLevel: VisitorLevel): string[] {
  */
 function getVisitorTypesCount(level: VisitorLevel): number {
   switch (level) {
-    case "Vazia":
+    case VisitorLevel.VAZIA:
+      return 0;
+    case VisitorLevel.QUASE_DESERTA:
       return 1;
-    case "Quase deserta":
-      return 1;
-    case "Pouco movimentada":
+    case VisitorLevel.POUCO_MOVIMENTADA:
       return 2;
-    case "Nem muito nem pouco":
-      return 2;
-    case "Muito frequentada":
+    case VisitorLevel.NEM_MUITO_NEM_POUCO:
       return 3;
-    case "Abarrotada":
+    case VisitorLevel.MUITO_FREQUENTADA:
       return 4;
-    case "Lotada":
+    case VisitorLevel.ABARROTADA:
       return 5;
+    case VisitorLevel.LOTADA:
+      return 6;
     default:
-      return 3;
+      return 2;
   }
 }
 
@@ -342,8 +378,10 @@ export function generateGuildRelations(
   const population = generatePopulationRelations(config);
 
   return {
-    government,
-    population,
+    government: government.result,
+    governmentDescription: government.description,
+    population: population.result,
+    populationDescription: population.description,
   };
 }
 
