@@ -1,9 +1,6 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
-import type {
-  Guild,
-  GuildGenerationConfig,
-} from "@/types/guild";
+import type { Guild, GuildGenerationConfig } from "@/types/guild";
 import { SettlementType } from "@/types/guild";
 import { generateGuildStructure } from "@/utils/generators/guildStructure";
 import { GuildRelationsGenerator } from "@/utils/generators/guildRelations";
@@ -62,31 +59,45 @@ export const useGuildStore = defineStore("guild", () => {
   const guildCount = computed(() => guildHistory.value.length);
   const recentGuilds = computed(() => guildHistory.value.slice(0, 10));
   const canRegenerate = computed(() => lastConfig.value !== null);
-  
+
   /**
    * Estatísticas do histórico de guildas
    */
   const historyStats = computed(() => {
     const history = guildHistory.value;
-    const settlementCounts = history.reduce((acc, guild) => {
-      acc[guild.settlementType] = (acc[guild.settlementType] || 0) + 1;
-      return acc;
-    }, {} as Record<SettlementType, number>);
+    const settlementCounts = history.reduce(
+      (acc, guild) => {
+        acc[guild.settlementType] = (acc[guild.settlementType] || 0) + 1;
+        return acc;
+      },
+      {} as Record<SettlementType, number>
+    );
 
-    const resourceCounts = history.reduce((acc, guild) => {
-      const level = guild.resources?.level || 'unknown';
-      acc[level] = (acc[level] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const resourceCounts = history.reduce(
+      (acc, guild) => {
+        const level = guild.resources?.level || "unknown";
+        acc[level] = (acc[level] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
     return {
       total: history.length,
       bySettlement: settlementCounts,
       byResourceLevel: resourceCounts,
-      oldestDate: history.length > 0 ? 
-        new Date(Math.min(...history.map(g => g.createdAt?.getTime() || 0))) : null,
-      newestDate: history.length > 0 ?
-        new Date(Math.max(...history.map(g => g.createdAt?.getTime() || 0))) : null,
+      oldestDate:
+        history.length > 0
+          ? new Date(
+              Math.min(...history.map((g) => g.createdAt?.getTime() || 0))
+            )
+          : null,
+      newestDate:
+        history.length > 0
+          ? new Date(
+              Math.max(...history.map((g) => g.createdAt?.getTime() || 0))
+            )
+          : null,
     };
   });
 
@@ -190,12 +201,13 @@ export const useGuildStore = defineStore("guild", () => {
 
       const structureResult = generateGuildStructure(lastConfig.value);
 
-      // Atualiza apenas a estrutura
+      // Atualiza a estrutura, funcionários e visitantes
       currentGuild.value = {
         ...currentGuild.value,
         structure: structureResult.guild.structure,
         staff: structureResult.guild.staff,
-        createdAt: new Date(),
+        visitors: structureResult.guild.visitors,
+        updatedAt: new Date(),
       };
 
       await saveToStorage();
@@ -218,20 +230,19 @@ export const useGuildStore = defineStore("guild", () => {
       const relationsResult = GuildRelationsGenerator.generate({
         settlementType: currentGuild.value.settlementType,
         customModifiers: {
-          governmentMod: lastConfig.value.customModifiers?.structure,
-          populationMod: lastConfig.value.customModifiers?.visitors,
-          resourcesMod: lastConfig.value.customModifiers?.structure,
+          governmentMod: lastConfig.value.customModifiers?.government,
+          populationMod: lastConfig.value.customModifiers?.population,
+          resourcesMod: lastConfig.value.customModifiers?.resources,
           visitorsMod: lastConfig.value.customModifiers?.visitors,
         },
       });
 
-      // Atualiza apenas as relações
+      // Atualiza apenas as relações e recursos
       currentGuild.value = {
         ...currentGuild.value,
         relations: relationsResult.relations,
-        visitors: relationsResult.visitors,
         resources: relationsResult.resources,
-        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       await saveToStorage();
@@ -408,9 +419,10 @@ export const useGuildStore = defineStore("guild", () => {
       };
 
       const serializedState = JSON.stringify(state);
-      
+
       // Verifica se há espaço suficiente no localStorage
-      if (serializedState.length > 5 * 1024 * 1024) { // 5MB limite
+      if (serializedState.length > 5 * 1024 * 1024) {
+        // 5MB limite
         // Se muito grande, mantém apenas as últimas 10 guildas
         state.guildHistory = guildHistory.value.slice(0, 10);
       }
@@ -447,14 +459,17 @@ export const useGuildStore = defineStore("guild", () => {
 
       // Converte datas que vêm como string do JSON
       if (state.currentGuild) {
-        if (state.currentGuild.createdAt && typeof state.currentGuild.createdAt === "string") {
+        if (
+          state.currentGuild.createdAt &&
+          typeof state.currentGuild.createdAt === "string"
+        ) {
           state.currentGuild.createdAt = new Date(state.currentGuild.createdAt);
         }
       }
 
       // Converte datas no histórico
       if (state.guildHistory && Array.isArray(state.guildHistory)) {
-        state.guildHistory = state.guildHistory.map(guild => ({
+        state.guildHistory = state.guildHistory.map((guild) => ({
           ...guild,
           createdAt: guild.createdAt ? new Date(guild.createdAt) : new Date(),
         }));
@@ -467,7 +482,6 @@ export const useGuildStore = defineStore("guild", () => {
       lastGenerated.value = state.lastGenerated
         ? new Date(state.lastGenerated)
         : null;
-
     } catch (error) {
       // Limpa dados corrompidos e reinicia com estado limpo
       localStorage.removeItem(STORAGE_KEY);
@@ -492,7 +506,7 @@ export const useGuildStore = defineStore("guild", () => {
   function generateGuildName(settlementType?: SettlementType): string {
     const prefixes = [
       "Guilda dos",
-      "Irmandade dos", 
+      "Irmandade dos",
       "Companhia dos",
       "Ordem dos",
       "Círculo dos",
@@ -500,10 +514,10 @@ export const useGuildStore = defineStore("guild", () => {
       "Conselho dos",
       "União dos",
     ];
-    
+
     const suffixes = [
       "Artesãos",
-      "Mercadores", 
+      "Mercadores",
       "Ferreiros",
       "Tecelões",
       "Alquimistas",
@@ -519,7 +533,7 @@ export const useGuildStore = defineStore("guild", () => {
     // Nomes especiais para assentamentos grandes
     const specialNames = [
       "Rosa Dourada",
-      "Luz Cerúlea", 
+      "Luz Cerúlea",
       "Forja Ancestral",
       "Lâmina Prata",
       "Escudo de Ferro",
@@ -529,8 +543,10 @@ export const useGuildStore = defineStore("guild", () => {
     ];
 
     // Para metrópoles e cidades grandes, chance de nome especial
-    if (settlementType === SettlementType.METROPOLE || 
-        settlementType === SettlementType.CIDADE_GRANDE) {
+    if (
+      settlementType === SettlementType.METROPOLE ||
+      settlementType === SettlementType.CIDADE_GRANDE
+    ) {
       if (Math.random() < 0.3) {
         return specialNames[Math.floor(Math.random() * specialNames.length)];
       }

@@ -2,13 +2,17 @@ import { z } from "zod";
 
 // Enums para valores fixos
 export enum ResourceLevel {
+  EM_DEBITO = "Em débito",
+  NENHUM = "Nenhum",
   ESCASSOS = "Escassos",
+  ESCASSOS_HONESTOS = "Escassos e obtidos com muito esforço e honestidade",
   LIMITADOS = "Limitados",
-  BÁSICOS = "Básicos",
-  ADEQUADOS = "Adequados",
+  SUFICIENTES = "Suficientes",
+  EXCEDENTES = "Excedentes",
+  EXCEDENTES_MALIGNOS = "Excedentes mas alimenta fins malignos",
+  ABUNDANTES_GOVERNO = "Abundantes porém quase todo vindo do governo de um assentamento próximo",
   ABUNDANTES = "Abundantes",
-  VASTOS = "Vastos",
-  LENDARIOS = "Lendários",
+  ABUNDANTES_SERVICO = "Abundantes vindos de muitos anos de serviço",
 }
 
 export enum VisitorLevel {
@@ -100,6 +104,9 @@ export interface GuildGenerationConfig {
   customModifiers?: {
     structure?: number;
     visitors?: number;
+    government?: number;
+    population?: number;
+    resources?: number;
   };
 }
 
@@ -124,13 +131,17 @@ export interface GuildGenerationResult {
 
 // Schemas Zod para validação
 export const ResourceLevelSchema = z.enum([
+  "Em débito",
+  "Nenhum",
   "Escassos",
+  "Escassos e obtidos com muito esforço e honestidade",
   "Limitados",
-  "Básicos",
-  "Adequados",
+  "Suficientes",
+  "Excedentes",
+  "Excedentes mas alimenta fins malignos",
+  "Abundantes porém quase todo vindo do governo de um assentamento próximo",
   "Abundantes",
-  "Vastos",
-  "Lendários",
+  "Abundantes vindos de muitos anos de serviço",
 ]);
 export const VisitorLevelSchema = z.enum([
   "Vazia",
@@ -209,6 +220,9 @@ export const GuildGenerationConfigSchema = z.object({
     .object({
       structure: z.number().int().optional(),
       visitors: z.number().int().optional(),
+      government: z.number().int().optional(),
+      population: z.number().int().optional(),
+      resources: z.number().int().optional(),
     })
     .optional(),
 });
