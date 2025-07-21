@@ -2,9 +2,9 @@ import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import type {
   Guild,
-  SettlementType,
   GuildGenerationConfig,
 } from "@/types/guild";
+import { SettlementType } from "@/types/guild";
 import { generateGuildStructure } from "@/utils/generators/guildStructure";
 import { GuildRelationsGenerator } from "@/utils/generators/guildRelations";
 import { isGuild } from "@/types/guild";
@@ -59,6 +59,8 @@ export const useGuildStore = defineStore("guild", () => {
   // Computadas
   const hasCurrentGuild = computed(() => currentGuild.value !== null);
   const historyCount = computed(() => guildHistory.value.length);
+  const guildCount = computed(() => guildHistory.value.length);
+  const recentGuilds = computed(() => guildHistory.value.slice(0, 10));
   const canRegenerate = computed(() => lastConfig.value !== null);
 
   /**
@@ -249,6 +251,42 @@ export const useGuildStore = defineStore("guild", () => {
   }
 
   /**
+   * Limpa todo o histórico e guilda atual
+   */
+  async function clearAll(): Promise<void> {
+    guildHistory.value = [];
+    currentGuild.value = null;
+    lastConfig.value = null;
+    lastGenerated.value = null;
+    await saveToStorage();
+  }
+
+  /**
+   * Define a guilda atual
+   */
+  function setCurrentGuild(guild: Guild): void {
+    currentGuild.value = guild;
+    lastGenerated.value = guild.createdAt;
+  }
+
+  /**
+   * Remove uma guilda do histórico (alias para removeFromHistory)
+   */
+  async function removeGuild(guildId: string): Promise<boolean> {
+    return removeFromHistory(guildId);
+  }
+
+  /**
+   * Gera uma guilda com configuração padrão
+   */
+  async function generateGuildWithDefaults(): Promise<Guild | null> {
+    return generateGuild({
+      settlementType: SettlementType.CIDADE_PEQUENA,
+      saveToHistory: true,
+    });
+  }
+
+  /**
    * Limpa todo o histórico
    */
   async function clearHistory(): Promise<void> {
@@ -421,17 +459,23 @@ export const useGuildStore = defineStore("guild", () => {
     // Computadas
     hasCurrentGuild,
     historyCount,
+    guildCount,
+    recentGuilds,
     canRegenerate,
 
     // Actions
     generateGuild,
+    generateGuildWithDefaults,
     regenerateCurrentGuild,
     regenerateStructure,
     regenerateRelations,
     selectGuildFromHistory,
     removeFromHistory,
+    removeGuild,
     clearHistory,
+    clearAll,
     clearCurrentGuild,
+    setCurrentGuild,
     exportCurrentGuild,
     exportHistory,
     importGuild,
