@@ -48,6 +48,8 @@ jspm_packages/
 # Optional npm cache directory
 .npm
 
+.github
+
 # Optional eslint cache
 .eslintcache
 
