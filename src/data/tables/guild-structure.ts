@@ -244,44 +244,20 @@ export const VISITOR_TYPES_TABLE: TableEntry<string>[] = [
   },
 ];
 
-// Nível de Recursos (1d12 + modificadores de tamanho)
+// Nível de Recursos (1d20)
 export const RESOURCES_LEVEL_TABLE: TableEntry<string>[] = [
-  {
-    min: 1,
-    max: 3,
-    result: "Escassos",
-    description: "Recursos muito limitados",
-  },
-  {
-    min: 4,
-    max: 6,
-    result: "Básicos",
-    description: "Recursos suficientes para operação básica",
-  },
-  {
-    min: 7,
-    max: 9,
-    result: "Adequados",
-    description: "Recursos suficientes para expansão moderada",
-  },
-  {
-    min: 10,
-    max: 12,
-    result: "Abundantes",
-    description: "Recursos suficientes para grandes projetos",
-  },
-  {
-    min: 13,
-    max: 15,
-    result: "Vastos",
-    description: "Recursos praticamente ilimitados",
-  },
-  {
-    min: 16,
-    max: 20,
-    result: "Lendários",
-    description: "Recursos que outros apenas sonham",
-  },
+  { min: 1, max: 2, result: 'Em débito' },
+  { min: 3, max: 5, result: 'Nenhum' },
+  { min: 6, max: 8, result: 'Escassos' },
+  { min: 9, max: 9, result: 'Escassos e obtidos com muito esforço e honestidade' },
+  { min: 10, max: 11, result: 'Limitados' },
+  { min: 12, max: 12, result: 'Limitados' },
+  { min: 13, max: 15, result: 'Suficientes' },
+  { min: 16, max: 16, result: 'Excedentes' },
+  { min: 17, max: 17, result: 'Excedentes mas alimenta fins malignos' },
+  { min: 18, max: 19, result: 'Abundantes porém quase todo vindo do governo de um assentamento próximo' },
+  { min: 20, max: 20, result: 'Abundantes' },
+  { min: 21, max: 25, result: 'Abundantes vindos de muitos anos de serviço' }
 ];
 
 // Especialidades de Recursos (1d10, role múltiplas vezes baseado no nível)
@@ -408,18 +384,24 @@ export function getVisitorTypesCount(level: string): number {
 // Função para determinar quantas especialidades baseado no nível de recursos
 export function getResourceSpecialtiesCount(level: string): number {
   switch (level) {
+    case "Em débito":
+      return 0;
+    case "Nenhum":
+      return 0;
     case "Escassos":
+    case "Escassos e obtidos com muito esforço e honestidade":
       return 1;
-    case "Básicos":
+    case "Limitados":
       return 2;
-    case "Adequados":
+    case "Suficientes":
       return 3;
-    case "Abundantes":
+    case "Excedentes":
+    case "Excedentes mas alimenta fins malignos":
       return 4;
-    case "Vastos":
+    case "Abundantes":
+    case "Abundantes porém quase todo vindo do governo de um assentamento próximo":
+    case "Abundantes vindos de muitos anos de serviço":
       return 5;
-    case "Lendários":
-      return 6;
     default:
       return 2;
   }

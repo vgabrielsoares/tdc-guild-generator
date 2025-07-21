@@ -9,6 +9,7 @@ import {
 } from "../../types/guild";
 import { rollDice } from "../dice";
 import { rollOnTable } from "../tableRoller";
+import type { TableEntry } from "../../types/tables";
 import {
   HEADQUARTERS_SIZE_TABLE,
   HEADQUARTERS_CHARACTERISTICS_TABLE,
@@ -21,13 +22,41 @@ import {
 } from "../../data/tables/guild-structure";
 
 /**
+ * Helper function to lookup a value in a table
+ */
+function lookupTableValue<T>(table: TableEntry<T>[], value: number): T {
+  const matchingEntry = table.find(
+    (entry) => value >= entry.min && value <= entry.max
+  );
+
+  if (!matchingEntry) {
+    // Use the closest entry as fallback
+    const closest = table.reduce((prev, curr) => {
+      const prevDistance = Math.min(
+        Math.abs(prev.min - value),
+        Math.abs(prev.max - value)
+      );
+      const currDistance = Math.min(
+        Math.abs(curr.min - value),
+        Math.abs(curr.max - value)
+      );
+      return currDistance < prevDistance ? curr : prev;
+    });
+
+    return closest.result;
+  }
+
+  return matchingEntry.result;
+}
+
+/**
  * Maps SettlementType enum to SETTLEMENT_DICE keys
  */
 function mapSettlementType(settlementType: SettlementType): string {
   const mapping: Record<SettlementType, string> = {
     [SettlementType.LUGAREJO]: "Lugarejo",
-    [SettlementType.ALDEIA]: "Aldeia",
-    [SettlementType.CIDADE_PEQUENA]: "Cidade grande",
+    [SettlementType.ALDEIA]: "Aldeia", 
+    [SettlementType.CIDADE_PEQUENA]: "Cidadela",
     [SettlementType.CIDADE_GRANDE]: "Cidade grande",
     [SettlementType.METROPOLE]: "Metrópole",
   };
@@ -46,12 +75,21 @@ export function generateHeadquartersSize(
     SETTLEMENT_DICE.structure[
       mappedSettlement as keyof typeof SETTLEMENT_DICE.structure
     ];
-  const diceRoll = rollDice({
-    notation: `${diceConfig.dice}${diceConfig.modifier + modifier >= 0 ? "+" : ""}${diceConfig.modifier + modifier}`,
-  });
-  const result = rollOnTable(HEADQUARTERS_SIZE_TABLE);
+  
+  if (!diceConfig) {
+    // Fallback to d8 for unknown settlement types
+    const fallbackConfig = { dice: 'd8', modifier: 0 };
+    const notation = `1${fallbackConfig.dice}${fallbackConfig.modifier + modifier >= 0 ? "+" : ""}${fallbackConfig.modifier + modifier}`;
+    const diceRoll = rollDice({ notation });
+    const size = lookupTableValue(HEADQUARTERS_SIZE_TABLE, diceRoll.result);
+    return { size, roll: diceRoll.result };
+  }
+  
+  const notation = `1${diceConfig.dice}${diceConfig.modifier + modifier >= 0 ? "+" : ""}${diceConfig.modifier + modifier}`;
+  const diceRoll = rollDice({ notation });
+  const size = lookupTableValue(HEADQUARTERS_SIZE_TABLE, diceRoll.result);
 
-  return { size: result.result, roll: diceRoll.result };
+  return { size, roll: diceRoll.result };
 }
 
 /**
@@ -70,12 +108,12 @@ export function generateHeadquartersCharacteristics(sizeRoll: number): {
   else if (sizeRoll >= 10) numCharacteristics = 2;
 
   for (let i = 0; i < numCharacteristics; i++) {
-    const diceRoll = rollDice({ notation: "d25" });
-    const result = rollOnTable(HEADQUARTERS_CHARACTERISTICS_TABLE);
+    const diceRoll = rollDice({ notation: "d20" });
+    const result = lookupTableValue(HEADQUARTERS_CHARACTERISTICS_TABLE, diceRoll.result);
 
     // Avoid duplicates
-    if (!characteristics.includes(result.result)) {
-      characteristics.push(result.result);
+    if (!characteristics.includes(result)) {
+      characteristics.push(result);
       rolls.push(diceRoll.result);
     } else {
       // Re-roll if duplicate
@@ -90,10 +128,10 @@ export function generateHeadquartersCharacteristics(sizeRoll: number): {
  * Generates employees for the guild
  */
 export function generateEmployees(): { employees: string; roll: number } {
-  const diceRoll = rollDice({ notation: "d25" });
-  const result = rollOnTable(EMPLOYEES_TABLE);
+  const diceRoll = rollDice({ notation: "d20" });
+  const result = lookupTableValue(EMPLOYEES_TABLE, diceRoll.result);
 
-  return { employees: result.result, roll: diceRoll.result };
+  return { employees: result, roll: diceRoll.result };
 }
 
 /**
@@ -138,12 +176,21 @@ export function generateVisitors(
     SETTLEMENT_DICE.visitors[
       mappedSettlement as keyof typeof SETTLEMENT_DICE.visitors
     ];
-  const diceRoll = rollDice({
-    notation: `${diceConfig.dice}${diceConfig.modifier + modifier >= 0 ? "+" : ""}${diceConfig.modifier + modifier}`,
-  });
-  const result = rollOnTable(VISITORS_FREQUENCY_TABLE);
+  
+  if (!diceConfig) {
+    // Fallback to d8 for unknown settlement types
+    const fallbackConfig = { dice: 'd8', modifier: 0 };
+    const notation = `1${fallbackConfig.dice}${fallbackConfig.modifier + modifier >= 0 ? "+" : ""}${fallbackConfig.modifier + modifier}`;
+    const diceRoll = rollDice({ notation });
+    const frequency = lookupTableValue(VISITORS_FREQUENCY_TABLE, diceRoll.result);
+    return { frequency, roll: diceRoll.result };
+  }
+  
+  const notation = `1${diceConfig.dice}${diceConfig.modifier + modifier >= 0 ? "+" : ""}${diceConfig.modifier + modifier}`;
+  const diceRoll = rollDice({ notation });
+  const frequency = lookupTableValue(VISITORS_FREQUENCY_TABLE, diceRoll.result);
 
-  return { frequency: result.result, roll: diceRoll.result };
+  return { frequency, roll: diceRoll.result };
 }
 
 /**
@@ -151,31 +198,46 @@ export function generateVisitors(
  */
 export function generateResources(): { level: ResourceLevel; roll: number } {
   const diceRoll = rollDice({ notation: "d20" });
-  const result = rollOnTable(RESOURCES_LEVEL_TABLE);
+  const result = lookupTableValue(RESOURCES_LEVEL_TABLE, diceRoll.result);
 
   // Convert string to enum using proper mapping
   let resourceLevel: ResourceLevel;
-  switch (result.result) {
+  switch (result) {
+    case "Em débito":
+      resourceLevel = ResourceLevel.EM_DEBITO;
+      break;
+    case "Nenhum":
+      resourceLevel = ResourceLevel.NENHUM;
+      break;
     case "Escassos":
       resourceLevel = ResourceLevel.ESCASSOS;
       break;
-    case "Básicos":
-      resourceLevel = ResourceLevel.BÁSICOS;
+    case "Escassos e obtidos com muito esforço e honestidade":
+      resourceLevel = ResourceLevel.ESCASSOS_HONESTOS;
       break;
-    case "Adequados":
-      resourceLevel = ResourceLevel.ADEQUADOS;
+    case "Limitados":
+      resourceLevel = ResourceLevel.LIMITADOS;
+      break;
+    case "Suficientes":
+      resourceLevel = ResourceLevel.SUFICIENTES;
+      break;
+    case "Excedentes":
+      resourceLevel = ResourceLevel.EXCEDENTES;
+      break;
+    case "Excedentes mas alimenta fins malignos":
+      resourceLevel = ResourceLevel.EXCEDENTES_MALIGNOS;
+      break;
+    case "Abundantes porém quase todo vindo do governo de um assentamento próximo":
+      resourceLevel = ResourceLevel.ABUNDANTES_GOVERNO;
       break;
     case "Abundantes":
       resourceLevel = ResourceLevel.ABUNDANTES;
       break;
-    case "Vastos":
-      resourceLevel = ResourceLevel.VASTOS;
-      break;
-    case "Lendários":
-      resourceLevel = ResourceLevel.LENDARIOS;
+    case "Abundantes vindos de muitos anos de serviço":
+      resourceLevel = ResourceLevel.ABUNDANTES_SERVICO;
       break;
     default:
-      resourceLevel = ResourceLevel.ADEQUADOS;
+      resourceLevel = ResourceLevel.LIMITADOS;
       break;
   }
 
@@ -187,63 +249,57 @@ export function generateResources(): { level: ResourceLevel; roll: number } {
  */
 function calculateModifiers(
   employees: string,
-  resources: ResourceLevel,
-  customModifiers?: { structure?: number; visitors?: number }
+  resources: ResourceLevel
 ): {
   structureModifier: number;
   visitorsModifier: number;
   governmentModifier: number;
   populationModifier: number;
 } {
-  let structureModifier = customModifiers?.structure || 0;
-  let visitorsModifier = customModifiers?.visitors || 0;
+  const structureModifier = 0;
+  const visitorsModifier = 0;
   let governmentModifier = 0;
   let populationModifier = 0;
 
   // Employee modifiers
   if (employees.includes("despreparado")) {
-    visitorsModifier -= 1;
     populationModifier -= 1;
+    governmentModifier -= 1;
   } else if (employees.includes("experiente")) {
-    visitorsModifier += 1;
     populationModifier += 1;
+    governmentModifier += 1;
   }
 
   // Resource modifiers
   switch (resources) {
+    case ResourceLevel.EM_DEBITO:
+    case ResourceLevel.NENHUM:
+      governmentModifier -= 3;
+      populationModifier -= 3;
+      break;
     case ResourceLevel.ESCASSOS:
-      visitorsModifier -= 6;
-      structureModifier -= 3;
+    case ResourceLevel.ESCASSOS_HONESTOS:
       governmentModifier -= 2;
       populationModifier -= 2;
       break;
-    case ResourceLevel.BÁSICOS:
-      visitorsModifier -= 2;
-      structureModifier -= 1;
+    case ResourceLevel.LIMITADOS:
       governmentModifier -= 1;
       populationModifier -= 1;
       break;
-    case ResourceLevel.ABUNDANTES:
-      visitorsModifier += 3;
-      structureModifier += 2;
+    case ResourceLevel.EXCEDENTES:
+    case ResourceLevel.EXCEDENTES_MALIGNOS:
       governmentModifier += 1;
+      populationModifier += 1;
+      break;
+    case ResourceLevel.ABUNDANTES:
+    case ResourceLevel.ABUNDANTES_GOVERNO:
+    case ResourceLevel.ABUNDANTES_SERVICO:
+      governmentModifier += 2;
       populationModifier += 2;
       break;
-    case ResourceLevel.VASTOS:
-      visitorsModifier += 6;
-      structureModifier += 4;
-      governmentModifier += 3;
-      populationModifier += 3;
-      break;
-    case ResourceLevel.LENDARIOS:
-      visitorsModifier += 9;
-      structureModifier += 6;
-      governmentModifier += 4;
-      populationModifier += 4;
-      break;
-    case ResourceLevel.ADEQUADOS:
+    case ResourceLevel.SUFICIENTES:
     default:
-      // Adequate resources: no modifiers
+      // Sufficient resources: no modifiers
       break;
   }
 
@@ -281,8 +337,7 @@ export function generateGuildStructure(
   // Step 3: Calculate modifiers
   const modifiers = calculateModifiers(
     employeesResult.employees,
-    resourcesResult.level,
-    config.customModifiers
+    resourcesResult.level
   );
   logs.push(
     `Calculated modifiers: structure ${modifiers.structureModifier >= 0 ? "+" : ""}${modifiers.structureModifier}, visitors ${modifiers.visitorsModifier >= 0 ? "+" : ""}${modifiers.visitorsModifier}`
