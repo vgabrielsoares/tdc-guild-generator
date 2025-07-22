@@ -1,6 +1,14 @@
 import { z } from "zod";
 
-// Enums para valores fixos
+// Enums para valores fixos - organizados por categoria
+export enum SettlementType {
+  LUGAREJO = "Lugarejo",
+  ALDEIA = "Aldeia",
+  CIDADE_PEQUENA = "Cidade Pequena",
+  CIDADE_GRANDE = "Cidade Grande",
+  METROPOLE = "Metrópole",
+}
+
 export enum ResourceLevel {
   EM_DEBITO = "Em débito",
   NENHUM = "Nenhum",
@@ -42,64 +50,51 @@ export enum RelationLevel {
   EXCELENTE_FUNCIONAR = "Excelente, a guilda faz o assentamento funcionar",
 }
 
-export enum SettlementType {
-  LUGAREJO = "Lugarejo",
-  ALDEIA = "Aldeia",
-  CIDADE_PEQUENA = "Cidade Pequena",
-  CIDADE_GRANDE = "Cidade Grande",
-  METROPOLE = "Metrópole",
-}
-
-// Interface para a estrutura física da guilda
+// Interfaces principais - organizadas e tipadas
 export interface GuildStructure {
-  size: string;
-  characteristics: string[];
-  location?: string;
-  description?: string;
+  readonly size: string;
+  readonly characteristics: string[];
+  readonly location?: string;
+  readonly description?: string;
 }
 
-// Interface para relações da guilda
 export interface GuildRelations {
-  government: string;
-  governmentDescription?: string;
-  population: string;
-  populationDescription?: string;
-  notes?: string;
+  readonly government: RelationLevel;
+  readonly governmentDescription?: string;
+  readonly population: RelationLevel;
+  readonly populationDescription?: string;
+  readonly notes?: string;
 }
 
-// Interface para funcionários da guilda
 export interface GuildStaff {
-  employees: string;
-  description?: string;
-  count?: number;
+  readonly employees: string;
+  readonly description?: string;
+  readonly count?: number;
 }
 
-// Interface para visitantes
 export interface GuildVisitors {
-  frequency: VisitorLevel;
-  description?: string;
-  types?: string[];
+  readonly frequency: VisitorLevel;
+  readonly description?: string;
+  readonly types?: readonly string[];
 }
 
-// Interface para recursos
 export interface GuildResources {
-  level: string;
-  description?: string;
-  details?: string[];
+  readonly level: ResourceLevel;
+  readonly description?: string;
+  readonly details?: readonly string[];
 }
 
-// Interface principal da guilda
 export interface Guild {
-  id: string;
-  name: string;
-  structure: GuildStructure;
-  relations: GuildRelations;
-  staff: GuildStaff;
-  visitors: GuildVisitors;
-  resources: GuildResources;
-  settlementType: SettlementType;
-  createdAt: Date;
-  updatedAt?: Date;
+  readonly id: string;
+  readonly name: string;
+  readonly structure: GuildStructure;
+  readonly relations: GuildRelations;
+  readonly staff: GuildStaff;
+  readonly visitors: GuildVisitors;
+  readonly resources: GuildResources;
+  readonly settlementType: SettlementType;
+  readonly createdAt: Date;
+  readonly updatedAt?: Date;
 }
 
 // Interface para configuração de geração
@@ -134,48 +129,11 @@ export interface GuildGenerationResult {
   logs: string[];
 }
 
-// Schemas Zod para validação
-export const ResourceLevelSchema = z.enum([
-  "Em débito",
-  "Nenhum",
-  "Escassos",
-  "Escassos e obtidos com muito esforço e honestidade",
-  "Limitados",
-  "Suficientes",
-  "Excedentes",
-  "Excedentes mas alimenta fins malignos",
-  "Abundantes porém quase todo vindo do governo de um assentamento próximo",
-  "Abundantes",
-  "Abundantes vindos de muitos anos de serviço",
-]);
-export const VisitorLevelSchema = z.enum([
-  "Vazia",
-  "Quase deserta", 
-  "Pouco movimentada",
-  "Nem muito nem pouco",
-  "Muito frequentada",
-  "Abarrotada",
-  "Lotada",
-]);
-export const RelationLevelSchema = z.enum([
-  "Péssima",
-  "Ruim",
-  "Ruim, mas tentam manter a cordialidade",
-  "Ruim, só causam problemas",
-  "Ruim, vistos como mercenários",
-  "Péssima, puro ódio",
-  "Diplomática",
-  "Opinião dividida",
-  "Boa, mas o governo tenta miná-los secretamente",
-  "Boa",
-  "Boa, ajudam com problemas",
-  "Boa, nos mantêm seguros",
-  "Muito boa, cooperam frequentemente",
-  "Muito boa, sem eles estaríamos perdidos",
-  "Excelente, governo e guilda são quase como um",
-  "Excelente, a guilda faz o assentamento funcionar",
-]);
+// Schemas Zod para validação - usando enums nativos
 export const SettlementTypeSchema = z.nativeEnum(SettlementType);
+export const ResourceLevelSchema = z.nativeEnum(ResourceLevel);
+export const VisitorLevelSchema = z.nativeEnum(VisitorLevel);
+export const RelationLevelSchema = z.nativeEnum(RelationLevel);
 
 export const GuildStructureSchema = z.object({
   size: z.string().min(1, "Size is required"),
@@ -188,7 +146,9 @@ export const GuildStructureSchema = z.object({
 
 export const GuildRelationsSchema = z.object({
   government: RelationLevelSchema,
+  governmentDescription: z.string().optional(),
   population: RelationLevelSchema,
+  populationDescription: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -211,8 +171,8 @@ export const GuildResourcesSchema = z.object({
 });
 
 export const GuildSchema = z.object({
-  id: z.string(),
-  name: z.string(),
+  id: z.string().min(1),
+  name: z.string().min(1),
   structure: GuildStructureSchema,
   relations: GuildRelationsSchema,
   staff: GuildStaffSchema,
