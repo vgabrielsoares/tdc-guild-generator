@@ -453,9 +453,9 @@ export const RESOURCE_MODIFIERS = {
   government: {
     'Péssima': -3,
     'Ruim': -2,
-    'Ruim, mas tentam manter a cordialidade': -1,
-    'Diplomática': 0,
-    'Boa, mas o governo tenta miná-los secretamente': 0,
+    'Ruim, mas tentam manter a cordialidade': -2,
+    'Diplomática': -1,
+    'Boa, mas o governo tenta miná-los secretamente': +1,
     'Boa': +1,
     'Muito boa, cooperam frequentemente': +2,
     'Excelente, governo e guilda são quase como um': +3
@@ -463,10 +463,10 @@ export const RESOURCE_MODIFIERS = {
   population: {
     'Péssima, puro ódio': -3,
     'Ruim, vistos como mercenários': -2,
-    'Ruim, só causam problemas': -1,
-    'Opinião dividida': 0,
+    'Ruim, só causam problemas': -2,
+    'Opinião dividida': -1,
     'Boa, ajudam com problemas': +1,
-    'Boa, nos mantêm seguros': +2,
+    'Boa, nos mantêm seguros': +1,
     'Muito boa, sem eles estaríamos perdidos': +2,
     'Excelente, a guilda faz o assentamento funcionar': +3
   }
@@ -475,25 +475,36 @@ export const RESOURCE_MODIFIERS = {
 // Modificadores para frequentadores baseado em funcionários e recursos
 export const VISITOR_FREQUENCY_MODIFIERS = {
   employees: {
-    'totalmente despreparados para o trabalho': -2,
-    'despreparados para o trabalho': -1,
-    'qualificados para o trabalho': 0,
-    'preparados para o trabalho': +1,
-    'extremamente qualificados para o trabalho': +2,
-    'experts no trabalho': +3
+    // Funcionários despreparados
+    'funcionário despreparado': -1,
+    'funcionários despreparados': -1,
+    'despreparado': -1,
+    'despreparados': -1,
+    // Funcionários experientes  
+    'funcionário experiente': +1,
+    'funcionários experientes': +1,
+    'experiente': +1,
+    'experientes': +1,
+    'explorador': +1,
+    'ex-membros': +1,
+    'ex-aventureiros': +1,
+    'clero': +1,
+    'nobre': +1,
+    'aventureiro': +1,
+    'animal falante': +1
   },
   resources: {
-    'Em débito': -3,
-    'Nenhum': -2,
-    'Escassos': -1,
-    'Escassos e obtidos com muito esforço e honestidade': -1,
+    'Em débito': -6,
+    'Nenhum': -3,
+    'Escassos': -2,
+    'Escassos e obtidos com muito esforço e honestidade': -2,
     'Limitados': 0,
-    'Suficientes': +1,
-    'Excedentes': +2,
-    'Excedentes mas alimenta fins malignos': +1,
-    'Abundantes': +3,
-    'Abundantes porém quase todo vindo do governo de um assentamento próximo': +2,
-    'Abundantes vindos de muitos anos de serviço': +3
+    'Suficientes': +2,
+    'Excedentes': +3,
+    'Excedentes mas alimenta fins malignos': +3,
+    'Abundantes': +6,
+    'Abundantes porém quase todo vindo do governo de um assentamento próximo': +6,
+    'Abundantes vindos de muitos anos de serviço': +6
   }
 };
 
