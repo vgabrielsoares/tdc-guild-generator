@@ -18,14 +18,14 @@
               class="btn btn-secondary flex items-center space-x-2"
               :disabled="guildStore.isGenerating"
             >
-              <font-awesome-icon :icon="['fas', 'sync-alt']" />
+              <ArrowPathIcon class="w-4 h-4" />
               <span>Regenerar</span>
             </button>
             <button
               @click="exportGuild"
               class="btn btn-primary flex items-center space-x-2"
             >
-              <font-awesome-icon :icon="['fas', 'download']" />
+              <ArrowDownTrayIcon class="w-4 h-4" />
               <span>Exportar</span>
             </button>
           </div>

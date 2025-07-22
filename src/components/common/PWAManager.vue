@@ -5,7 +5,7 @@
       class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-guild-800 border border-guild-600 rounded-lg p-4 shadow-lg z-50">
       <div class="flex items-start space-x-3">
         <div class="text-2xl">
-          <font-awesome-icon icon="globe" class="text-blue-400" />
+          <GlobeAltIcon class="w-6 h-6 text-blue-400" />
         </div>
         <div class="flex-1">
           <h3 class="font-semibold text-white mb-1">Instalar Aplicativo</h3>
@@ -22,7 +22,7 @@
           </div>
         </div>
         <button @click="dismissInstall" class="text-gray-400 hover:text-white">
-          ✕
+          <XMarkIcon class="w-4 h-4" />
         </button>
       </div>
     </div>
@@ -32,7 +32,7 @@
       class="fixed top-4 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-green-800 border border-green-600 rounded-lg p-4 shadow-lg z-50">
       <div class="flex items-start space-x-3">
         <div class="text-2xl">
-          <font-awesome-icon :icon="['fas', 'arrows-rotate']" />
+          <ArrowPathIcon class="w-6 h-6" />
         </div>
         <div class="flex-1">
           <h3 class="font-semibold text-white mb-1">Atualização Disponível</h3>
@@ -59,7 +59,7 @@
       class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-yellow-800 border border-yellow-600 rounded-lg px-4 py-2 shadow-lg z-50">
       <div class="flex items-center space-x-2 text-yellow-200">
         <span>
-          <font-awesome-icon :icon="['fas', 'signal']" />
+          <SignalIcon class="w-4 h-4" />
         </span>
         <span class="text-sm font-medium">Modo Offline</span>
       </div>
@@ -69,6 +69,12 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+import { 
+  GlobeAltIcon, 
+  ArrowPathIcon, 
+  XMarkIcon, 
+  SignalIcon 
+} from '@heroicons/vue/24/outline'
 
 // Estado dos prompts
 const showInstallPrompt = ref(false)

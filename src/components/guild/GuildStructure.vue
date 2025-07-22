@@ -2,7 +2,7 @@
   <div class="guild-structure bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
     <div class="flex items-center justify-between mb-4">
       <h3 class="text-lg font-semibold text-amber-400 flex items-center space-x-2">
-        <font-awesome-icon :icon="['fas', 'building']" class="text-amber-400" />
+        <BuildingOffice2Icon class="w-5 h-5 text-amber-400" />
         <span>Estrutura</span>
       </h3>
       <button
@@ -10,7 +10,7 @@
         class="btn btn-sm btn-outline flex items-center space-x-1"
         title="Regenerar estrutura"
       >
-        <font-awesome-icon :icon="['fas', 'sync-alt']" class="text-xs" />
+        <ArrowPathIcon class="w-4 h-4" />
         <span class="text-xs">Regenerar</span>
       </button>
     </div>
@@ -19,7 +19,7 @@
       <!-- Tamanho da Guilda -->
       <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
         <h4 class="font-semibold text-gray-300 mb-2 flex items-center space-x-2">
-          <font-awesome-icon :icon="['fas', 'ruler-combined']" class="text-gray-400" />
+          <Square3Stack3DIcon class="w-4 h-4 text-gray-400" />
           <span>Tamanho</span>
         </h4>
         <p class="text-white font-medium">{{ guild.structure.size }}</p>
@@ -28,7 +28,7 @@
       <!-- Características -->
       <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
         <h4 class="font-semibold text-gray-300 mb-2 flex items-center space-x-2">
-          <font-awesome-icon :icon="['fas', 'list-ul']" class="text-gray-400" />
+          <ListBulletIcon class="w-4 h-4 text-gray-400" />
           <span>Características</span>
         </h4>
         <ul class="space-y-1">
@@ -46,7 +46,7 @@
       <!-- Localização (se houver) -->
       <div v-if="guild.structure.location" class="bg-gray-700 rounded-lg p-4 border border-gray-600">
         <h4 class="font-semibold text-gray-300 mb-2 flex items-center space-x-2">
-          <font-awesome-icon :icon="['fas', 'map-marker-alt']" class="text-gray-400" />
+          <MapPinIcon class="w-4 h-4 text-gray-400" />
           <span>Localização</span>
         </h4>
         <p class="text-gray-200">{{ guild.structure.location }}</p>
@@ -55,7 +55,7 @@
       <!-- Descrição (se houver) -->
       <div v-if="guild.structure.description" class="bg-gray-700 rounded-lg p-4 border border-gray-600">
         <h4 class="font-semibold text-gray-300 mb-2 flex items-center space-x-2">
-          <font-awesome-icon :icon="['fas', 'file-alt']" class="text-gray-400" />
+          <DocumentTextIcon class="w-4 h-4 text-gray-400" />
           <span>Descrição</span>
         </h4>
         <p class="text-gray-200">{{ guild.structure.description }}</p>
@@ -64,7 +64,7 @@
       <!-- Funcionários -->
       <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
         <h4 class="font-semibold text-gray-300 mb-2 flex items-center space-x-2">
-          <font-awesome-icon :icon="['fas', 'users']" class="text-gray-400" />
+          <UserGroupIcon class="w-4 h-4 text-gray-400" />
           <span>Funcionários</span>
         </h4>
         <p class="text-white font-medium">{{ guild.staff.employees }}</p>
@@ -74,7 +74,7 @@
       <!-- Visitantes -->
       <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
         <h4 class="font-semibold text-gray-300 mb-2 flex items-center space-x-2">
-          <font-awesome-icon :icon="['fas', 'door-open']" class="text-gray-400" />
+          <BuildingOfficeIcon class="w-4 h-4 text-blue-400" />
           <span>Frequentadores</span>
         </h4>
         <p class="text-white font-medium">{{ guild.visitors.frequency }}</p>
@@ -96,6 +96,16 @@
 </template>
 
 <script setup lang="ts">
+import {
+  BuildingOffice2Icon,
+  ArrowPathIcon,
+  Square3Stack3DIcon,
+  ListBulletIcon,
+  MapPinIcon,
+  DocumentTextIcon,
+  UserGroupIcon,
+  BuildingOfficeIcon
+} from '@heroicons/vue/24/solid'
 import type { Guild } from '@/types/guild'
 
 defineProps<{

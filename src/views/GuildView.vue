@@ -2,7 +2,7 @@
   <div class="space-y-8">
     <div class="text-center">
       <h1 class="text-3xl font-medieval font-bold text-gold-400 mb-4 flex items-center justify-center gap-3">
-        <font-awesome-icon icon="home" class="text-gold-400" />
+        <HomeIcon class="w-7 h-7 text-gold-400" />
         Estrutura da Guilda
       </h1>
       <p class="text-lg text-gray-300 mb-8">
@@ -87,7 +87,7 @@
 </template>
 
 <script setup lang="ts">
-// Import guild components
+import { HomeIcon } from '@heroicons/vue/24/outline'
 import GuildDisplay from '@/components/guild/GuildDisplay.vue'
 import DiceRoller from '@/components/common/DiceRoller.vue'
 

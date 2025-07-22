@@ -3,7 +3,7 @@
     <!-- Hero Section -->
     <div class="text-center bg-gradient-to-r from-guild-800 to-guild-900 rounded-lg p-8 mb-8">
       <h1 class="text-4xl font-medieval font-bold text-gold-400 mb-4 flex items-center justify-center gap-3">
-        <font-awesome-icon icon="wand-magic-sparkles" class="text-gold-400" />
+        <SparklesIcon class="w-10 h-10 text-gold-400" />
         Gerador de Guildas
       </h1>
       <p class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
@@ -18,7 +18,7 @@
         class="bg-gray-800 rounded-lg p-6 hover:bg-gray-700 transition-colors cursor-pointer"
         @click="navigateTo(feature.path)">
         <div class="flex items-center justify-center w-12 h-12 bg-amber-600 rounded-lg mb-4">
-          <font-awesome-icon :icon="feature.icon" class="text-white text-xl" />
+          <component :is="feature.icon" class="w-6 h-6 text-white" />
         </div>
         <h3 class="text-lg font-semibold text-white mb-2">{{ feature.title }}</h3>
         <p class="text-gray-400">{{ feature.description }}</p>
@@ -60,6 +60,15 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import {
+  SparklesIcon,
+  HomeIcon,
+  DocumentTextIcon,
+  WrenchScrewdriverIcon,
+  UserGroupIcon,
+  ClipboardDocumentListIcon,
+  TrophyIcon
+} from '@heroicons/vue/24/solid'
 
 const router = useRouter()
 
@@ -67,37 +76,37 @@ const features = [
   {
     title: 'Estrutura da Guilda',
     description: 'Gere a sede, recursos, relações e funcionários da sua guilda.',
-    icon: 'home',
+    icon: HomeIcon,
     path: '/guild'
   },
   {
     title: 'Contratos',
     description: 'Contratos disponíveis com valores dinâmicos e modificadores.',
-    icon: 'scroll',
+    icon: DocumentTextIcon,
     path: '/contracts'
   },
   {
     title: 'Serviços',
     description: 'Serviços especializados com pagamentos alternativos.',
-    icon: 'hammer',
+    icon: WrenchScrewdriverIcon,
     path: '/services'
   },
   {
     title: 'Membros',
     description: 'Contrate aventureiros de diferentes níveis e especialidades.',
-    icon: 'users',
+    icon: UserGroupIcon,
     path: '/members'
   },
   {
     title: 'Mural de Avisos',
     description: 'Avisos, execuções, procurados e oportunidades comerciais.',
-    icon: 'scroll',
+    icon: ClipboardDocumentListIcon,
     path: '/notices'
   },
   {
     title: 'Sistema de Renome',
     description: 'Acompanhe sua progressão e benefícios na guilda.',
-    icon: 'trophy',
+    icon: TrophyIcon,
     path: '/renown'
   }
 ]
