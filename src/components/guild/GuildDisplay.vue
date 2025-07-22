@@ -93,12 +93,12 @@
       </div>
 
       <!-- Estatísticas do Histórico -->
-      <div v-if="guildStore.historyStats.total > 0" class="mt-6 bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
+      <div v-if="guildStore.historyCount > 0" class="mt-6 bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
         <h3 class="text-lg font-semibold text-amber-400 mb-4">Estatísticas do Histórico</h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <div class="bg-blue-900 rounded-lg p-3 border border-blue-700">
             <div class="font-semibold text-blue-300">Total de Guildas</div>
-            <div class="text-2xl font-bold text-blue-100">{{ guildStore.historyStats.total }}</div>
+            <div class="text-2xl font-bold text-blue-100">{{ guildStore.historyCount }}</div>
           </div>
           <div class="bg-green-900 rounded-lg p-3 border border-green-700">
             <div class="font-semibold text-green-300">Tipo Mais Comum</div>
@@ -163,44 +163,85 @@ const selectedSettlementType = ref<SettlementType | 'random'>('random')
 const settlementTypes = Object.values(SettlementType)
 
 const mostCommonSettlement = computed(() => {
-  const stats = guildStore.historyStats.bySettlement
-  const settlements = Object.entries(stats)
-  if (settlements.length === 0) return 'N/A'
+  const history = guildStore.guildHistory
+  if (history.length === 0) return 'N/A'
   
-  const [mostCommon] = settlements.reduce((a, b) => a[1] > b[1] ? a : b)
+  const settlementCounts: Record<string, number> = {}
+  history.forEach(guild => {
+    const type = guild.settlementType
+    settlementCounts[type] = (settlementCounts[type] || 0) + 1
+  })
+  
+  const entries = Object.entries(settlementCounts)
+  if (entries.length === 0) return 'N/A'
+  
+  const [mostCommon] = entries.reduce((a, b) => a[1] > b[1] ? a : b)
   return mostCommon
 })
 
 const averageResources = computed(() => {
-  const stats = guildStore.historyStats.byResourceLevel
-  const levels = Object.entries(stats)
-  if (levels.length === 0) return 'N/A'
+  const history = guildStore.guildHistory
+  if (history.length === 0) return 'N/A'
   
-  const [mostCommon] = levels.reduce((a, b) => a[1] > b[1] ? a : b)
+  const resourceCounts: Record<string, number> = {}
+  history.forEach(guild => {
+    const level = guild.resources.level
+    resourceCounts[level] = (resourceCounts[level] || 0) + 1
+  })
+  
+  const entries = Object.entries(resourceCounts)
+  if (entries.length === 0) return 'N/A'
+  
+  const [mostCommon] = entries.reduce((a, b) => a[1] > b[1] ? a : b)
   return mostCommon
 })
 
-const generateNewGuild = () => {
-  if (selectedSettlementType.value === 'random') {
-    guildStore.generateGuildWithDefaults()
-  } else {
-    guildStore.generateGuild({
-      settlementType: selectedSettlementType.value as SettlementType,
-      saveToHistory: true
-    })
+const generateNewGuild = async () => {
+  try {
+    if (selectedSettlementType.value === 'random') {
+      // Gera tipo aleatório de settlement
+      const settlements = Object.values(SettlementType);
+      const randomSettlement = settlements[Math.floor(Math.random() * settlements.length)];
+      
+      await guildStore.generateGuild({
+        settlementType: randomSettlement,
+        saveToHistory: true
+      })
+    } else {
+      await guildStore.generateGuild({
+        settlementType: selectedSettlementType.value as SettlementType,
+        saveToHistory: true
+      })
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      alert(`Erro ao gerar guilda: ${error.message}`)
+    }
   }
 }
 
-const regenerateGuild = () => {
-  guildStore.regenerateCurrentGuild()
+const regenerateGuild = async () => {
+  try {
+    await guildStore.regenerateCurrentGuild()
+  } catch (error) {
+    // Erro será tratado pelo store
+  }
 }
 
-const regenerateStructure = () => {
-  guildStore.regenerateStructure()
+const regenerateStructure = async () => {
+  try {
+    await guildStore.regenerateStructure()
+  } catch (error) {
+    // Erro será tratado pelo store
+  }
 }
 
-const regenerateRelations = () => {
-  guildStore.regenerateRelations()
+const regenerateRelations = async () => {
+  try {
+    await guildStore.regenerateRelations()
+  } catch (error) {
+    // Erro será tratado pelo store
+  }
 }
 
 const saveToHistory = () => {
