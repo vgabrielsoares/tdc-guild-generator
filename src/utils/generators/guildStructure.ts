@@ -11,13 +11,6 @@ import {
 } from "../../types/guild";
 import { rollDice } from "../dice";
 
-/**
- * Helper function to find table entry by roll value
- */
-function findTableEntry<T>(table: TableEntry<T>[], roll: number): T | null {
-  const entry = table.find(entry => roll >= entry.min && roll <= entry.max);
-  return entry ? entry.result : null;
-}
 import type { TableEntry } from "../../types/tables";
 import {
   HEADQUARTERS_SIZE_TABLE,
@@ -27,10 +20,18 @@ import {
   POPULATION_RELATIONS_TABLE,
   SETTLEMENT_DICE,
   RESOURCE_MODIFIERS,
-  VISITOR_FREQUENCY_MODIFIERS,
   getVisitorFrequencyTable,
   getResourceLevelTable,
 } from "../../data/tables/guild-structure";
+import { ModifierCalculator } from "./resources-visitors-generator";
+
+/**
+ * Helper function to find table entry by roll value
+ */
+function findTableEntry<T>(table: TableEntry<T>[], roll: number): T | null {
+  const entry = table.find((entry) => roll >= entry.min && roll <= entry.max);
+  return entry ? entry.result : null;
+}
 
 /**
  * Helper function to lookup a value in a table
@@ -66,7 +67,7 @@ function lookupTableValue<T>(table: TableEntry<T>[], value: number): T {
 function mapSettlementType(settlementType: SettlementType): string {
   const mapping: Record<SettlementType, string> = {
     [SettlementType.LUGAREJO]: "Lugarejo",
-    [SettlementType.ALDEIA]: "Aldeia", 
+    [SettlementType.ALDEIA]: "Aldeia",
     [SettlementType.CIDADE_PEQUENA]: "Cidadela",
     [SettlementType.CIDADE_GRANDE]: "Cidade grande",
     [SettlementType.METROPOLE]: "Metrópole",
@@ -86,16 +87,16 @@ export function generateHeadquartersSize(
     SETTLEMENT_DICE.structure[
       mappedSettlement as keyof typeof SETTLEMENT_DICE.structure
     ];
-  
+
   if (!diceConfig) {
     // Fallback to d8 for unknown settlement types
-    const fallbackConfig = { dice: 'd8', modifier: 0 };
+    const fallbackConfig = { dice: "d8", modifier: 0 };
     const notation = `1${fallbackConfig.dice}${fallbackConfig.modifier + modifier >= 0 ? "+" : ""}${fallbackConfig.modifier + modifier}`;
     const diceRoll = rollDice({ notation });
     const size = lookupTableValue(HEADQUARTERS_SIZE_TABLE, diceRoll.result);
     return { size, roll: diceRoll.result };
   }
-  
+
   const notation = `1${diceConfig.dice}${diceConfig.modifier + modifier >= 0 ? "+" : ""}${diceConfig.modifier + modifier}`;
   const diceRoll = rollDice({ notation });
   const size = lookupTableValue(HEADQUARTERS_SIZE_TABLE, diceRoll.result);
@@ -119,15 +120,18 @@ export function generateHeadquartersCharacteristics(sizeRoll: number): {
   else if (sizeRoll >= 10) numCharacteristics = 2;
 
   const usedCharacteristics = new Set<string>();
-  
+
   for (let i = 0; i < numCharacteristics; i++) {
     let attempts = 0;
     let result: string;
     let diceRoll: { result: number };
-    
+
     do {
       diceRoll = rollDice({ notation: "d20" });
-      result = lookupTableValue(HEADQUARTERS_CHARACTERISTICS_TABLE, diceRoll.result);
+      result = lookupTableValue(
+        HEADQUARTERS_CHARACTERISTICS_TABLE,
+        diceRoll.result
+      );
       attempts++;
     } while (usedCharacteristics.has(result) && attempts < 50); // Limit attempts to prevent infinite loop
 
@@ -158,10 +162,10 @@ export function generateEmployees(settlementType: SettlementType): {
     SETTLEMENT_DICE.structure[
       mappedSettlement as keyof typeof SETTLEMENT_DICE.structure
     ];
-  
+
   if (!diceConfig) {
     // Fallback to d8 for unknown settlement types
-    const fallbackConfig = { dice: 'd8', modifier: 0 };
+    const fallbackConfig = { dice: "d8", modifier: 0 };
     const notation = `1${fallbackConfig.dice}${fallbackConfig.modifier >= 0 ? "+" : ""}${fallbackConfig.modifier}`;
     const diceRoll = rollDice({ notation });
     const result = lookupTableValue(EMPLOYEES_TABLE, diceRoll.result);
@@ -233,7 +237,10 @@ export function generateStructureGovernmentRelations(modifier: number = 0): {
   const diceRoll = rollDice({
     notation: `d20${modifier >= 0 ? "+" : ""}${modifier}`,
   });
-  const tableResult = findTableEntry(GOVERNMENT_RELATIONS_TABLE, diceRoll.result);
+  const tableResult = findTableEntry(
+    GOVERNMENT_RELATIONS_TABLE,
+    diceRoll.result
+  );
   const enumValue = mapGovernmentRelationToEnum(tableResult || "Diplomática");
 
   return { relation: enumValue, roll: diceRoll.result };
@@ -249,8 +256,13 @@ export function generateStructurePopulationRelations(modifier: number = 0): {
   const diceRoll = rollDice({
     notation: `d20${modifier >= 0 ? "+" : ""}${modifier}`,
   });
-  const tableResult = findTableEntry(POPULATION_RELATIONS_TABLE, diceRoll.result);
-  const enumValue = mapPopulationRelationToEnum(tableResult || "Opinião dividida");
+  const tableResult = findTableEntry(
+    POPULATION_RELATIONS_TABLE,
+    diceRoll.result
+  );
+  const enumValue = mapPopulationRelationToEnum(
+    tableResult || "Opinião dividida"
+  );
 
   return { relation: enumValue, roll: diceRoll.result };
 }
@@ -268,24 +280,38 @@ export function generateVisitors(
     SETTLEMENT_DICE.visitors[
       mappedSettlement as keyof typeof SETTLEMENT_DICE.visitors
     ];
-  
+
   // Get the appropriate table for this settlement type
   const frequencyTable = getVisitorFrequencyTable(mappedSettlement);
-  
+
   if (!diceConfig) {
     // Fallback to d8 for unknown settlement types
-    const fallbackConfig = { dice: 'd8', modifier: 0 };
-    const notation = `1${fallbackConfig.dice}${fallbackConfig.modifier + modifier >= 0 ? "+" : ""}${fallbackConfig.modifier + modifier}`;
+    const fallbackConfig = { dice: "d8", modifier: 0 };
+    const finalModifier = (fallbackConfig.modifier || 0) + modifier;
+    const notation =
+      finalModifier === 0
+        ? `1${fallbackConfig.dice}`
+        : `1${fallbackConfig.dice}${finalModifier >= 0 ? "+" : ""}${finalModifier}`;
     const diceRoll = rollDice({ notation });
     const result = findTableEntry(frequencyTable, diceRoll.result);
-    return { frequency: mapVisitorStringToEnum(result || "Nem muito nem pouco"), roll: diceRoll.result };
+    return {
+      frequency: mapVisitorStringToEnum(result || "Nem muito nem pouco"),
+      roll: diceRoll.result,
+    };
   }
 
-  const notation = `1${diceConfig.dice}${diceConfig.modifier + modifier >= 0 ? "+" : ""}${diceConfig.modifier + modifier}`;
+  const finalModifier = (diceConfig.modifier || 0) + modifier;
+  const notation =
+    finalModifier === 0
+      ? `1${diceConfig.dice}`
+      : `1${diceConfig.dice}${finalModifier >= 0 ? "+" : ""}${finalModifier}`;
   const diceRoll = rollDice({ notation });
   const result = findTableEntry(frequencyTable, diceRoll.result);
 
-  return { frequency: mapVisitorStringToEnum(result || "Nem muito nem pouco"), roll: diceRoll.result };
+  return {
+    frequency: mapVisitorStringToEnum(result || "Nem muito nem pouco"),
+    roll: diceRoll.result,
+  };
 }
 
 /**
@@ -325,24 +351,30 @@ export function generateResources(
     SETTLEMENT_DICE.structure[
       mappedSettlement as keyof typeof SETTLEMENT_DICE.structure
     ];
-  
+
   // Get the appropriate table for this settlement type
   const resourceTable = getResourceLevelTable(mappedSettlement);
-  
+
   if (!diceConfig) {
     // Fallback to d8 for unknown settlement types
-    const fallbackConfig = { dice: 'd8', modifier: 0 };
+    const fallbackConfig = { dice: "d8", modifier: 0 };
     const notation = `1${fallbackConfig.dice}${fallbackConfig.modifier + modifier >= 0 ? "+" : ""}${fallbackConfig.modifier + modifier}`;
     const diceRoll = rollDice({ notation });
     const result = findTableEntry(resourceTable, diceRoll.result);
-    return { level: mapResourceStringToEnum(result || "Limitados"), roll: diceRoll.result };
+    return {
+      level: mapResourceStringToEnum(result || "Limitados"),
+      roll: diceRoll.result,
+    };
   }
 
   const notation = `1${diceConfig.dice}${diceConfig.modifier + modifier >= 0 ? "+" : ""}${diceConfig.modifier + modifier}`;
   const diceRoll = rollDice({ notation });
   const result = findTableEntry(resourceTable, diceRoll.result);
 
-  return { level: mapResourceStringToEnum(result || "Limitados"), roll: diceRoll.result };
+  return {
+    level: mapResourceStringToEnum(result || "Limitados"),
+    roll: diceRoll.result,
+  };
 }
 
 /**
@@ -395,30 +427,27 @@ function calculateModifiers(
   let resourceModifier = 0;
 
   // Employee modifiers for visitors
-  if (employees.includes("totalmente despreparados")) {
-    visitorsModifier += VISITOR_FREQUENCY_MODIFIERS.employees["totalmente despreparados para o trabalho"];
-  } else if (employees.includes("despreparados")) {
-    visitorsModifier += VISITOR_FREQUENCY_MODIFIERS.employees["despreparados para o trabalho"];
-  } else if (employees.includes("qualificados")) {
-    visitorsModifier += VISITOR_FREQUENCY_MODIFIERS.employees["qualificados para o trabalho"];
-  } else if (employees.includes("preparados")) {
-    visitorsModifier += VISITOR_FREQUENCY_MODIFIERS.employees["preparados para o trabalho"];
-  } else if (employees.includes("extremamente qualificados")) {
-    visitorsModifier += VISITOR_FREQUENCY_MODIFIERS.employees["extremamente qualificados para o trabalho"];
-  } else if (employees.includes("experts")) {
-    visitorsModifier += VISITOR_FREQUENCY_MODIFIERS.employees["experts no trabalho"];
-  }
+  visitorsModifier = ModifierCalculator.calculateVisitorModifiers(
+    employees,
+    resourceLevel
+  );
 
-  // Resource modifiers for visitors
-  const resourceString = mapResourceLevelToString(resourceLevel);
-  const resourceModifierValue = (VISITOR_FREQUENCY_MODIFIERS.resources as Record<string, number>)[resourceString];
-  if (resourceModifierValue !== undefined) {
-    visitorsModifier += resourceModifierValue;
+  // Resource modifiers come from government and population relations
+  if (governmentRelation && populationRelation) {
+    // Mapear strings para enums se necessário
+    const govRelation = governmentRelation as RelationLevel;
+    const popRelation = populationRelation as RelationLevel;
+    resourceModifier = ModifierCalculator.calculateResourceModifiers(
+      govRelation,
+      popRelation
+    );
   }
 
   // Government relation modifiers for resources
   if (governmentRelation) {
-    const govModifierValue = (RESOURCE_MODIFIERS.government as Record<string, number>)[governmentRelation];
+    const govModifierValue = (
+      RESOURCE_MODIFIERS.government as Record<string, number>
+    )[governmentRelation];
     if (govModifierValue !== undefined) {
       resourceModifier += govModifierValue;
     }
@@ -426,7 +455,9 @@ function calculateModifiers(
 
   // Population relation modifiers for resources
   if (populationRelation) {
-    const popModifierValue = (RESOURCE_MODIFIERS.population as Record<string, number>)[populationRelation];
+    const popModifierValue = (
+      RESOURCE_MODIFIERS.population as Record<string, number>
+    )[populationRelation];
     if (popModifierValue !== undefined) {
       resourceModifier += popModifierValue;
     }
@@ -437,38 +468,6 @@ function calculateModifiers(
     visitorsModifier,
     resourceModifier,
   };
-}
-
-/**
- * Maps ResourceLevel enum back to string for modifier lookup
- */
-function mapResourceLevelToString(resourceLevel: ResourceLevel): string {
-  switch (resourceLevel) {
-    case ResourceLevel.EM_DEBITO:
-      return "Em débito";
-    case ResourceLevel.NENHUM:
-      return "Nenhum";
-    case ResourceLevel.ESCASSOS:
-      return "Escassos";
-    case ResourceLevel.ESCASSOS_HONESTOS:
-      return "Escassos e obtidos com muito esforço e honestidade";
-    case ResourceLevel.LIMITADOS:
-      return "Limitados";
-    case ResourceLevel.SUFICIENTES:
-      return "Suficientes";
-    case ResourceLevel.EXCEDENTES:
-      return "Excedentes";
-    case ResourceLevel.EXCEDENTES_MALIGNOS:
-      return "Excedentes mas alimenta fins malignos";
-    case ResourceLevel.ABUNDANTES_GOVERNO:
-      return "Abundantes porém quase todo vindo do governo de um assentamento próximo";
-    case ResourceLevel.ABUNDANTES:
-      return "Abundantes";
-    case ResourceLevel.ABUNDANTES_SERVICO:
-      return "Abundantes vindos de muitos anos de serviço";
-    default:
-      return "Limitados";
-  }
 }
 
 /**
@@ -514,10 +513,10 @@ export function generateGuildStructure(
     governmentResult.relation,
     populationResult.relation
   );
-  
+
   // Step 4: Generate resources with relation modifiers
   const resourcesResult = generateResources(
-    config.settlementType, 
+    config.settlementType,
     relationModifiers.resourceModifier
   );
   logs.push(
@@ -549,9 +548,7 @@ export function generateGuildStructure(
     config.settlementType,
     finalModifiers.visitorsModifier
   );
-  logs.push(
-    `Visitors: ${visitorsResult.roll} -> ${visitorsResult.frequency}`
-  );
+  logs.push(`Visitors: ${visitorsResult.roll} -> ${visitorsResult.frequency}`);
 
   // Create the guild object
   const guild: Guild = {
@@ -562,8 +559,8 @@ export function generateGuildStructure(
       characteristics: characteristicsResult.characteristics,
     },
     relations: {
-      government: governmentResult.relation,
-      population: populationResult.relation,
+      government: governmentResult.relation as RelationLevel,
+      population: populationResult.relation as RelationLevel,
     },
     staff: {
       employees: employeesResult.employees,
