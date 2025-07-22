@@ -92,17 +92,25 @@ import GuildDisplay from '@/components/guild/GuildDisplay.vue'
 import DiceRoller from '@/components/common/DiceRoller.vue'
 
 import { useGuildStore } from '@/stores/guild'
-import type { Guild } from '@/types/guild'
+import { SettlementType, type Guild } from '@/types/guild'
 
 // Initialize store
 const guildStore = useGuildStore()
 
 const generateGuild = async () => {
-  await guildStore.generateGuildWithDefaults()
+  // Gera uma guilda com settlement aleatório
+  const settlements = Object.values(SettlementType);
+  const randomSettlement = settlements[Math.floor(Math.random() * settlements.length)] as SettlementType;
+  
+  await guildStore.generateGuild({
+    settlementType: randomSettlement,
+    saveToHistory: true
+  })
 }
 
 const clearGuilds = () => {
-  guildStore.clearAll()
+  guildStore.clearHistory()
+  guildStore.clearCurrentGuild()
 }
 
 const selectGuild = (guild: Guild) => {
@@ -110,7 +118,7 @@ const selectGuild = (guild: Guild) => {
 }
 
 const removeGuild = (guildId: string) => {
-  guildStore.removeGuild(guildId)
+  guildStore.removeFromHistory(guildId)
 }
 
 const formatDate = (date: Date | string | undefined) => {
