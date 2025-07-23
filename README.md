@@ -63,6 +63,178 @@ Apesar dos resultados das geraçõess, no geral, serem genéricos o bastante par
 - **Linting**: ESLint para qualidade de código
 - **Testes**: Vitest + Vue Test Utils para testes unitários
 
+## Desenvolvimento Local
+
+### Pré-requisitos
+
+Antes de começar, certifique-se de ter instalado em sua máquina:
+
+- **Node.js** (versão 18.x ou superior) - [Download](https://nodejs.org/)
+- **npm** (vem com Node.js) ou **yarn** (opcional)
+- **Git** para controle de versão - [Download](https://git-scm.com/)
+
+Para verificar se tudo está instalado corretamente:
+
+```bash
+node --version  # deve retornar v18.x.x ou superior
+npm --version   # deve retornar versão do npm
+git --version   # deve retornar versão do git
+```
+
+### Clonando o Repositório
+
+```bash
+# Clone o repositório
+git clone https://github.com/vgabrielsoares/generator-guild.git
+
+# Entre no diretório do projeto
+cd generator-guild
+
+# Mude para a branch de desenvolvimento
+git checkout dev
+```
+
+### Instalação das Dependências
+
+```bash
+# Instalar todas as dependências
+npm install
+
+# Ou, se preferir usar yarn
+yarn install
+```
+
+### ⚙️ Configuração do Ambiente
+
+O projeto não requer variáveis de ambiente específicas para desenvolvimento local. Todas as configurações necessárias já estão incluídas nos arquivos de configuração.
+
+**Arquivos de configuração importantes:**
+- `vite.config.ts` - Configuração do Vite e PWA
+- `tailwind.config.js` - Configuração do Tailwind CSS
+- `tsconfig.json` - Configuração do TypeScript
+- `vitest.config.ts` - Configuração dos testes
+
+### 🏃‍♂️ Executando o Projeto
+
+#### Desenvolvimento
+```bash
+# Inicia o servidor de desenvolvimento
+npm run dev
+
+# O aplicativo estará disponível em:
+# http://localhost:5173
+```
+
+O servidor de desenvolvimento oferece:
+- ✅ **Hot Module Replacement (HMR)** - Recarregamento instantâneo
+- ✅ **TypeScript** em tempo real
+- ✅ **Tailwind CSS** com rebuild automático
+- ✅ **PWA** funcional em desenvolvimento
+
+#### Build de Produção
+```bash
+# Compila o projeto para produção
+npm run build
+
+# Visualiza o build de produção localmente
+npm run preview
+```
+
+Os arquivos compilados estarão na pasta `dist/`.
+
+### Executando Testes
+
+```bash
+# Executa todos os testes
+npm run test
+
+# Executa testes com interface visual
+npm run test:ui
+
+# Executa testes com relatório de cobertura
+npm run test:coverage
+
+# Executa testes em modo watch (reexecuta ao salvar)
+npm run test -- --watch
+```
+
+### Comandos de Desenvolvimento
+
+```bash
+# Formatação de código
+npm run format
+
+# Linting (quando configurado)
+npm run lint
+
+# Análise de tipos TypeScript
+npx vue-tsc --noEmit
+
+# Análise do bundle de produção
+npx vite-bundle-analyzer
+```
+
+### Estrutura de Pastas para Desenvolvimento
+
+```
+src/
+├── components/        # Componentes Vue reutilizáveis
+│   ├── common/       # Componentes comuns (dice, toast, etc.)
+│   ├── contracts/    # Componentes de contratos
+│   ├── guild/        # Componentes da guilda
+│   └── ...
+├── composables/      # Composables Vue (lógica reutilizável)
+├── data/            # Dados estáticos e tabelas de RPG
+├── stores/          # Stores Pinia (gerenciamento de estado)
+├── types/           # Definições TypeScript
+├── utils/           # Utilitários e helpers
+├── views/           # Páginas/Views principais
+└── tests/           # Testes unitários
+```
+
+### Solução de Problemas
+
+#### **Erro de dependências**
+```bash
+# Limpa cache do npm e reinstala
+rm -rf node_modules package-lock.json
+npm install
+```
+
+#### **Erro de TypeScript**
+```bash
+# Verifica tipos sem emitir arquivos
+npx vue-tsc --noEmit --watch
+```
+
+#### **Problemas de PWA em desenvolvimento**
+- A PWA funciona melhor após um build (`npm run build` + `npm run preview`)
+- Service Workers podem ser limpos em DevTools → Application → Storage
+
+### Workflow de Desenvolvimento
+
+1. **Fork** o repositório (se contribuindo)
+2. **Clone** localmente
+3. **Crie uma branch** para sua feature: `git checkout -b feature/nova-funcionalidade`
+4. **Desenvolva** com testes: `npm run test -- --watch`
+5. **Formate** o código: `npm run format`
+6. **Teste** a build: `npm run build`
+7. **Commit** e **push** suas mudanças
+8. **Abra um Pull Request**
+
+### Métricas de Desenvolvimento
+
+- **Bundle size**: Monitore com `npm run build`
+- **Performance**: Lighthouse no DevTools
+- **Testes**: Cobertura com `npm run test:coverage`
+- **Types**: Verificação com `npx vue-tsc --noEmit`
+
+### Obtendo Ajuda
+
+- **Documentação Vue 3**: [vuejs.org](https://vuejs.org/)
+- **Documentação Vite**: [vitejs.dev](https://vitejs.dev/)
+- **Issues**: [GitHub Issues](https://github.com/vgabrielsoares/generator-guild/issues)
+
 ### Funcionalidades PWA
 - **Instalável** em dispositivos móveis e desktop
 - **Funcionamento offline** com Service Workers
