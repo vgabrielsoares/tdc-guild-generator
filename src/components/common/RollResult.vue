@@ -34,13 +34,13 @@
     <div v-if="showActions" class="flex gap-2 mt-3">
       <button v-if="canReroll" @click="$emit('reroll')"
         class="text-xs px-2 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded transition-colors flex items-center gap-1">
-        <font-awesome-icon icon="arrows-rotate" />
+        <ArrowPathIcon class="w-3 h-3" />
         Rolar Novamente
       </button>
 
       <button v-if="canCopy" @click="copyResult"
         class="text-xs px-2 py-1 bg-gray-600 hover:bg-gray-700 text-white rounded transition-colors flex items-center gap-1">
-        <font-awesome-icon icon="copy" />
+        <ClipboardIcon class="w-3 h-3" />
         Copiar
       </button>
     </div>
@@ -52,6 +52,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { ArrowPathIcon, ClipboardIcon } from '@heroicons/vue/24/outline'
 import type { DiceRoll, RollLog } from '@/types/dice'
 
 // Props
@@ -120,11 +121,22 @@ const resultTextClass = computed(() => {
 
 // Methods
 const formatTime = (date: Date): string => {
-  return new Intl.DateTimeFormat('pt-BR', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
-  }).format(new Date(date))
+  try {
+    const dateObj = new Date(date)
+    
+    // Verifica se a data é válida
+    if (isNaN(dateObj.getTime())) {
+      return '--:--:--'
+    }
+    
+    return new Intl.DateTimeFormat('pt-BR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    }).format(dateObj)
+  } catch {
+    return '--:--:--'
+  }
 }
 
 const copyResult = async () => {

@@ -10,7 +10,7 @@
           <div class="flex items-center">
             <div class="flex-shrink-0">
               <h1 class="text-xl font-medieval font-bold text-gold-400 flex items-center gap-2">
-                <font-awesome-icon :icon="['fas', 'wand-magic-sparkles']" class="text-gold-400" />
+                <SparklesIcon class="w-5 h-5 text-gold-400" />
                 Gerador de Guildas
               </h1>
             </div>
@@ -44,12 +44,16 @@
         </p>
       </div>
     </footer>
+
+    <ToastManager />
   </div>
 </template>
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
+import { SparklesIcon } from '@heroicons/vue/24/outline'
 import PWAManager from '@/components/common/PWAManager.vue'
+import ToastManager from '@/components/common/ToastManager.vue'
 
 const route = useRoute()
 

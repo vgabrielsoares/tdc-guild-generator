@@ -76,14 +76,14 @@ describe('Guild Structure Tables', () => {
   describe('Settlement Dice Configuration', () => {
     it('should have proper dice configuration for structure', () => {
       expect(SETTLEMENT_DICE.structure).toBeDefined();
-      expect(SETTLEMENT_DICE.structure['Lugarejo']).toBe('d8');
-      expect(SETTLEMENT_DICE.structure['Metrópole']).toBe('d20+8');
+      expect(SETTLEMENT_DICE.structure['Lugarejo']).toEqual({ dice: 'd8', modifier: 0 });
+      expect(SETTLEMENT_DICE.structure['Metrópole']).toEqual({ dice: 'd20', modifier: 8 });
     });
 
     it('should have proper dice configuration for visitors', () => {
       expect(SETTLEMENT_DICE.visitors).toBeDefined();
-      expect(SETTLEMENT_DICE.visitors['Lugarejo']).toBe('d8');
-      expect(SETTLEMENT_DICE.visitors['Metrópole']).toBe('d20+5');
+      expect(SETTLEMENT_DICE.visitors['Lugarejo']).toEqual({ dice: 'd8', modifier: 0 });
+      expect(SETTLEMENT_DICE.visitors['Metrópole']).toEqual({ dice: 'd20', modifier: 5 });
     });
   });
 
