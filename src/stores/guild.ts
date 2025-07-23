@@ -490,6 +490,14 @@ export const useGuildStore = defineStore('guild', () => {
     } catch (err) {
       // eslint-disable-next-line no-console
       console.warn('Failed to save guild state to storage:', err);
+      
+      if (err instanceof Error) {
+        if (err.name === 'QuotaExceededError') {
+          error.value = 'Espaço de armazenamento insuficiente. Considere limpar o histórico de guildas.';
+        } else {
+          error.value = 'Falha ao salvar dados. Suas alterações podem ser perdidas.';
+        }
+      }
     }
   }
 
