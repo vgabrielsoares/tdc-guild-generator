@@ -240,6 +240,40 @@ export class ResourcesVisitorsGenerator extends BaseGenerator<ResourcesVisitorsG
   }
 
   /**
+   * Determina o range máximo baseado no tipo de dado e tabela
+   */
+  private getDiceRange(dice: string, context: 'resources' | 'visitors' = 'resources'): { min: number; max: number } {
+    switch (dice) {
+      case 'd8': return { min: 1, max: 8 };
+      case 'd10': return { min: 1, max: 10 };
+      case 'd12': return { min: 1, max: 12 };
+      case 'd20': 
+        // A tabela de recursos D20 vai até 25 devido a modificadores
+        if (context === 'resources') return { min: 1, max: 25 };
+        return { min: 1, max: 20 };
+      case 'd25': return { min: 1, max: 25 };
+      default: return { min: 1, max: 20 }; // fallback
+    }
+  }
+
+  /**
+   * Aplica clamp ao roll baseado no range do dado
+   */
+  private clampRoll(roll: number, dice: string, context: 'resources' | 'visitors', logContext: string): number {
+    const range = this.getDiceRange(dice, context);
+    const clampedRoll = Math.max(range.min, Math.min(range.max, roll));
+    
+    if (clampedRoll !== roll) {
+      this.log(
+        `${logContext}: Roll ${roll} clamped to ${clampedRoll} for table range ${range.min}-${range.max}`, 
+        'MODIFIER'
+      );
+    }
+    
+    return clampedRoll;
+  }
+
+  /**
    * Gera recursos baseado no tipo de assentamento e modificadores
    */
   private generateResources(modifier: number): { level: ResourceLevel; roll: number } {
@@ -253,7 +287,8 @@ export class ResourcesVisitorsGenerator extends BaseGenerator<ResourcesVisitorsG
       const notation = modifier === 0 ? 'd8' : `d8${modifier >= 0 ? '+' : ''}${modifier}`;
       
       const rollResult = this.rollWithLog(notation, 'Resources (fallback)');
-      const tableResult = findTableEntry(resourceTable, rollResult.result);
+      const clampedRoll = this.clampRoll(rollResult.result, 'd8', 'resources', 'Resources');
+      const tableResult = findTableEntry(resourceTable, clampedRoll);
       const level = mapResourceStringToEnum(tableResult || 'Limitados');
       
       return { level, roll: rollResult.result };
@@ -263,7 +298,8 @@ export class ResourcesVisitorsGenerator extends BaseGenerator<ResourcesVisitorsG
     const notation = finalModifier === 0 ? `1${diceConfig.dice}` : `1${diceConfig.dice}${finalModifier >= 0 ? '+' : ''}${finalModifier}`;
     
     const rollResult = this.rollWithLog(notation, `Resources (${settlementKey})`);
-    const tableResult = findTableEntry(resourceTable, rollResult.result);
+    const clampedRoll = this.clampRoll(rollResult.result, diceConfig.dice, 'resources', 'Resources');
+    const tableResult = findTableEntry(resourceTable, clampedRoll);
     const level = mapResourceStringToEnum(tableResult || 'Limitados');
     
     this.log(`Resource level: ${level}`, 'RESOURCES');
@@ -284,7 +320,8 @@ export class ResourcesVisitorsGenerator extends BaseGenerator<ResourcesVisitorsG
       const notation = modifier === 0 ? 'd8' : `d8${modifier >= 0 ? '+' : ''}${modifier}`;
       
       const rollResult = this.rollWithLog(notation, 'Visitors (fallback)');
-      const tableResult = findTableEntry(visitorTable, rollResult.result);
+      const clampedRoll = this.clampRoll(rollResult.result, 'd8', 'visitors', 'Visitors');
+      const tableResult = findTableEntry(visitorTable, clampedRoll);
       const frequency = mapVisitorStringToEnum(tableResult || 'Nem muito nem pouco');
       
       return { frequency, roll: rollResult.result };
@@ -294,7 +331,8 @@ export class ResourcesVisitorsGenerator extends BaseGenerator<ResourcesVisitorsG
     const notation = finalModifier === 0 ? `1${diceConfig.dice}` : `1${diceConfig.dice}${finalModifier >= 0 ? '+' : ''}${finalModifier}`;
     
     const rollResult = this.rollWithLog(notation, `Visitors (${settlementKey})`);
-    const tableResult = findTableEntry(visitorTable, rollResult.result);
+    const clampedRoll = this.clampRoll(rollResult.result, diceConfig.dice, 'visitors', 'Visitors');
+    const tableResult = findTableEntry(visitorTable, clampedRoll);
     const frequency = mapVisitorStringToEnum(tableResult || 'Nem muito nem pouco');
     
     this.log(`Visitor frequency: ${frequency}`, 'VISITORS');

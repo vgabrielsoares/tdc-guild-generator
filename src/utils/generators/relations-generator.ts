@@ -74,10 +74,17 @@ export class RelationsGenerator extends BaseGenerator<RelationsGenerationConfig,
     const notation = modifier === 0 ? 'd20' : `d20${modifier >= 0 ? '+' : ''}${modifier}`;
     
     const rollResult = this.rollWithLog(notation, 'Government relations');
-    const tableResult = findTableEntry(GOVERNMENT_RELATIONS_TABLE, rollResult.result);
+    
+    // Clampar o resultado para o range válido da tabela (1-20)
+    const clampedRoll = Math.max(1, Math.min(20, rollResult.result));
+    if (clampedRoll !== rollResult.result) {
+      this.log(`Roll ${rollResult.result} clamped to ${clampedRoll} for table range 1-20`, 'MODIFIER');
+    }
+    
+    const tableResult = findTableEntry(GOVERNMENT_RELATIONS_TABLE, clampedRoll);
     
     if (!tableResult) {
-      this.log(`No table entry found for roll ${rollResult.result}, using default`, 'WARNING');
+      this.log(`No table entry found for roll ${clampedRoll}, using default`, 'WARNING');
       return { relation: RelationLevel.DIPLOMATICA, roll: rollResult.result };
     }
     
@@ -95,10 +102,17 @@ export class RelationsGenerator extends BaseGenerator<RelationsGenerationConfig,
     const notation = modifier === 0 ? 'd20' : `d20${modifier >= 0 ? '+' : ''}${modifier}`;
     
     const rollResult = this.rollWithLog(notation, 'Population relations');
-    const tableResult = findTableEntry(POPULATION_RELATIONS_TABLE, rollResult.result);
+    
+    // Clampar o resultado para o range válido da tabela (1-20)
+    const clampedRoll = Math.max(1, Math.min(20, rollResult.result));
+    if (clampedRoll !== rollResult.result) {
+      this.log(`Roll ${rollResult.result} clamped to ${clampedRoll} for table range 1-20`, 'MODIFIER');
+    }
+    
+    const tableResult = findTableEntry(POPULATION_RELATIONS_TABLE, clampedRoll);
     
     if (!tableResult) {
-      this.log(`No table entry found for roll ${rollResult.result}, using default`, 'WARNING');
+      this.log(`No table entry found for roll ${clampedRoll}, using default`, 'WARNING');
       return { relation: RelationLevel.OPINIAO_DIVIDIDA, roll: rollResult.result };
     }
     
