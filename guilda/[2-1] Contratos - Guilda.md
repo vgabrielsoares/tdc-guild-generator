@@ -1,4 +1,4 @@
-# Contratos
+# Gerador de Contratos da Guilda
 
 A primeira vez que um jogador adentrar a sede de uma guilda role na tabela para descobrir quantos contratos originalmente estariam disponíveis (Contratos novos surgem de tempos em tempos e você precisará retornar aqui e repetir todo o processo, fique atento à tabela "Novos e antigos contratos e serviços").
 
