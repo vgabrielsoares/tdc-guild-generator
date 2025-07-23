@@ -158,14 +158,19 @@ export class StructureGenerator extends BaseGenerator<StructureGenerationConfig,
         return { characteristic, roll: rollResult.result };
       }
       
+      // Se chegou no último attempt, retorna a característica mesmo que duplicada
       if (attempt === maxAttempts) {
         this.log(`Max attempts reached, using duplicate: ${characteristic}`, 'WARNING');
         return { characteristic, roll: rollResult.result };
       }
     }
     
-    // Este código nunca deveria ser alcançado, mas TypeScript exige
-    throw new Error('Failed to generate characteristic');
+    // Esta linha nunca deveria ser alcançada devido à lógica do loop
+    // Mantida apenas para satisfazer o TypeScript
+    const fallbackRoll = this.rollWithLog('d20', `Fallback characteristic ${attemptNumber}`);
+    const fallbackCharacteristic = lookupTableValue(HEADQUARTERS_CHARACTERISTICS_TABLE, fallbackRoll.result);
+    this.log(`Fallback characteristic used: ${fallbackCharacteristic}`, 'WARNING');
+    return { characteristic: fallbackCharacteristic, roll: fallbackRoll.result };
   }
 
   /**
