@@ -44,12 +44,16 @@
         </p>
       </div>
     </footer>
+
+    <ToastManager />
   </div>
 </template>
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
+import { SparklesIcon } from '@heroicons/vue/24/outline'
 import PWAManager from '@/components/common/PWAManager.vue'
+import ToastManager from '@/components/common/ToastManager.vue'
 
 const route = useRoute()
 
