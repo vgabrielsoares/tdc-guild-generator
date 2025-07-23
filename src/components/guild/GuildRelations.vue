@@ -79,13 +79,26 @@
         <p class="text-gray-200">{{ guild.relations.notes }}</p>
       </div>
 
-      <!-- Informações do Assentamento -->
-      <div class="bg-blue-900 rounded-lg p-4 border border-blue-700">
-        <h4 class="font-semibold text-blue-300 mb-2 flex items-center space-x-2">
+      <!-- Frequentadores -->
+      <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
+        <h4 class="font-semibold text-gray-300 mb-2 flex items-center space-x-2">
           <ArrowRightOnRectangleIcon class="w-4 h-4 text-gray-400" />
-          <span>Assentamento</span>
+          <span>Frequentadores</span>
         </h4>
-        <p class="text-blue-100 font-medium">{{ guild.settlementType }}</p>
+        <p class="text-white font-medium">{{ guild.visitors.frequency }}</p>
+        <div v-if="guild.visitors.types && guild.visitors.types.length > 0" class="mt-2">
+          <p class="text-gray-300 text-sm mb-1">Tipos de visitantes:</p>
+          <div class="flex flex-wrap gap-1">
+            <span
+              v-for="(type, index) in guild.visitors.types"
+              :key="index"
+              class="inline-block px-2 py-1 bg-blue-800 text-blue-200 text-xs rounded-full border border-blue-600"
+            >
+              {{ type }}
+            </span>
+          </div>
+        </div>
+        <p v-if="guild.visitors.description" class="text-gray-300 text-sm mt-2">{{ guild.visitors.description }}</p>
       </div>
 
       <!-- Metadados -->
