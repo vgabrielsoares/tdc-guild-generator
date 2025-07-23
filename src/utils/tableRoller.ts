@@ -114,7 +114,16 @@ export function rollOnTable<T>(
     logRoll: true,
   });
 
-  const finalRoll = diceRoll.result;
+  // Clamp the roll result to the table range to prevent out-of-bounds issues
+  const clampedRoll = Math.max(minValue, Math.min(maxValue, diceRoll.result));
+  
+  if (clampedRoll !== diceRoll.result) {
+    logTable.warn(
+      `Roll ${diceRoll.result} clamped to ${clampedRoll} to fit table range ${minValue}-${maxValue}`
+    );
+  }
+
+  const finalRoll = clampedRoll;
 
   // Find the matching table entry
   const matchingEntry = table.find(
