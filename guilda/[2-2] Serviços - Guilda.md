@@ -1,8 +1,8 @@
-## Gerador de Serviços
+# Gerador de Serviços da Guilda
 
 A ideia é que os serviços sejam tarefas simples resolvidas em um curto espaço de tempo e que não ponham em risco a vida da criatura. Nada impede de algo mais mirabolante acontecer, mas tenha cautela na hora de usar os temas para improvisar, pois as recompensas são baixas e isso pode acabar afastando os jogadores na hora de escolher o que fazer.
 
-### Contratante do Serviço
+## Contratante do Serviço
 
 | 1d20 | Contratante |
 |------|-------------|
@@ -12,7 +12,7 @@ A ideia é que os serviços sejam tarefas simples resolvidas em um curto espaço
 
 > **Nota**: Ajuste o resultado de acordo com a relação com a população local e com o governo local
 
-#### Modificadores de Relação
+### Modificadores de Relação
 
 **Relação com a população local:**
 - Péssima +4
@@ -30,7 +30,7 @@ A ideia é que os serviços sejam tarefas simples resolvidas em um curto espaço
 - Muito boa +2
 - Excelente +5
 
-### Contratante do Governo
+## Contratante do Governo
 
 | 1d20 | Contratante do governo |
 |------|------------------------|
@@ -410,9 +410,9 @@ Essas ideias aqui são birutas. Às vezes vão parecer até outro objetivo ou ir
 
 Eventualmente os desafios ficarão repetitivos já que essa tabela será globalmente usada. Pensando nisso role 1d6 palavras aleatórias de diferentes tabelas e tente incorporá-las criativamente ao desafio ou serviço.
 
-### Palavras-chave Adicionais para Criatividade
+#### Palavras-chave Adicionais para Criatividade
 
-#### Conjunto 7 (d10)
+##### Conjunto 7 (d10)
 | d10 | Palavra-chave |
 |-----|---------------|
 | 1   | Bêbado        |
@@ -426,7 +426,7 @@ Eventualmente os desafios ficarão repetitivos já que essa tabela será globalm
 | 9   | Ladino        |
 | 10  | Cavalo        |
 
-#### Conjunto 8 (d10)
+##### Conjunto 8 (d10)
 | d10 | Palavra-chave |
 |-----|---------------|
 | 1   | Amor          |
@@ -440,7 +440,7 @@ Eventualmente os desafios ficarão repetitivos já que essa tabela será globalm
 | 9   | Avareza       |
 | 10  | Medo          |
 
-#### Conjunto 9 (d10)
+##### Conjunto 9 (d10)
 | d10 | Palavra-chave |
 |-----|---------------|
 | 1   | Sujo          |
@@ -454,7 +454,7 @@ Eventualmente os desafios ficarão repetitivos já que essa tabela será globalm
 | 9   | Armadilha     |
 | 10  | Ponte         |
 
-#### Conjunto 10 (d10)
+##### Conjunto 10 (d10)
 | d10 | Palavra-chave |
 |-----|---------------|
 | 1   | Prato         |
@@ -468,7 +468,7 @@ Eventualmente os desafios ficarão repetitivos já que essa tabela será globalm
 | 9   | Cajado        |
 | 10  | Buraco        |
 
-#### Conjunto 11 (d10)
+##### Conjunto 11 (d10)
 | d10 | Palavra-chave |
 |-----|---------------|
 | 1   | Esposa        |
@@ -482,7 +482,7 @@ Eventualmente os desafios ficarão repetitivos já que essa tabela será globalm
 | 9   | Espada        |
 | 10  | Chão          |
 
-#### Conjunto 12 (d10)
+##### Conjunto 12 (d10)
 | d10 | Palavra-chave |
 |-----|---------------|
 | 1   | Morte         |
