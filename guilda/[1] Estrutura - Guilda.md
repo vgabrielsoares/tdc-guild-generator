@@ -2,11 +2,13 @@
 
 ## Descrição
 
-Cerca de 500 anos atrás, no auge das batalhas por territorio e cercos no continente, os humanoides das terras altas se viram desprovidos de aliados e ajuda em meio ao caos sanguinario de seus inimigos. Em um ato de desespero os lideres humanos, sempre ambiciosos e dipostos a qualquer coisa para trazer a gloria para seu povo, ofereceram ouro em troca da ajuda de qualquer um que estivesse disposto a lutar, e pela quantia certa muitos estão.
+
+
+<!-- Cerca de 500 anos atrás, no auge das batalhas por territorio e cercos nos continentes, os humanoides se viram desprovidos de aliados e ajuda em meio ao caos sanguinario de seus inimigos. Em um ato de desespero, os lideres humanos, sempre ambiciosos e dipostos a qualquer coisa para trazer a gloria para seu povo, ofereceram ouro em troca da ajuda de qualquer um que estivesse disposto a lutar, e pela quantia certa muitos estão.
 
 A estrategia deu tão certo que se espalhou como fogo pelos assentamentos humanos, e após conquistarem o que tanto almejavam, essa especie de "tratado de ouro" manteve a paz e reconstruiu tudo que estava em ruína, a ponto de que com o passar dos anos se tornasse uma tradição. Começou com uma pequena aliança entre o governo e alguns mercenarios, e agora membros da guilda se espalham pelo continente, e até fora dele, ajudando quem precisar em troca da quantia certa.
 
-Muitos não gostam da guilda, muitos não entendem por que alguem só ajudaria em troca de ouro, mas o fato é que a guilda é, para os que tem coragem suficiente, uma passagem para uma vida melhor, muitos se arriscam e tem sua vida seifada em pouco tempo, mas o ouro e a gloria ofuscam esses acontecimentos.
+Muitos não gostam da guilda, muitos não entendem por que alguem só ajudaria em troca de ouro, mas o fato é que a guilda é, para os que tem coragem suficiente, uma passagem para uma vida melhor, muitos se arriscam e tem sua vida ceifada em pouco tempo, mas o ouro e a gloria ofuscam esses acontecimentos. -->
 
 ### Taxas e Custos
 
@@ -21,14 +23,38 @@ A recompensa inicialmente é decidida pelo contratante. Caso ache necessário, a
 
 ## Regras da Guilda
 
-1. Todos os membros da guilda devem agir de acordo com os interesses da mesma
-2. Nenhum membro da guilda deve ferir outro membro da guilda ou suas possessões
-3. Regras locais devem ser respeitadas sempre
-4. Inimigos rendidos estarão sob nossa proteção até que os entreguem à lei local
-5. O uso da força contra grupos inocentes nunca é uma opção
-6. A proteção de grupos inocentes supera todas as regras acima
-7. Membros da guilda devem se submeter ao desejo da lei local e suas forças, a não ser que a própria força de lei tenha sido comprometida
-8. Todos devem honrar o renome da guilda
+*(Código de Conduta para Membros Registrados)*  
+
+1. **Lealdade Inquestionável**  
+   > *"A Guilda é seu lar e sua bandeira. Traí-la é trair a si mesmo."*  
+   - Ações que prejudiquem reputação, recursos ou interesses da Guilda serão punidas de acordo, variando entre expulsão, banimento, ou o que for condizente.
+
+2. **Santidade do Contrato**  
+   > *"Ouro recebido, palavra empenhada."*  
+   - Termos acordados devem ser cumpridos rigorosamente, exceto se:  
+     a) Violarem a Regra #3;  
+     b) Forem comprovadamente impossíveis.
+
+3. **Proteção dos Inocentes**  
+   > *"Nossa espada defende, nunca oprime."*  
+   - Uso de força contra não-combatentes é proibido. Esta regra sobrepõe-se a todas as outras.
+
+4. **Submissão à Lei Local**  
+   > *"Respeite o solo que pisa."*  
+   - Autoridades locais devem ser obedecidas, exceto quando corrompidas ou inoperantes.
+
+5. **Trato com Prisioneiros**  
+   > *"Inimigo rendido é dever cumprido."*  
+   - Capturados devem ser entregues às autoridades. Tortura/execução sumária acarretam em punição.
+
+6. **Conflitos Internos**  
+   > *"Ferir colega é ferir a Guilda."*  
+   - Disputas resolvem-se perante o Conselho.  
+   - Danos a colegas ou seus bens exigem reparação em dobro.
+
+7. **Voto de Silêncio**  
+   > *"Segredos guardados são vidas preservadas."*  
+   - Vazamento de detalhes de contratos, recursos da Guilda ou identidades de clientes é traição.
 
 ## Identidade da Guilda
 
@@ -52,13 +78,13 @@ A recompensa inicialmente é decidida pelo contratante. Caso ache necessário, a
 
 ### Existência de Sede
 
-| 1d20 | Assentamento Humano | 1d20 | Outros Assentamentos |
-|------|--------------------|----- |--------------------- |
-| 1-7  | Não                | 1-20 | Não                  |
-| 8-20 | Sim                | 21+  | Sim                  |
-| 21+  | Sede matriz*       |      |                      |
+| 1d20 | Existe uma Guilda no Assentamento? |
+|------|--------------------|
+| 1-7  | Não                |
+| 8-20 | Sim                |
+| 21+  | Sede matriz*       |
 
-*Adicione +5 nas próximas rolagens
+*Adicione +5 no resto das rolagens de estrutura para essa guilda
 
 ### Tamanho da Sede
 
@@ -149,8 +175,7 @@ A recompensa inicialmente é decidida pelo contratante. Caso ache necessário, a
 | 3-5   | Nenhum |
 | 6-8   | Escassos |
 | 9     | Escassos e obtidos com muito esforço e honestidade |
-| 10-11 | Limitados |
-| 12    | Limitados |
+| 10-12 | Limitados |
 | 13-15 | Suficientes |
 | 16    | Excedentes |
 | 17    | Excedentes mas alimenta fins malignos |
