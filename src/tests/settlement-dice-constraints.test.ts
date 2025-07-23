@@ -71,9 +71,29 @@ describe("Settlement Dice Constraints - Bug Fix Validation", () => {
       });
     });
 
-    it.skip("should show clear differences between settlement types", () => {
-      // Teste desabilitado temporariamente para debug
-      expect(true).toBe(true);
+    it("should show clear differences between settlement types", () => {
+      const results: Record<string, ReturnType<typeof generateGuildStructure>[]> = {};
+      const settlementTypes = [ST.LUGAREJO, ST.ALDEIA, ST.CIDADE_PEQUENA, ST.CIDADE_GRANDE, ST.METROPOLE];
+      
+      // Gerar várias guildas para cada tipo de assentamento
+      settlementTypes.forEach((settlementType) => {
+        const guilds = [];
+        for (let i = 0; i < 10; i++) {
+          const result = generateGuildStructure({ settlementType, useModifiers: false });
+          guilds.push(result);
+        }
+        results[settlementType] = guilds;
+      });
+
+      // Verificar que diferentes tipos de assentamento produzem resultados distintos
+      const lugarejosRolls = results[ST.LUGAREJO].map((r) => r.rolls.structure.size);
+      const metropoleRolls = results[ST.METROPOLE].map((r) => r.rolls.structure.size);
+      
+      // Lugarejo deve ter rolls menores que metrópole em média
+      const avgLugarejo = lugarejosRolls.reduce((a: number, b: number) => a + b, 0) / lugarejosRolls.length;
+      const avgMetropole = metropoleRolls.reduce((a: number, b: number) => a + b, 0) / metropoleRolls.length;
+      
+      expect(avgLugarejo).toBeLessThan(avgMetropole);
     });
 
     it("should handle all settlement types without errors", () => {
@@ -96,9 +116,29 @@ describe("Settlement Dice Constraints - Bug Fix Validation", () => {
       });
     });
 
-    it.skip("should maintain consistency in regeneration logic", () => {
-      // Teste desabilitado temporariamente para debug
-      expect(true).toBe(true);
+    it("should maintain consistency in regeneration logic", () => {
+      const settlementType = ST.CIDADE_PEQUENA;
+      const config = { settlementType, useModifiers: false };
+      
+      // Gerar várias guildas com a mesma configuração
+      const results = [];
+      for (let i = 0; i < 20; i++) {
+        results.push(generateGuildStructure(config));
+      }
+      
+      // Verificar que todas têm o mesmo tipo de assentamento
+      results.forEach((result) => {
+        expect(result.guild.settlementType).toBe(settlementType);
+        expect(result.rolls.structure).toBeDefined();
+        expect(result.rolls.structure.size).toBeGreaterThan(0);
+        expect(result.rolls.structure.characteristics).toBeInstanceOf(Array);
+        expect(result.rolls.structure.characteristics.length).toBeGreaterThan(0);
+      });
+      
+      // Verificar que os rolls estão dentro dos limites esperados para cidade pequena
+      const sizeRolls = results.map(r => r.rolls.structure.size);
+      expect(Math.min(...sizeRolls)).toBeGreaterThanOrEqual(1);
+      expect(Math.max(...sizeRolls)).toBeLessThanOrEqual(20); // d20 base
     });
   });
 });
