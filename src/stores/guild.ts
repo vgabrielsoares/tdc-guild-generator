@@ -283,6 +283,13 @@ export const useGuildStore = defineStore('guild', () => {
   }
 
   function removeFromHistory(guildId: string): boolean {
+    const guild = guildHistory.value.find(g => g.id === guildId);
+    
+    // Não permitir remoção se a guilda estiver bloqueada
+    if (guild?.locked) {
+      return false;
+    }
+    
     const initialLength = guildHistory.value.length;
     
     // Se a guilda atual está sendo removida, limpar
@@ -302,8 +309,28 @@ export const useGuildStore = defineStore('guild', () => {
   }
 
   function clearHistory(): void {
-    guildHistory.value = [];
+    // Manter apenas as guildas bloqueadas
+    guildHistory.value = guildHistory.value.filter(g => g.locked);
     saveToStorage();
+  }
+
+  function toggleGuildLock(guildId: string): boolean {
+    const guildIndex = guildHistory.value.findIndex(g => g.id === guildId);
+    if (guildIndex === -1) {
+      return false;
+    }
+    
+    const guild = guildHistory.value[guildIndex];
+    const newGuild = { ...guild, locked: !guild.locked };
+    guildHistory.value[guildIndex] = newGuild;
+    
+    // Se a guilda atual está sendo modificada, atualizar também
+    if (currentGuild.value?.id === guildId) {
+      currentGuild.value = newGuild;
+    }
+    
+    saveToStorage();
+    return true;
   }
 
   function loadGuildFromHistory(guildId: string): Guild | null {
@@ -327,6 +354,39 @@ export const useGuildStore = defineStore('guild', () => {
       throw new Error('Invalid guild object');
     }
     currentGuild.value = guild;
+  }
+
+  function updateGuildName(newName: string): boolean {
+    if (!currentGuild.value || !newName.trim()) {
+      return false;
+    }
+    
+    const trimmedName = newName.trim();
+    if (trimmedName === currentGuild.value.name) {
+      return false;
+    }
+    
+    // Criar nova instância da guilda com o nome atualizado
+    const updatedGuild: Guild = {
+      ...currentGuild.value,
+      name: trimmedName,
+      updatedAt: new Date()
+    };
+    
+    currentGuild.value = updatedGuild;
+    
+    // Atualizar no histórico se existe
+    const historyIndex = guildHistory.value.findIndex(g => g.id === updatedGuild.id);
+    if (historyIndex !== -1) {
+      guildHistory.value = [
+        ...guildHistory.value.slice(0, historyIndex),
+        updatedGuild,
+        ...guildHistory.value.slice(historyIndex + 1)
+      ];
+    }
+    
+    saveToStorage();
+    return true;
   }
 
   function clearCurrentGuild(): void {
@@ -520,9 +580,11 @@ export const useGuildStore = defineStore('guild', () => {
     addToHistory,
     removeFromHistory,
     clearHistory,
+    toggleGuildLock,
     loadGuildFromHistory,
     selectGuildFromHistory,
     setCurrentGuild,
+    updateGuildName,
     clearCurrentGuild,
     clearError,
     saveToStorage,

@@ -95,6 +95,7 @@ export interface Guild {
   readonly settlementType: SettlementType;
   readonly createdAt: Date;
   readonly updatedAt?: Date;
+  readonly locked?: boolean;
 }
 
 // Interface para configuração de geração
@@ -181,6 +182,7 @@ export const GuildSchema = z.object({
   settlementType: SettlementTypeSchema,
   createdAt: z.date(),
   updatedAt: z.date().optional(),
+  locked: z.boolean().optional().default(false),
 });
 
 export const GuildGenerationConfigSchema = z.object({
