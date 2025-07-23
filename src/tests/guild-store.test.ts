@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { setActivePinia, createPinia } from "pinia";
 import { useGuildStore } from "@/stores/guild";
-import { SettlementType, type Guild } from "@/types/guild";
+import { SettlementType } from "@/types/guild";
 import { GUILD_NAME_CONFIG } from "@/data/guild-names";
 
 // Mock localStorage
@@ -93,11 +93,10 @@ describe("Issue 3.4 - Guild Store Complete", () => {
       const guild = await store.generateGuild({
         settlementType: SettlementType.CIDADE_GRANDE,
         customModifiers: {
-          structure: 5,
-          visitors: -2,
-          government: 3,
-          population: -1,
-          resources: 4,
+          structure: { size: 5, employees: 2 },
+          visitors: { frequency: -2 },
+          relations: { government: 3, population: -1 },
+          resources: { level: 4 },
         },
         saveToHistory: true,
       });
@@ -105,11 +104,10 @@ describe("Issue 3.4 - Guild Store Complete", () => {
       expect(guild).toBeDefined();
       expect(guild?.settlementType).toBe(SettlementType.CIDADE_GRANDE);
       expect(store.lastConfig?.customModifiers).toEqual({
-        structure: 5,
-        visitors: -2,
-        government: 3,
-        population: -1,
-        resources: 4,
+        structure: { size: 5, employees: 2 },
+        visitors: { frequency: -2 },
+        relations: { government: 3, population: -1 },
+        resources: { level: 4 },
       });
     });
 
@@ -160,7 +158,7 @@ describe("Issue 3.4 - Guild Store Complete", () => {
 
       const firstGuild = await store.generateGuild({
         settlementType: SettlementType.ALDEIA,
-        customModifiers: { structure: 2 },
+        customModifiers: { structure: { size: 2 } },
       });
 
       const secondGuild = await store.regenerateCurrentGuild();

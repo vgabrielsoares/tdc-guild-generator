@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useGuildStore } from '@/stores/guild';
-import { SettlementType, type Guild } from '@/types/guild';
+import { SettlementType } from '@/types/guild';
 import { convertToGuild } from './utils/test-helpers';
 
 describe('Guild Improvements', () => {

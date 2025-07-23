@@ -39,6 +39,42 @@ function createCustomLog(category: string, message: string): void {
 }
 
 /**
+ * Mapear resultado da tabela para o enum RelationLevel
+ */
+function mapToRelationLevel(result: string): RelationLevel {
+  // Mapeamento direto dos valores das tabelas para o enum
+  const mappings: { [key: string]: RelationLevel } = {
+    "Péssima": RelationLevel.PESSIMA,
+    "Ruim": RelationLevel.RUIM,
+    "Ruim, mas tentam manter a cordialidade": RelationLevel.RUIM_CORDIAL,
+    "Ruim, só causam problemas": RelationLevel.RUIM_PROBLEMAS,
+    "Diplomática": RelationLevel.DIPLOMATICA,
+    "Opinião dividida": RelationLevel.OPINIAO_DIVIDIDA,
+    "Boa, mas o governo tenta miná-los secretamente": RelationLevel.BOA_TENSAO,
+    "Boa": RelationLevel.BOA,
+    "Boa, ajudam com problemas": RelationLevel.BOA_AJUDAM,
+    "Boa, nos mantêm seguros": RelationLevel.BOA_SEGUROS,
+    "Muito boa, cooperam frequentemente": RelationLevel.MUITO_BOA,
+    "Muito boa, sem eles estaríamos perdidos": RelationLevel.MUITO_BOA_PERDIDOS,
+    "Excelente, governo e guilda são quase como um": RelationLevel.EXCELENTE,
+    "Excelente, a guilda faz o assentamento funcionar": RelationLevel.EXCELENTE_FUNCIONAR,
+    "Péssima, puro ódio": RelationLevel.PESSIMA_ODIO,
+    "Ruim, vistos como mercenários": RelationLevel.RUIM_MERCENARIOS,
+  };
+
+  const mapped = mappings[result];
+  if (!mapped) {
+    createCustomLog(
+      "GUILD RELATIONS",
+      `Unmapped relation result "${result}" - falling back to DIPLOMATICA. Consider adding explicit mapping.`
+    );
+    return RelationLevel.DIPLOMATICA;
+  }
+  
+  return mapped;
+}
+
+/**
  * Generate government relations for the guild
  */
 export function generateGovernmentRelations(
@@ -201,11 +237,11 @@ export function generateResourceSpecialties(
 function stringToRelationLevel(value: string): RelationLevel {
   const exactMapping: Record<string, RelationLevel> = {
     'Péssima': RelationLevel.PESSIMA,
+    'Péssima, puro ódio': RelationLevel.PESSIMA_ODIO,
     'Ruim': RelationLevel.RUIM,
+    'Ruim, vistos como mercenários': RelationLevel.RUIM_MERCENARIOS,
     'Ruim, mas tentam manter a cordialidade': RelationLevel.RUIM_CORDIAL,
     'Ruim, só causam problemas': RelationLevel.RUIM_PROBLEMAS,
-    'Ruim, vistos como mercenários': RelationLevel.RUIM_PROBLEMAS,
-    'Péssima, puro ódio': RelationLevel.PESSIMA,
     'Diplomática': RelationLevel.DIPLOMATICA,
     'Opinião dividida': RelationLevel.OPINIAO_DIVIDIDA,
     'Boa, mas o governo tenta miná-los secretamente': RelationLevel.BOA_TENSAO,
@@ -218,7 +254,16 @@ function stringToRelationLevel(value: string): RelationLevel {
     'Excelente, a guilda faz o assentamento funcionar': RelationLevel.EXCELENTE_FUNCIONAR,
   };
   
-  return exactMapping[value] || RelationLevel.DIPLOMATICA;
+  const mapped = exactMapping[value];
+  if (!mapped) {
+    createCustomLog(
+      "GUILD RELATIONS",
+      `Unmapped relation value "${value}" in stringToRelationLevel - falling back to DIPLOMATICA. Consider adding explicit mapping.`
+    );
+    return RelationLevel.DIPLOMATICA;
+  }
+  
+  return mapped;
 }
 
 /**
@@ -378,9 +423,9 @@ export function generateGuildRelations(
   const population = generatePopulationRelations(config);
 
   return {
-    government: government.result,
+    government: mapToRelationLevel(government.result),
     governmentDescription: government.description,
-    population: population.result,
+    population: mapToRelationLevel(population.result),
     populationDescription: population.description,
   };
 }

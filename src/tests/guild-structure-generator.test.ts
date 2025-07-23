@@ -38,7 +38,7 @@ describe('Issue 3.2 - Guild Structure Generator', () => {
     });
 
     it('should generate employees with valid data', () => {
-      const result = generateEmployees();
+      const result = generateEmployees(SettlementType.CIDADE_GRANDE);
       
       expect(result.employees).toBeTypeOf('string');
       expect(result.employees.length).toBeGreaterThan(0);
@@ -74,12 +74,12 @@ describe('Issue 3.2 - Guild Structure Generator', () => {
     });
 
     it('should generate resources with valid enum', () => {
-      const result = generateResources();
+      const result = generateResources(SettlementType.CIDADE_GRANDE);
       
       expect(Object.values(ResourceLevel)).toContain(result.level);
       expect(result.roll).toBeTypeOf('number');
       expect(result.roll).toBeGreaterThan(0);
-      expect(result.roll).toBeLessThanOrEqual(20);
+      expect(result.roll).toBeLessThanOrEqual(24);
     });
   });
 

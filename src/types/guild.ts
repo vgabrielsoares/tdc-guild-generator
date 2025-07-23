@@ -35,7 +35,9 @@ export enum VisitorLevel {
 
 export enum RelationLevel {
   PESSIMA = "Péssima",
+  PESSIMA_ODIO = "Péssima, puro ódio",
   RUIM = "Ruim",
+  RUIM_MERCENARIOS = "Ruim, vistos como mercenários",
   RUIM_CORDIAL = "Ruim, mas tentam manter a cordialidade",
   RUIM_PROBLEMAS = "Ruim, só causam problemas",
   DIPLOMATICA = "Diplomática", 
@@ -53,7 +55,7 @@ export enum RelationLevel {
 // Interfaces principais - organizadas e tipadas
 export interface GuildStructure {
   readonly size: string;
-  readonly characteristics: string[];
+  readonly characteristics: readonly string[];
   readonly location?: string;
   readonly description?: string;
 }
