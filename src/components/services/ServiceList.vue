@@ -12,7 +12,7 @@
   </div>
 </template>
 
-<script setuplang="ts">
+<script setup lang="ts">
 // ServiceList component
 // Will be implemented in Issue 5.5
 console.log('[SERVICE LIST] ServiceList component loaded')

@@ -12,7 +12,7 @@
   </div>
 </template>
 
-<script setuplang="ts">
+<script setup lang="ts">
 // NoticeBoard component
 // Will be implemented in Issue 7.5
 console.log('[NOTICE BOARD] NoticeBoard component loaded')
