@@ -54,7 +54,8 @@ export abstract class BaseGenerator<TConfig extends BaseGenerationConfig, TResul
     const logMessage = `[${category}] ${message}`;
     this.logs.push(logMessage);
     
-    if (this.debug) {
+    // Usar console apenas em modo debug e em desenvolvimento
+    if (this.debug && typeof window !== 'undefined' && window.location.hostname === 'localhost') {
       // eslint-disable-next-line no-console
       console.log(logMessage);
     }
