@@ -53,7 +53,7 @@ export enum RelationLevel {
 // Interfaces principais - organizadas e tipadas
 export interface GuildStructure {
   readonly size: string;
-  readonly characteristics: string[];
+  readonly characteristics: readonly string[];
   readonly location?: string;
   readonly description?: string;
 }
