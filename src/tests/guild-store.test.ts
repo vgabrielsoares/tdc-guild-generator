@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { setActivePinia, createPinia } from "pinia";
 import { useGuildStore } from "@/stores/guild";
-import { SettlementType } from "@/types/guild";
+import { SettlementType, type Guild } from "@/types/guild";
+import { GUILD_NAME_CONFIG } from "@/data/guild-names";
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -473,18 +474,28 @@ describe("Issue 3.4 - Guild Store Complete", () => {
       });
 
       expect(guild?.name).toBeDefined();
-      
+
       const guildName = guild?.name;
       expect(guildName).toBeDefined();
-      
-      // Testa nomes compostos tradicionais
-      const traditionalPattern = /^(Guilda dos|Irmandade dos|Companhia dos|Ordem dos|Círculo dos|Liga dos|Conselho dos|União dos) (Artesãos|Mercadores|Ferreiros|Tecelões|Alquimistas|Escribas|Construtores|Aventureiros|Exploradores|Protetores|Comerciantes|Mestres)$/;
-      
-      // Testa nomes especiais (para assentamentos grandes)
-      const specialPattern = /^(Rosa Dourada|Luz Cerúlea|Forja Ancestral|Lâmina Prata|Escudo de Ferro|Coroa Imperial|Torre de Marfim|Punho de Aço)$/;
-      
+
+      // Criar regex dinamicamente baseado na configuração atual
+      const prefixPattern = GUILD_NAME_CONFIG.prefixes
+        .map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+        .join("|");
+      const suffixPattern = GUILD_NAME_CONFIG.suffixes
+        .map((s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+        .join("|");
+      const traditionalPattern = new RegExp(
+        `^(${prefixPattern}) (${suffixPattern})$`
+      );
+
+      // Testa nomes especiais (para assentamentos grandes) - mantido para compatibilidade
+      const specialPattern =
+        /^(Rosa Dourada|Luz Cerúlea|Forja Ancestral|Lâmina Prata|Escudo de Ferro|Coroa Imperial|Torre de Marfim|Punho de Aço)$/;
+
       // O nome deve corresponder a um dos padrões
-      const isValidName = traditionalPattern.test(guildName!) || specialPattern.test(guildName!);
+      const isValidName =
+        traditionalPattern.test(guildName!) || specialPattern.test(guildName!);
       expect(isValidName).toBe(true);
     });
   });
