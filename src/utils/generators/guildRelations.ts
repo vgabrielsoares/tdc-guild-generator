@@ -39,6 +39,34 @@ function createCustomLog(category: string, message: string): void {
 }
 
 /**
+ * Mapear resultado da tabela para o enum RelationLevel
+ */
+function mapToRelationLevel(result: string): RelationLevel {
+  // Mapeamento direto dos valores das tabelas para o enum
+  const mappings: { [key: string]: RelationLevel } = {
+    "Péssima": RelationLevel.PESSIMA,
+    "Ruim": RelationLevel.RUIM,
+    "Ruim, mas tentam manter a cordialidade": RelationLevel.RUIM_CORDIAL,
+    "Ruim, só causam problemas": RelationLevel.RUIM_PROBLEMAS,
+    "Diplomática": RelationLevel.DIPLOMATICA,
+    "Opinião dividida": RelationLevel.OPINIAO_DIVIDIDA,
+    "Boa, mas o governo tenta miná-los secretamente": RelationLevel.BOA_TENSAO,
+    "Boa": RelationLevel.BOA,
+    "Boa, ajudam com problemas": RelationLevel.BOA_AJUDAM,
+    "Boa, nos mantêm seguros": RelationLevel.BOA_SEGUROS,
+    "Muito boa, cooperam frequentemente": RelationLevel.MUITO_BOA,
+    "Muito boa, sem eles estaríamos perdidos": RelationLevel.MUITO_BOA_PERDIDOS,
+    "Excelente, governo e guilda são quase como um": RelationLevel.EXCELENTE,
+    "Excelente, a guilda faz o assentamento funcionar": RelationLevel.EXCELENTE_FUNCIONAR,
+    // Para casos de população
+    "Péssima, puro ódio": RelationLevel.PESSIMA,
+    "Ruim, vistos como mercenários": RelationLevel.RUIM,
+  };
+
+  return mappings[result] || RelationLevel.DIPLOMATICA;
+}
+
+/**
  * Generate government relations for the guild
  */
 export function generateGovernmentRelations(
@@ -378,9 +406,9 @@ export function generateGuildRelations(
   const population = generatePopulationRelations(config);
 
   return {
-    government: government.result,
+    government: mapToRelationLevel(government.result),
     governmentDescription: government.description,
-    population: population.result,
+    population: mapToRelationLevel(population.result),
     populationDescription: population.description,
   };
 }
