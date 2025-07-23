@@ -11,7 +11,44 @@
       <!-- Header da Guilda -->
       <div class="guild-header bg-gray-800 rounded-lg shadow-md p-6 mb-6 border border-gray-700">
         <div class="flex items-center justify-between mb-4">
-          <h1 class="text-3xl font-bold text-amber-400">{{ guild.name }}</h1>
+          <!-- Nome Editável da Guilda -->
+          <div class="flex-1 mr-4">
+            <div v-if="!isEditingName" class="flex items-center group">
+              <h1 class="text-3xl font-bold text-amber-400 mr-2">{{ guild.name }}</h1>
+              <button
+                @click="startEditingName"
+                class="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-amber-400 p-1"
+                title="Editar nome da guilda"
+              >
+                <PencilIcon class="w-4 h-4" />
+              </button>
+            </div>
+            <div v-else class="flex items-center">
+              <input
+                v-model="editingGuildName"
+                ref="nameInput"
+                @keyup.enter="saveGuildName"
+                @keyup.escape="cancelEditingName"
+                @blur="saveGuildName"
+                class="text-3xl font-bold text-amber-400 bg-gray-700 border border-amber-400 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-amber-500 flex-1"
+                maxlength="100"
+              />
+              <button
+                @click="saveGuildName"
+                class="ml-2 text-green-400 hover:text-green-300 p-1"
+                title="Salvar"
+              >
+                <CheckIcon class="w-4 h-4" />
+              </button>
+              <button
+                @click="cancelEditingName"
+                class="ml-1 text-red-400 hover:text-red-300 p-1"
+                title="Cancelar"
+              >
+                <XMarkIcon class="w-4 h-4" />
+              </button>
+            </div>
+          </div>
           <div class="flex space-x-2">
             <button
               @click="regenerateGuild"
@@ -62,7 +99,7 @@
             class="btn btn-outline flex items-center justify-center space-x-2"
             :disabled="guildStore.isGenerating"
           >
-            <font-awesome-icon :icon="['fas', 'building']" />
+            <BuildingOffice2Icon class="w-4 h-4" />
             <span>Regenerar Estrutura</span>
           </button>
           <button
@@ -70,23 +107,27 @@
             class="btn btn-outline flex items-center justify-center space-x-2"
             :disabled="guildStore.isGenerating"
           >
-            <font-awesome-icon :icon="['fas', 'users']" />
+            <UserGroupIcon class="w-4 h-4" />
             <span>Regenerar Relações</span>
           </button>
           <button
             @click="saveToHistory"
-            class="btn btn-outline flex items-center justify-center space-x-2"
-            :disabled="!guild || guildStore.isGenerating"
+            :class="[
+              'btn flex items-center justify-center space-x-2',
+              isGuildInHistory ? 'btn-success' : 'btn-outline'
+            ]"
+            :disabled="!guild || guildStore.isGenerating || isGuildInHistory"
           >
-            <font-awesome-icon :icon="['fas', 'save']" />
-            <span>Salvar no Histórico</span>
+            <CheckIcon v-if="isGuildInHistory" class="w-4 h-4" />
+            <BookmarkIcon v-else class="w-4 h-4" />
+            <span>{{ isGuildInHistory ? 'Já no Histórico' : 'Salvar no Histórico' }}</span>
           </button>
           <button
             @click="clearGuild"
             class="btn btn-outline-danger flex items-center justify-center space-x-2"
             :disabled="guildStore.isGenerating"
           >
-            <font-awesome-icon :icon="['fas', 'trash']" />
+            <TrashIcon class="w-4 h-4" />
             <span>Limpar</span>
           </button>
         </div>
@@ -114,7 +155,7 @@
 
     <div v-else class="empty-state">
       <div class="text-center py-12 bg-gray-800 rounded-lg shadow-md border border-gray-700">
-        <font-awesome-icon :icon="['fas', 'castle']" class="text-6xl text-gray-500 mb-4" />
+        <BuildingStorefrontIcon class="w-24 h-24 text-gray-500 mb-4 mx-auto" />
         <h2 class="text-2xl font-semibold text-gray-300 mb-2">Nenhuma guilda gerada</h2>
         <p class="text-gray-400 mb-6">Configure o tipo de assentamento e gere uma nova guilda</p>
         
@@ -139,7 +180,7 @@
           class="btn btn-primary text-lg px-8 py-3"
           :disabled="guildStore.isGenerating"
         >
-          <font-awesome-icon :icon="['fas', 'plus']" class="mr-2" />
+          <PlusIcon class="w-5 h-5 mr-2" />
           Gerar Nova Guilda
         </button>
       </div>
@@ -149,18 +190,38 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { 
+  PencilIcon,
+  CheckIcon,
+  XMarkIcon,
+  ArrowPathIcon,
+  ArrowDownTrayIcon,
+  BuildingOffice2Icon,
+  UserGroupIcon,
+  BookmarkIcon,
+  TrashIcon,
+  PlusIcon
+} from '@heroicons/vue/24/solid'
+import { BuildingStorefrontIcon } from '@heroicons/vue/24/outline'
 import { useGuildStore } from '@/stores/guild'
-import { SettlementType } from '@/types/guild'
+import { SettlementType, type Guild } from '@/types/guild'
+import { useToast } from '@/composables/useToast'
 import GuildStructure from './GuildStructure.vue'
 import GuildRelations from './GuildRelations.vue'
 
 const guildStore = useGuildStore()
+const { showSuccess, showError, showWarning } = useToast()
 
 const guild = computed(() => guildStore.currentGuild)
 
 // Seletor de tipo de assentamento
 const selectedSettlementType = ref<SettlementType | 'random'>('random')
 const settlementTypes = Object.values(SettlementType)
+
+// Edição do nome da guilda
+const isEditingName = ref(false)
+const editingGuildName = ref('')
+const nameInput = ref<HTMLInputElement>()
 
 const mostCommonSettlement = computed(() => {
   const history = guildStore.guildHistory
@@ -196,6 +257,12 @@ const averageResources = computed(() => {
   return mostCommon
 })
 
+// Verificar se a guilda atual está no histórico
+const isGuildInHistory = computed(() => {
+  if (!guild.value) return false
+  return guildStore.guildHistory.some(g => g.id === guild.value!.id)
+})
+
 const generateNewGuild = async () => {
   try {
     if (selectedSettlementType.value === 'random') {
@@ -205,12 +272,12 @@ const generateNewGuild = async () => {
       
       await guildStore.generateGuild({
         settlementType: randomSettlement,
-        saveToHistory: true
+        saveToHistory: false
       })
     } else {
       await guildStore.generateGuild({
         settlementType: selectedSettlementType.value as SettlementType,
-        saveToHistory: true
+        saveToHistory: false
       })
     }
   } catch (error) {
@@ -246,13 +313,79 @@ const regenerateRelations = async () => {
 
 const saveToHistory = () => {
   if (guild.value) {
-    // A guilda já é automaticamente adicionada ao histórico na geração
-    // Aqui poderíamos implementar alguma lógica adicional se necessário
+    try {
+      // Converter readonly para tipo mutável
+      const guildCopy = JSON.parse(JSON.stringify(guild.value));
+      
+      // Converter strings de data de volta para objetos Date
+      if (guildCopy.createdAt && typeof guildCopy.createdAt === 'string') {
+        guildCopy.createdAt = new Date(guildCopy.createdAt);
+      }
+      if (guildCopy.updatedAt && typeof guildCopy.updatedAt === 'string') {
+        guildCopy.updatedAt = new Date(guildCopy.updatedAt);
+      }
+      
+      const guildToSave = guildCopy as Guild;
+      guildStore.addToHistory(guildToSave);
+      
+      // Usar toast em vez de alert
+      showSuccess('Guilda salva no histórico com sucesso!');
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Erro completo:', error);
+      const message = error instanceof Error ? error.message : 'Erro desconhecido ao salvar guilda';
+      showError(`Erro ao salvar guilda: ${message}`);
+    }
+  } else {
+    showWarning('Nenhuma guilda para salvar');
   }
 }
 
 const clearGuild = () => {
   guildStore.clearCurrentGuild()
+}
+
+// Funções de edição do nome
+const startEditingName = () => {
+  if (!guild.value) return
+  editingGuildName.value = guild.value.name
+  isEditingName.value = true
+  // Focus no input após o próximo tick
+  setTimeout(() => {
+    nameInput.value?.focus()
+    nameInput.value?.select()
+  }, 10)
+}
+
+const saveGuildName = async () => {
+  if (!guild.value || !editingGuildName.value.trim()) {
+    cancelEditingName()
+    return
+  }
+  
+  const newName = editingGuildName.value.trim()
+  if (newName === guild.value.name) {
+    cancelEditingName()
+    return
+  }
+  
+  try {
+    const success = guildStore.updateGuildName(newName)
+    if (success) {
+      isEditingName.value = false
+      showSuccess('Nome da guilda atualizado com sucesso!')
+    } else {
+      showError('Erro ao atualizar nome da guilda')
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Erro desconhecido'
+    showError(`Erro ao atualizar nome: ${message}`)
+  }
+}
+
+const cancelEditingName = () => {
+  isEditingName.value = false
+  editingGuildName.value = ''
 }
 
 const exportGuild = () => {
@@ -282,6 +415,10 @@ const exportGuild = () => {
 
 .btn-secondary {
   @apply bg-gray-600 text-white hover:bg-gray-700;
+}
+
+.btn-success {
+  @apply bg-green-600 text-white border border-green-500;
 }
 
 .btn-outline {
