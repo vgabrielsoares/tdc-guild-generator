@@ -1,10 +1,14 @@
-# Gerador de Guildas
+# Gerador de Guildas - Tabuleiro do Caos RPG
 
 [![Vue 3](https://img.shields.io/badge/Vue-3.x-green.svg)](https://vuejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.x-cyan.svg)](https://tailwindcss.com/)
 
-Um sistema completo para geração procedural de guildas de aventureiros para RPG de mesa. Baseado nas regras e tabelas tradicionais de guildas medievais, este gerador permite criar guildas completas com estrutura, contratos, serviços, membros e sistema de renome.
+Um sistema completo para geração procedural de guildas de aventureiros para RPG de mesa. Baseado em regras e tabelas utilizando rolagem de dados, este gerador permite criar guildas completas com estrutura, contratos, serviços, membros e sistema de renome.
+
+A base inicial das regras de geração procedural do projeto foi inspirada nas tabelas criadas por [Pato Papão](https://www.youtube.com/user/PatoPapao), seu conteúdo foi disponibilizado diretamente por ele. As tabelas foram expandidas e modificadas para incluir regras mais específicas e se adequar a gostos pessoais. Fica aqui meu agradecimento ao Pato Papão por sua contribuição para a comunidade de RPG.
+
+Apesar dos resultados das geraçõess, no geral, serem genéricos o bastante para serem usados em qualquer cenário de RPG medieval, alguns detalhes do conteúdo foram feitos visando o sistema Tabuleiro do Caos RPG, de autoria própria. Então certifique-se de adaptar o que for necessário para o seu estilo de jogo.
 
 ## Funcionalidades
 
@@ -186,6 +190,7 @@ Para limpar todos os dados armazenados:
 - Gere guildas antes da sessão (funciona offline)
 - Use os atalhos rápidos para acessar contratos e avisos
 - Aproveite o modo offline durante jogos sem conexão
+- Adeque os resultados às suas campanhas, personalizando as gerações
 
 
 ### Utilitários
