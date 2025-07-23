@@ -1,6 +1,8 @@
 # Gerador de Contratos da Guilda
 
-A primeira vez que um jogador adentrar a sede de uma guilda role na tabela para descobrir quantos contratos originalmente estariam disponíveis (Contratos novos surgem de tempos em tempos e você precisará retornar aqui e repetir todo o processo, fique atento à tabela "Novos e antigos contratos e serviços").
+A primeira vez que os jogadores adentrarem a sede de uma guilda, role na tabela para descobrir quantos contratos originalmente estariam disponíveis
+
+> Contratos novos surgem de tempos em tempos e você precisará retornar aqui e repetir todo o processo, fique atento à tabela "Novos e antigos contratos e serviços".
 
 A disponibilidade do dado é equivalente à estrutura disponível:
 
@@ -10,7 +12,7 @@ A disponibilidade do dado é equivalente à estrutura disponível:
 |---------|-----------------|
 | Minúsculo | 1d4 |
 | Muito pequeno | 1d6 |
-| Pequeno e modesto, P. e confortável | 1d6+1 |
+| Pequeno e modesto, Pequeno e confortável | 1d6+1 |
 | Mediano e comum, Mediano em dobro | 1d8+2 |
 | Grande | 1d10+2 |
 | Luxuosamente grande | 1d12+4 |
@@ -33,14 +35,15 @@ A disponibilidade do dado é equivalente à estrutura disponível:
 |------|-----------------------|
 | 1-4 | 1 contrato e 1d4+1 serviços |
 | 5-6 | 1d4 contratos e 1d4+2 serviços |
-| 7-9 | 1 contrato e 1d6+2 serviços |
+| 7-9 | 1d4 contratos e 1d6+2 serviços |
 | 10 | 1d6+1 contratos e 1d4+1 serviços |
 | 11 | 2d6 contratos e 1d4+2 serviços |
 | 12-13 | 3d6 contratos |
 | 14-16 | 2d6+2 contratos e 2d4+1 serviços |
-| 17-18 | 2 contratos e 5d6 serviços |
+| 17-18 | 1d12 contratos e 5d6 serviços |
 | 19 | 3d6 contratos e 3d4 serviços |
-| 20+ | 5d6 contratos |
+| 20 | 5d6 contratos |
+| 21+ | 3d6 contratos e 3d6 serviços |
 
 ### Prazo para Conclusão
 
@@ -1401,6 +1404,8 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 
 ### Detalhamento das Recompensas
 
+<!-- TODO: Adicionar quais recompensas são visíveis para os players e quais não são (só são reveladas ao completar o contrato). Acho que um asterisco funciona bem. -->
+
 #### Riquezas
 
 | 1d10 | Riquezas |
@@ -1617,12 +1622,14 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 5 | Tudo não passa de um sonho |
 | 6 | Tudo foi uma vingança friamente planejada |
 
-### Chance de Consequências Severas
+## Chance de Consequências Severas
 
-| 1d20 | Haverá consequências mais severas? |
+<!-- TODO: Essas são as consequências em caso de falha no contrato, explicar isso -->
+
+| 1d20 | Haverão consequências mais severas? |
 |------|-----------------------------------|
-| 1-13 | Não |
-| 14-20 | Sim |
+| 1-2 | Sim |
+| 3-20 | Não |
 
 ### Tipos de Consequências Severas
 
@@ -1801,7 +1808,7 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 
 ## Palavras-chave Temáticas
 
-Eventualmente os contratos ficarão repetitivos já que essa tabela será globalmente usada. Pensando nisso role 1d6-1 palavras-chave e tente incorporá-las ao contrato do jeito que achar melhor. Um resultado 0 significa, obviamente, que não haverão palavras-chave.
+Eventualmente os contratos ficarão repetitivos já que essa tabela será muito usada. Pensando nisso role 1d6-1 palavras-chave e tente incorporá-las ao contrato do jeito que achar melhor. Um resultado 0 significa, obviamente, que não haverão palavras-chave.
 
 ### Primeira Tabela Temática
 
@@ -2069,7 +2076,7 @@ Eventualmente os contratos ficarão repetitivos já que essa tabela será global
 | 99   | Duplo assassino em série |
 | 100  | 3 magos guiados por uma estrela, buscando uma criança profética |
 
-> **Dica:** Eventualmente os contratantes ficarão repetitivos já que essa tabela será globalmente usada. Pensando nisso role 1d6 palavras aleatórias de diferentes tabelas e tente incorporá-las criativamente ao contratante ou contrato.
+> **Dica:** Eventualmente os contratantes ficarão repetitivos já que essa tabela será muito usada. Pensando nisso role 1d6 palavras aleatórias de diferentes tabelas e tente incorporá-las criativamente ao contratante.
 
 ### Palavras-chave para Criatividade
 
