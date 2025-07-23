@@ -8,6 +8,7 @@ import {
   type GuildGenerationResult 
 } from '@/utils/generators/guild-generator';
 import { createGuild, isGuild } from '@/types/guild';
+import { generateRandomGuildName } from '@/data/guild-names';
 
 // Interface para opções de geração
 export interface GenerateGuildOptions {
@@ -424,13 +425,7 @@ export const useGuildStore = defineStore('guild', () => {
 
   // Gerar nome de guilda
   function generateGuildName(): string {
-    const prefixes = ['Guilda dos', 'Irmandade dos', 'Companhia dos', 'Ordem dos', 'Círculo dos', 'Liga dos', 'Conselho dos', 'União dos'];
-    const suffixes = ['Artesãos', 'Mercadores', 'Ferreiros', 'Tecelões', 'Alquimistas', 'Escribas', 'Construtores', 'Aventureiros', 'Exploradores', 'Protetores', 'Comerciantes', 'Mestres'];
-    
-    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
-    const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
-    
-    return `${prefix} ${suffix}`;
+    return generateRandomGuildName();
   }
 
   // Importar guilda do JSON
