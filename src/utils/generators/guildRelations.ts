@@ -58,12 +58,20 @@ function mapToRelationLevel(result: string): RelationLevel {
     "Muito boa, sem eles estaríamos perdidos": RelationLevel.MUITO_BOA_PERDIDOS,
     "Excelente, governo e guilda são quase como um": RelationLevel.EXCELENTE,
     "Excelente, a guilda faz o assentamento funcionar": RelationLevel.EXCELENTE_FUNCIONAR,
-    // Para casos de população
-    "Péssima, puro ódio": RelationLevel.PESSIMA,
-    "Ruim, vistos como mercenários": RelationLevel.RUIM,
+    "Péssima, puro ódio": RelationLevel.PESSIMA_ODIO,
+    "Ruim, vistos como mercenários": RelationLevel.RUIM_MERCENARIOS,
   };
 
-  return mappings[result] || RelationLevel.DIPLOMATICA;
+  const mapped = mappings[result];
+  if (!mapped) {
+    createCustomLog(
+      "GUILD RELATIONS",
+      `Unmapped relation result "${result}" - falling back to DIPLOMATICA. Consider adding explicit mapping.`
+    );
+    return RelationLevel.DIPLOMATICA;
+  }
+  
+  return mapped;
 }
 
 /**
@@ -229,11 +237,11 @@ export function generateResourceSpecialties(
 function stringToRelationLevel(value: string): RelationLevel {
   const exactMapping: Record<string, RelationLevel> = {
     'Péssima': RelationLevel.PESSIMA,
+    'Péssima, puro ódio': RelationLevel.PESSIMA_ODIO,
     'Ruim': RelationLevel.RUIM,
+    'Ruim, vistos como mercenários': RelationLevel.RUIM_MERCENARIOS,
     'Ruim, mas tentam manter a cordialidade': RelationLevel.RUIM_CORDIAL,
     'Ruim, só causam problemas': RelationLevel.RUIM_PROBLEMAS,
-    'Ruim, vistos como mercenários': RelationLevel.RUIM_PROBLEMAS,
-    'Péssima, puro ódio': RelationLevel.PESSIMA,
     'Diplomática': RelationLevel.DIPLOMATICA,
     'Opinião dividida': RelationLevel.OPINIAO_DIVIDIDA,
     'Boa, mas o governo tenta miná-los secretamente': RelationLevel.BOA_TENSAO,
@@ -246,7 +254,16 @@ function stringToRelationLevel(value: string): RelationLevel {
     'Excelente, a guilda faz o assentamento funcionar': RelationLevel.EXCELENTE_FUNCIONAR,
   };
   
-  return exactMapping[value] || RelationLevel.DIPLOMATICA;
+  const mapped = exactMapping[value];
+  if (!mapped) {
+    createCustomLog(
+      "GUILD RELATIONS",
+      `Unmapped relation value "${value}" in stringToRelationLevel - falling back to DIPLOMATICA. Consider adding explicit mapping.`
+    );
+    return RelationLevel.DIPLOMATICA;
+  }
+  
+  return mapped;
 }
 
 /**

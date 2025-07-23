@@ -35,7 +35,9 @@ export enum VisitorLevel {
 
 export enum RelationLevel {
   PESSIMA = "Péssima",
+  PESSIMA_ODIO = "Péssima, puro ódio",
   RUIM = "Ruim",
+  RUIM_MERCENARIOS = "Ruim, vistos como mercenários",
   RUIM_CORDIAL = "Ruim, mas tentam manter a cordialidade",
   RUIM_PROBLEMAS = "Ruim, só causam problemas",
   DIPLOMATICA = "Diplomática", 

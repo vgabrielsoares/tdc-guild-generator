@@ -70,7 +70,9 @@ export class ModifierCalculator {
     // Mapeamento específico para população conforme markdown
     const mapping: Record<RelationLevel, string> = {
       [RelationLevel.PESSIMA]: "Péssima, puro ódio",
+      [RelationLevel.PESSIMA_ODIO]: "Péssima, puro ódio",
       [RelationLevel.RUIM]: "Ruim, vistos como mercenários",
+      [RelationLevel.RUIM_MERCENARIOS]: "Ruim, vistos como mercenários",
       [RelationLevel.RUIM_CORDIAL]: "Ruim, vistos como mercenários",
       [RelationLevel.RUIM_PROBLEMAS]: "Ruim, só causam problemas",
       [RelationLevel.DIPLOMATICA]: "Opinião dividida",
