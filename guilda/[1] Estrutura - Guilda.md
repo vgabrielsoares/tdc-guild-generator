@@ -2,13 +2,26 @@
 
 ## Descrição
 
+Em um mundo onde a magia pulsa nas veias da realidade, A Guilda surgiu da mais pragmática das necessidades: resolver problemas que ninguém mais ousa enfrentar.
 
+Não foi por heroísmo ou idealismo, mas por pura lógica. Quando criaturas das profundezas ameaçavam vilas fronteiriças, relíquias amaldiçoadas corrompiam florestas, ou nobres precisavam de "serviços discretos", apenas um tipo de pessoa aceitava o desafio: aventureiros. Para unir oferta e demanda sob regras claras, nasceu a Guilda — uma máquina de eficiência neutra, onde ouro compra coragem, e resultados escrevem reputações.
 
-<!-- Cerca de 500 anos atrás, no auge das batalhas por territorio e cercos nos continentes, os humanoides se viram desprovidos de aliados e ajuda em meio ao caos sanguinario de seus inimigos. Em um ato de desespero, os lideres humanos, sempre ambiciosos e dipostos a qualquer coisa para trazer a gloria para seu povo, ofereceram ouro em troca da ajuda de qualquer um que estivesse disposto a lutar, e pela quantia certa muitos estão.
+### O Coração da Operação
 
-A estrategia deu tão certo que se espalhou como fogo pelos assentamentos humanos, e após conquistarem o que tanto almejavam, essa especie de "tratado de ouro" manteve a paz e reconstruiu tudo que estava em ruína, a ponto de que com o passar dos anos se tornasse uma tradição. Começou com uma pequena aliança entre o governo e alguns mercenarios, e agora membros da guilda se espalham pelo continente, e até fora dele, ajudando quem precisar em troca da quantia certa.
+A Guilda não é uma família, caridade ou governo. É uma ponte entre quem precisa e quem pode resolver. Seu papel é garantir que contratos sejam justos, pagamentos honrados e riscos calculados.
 
-Muitos não gostam da guilda, muitos não entendem por que alguem só ajudaria em troca de ouro, mas o fato é que a guilda é, para os que tem coragem suficiente, uma passagem para uma vida melhor, muitos se arriscam e tem sua vida ceifada em pouco tempo, mas o ouro e a gloria ofuscam esses acontecimentos. -->
+Sedes maiores usam círculos de teletransporte para comunicação e transitação rápida. Contratos complexos são impressos em pergaminho antimágico (à prova de fraude). Membros de elite têm acesso a itens encantados — por um período.
+
+Por trás de cada missão há uma história, uma necessidade: um camponês oferecendo suas economias para salvar a filha raptada; um anão trocando sua herança por vingança; um mago pagando fortunas por conhecimento proibido. A Guilda não julga motivos — apenas garante que o acordo seja cumprido.
+
+### Presença e Influência
+A Guilda só existe onde é necessária e viável. Em metrópoles, suas sedes são fortalezas de mármore; em vilas remotas, podem ser um escritório improvisado na taverna local. Sua relação com governos varia:
+
+- Colaboram com a Guilda.
+
+- Enxergam-na como ameaça e a restringem.
+
+- Algumas sedes locais distorcem regras por ouro extra — um risco que membros astutos aprendem a identificar.
 
 ### Taxas e Custos
 
@@ -60,7 +73,13 @@ A recompensa inicialmente é decidida pelo contratante. Caso ache necessário, a
 
 **Símbolo**: Uma mão segurando uma espada pela lâmina. O fundo é um escudo azul.
 
-**Lema**: "Se aventurar, brilhar, nunca se apagar. Luz cerúlea prevalece."
+**Lema**: "A lâmina que desbrava; a mão que une."
+
+>**Alternativa:** \
+"Desbravar com a lâmina,\
+unir com a mão; \
+sob a luz cerúlea, \
+forjamos a solução!"
 
 **Ganhos por participação**:
 - Uma ficha de contrato da guilda (tinta mágica que não queima, molha ou rasga - 5 PO$)
