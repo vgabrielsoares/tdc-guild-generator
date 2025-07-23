@@ -2,25 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useGuildStore } from '@/stores/guild';
 import { SettlementType, type Guild } from '@/types/guild';
-
-// Helper para converter guilda readonly para Guild
-const convertToGuild = (readonlyGuild: unknown): Guild => {
-  // Usar JSON para fazer deep clone e remover readonly
-  const cloned = JSON.parse(JSON.stringify(readonlyGuild, (_, value) => {
-    // Preservar Dates
-    if (value && typeof value === 'object' && value.constructor === Date) {
-      return value.toISOString();
-    }
-    return value;
-  }));
-  
-  // Converter strings de volta para Dates
-  if (cloned.createdAt) cloned.createdAt = new Date(cloned.createdAt);
-  if (cloned.updatedAt) cloned.updatedAt = new Date(cloned.updatedAt);
-  
-  cloned.locked = cloned.locked || false;
-  return cloned as Guild;
-};
+import { convertToGuild } from './utils/test-helpers';
 
 describe('Guild Improvements', () => {
   beforeEach(() => {
