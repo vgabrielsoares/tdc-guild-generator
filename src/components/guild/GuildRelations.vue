@@ -172,7 +172,7 @@ const getResourceColor = (level: string): string => {
   } else if (lowerLevel.includes('abundantes')) {
     return 'bg-green-500'
   } else if (lowerLevel.includes('vastos')) {
-    return 'bg-purple-500'
+    return 'bg-cyan-500'
   } else if (lowerLevel.includes('lendários')) {
     return 'bg-amber-500'
   }

@@ -239,7 +239,7 @@ function formatDate(date: Date): string {
 }
 
 .guild-info-card__badge--grande {
-  @apply bg-purple-900 text-purple-300;
+  @apply bg-cyan-900 text-cyan-300;
 }
 
 .guild-info-card__badge--metropole {
@@ -351,7 +351,7 @@ function formatDate(date: Date): string {
 }
 
 .visitor-level--crowded {
-  @apply text-purple-400;
+  @apply text-cyan-400;
 }
 
 .visitor-level--neutral {

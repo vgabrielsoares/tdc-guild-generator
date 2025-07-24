@@ -145,9 +145,9 @@
             <div class="font-semibold text-green-300">Tipo Mais Comum</div>
             <div class="text-green-100">{{ mostCommonSettlement || 'N/A' }}</div>
           </div>
-          <div class="bg-purple-900 rounded-lg p-3 border border-purple-700">
-            <div class="font-semibold text-purple-300">Recursos Médios</div>
-            <div class="text-purple-100">{{ averageResources || 'N/A' }}</div>
+          <div class="bg-cyan-900 rounded-lg p-3 border border-cyan-700">
+            <div class="font-semibold text-cyan-300">Recursos Médios</div>
+            <div class="text-cyan-100">{{ averageResources || 'N/A' }}</div>
           </div>
         </div>
       </div>
@@ -177,10 +177,10 @@
         
         <button
           @click="generateNewGuild"
-          class="btn btn-primary text-lg px-8 py-3"
+          class="btn btn-primary text-lg px-8 py-3 flex items-center justify-center gap-2 mx-auto"
           :disabled="guildStore.isGenerating"
         >
-          <PlusIcon class="w-5 h-5 mr-2" />
+          <PlusIcon class="w-5 h-5" />
           Gerar Nova Guilda
         </button>
       </div>

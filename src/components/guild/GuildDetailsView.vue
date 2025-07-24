@@ -530,7 +530,7 @@ function getLogClass(log: string): string {
 }
 
 .visitor-status--crowded {
-  @apply text-purple-400;
+  @apply text-cyan-400;
 }
 
 .visitor-status--neutral {
