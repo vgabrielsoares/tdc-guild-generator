@@ -1,12 +1,18 @@
 # Gerador de Contratos da Guilda
 
-A primeira vez que os jogadores adentrarem a sede de uma guilda, role na tabela para descobrir quantos contratos originalmente estariam disponíveis
+Os contratos são uma parte essencial da dinâmica de uma guilda, permitindo que aventureiros se unam para cumprir missões, resolver problemas e ganhar recompensas. Este gerador ajuda a criar contratos variados, desde simples tarefas até desafios épicos.
+
+Cada contrato pode funcionar como uma "missão" ou "aventura" em um RPG. 
+
+A primeira vez que os jogadores entrarem na sede da guilda, role para descobrir quantos contratos disponíveis existem.
 
 > Contratos novos surgem de tempos em tempos e você precisará retornar aqui e repetir todo o processo, fique atento à tabela "Novos e antigos contratos e serviços".
 
 A disponibilidade do dado é equivalente à estrutura disponível:
 
 ## Dados por Tamanho da Sede
+
+Quanto maior a sede, maior a quantidade de contratantes querendo firmar um novo contrato ou serviço. Consequentemente, mais contratos estarão disponíveis.
 
 | Tamanho | Dado Disponível |
 |---------|-----------------|

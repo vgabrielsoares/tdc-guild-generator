@@ -8,7 +8,47 @@ Um sistema completo para geração procedural de guildas de aventureiros para RP
 
 A base inicial das regras de geração procedural do projeto foi inspirada nas tabelas criadas por [Pato Papão](https://www.youtube.com/user/PatoPapao), seu conteúdo foi disponibilizado diretamente por ele. As tabelas foram expandidas e modificadas para incluir regras mais específicas e se adequar a gostos pessoais. Fica aqui meu agradecimento ao Pato Papão por sua contribuição para a comunidade de RPG.
 
-Apesar dos resultados das geraçõess, no geral, serem genéricos o bastante para serem usados em qualquer cenário de RPG medieval, alguns detalhes do conteúdo foram feitos visando o sistema Tabuleiro do Caos RPG, de autoria própria. Então certifique-se de adaptar o que for necessário para o seu estilo de jogo.
+Apesar dos resultados das gerações, no geral, serem genéricos o bastante para serem usados em qualquer cenário de RPG medieval, alguns detalhes do conteúdo foram feitos visando o sistema Tabuleiro do Caos RPG, de autoria própria. Então certifique-se de adaptar o que for necessário para o seu estilo de jogo.
+
+## Índice
+
+- [Funcionalidades](#funcionalidades)
+- [Stack Tecnológica](#stack-tecnológica)
+  - [Frontend](#frontend)
+  - [Utilitários e Qualidade](#utilitários-e-qualidade)
+- [Desenvolvimento Local](#desenvolvimento-local)
+  - [Pré-requisitos](#pré-requisitos)
+  - [Clonando o Repositório](#clonando-o-repositório)
+  - [Instalação das Dependências](#instalação-das-dependências)
+  - [Configuração do Ambiente](#️-configuração-do-ambiente)
+  - [Executando o Projeto](#🏃‍♂️-executando-o-projeto)
+  - [Executando Testes](#executando-testes)
+  - [Comandos de Desenvolvimento](#comandos-de-desenvolvimento)
+  - [Estrutura de Pastas para Desenvolvimento](#estrutura-de-pastas-para-desenvolvimento)
+  - [Solução de Problemas](#solução-de-problemas)
+- [Workflow de Desenvolvimento](#workflow-de-desenvolvimento)
+- [Métricas de Desenvolvimento](#métricas-de-desenvolvimento)
+- [Obtendo Ajuda](#obtendo-ajuda)
+- [Funcionalidades PWA](#funcionalidades-pwa)
+- [Progressive Web App (PWA)](#progressive-web-app-pwa)
+  - [O que é uma PWA?](#o-que-é-uma-pwa)
+  - [Como Instalar](#como-instalar)
+  - [Funcionalidades Offline](#🔧-funcionalidades-offline)
+  - [Atualizações Automáticas](#atualizações-automáticas)
+  - [Configurações Avançadas](#configurações-avançadas)
+  - [Compatibilidade](#compatibilidade)
+  - [Solução de Problemas](#solução-de-problemas-1)
+  - [Dicas de Uso](#dicas-de-uso)
+  - [Utilitários](#utilitários)
+- [Arquitetura e Performance](#arquitetura-e-performance)
+  - [Considerações de Performance](#considerações-de-performance)
+  - [Segurança e Validação](#segurança-e-validação)
+- [Sistema de Geração](#sistema-de-geração)
+  - [Exemplo de Geração](#exemplo-de-geraçao)
+- [Público-Alvo](#público-alvo)
+- [Como Usar](#como-usar)
+  - [Acesso Web](#acesso-web)
+  - [Instalação como App](#instalação-como-app)
 
 ## Funcionalidades
 
@@ -402,7 +442,7 @@ O gerador utiliza um sistema complexo de tabelas probabilísticas que considera:
 4. **Funcionários**: 1 explorador experiente (+1d4 contratos de exploração)
 5. **Resultado**: 2d6+2 contratos e 2d4+1 serviços disponíveis
 
-##  Público-Alvo
+## Público-Alvo
 
 - **Mestres de RPG** que querem guildas detalhadas rapidamente
 - **Jogadores** interessados em sistemas de progressão

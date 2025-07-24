@@ -1,6 +1,30 @@
 # A Guilda
 
-## Descrição
+## Índice
+
+- [O que é a Guilda?](#o-que-é-a-guilda)
+- [O Coração da Operação](#o-coração-da-operação)
+- [Presença e Influência](#presença-e-influência)
+- [Taxas e Custos](#taxas-e-custos)
+- [Regras da Guilda](#regras-da-guilda)
+- [Identidade da Guilda](#identidade-da-guilda)
+- [Gerando uma Sede da Guilda - Estrutura](#gerando-uma-sede-da-guilda---estrutura)
+  - [Dados por Tipo de Assentamento](#dados-por-tipo-de-assentamento)
+  - [Existência de Sede](#existência-de-sede)
+  - [Tamanho da Sede](#tamanho-da-sede)
+  - [Características da Sede](#características-da-sede)
+  - [Relações](#relações)
+    - [Relação com o Governo Local](#relação-com-o-governo-local)
+    - [Reputação com a População Local](#reputação-com-a-população-local)
+  - [Funcionários](#funcionários)
+  - [Recursos](#recursos)
+    - [Modificadores de Recursos](#modificadores-de-recursos)
+- [Frequentadores](#frequentadores)
+  - [Dados por Tipo de Assentamento](#dados-por-tipo-de-assentamento-1)
+  - [Quantidade de Frequentadores](#quantidade-de-frequentadores)
+  - [Modificadores de Frequentadores](#modificadores-de-frequentadores)
+
+## O que é a Guilda?
 
 Em um mundo onde a magia pulsa nas veias da realidade, A Guilda surgiu da mais pragmática das necessidades: resolver problemas que ninguém mais ousa enfrentar.
 
@@ -25,16 +49,25 @@ A Guilda só existe onde é necessária e viável. Em metrópoles, suas sedes s�
 
 ### Taxas e Custos
 
+Aventureiros que queiram aderir à Guilda devem pagar taxas para registrar-se e manter sua afiliação. Uma vez registrados, podem aceitar contratos e receber recompensas. As taxas são:
+
 - **Taxa de inscrição**: 10 peças de ouro (PO$)
   - 5 (PO$) para tinta mágica do carimbo de registro
   - 5 (PO$) de taxa administrativa
 - **Renovação anual**: 10 peças de ouro (PO$)
+
+Já contratantes, também pagam taxas para registrar contratos e serviços. As taxas são:
+
 - **Criação de contrato**: 1,5 peças de ouro (PO$)
 - **Serviços**: 1 peça de cobre (C$)
 
 A recompensa inicialmente é decidida pelo contratante. Caso ache necessário, a guilda intervém e aumenta ou diminui a recompensa levando em conta os riscos e sua reputação. A guilda também rejeita contratos que ferem as leis, que acham impossíveis ou simplesmente absurdos.
 
 ## Regras da Guilda
+
+Como toda organização, a Guilda tem regras que regem o comportamento de seus membros. Essas regras são fundamentais para manter a ordem, a reputação e a eficiência da Guilda. Infrações são analisadas e punidas de acordo com a decisão do Conselho da Guilda. O Conselho é responsável por todo gerenciamento da Guilda. 
+
+Abaixo estão as principais diretrizes que todos os membros devem seguir:
 
 *(Código de Conduta para Membros Registrados)*  
 
@@ -62,7 +95,7 @@ A recompensa inicialmente é decidida pelo contratante. Caso ache necessário, a
 
 6. **Conflitos Internos**  
    > *"Ferir colega é ferir a Guilda."*  
-   - Disputas resolvem-se perante o Conselho.  
+   - Disputas resolvem-se perante o Conselho da Guilda.  
    - Danos a colegas ou seus bens exigem reparação em dobro.
 
 7. **Voto de Silêncio**  
@@ -79,23 +112,44 @@ A recompensa inicialmente é decidida pelo contratante. Caso ache necessário, a
 "Desbravar com a lâmina,\
 unir com a mão; \
 sob a luz cerúlea, \
-forjamos a solução!"
+forjamos a solução."
 
 **Ganhos por participação**:
-- Uma ficha de contrato da guilda (tinta mágica que não queima, molha ou rasga - 5 PO$)
-- Uma capa azul com brasão da guilda
-- Uma carta de prova da participação da guilda
 
-## Estrutura
+Todo membro registrado da Guilda recebe benefícios por sua participação, que incluem:
+
+- Acesso a contratos, recompensas e benefícios
+- Uma ficha de contrato da guilda (com tinta mágica que não queima, molha ou rasga)
+- Uma capa azul com brasão da guilda
+- Uma carta de prova da participação na guilda
+
+## Gerando uma Sede da Guilda - Estrutura
+
+Sendo uma organização que se adapta às necessidades locais, a Guilda pode ter sedes de diferentes tamanhos e características, dependendo do assentamento onde está localizada.
 
 ### Dados por Tipo de Assentamento
+
+Por surgir onde há demanda, é mais comum encontrar a Guilda em assentamentos maiores. Consequentemente, a capacidade da estrutura também varia de acordo com as condições de cada assentamento.
+
+Os valores abaixo são usados para determinar o tamanho e a capacidade da sede da Guilda, dependendo do tipo de assentamento onde ela está localizada:
+
 - **Lugarejo, Povoado e Aldeia**: 1d8
 - **Vilarejo e Vila grande**: 1d12
 - **Cidadela**: 1d20
 - **Cidade grande**: 1d20+4
 - **Metrópole**: 1d20+8
 
+> Para cada tipo de assentamento, deve-se usar os dados correspondentes em cada uma das tabelas de geração da Estrutura da Sede da Guilda.
+
+Note que, quanto maior o assentamento, maior o seu dado. As maiores possuem até modificadores. Isso acarreta na limitação do potencial de sedes menores, e aumenta a qualidade mínima das sedes maiores.
+
+As tabelas de geração geralmente seguem o padrão de 1d20, onde os menores valores são "piores" e os maiores valores são "melhores". Assim, o intervalo de resultados de um Lugarejo, por exemplo, é de 1 a 8, enquanto uma Metrópole pode ter resultados de 9 a 28 (1d20+8). A média dos resultados de um Lugarejo seria de 4,5, enquanto a média de uma Metrópole seria de 18,5.
+
+> Resultados maiores que 20, graças a modificadores, se encaixam na opção 21+ na tabela.
+
 ### Existência de Sede
+
+Há a chance de uma sede da Guilda existir em cada assentamento, e essa é a primeira coisa a se determinar:
 
 | 1d20 | Existe uma Guilda no Assentamento? |
 |------|--------------------|
@@ -103,9 +157,17 @@ forjamos a solução!"
 | 8-20 | Sim                |
 | 21+  | Sede matriz*       |
 
-*Adicione +5 no resto das rolagens de estrutura para essa guilda
+> *Adicione +5 no resto das rolagens de estrutura para essa guilda
+
+Por serem menos movimentados, assentamentos menores têm menos demanda, e consequentemente menos chance de ter uma sede da Guilda.
+
+Uma Sede Matriz é uma sede maior e mais influente, que serve como centro de operações para outras sedes menores. Ela pode ter acesso a recursos e informações que as sedes menores não possuem. Uma Sede Matriz aceita o recebimento de contratos de outras sedes, e pode enviar membros para auxiliar em missões mais complexas.
 
 ### Tamanho da Sede
+
+O tamanho da sede define a quantidade de recursos disponíveis e a capacidade de acomodar membros e atividades.
+
+> O tamanho da sede, assim como vários dos resultados, impacta diretamente em modificadores em futuras rolagens.
 
 | 1d20  | Tamanho |
 |-------|---------|
@@ -143,6 +205,8 @@ forjamos a solução!"
 
 #### Relação com o Governo Local
 
+A relação da guilda com o governo local define como a guilda é vista e tratada pelas autoridades.
+
 | 1d20  | Relação |
 |-------|---------|
 | 1-2   | Péssima |
@@ -156,6 +220,8 @@ forjamos a solução!"
 
 #### Reputação com a População Local
 
+A reputação da guilda com a população local define como a guilda é vista pelos cidadãos comuns.
+
 | 1d20  | Reputação |
 |-------|-----------|
 | 1-2   | Péssima, puro ódio |
@@ -168,6 +234,10 @@ forjamos a solução!"
 | 21+   | Excelente, a guilda faz o assentamento funcionar |
 
 ### Funcionários
+
+Os funcionários da guilda são essenciais para o funcionamento da sede. Eles podem variar em número, experiência e habilidades.
+
+Os funcionários podem influenciar a quantidade de frequentadores e de contratos disponíveis.
 
 | 1d20  | Funcionários |
 |-------|--------------|
@@ -184,9 +254,13 @@ forjamos a solução!"
 | 20    | 1d4 ex-aventureiros |
 | 21+   | 1d6+3 funcionários experientes |
 
-> **Regra especial**: Se o resultado for exatamente 23 em todos os testes, o funcionário é um dragão disfarçado.
+> **Regra especial**: Se o resultado for exatamente 23 em todos os testes (Tamanho, Características, Relações, Funcionários), o funcionário é um dragão disfarçado.
 
 ### Recursos
+
+Os recursos da sede definem a capacidade da guilda de operar e conceder benefícios.
+
+Os recursos podem influenciar a quantidade de frequentadores.
 
 | 1d20  | Recursos |
 |-------|----------|
@@ -204,7 +278,7 @@ forjamos a solução!"
 
 #### Modificadores de Recursos
 
-Os recursos da guilda são influenciados pela relação com aqueles que a cercam. Some ou subtraia o valor indicado:
+Os recursos da guilda são influenciados pela relação com o governo e a população local. Some ou subtraia o valor indicado:
 
 | Relação | Modificador |
 |---------|-------------|
@@ -215,11 +289,18 @@ Os recursos da guilda são influenciados pela relação com aqueles que a cercam
 | Muito boa | +2 |
 | Excelente | +3 |
 
-> **Nota**: Some ambas as relações (governo + população). Exemplo: relação péssima com governo (-3) + muito boa com população (+2) = modificador final de -1.
+> **Nota**: Some o modificador de ambas as relações (governo + população). Exemplo: relação péssima com governo (-3) + muito boa com população (+2) = modificador final de -1.
 
 ## Frequentadores
 
+A Guilda pode ser um ponto de encontro para aventureiros, mercadores e cidadãos comuns.
+
+Os frequentadores podem influenciar a quantidade de contratos disponíveis.
+
 ### Dados por Tipo de Assentamento
+
+Para essa seção, utilize os seguintes dados:
+
 - **Lugarejo, Povoado e Aldeia**: 1d8
 - **Vilarejo e Vila grande**: 1d10
 - **Cidadela**: 1d12
