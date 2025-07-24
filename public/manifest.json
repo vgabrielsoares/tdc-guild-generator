@@ -1,8 +1,8 @@
 {
-  "name": "Gerador de Guildas - Sistema para RPG de Mesa",
+  "name": "Gerador de Guildas - Tabuleiro do Caos RPG",
   "short_name": "Guild Generator",
   "description": "Sistema completo para geração procedural de guildas de aventureiros para RPG de mesa. Baseado nas regras e tabelas tradicionais de guildas medievais.",
-  "theme_color": "#7c3aed",
+  "theme_color": "#2f8bb0",
   "background_color": "#1f2937",
   "display": "standalone",
   "orientation": "portrait-primary",
