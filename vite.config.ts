@@ -42,7 +42,7 @@ export default defineConfig({
           {
             src: '/guild-logo.png',
             sizes: '100x100',
-            type: 'image/svg+xml'
+            type: 'image/png'
           }
         ],
         shortcuts: [
