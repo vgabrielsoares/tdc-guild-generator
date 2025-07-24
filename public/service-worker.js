@@ -9,7 +9,7 @@ const CRITICAL_RESOURCES = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/guild-logo.svg'
+  '/guild-logo.png'
 ];
 
 // Recursos estáticos para cache

@@ -12,7 +12,7 @@
         <button
           @click="showConfirmClear = true"
           :disabled="guildStore.historyCount === 0"
-          class="btn btn-danger btn-sm"
+          class="btn btn-danger btn-sm flex items-center gap-2"
           title="Limpar Histórico"
         >
           <TrashIcon class="w-4 h-4" />
@@ -115,7 +115,7 @@
           </button>
           <button
             @click="confirmClearHistory"
-            class="btn btn-danger"
+            class="btn btn-danger flex items-center gap-2"
           >
             <TrashIcon class="w-4 h-4" />
             Limpar Histórico
@@ -236,7 +236,7 @@ const confirmClearHistory = () => {
 }
 
 .empty-icon {
-  @apply text-4xl mb-4;
+  @apply mx-auto mb-4;
 }
 
 .empty-hint {

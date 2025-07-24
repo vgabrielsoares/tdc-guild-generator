@@ -12,12 +12,12 @@ export default defineConfig({
       devOptions: {
         enabled: true
       },
-      includeAssets: ['favicon.ico', 'guild-logo.svg', 'robots.txt'],
+      includeAssets: ['favicon.ico', 'guild-logo.png', 'robots.txt'],
       manifest: {
-        name: 'Gerador de Guildas - Sistema para RPG de Mesa',
+        name: 'Gerador de Guildas - Tabuleiro do Caos RPG',
         short_name: 'Guild Generator',
         description: 'Sistema completo para geração procedural de guildas de aventureiros para RPG de mesa',
-        theme_color: '#7c3aed',
+        theme_color: '#2f8bb0',
         background_color: '#1f2937',
         display: 'standalone',
         orientation: 'portrait-primary',
@@ -40,9 +40,9 @@ export default defineConfig({
             purpose: 'any maskable'
           },
           {
-            src: '/guild-logo.svg',
+            src: '/guild-logo.png',
             sizes: '100x100',
-            type: 'image/svg+xml'
+            type: 'image/png'
           }
         ],
         shortcuts: [
@@ -51,14 +51,14 @@ export default defineConfig({
             short_name: 'Nova Guilda',
             description: 'Gera uma nova guilda completa',
             url: '/guild?action=generate',
-            icons: [{ src: '/guild-logo.svg', sizes: '96x96' }]
+            icons: [{ src: '/guild-logo.png', sizes: '96x96' }]
           },
           {
             name: 'Ver Contratos',
             short_name: 'Contratos',
             description: 'Visualiza contratos disponíveis',
             url: '/contracts',
-            icons: [{ src: '/guild-logo.svg', sizes: '96x96' }]
+            icons: [{ src: '/guild-logo.png', sizes: '96x96' }]
           }
         ]
       },
