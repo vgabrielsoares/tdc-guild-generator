@@ -33,6 +33,8 @@ Quanto maior a sede, maior a quantidade de contratantes querendo firmar um novo 
 | Funcionários despreparados | Adicione -1 ao resultado final |
 | Funcionários experientes | Adicione +1 ao resultado final |
 
+> Os dados por tamanho da sede e os modificadores por condição são usados para determinar as tabelas de quantidade de contratos disponíveis e seu prazo de conclusão.
+
 ## Quantidade e Prazos
 
 ### Quantidade Disponível
@@ -70,7 +72,9 @@ Quanto maior a sede, maior a quantidade de contratantes querendo firmar um novo 
 
 > **Atenção!** Serviços não utilizam essa parte da tabela.
 
-Determine o valor de cada contrato individualmente. O valor representa, além do ouro, a experiência que você pode gastar para montar o contrato. Por exemplo: 1k significa que você tem 1k XP para "comprar" monstros, desafios e conflitos. (Consulte a tabela de valores)
+A tabela de Valores e Recompensas determina o valor de cada contrato individualmente. O valor representa, além da recompensa paga em ouro (PO$), a experiência que você pode usar para estruturar um contrato. Por exemplo: um valor de 1000 significa que você tem, inicialmente, 1k de XP para "comprar" monstros, desafios e conflitos, e 1k de PO$ para oferecer de recompensa no contrato. Esses valores são independentes, então é possível que um valor seja maior ou menor que o outro.
+
+Nessa tabela, todos os contratos rolam 1d100 sem modificadores. As modificações são aplicadas após a rolagem, nas próximas seções. Guarde o valor de ouro e experiência individualmente, mas use a mesma rolagem para definir o valor inicial (ambos comecam com o mesmo valor e são modificados ao longo da geração do contrato).
 
 ### Tabela de Valores e Recompensas
 
@@ -130,13 +134,16 @@ Determine o valor de cada contrato individualmente. O valor representa, além do
 | 96 | 8500 |
 | 97 | 8800 |
 | 98 | 9500 |
-| 99 | 10900 
-| 100 | 12700
+| 99 | 10900 |
+| 100 | 12700 |
 
+#### Como usar os valores de Experiência e Ouro
+
+<!-- TODO: definir certinho depois a multiplicação do ouro (provavelmente 0.1 de PO), e em como o XP é usado pra montar o contrato -->
 
 ## Distância
 
-A distância determina o quão longe está o local determinado para o cumprimento do contrato. Adicione ou reduza o "Valor e recompensa" de acordo com o resultado.
+A distância determina o quão longe está o local determinado para o cumprimento do contrato. Adicione ou reduza o "Valor e Recompensa" de acordo com o resultado.
 
 ### Dados por Tamanho da Sede
 
@@ -146,6 +153,8 @@ A distância determina o quão longe está o local determinado para o cumpriment
 - **Enorme, Enorme e confortável, Colossal e Colossal e primorosa**: 1d20+5
 
 ### Tabela de Distância
+
+<!-- TODO: acho que faz mais sentido não terem modificadores nessa tabela, já que a distância deveria variar independente do tipo de assentamento. -->
 
 | 1d20 | Distância | Modificador |
 |------|-----------|-------------|
@@ -164,7 +173,7 @@ A distância determina o quão longe está o local determinado para o cumpriment
 
 A relação com a população e o governo local afetam o valor e a recompensa dos contratos.
 
-> **Lembrete**: "Valor" é a quantidade de experiência para montar o contrato e "Recompensa" é a quantidade em peças de ouro. Subtraia ou some o 1d100 para obter os resultados.
+> "Valor" é a quantidade de experiência para montar o contrato e "Recompensa" é a quantidade em peças de ouro. Subtraia ou some o 1d100 para obter os resultados.
 
 ### Relação com a População Local
 
