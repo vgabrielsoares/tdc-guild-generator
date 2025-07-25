@@ -8,11 +8,15 @@ A primeira vez que os jogadores entrarem na sede da guilda, role para descobrir 
 
 > Contratos novos surgem de tempos em tempos e você precisará retornar aqui e repetir todo o processo, fique atento à tabela "Novos e antigos contratos e serviços".
 
-A disponibilidade do dado é equivalente à estrutura disponível:
+## Quantidade e Prazos
 
-## Dados por Tamanho da Sede
+Primeiro é preciso estabelecer a quantidade de contratos e serviços disponíveis, e o prazo para conclusão de cada um deles. Esses dados são determinados pelo tamanho da sede da guilda, a quantidade de funcionários e a condição deles.
+
+### Dados por Tamanho da Sede
 
 Quanto maior a sede, maior a quantidade de contratantes querendo firmar um novo contrato ou serviço. Consequentemente, mais contratos estarão disponíveis.
+
+Os dados usados em 'Quantidade e Prazos' é equivalente à estrutura da sede da guilda:
 
 | Tamanho | Dado Disponível |
 |---------|-----------------|
@@ -26,7 +30,7 @@ Quanto maior a sede, maior a quantidade de contratantes querendo firmar um novo 
 | Colossal | 1d20+8 |
 | Colossal e primorosa | 1d20+10 |
 
-### Modificadores por Condição
+#### Modificadores por Condição
 
 | Condição | Resultado |
 |----------|-----------|
@@ -34,8 +38,6 @@ Quanto maior a sede, maior a quantidade de contratantes querendo firmar um novo 
 | Funcionários experientes | Adicione +1 ao resultado final |
 
 > Os dados por tamanho da sede e os modificadores por condição são usados para determinar as tabelas de quantidade de contratos disponíveis e seu prazo de conclusão.
-
-## Quantidade e Prazos
 
 ### Quantidade Disponível
 
@@ -53,7 +55,29 @@ Quanto maior a sede, maior a quantidade de contratantes querendo firmar um novo 
 | 20 | 5d6 contratos |
 | 21+ | 3d6 contratos e 3d6 serviços |
 
+#### Redução por Frequentadores
+
+De acordo com aqueles que frequentam a guilda, a quantidade de contratos disponíveis pode diminuir.
+
+| Frequentadores | Redução |
+|----------------|---------|
+| Vazia | Todos os contratos e serviços estão disponíveis |
+| Quase deserta | -1 contrato e -1 serviço |
+| Pouco movimentada | -1d4 contratos e -1d4 serviços |
+| Nem muito nem pouco | -1d6+1 contratos e -1d6+1 serviços |
+| Muito frequentada | -2d6 contratos e -2d4 serviços |
+| Abarrotada | -3d6 contratos e -2d4+2 serviços |
+| Lotada | -4d6 contratos e -3d4 serviços |
+
+> **Nota**: Caso o saldo fique negativo, retire o valor dos próximos contratos rolados.
+
 ### Prazo para Conclusão
+
+Alguns contratos só são considerados concluídos quando se retorna ao contratante, com a tarefa concluída, dentro do prazo estipulado. Outros podem ser mais flexíveis, e desde que o objetivo tenha sido cumprido dentro do prazo, mas o retorno ao contratante tenha sido feito posteriormente, o contrato ainda é considerado concluído.
+
+Enquanto alguns prazos são puramente arbitrários, outros possuem uma janela de oportunidade específica, onde não é mais possível concluir o objetivo após ultrapassar esse intervalo de tempo.
+
+> Use o bom o senso para determinar fatores como a arbitrariedade do prazo e a flexibilidade do contratante.
 
 | 1d20 | Prazo |
 |------|-------|
@@ -70,7 +94,7 @@ Quanto maior a sede, maior a quantidade de contratantes querendo firmar um novo 
 
 ## Valores e Recompensas
 
-> **Atenção!** Serviços não utilizam essa parte da tabela.
+> Serviços não utilizam essa parte da tabela.
 
 A tabela de Valores e Recompensas determina o valor de cada contrato individualmente. O valor representa, além da recompensa paga em ouro (PO$), a experiência que você pode usar para estruturar um contrato. Por exemplo: um valor de 1000 significa que você tem, inicialmente, 1k de XP para "comprar" monstros, desafios e conflitos, e 1k de PO$ para oferecer de recompensa no contrato. Esses valores são independentes, então é possível que um valor seja maior ou menor que o outro.
 
@@ -80,47 +104,48 @@ Nessa tabela, todos os contratos rolam 1d100 sem modificadores. As modificaçõe
 
 | 1d100 | Valor |
 |-------|-------|
-| 1-2 | 75 |
-| 3-4 | 100 |
-| 5-6 | 125 |
-| 7-8 | 150 |
-| 9-11 | 200 |
-| 12-14 | 225 |
-| 15-18 | 250 |
-| 19-21 | 300 |
-| 22-23 | 350 |
-| 24-28 | 375 |
-| 29-31 | 400 |
-| 32 | 450 |
-| 33-35 | 500 |	
-| 36 | 550 |
-| 37-39 | 600 |
-| 40-41 | 750 |
-| 42-43 | 800 | 
-| 44-46 | 900 | 
-| 47-49 | 1000 |
-| 50-51 | 1100 |
-| 52 | 1200 |
-| 53-54 | 1250 |
-| 55-56 | 1400 |
-| 57-59 | 1500 |
-| 60-62 | 1600 |
-| 63-64 | 1700 |
-| 65-68 | 1900 |
-| 69-72 | 2000 |	
-| 73 | 2100 |
-| 74 | 2200 |
-| 75 | 2400 |
-| 76 | 2500 |
-| 77 | 2800 |
-| 78 | 3000 |
-| 79 | 3200 |
-| 80 | 3400 |
-| 81 | 3600 |
-| 82 | 3800 |
-| 83 | 3900 |
-| 84 | 4200 |
-| 85 | 4300 |
+| 1-8 | 75 |
+| 9-15 | 100 |
+| 16-20 | 125 |
+| 21-23 | 150 |
+| 24-26 | 175 |
+| 27-29 | 200 |
+| 30-31 | 250 |
+| 32-33 | 300 |
+| 34-35 | 350 |
+| 36-37 | 400 |
+| 38-39 | 450 |
+| 40-41 | 500 |
+| 42-43 | 550 |	
+| 44-45 | 600 |
+| 46-47 | 700 |
+| 48-49 | 800 |
+| 50-51 | 900 | 
+| 52-53 | 1000 | 
+| 54-55 | 1100 |
+| 56-57 | 1200 |
+| 58-59 | 1300 |
+| 60-61 | 1500 |
+| 62-63 | 1700 |
+| 64-65 | 1900 |
+| 66-67 | 2100 |
+| 68-69 | 2300 |
+| 70-71 | 2500 |
+| 72 | 2900 |	
+| 73 | 3300 |
+| 74 | 3700 |
+| 75 | 4100 |
+| 76 | 4500 |
+| 77 | 4900 |
+| 78 | 5300 |
+| 79 | 5700 |
+| 80 | 6100 |
+| 81 | 6600 |
+| 82 | 7100 |
+| 83 | 7600 |
+| 84 | 8100 |
+| 85 | 8600 |
+<!-- TODO: continuar os XP -->
 | 86 | 4500 |
 | 87 | 4800 |
 | 88 | 4900 |
@@ -136,46 +161,40 @@ Nessa tabela, todos os contratos rolam 1d100 sem modificadores. As modificaçõe
 | 98 | 9500 |
 | 99 | 10900 |
 | 100 | 12700 |
+| 101+ | Valor anterior * 1.1 |
+
+> Role 1d100 sem modificadores para todos os contratos, independete do tipo de assentamento.
 
 #### Como usar os valores de Experiência e Ouro
 
-<!-- TODO: definir certinho depois a multiplicação do ouro (provavelmente 0.1 de PO), e em como o XP é usado pra montar o contrato -->
+<!-- TODO: definir certinho depois a multiplicação do ouro (provavelmente 0.1 de PO), e em como o XP é usado pra montar o contrato. detalhar que a dificuldade de um contrato vai poder ser percebida pelos jogadores através da recompensa, e que não necessariamente os contratos vão estar nivelados com os jogadores -->
 
-## Distância
+### Distância
 
-A distância determina o quão longe está o local determinado para o cumprimento do contrato. Adicione ou reduza o "Valor e Recompensa" de acordo com o resultado.
+A distância determina o quão longe está o local determinado para o cumprimento do contrato. Faz parte do trabalho dos jogadores, como aventureiros, fazerem a viagem até o local especificado, sendo os meios da viagem total responsabilidade dos mesmos. O valor pago pela guilda pela conclusão do contrato já leva em conta a dificuldade de locomoção. A guilda não paga ou se responsabiliza pelo transporte de ida ou volta.
 
-### Dados por Tamanho da Sede
-
-- **Minúsculo, Muito pequeno, Pequeno e modesto e Pequeno e confortável**: 1d6
-- **Mediano e comum, Mediano em dobro e Grande**: 1d10+1
-- **Luxuosamente grande**: 1d10+2
-- **Enorme, Enorme e confortável, Colossal e Colossal e primorosa**: 1d20+5
-
-### Tabela de Distância
-
-<!-- TODO: acho que faz mais sentido não terem modificadores nessa tabela, já que a distância deveria variar independente do tipo de assentamento. -->
+#### Tabela de Distância
 
 | 1d20 | Distância | Modificador |
 |------|-----------|-------------|
-| 1-2 | Um hexágono ou menos | -20 |
-| 3-4 | Dois hexágonos ou menos | -15 |
-| 5-6 | Três hexágonos ou menos | -10 |
-| 7-8 | Dois hexágonos ou mais | -5 |
-| 9-13 | Três hexágonos ou mais | +0 |
-| 14-16 | Quatro hexágonos ou mais | +5 |
-| 17-18 | Cinco hexágonos ou mais | +10 |
-| 19 | Seis hexágonos ou mais | +12 |
-| 20 | Sete hexágonos ou mais | +14 |
-| 21+ | Oito hexágonos ou mais | +20 |
+| 1-4 | Um hexágono ou menos | -20 |
+| 5-6 | Dois hexágonos ou menos | -15 |
+| 7-8 | Três hexágonos ou menos | -10 |
+| 9-10 | Dois hexágonos ou mais | -5 |
+| 11-12 | Três hexágonos ou mais | +0 |
+| 13-15 | Quatro hexágonos ou mais | +5 |
+| 16-17 | Cinco hexágonos ou mais | +10 |
+| 18 | Seis hexágonos ou mais | +12 |
+| 19 | Sete hexágonos ou mais | +14 |
+| 20 | Oito hexágonos ou mais | +20 |
 
-## Modificadores por Relações
+> Adicione ou reduza o "Valor" e "Recompensa" do contrato de acordo com a distância.
 
-A relação com a população e o governo local afetam o valor e a recompensa dos contratos.
+### Modificadores por Relações
 
-> "Valor" é a quantidade de experiência para montar o contrato e "Recompensa" é a quantidade em peças de ouro. Subtraia ou some o 1d100 para obter os resultados.
+A relação com a população e o governo local afetam o valor e a recompensa dos contratos, caso eles tenham sido criados pelos mesmos.
 
-### Relação com a População Local
+#### Relação com a População Local
 
 | Relação | Modificador Valor | Modificador Recompensa |
 |---------|-------------------|------------------------|
@@ -186,7 +205,7 @@ A relação com a população e o governo local afetam o valor e a recompensa do
 | Muito boa | +0 | +0 |
 | Excelente | +0 | +5 |
 
-### Relação com o Governo Local
+#### Relação com o Governo Local
 
 | Relação | Modificador Valor | Modificador Recompensa |
 |---------|-------------------|------------------------|
@@ -197,34 +216,26 @@ A relação com a população e o governo local afetam o valor e a recompensa do
 | Muito boa | +5 | +5 |
 | Excelente | +5 | +10 |
 
-> **Exemplo**: Em um contrato você rolou resultado 40. Mas o contrato é com a população local e a relação deles com a guilda é péssima. Então você vai usar um 25 para determinar o valor em exp. e um 20 para determinar a recompensa.
-
-## Redução por Frequentadores
-
-De acordo com aqueles que frequentam a guilda, a quantidade de contratos disponíveis pode diminuir.
-
-| Frequentadores | Redução |
-|----------------|---------|
-| Vazia | Todos os contratos e serviços estão disponíveis |
-| Quase deserta | -1 contrato e -1 serviço |
-| Pouco movimentada | -1d4 contratos e -1d4 serviços |
-| Nem muito nem pouco | -1d6+1 contratos e -1d6+1 serviços |
-| Muito frequentada | -2d6 contratos e -2d4 serviços |
-| Abarrotada | -3d6 contratos e -2d4+2 serviços |
-| Lotada | -4d6 contratos e -3d4 serviços |
-
-> **Nota**: Caso o saldo fique negativo, retire o valor de novos contratos rolados.
-
-## Dificuldade dos Contratos
+> **Exemplo**: Em um contrato você rolou resultado 40. Mas o contrato é com a população local e a relação deles com a guilda é péssima. Então você vai usar um 25 para determinar o valor em exp. e um 20 para determinar a recompensa. Instituições de Ofício são neutras (os contratantes são definidos em seções futuras do gerador)
 
 ### Modificadores por Funcionários
+
+Funcionários podem influenciar o resultado dos contratos de diversas maneiras, dependendo de sua experiência e preparo. A análise dos requisitos e da verdadeira dificuldade são afetadas diretamente por esses fatores.
 
 | Condição | Resultado |
 |----------|-----------|
 | Funcionários despreparados | Adicione -2 ao resultado final da recompensa |
 | Funcionários experientes | Adicione +2 ao resultado final da recompensa |
 
-### Tabela de Dificuldade
+> Esse modificador é adicionado ao d100, e não ao valor em si
+
+### Dificuldade dos Contratos
+
+A dificuldade de um contrato é determinada por diversos fatores, incluindo a complexidade da tarefa, os perigos envolvidos e os recursos necessários. Essa dificuldade pode ser percebida pelos jogadores através da recompensa oferecida, que deve refletir o desafio que o contrato representa.
+
+A definição da dificuldade é a principal relação do balanço entre o valor em XP e a recompensa em PO$ do contrato. 
+
+#### Tabela de Dificuldade
 
 | 1d20 | Dificuldade | Multiplicador Valor | Modificador Recompensa |
 |------|-------------|---------------------|------------------------|
