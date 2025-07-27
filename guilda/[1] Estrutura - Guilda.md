@@ -203,6 +203,10 @@ O tamanho da sede define a quantidade de recursos disponíveis e a capacidade de
 
 ### Relações
 
+A Guilda, como uma entidade social e econômica, estabelece diversas relações com o ambiente ao seu redor.
+
+A relação da guilda com o governo local e a população local podem influenciar os tipos de contratantes para cada contrato.
+
 #### Relação com o Governo Local
 
 A relação da guilda com o governo local define como a guilda é vista e tratada pelas autoridades.
@@ -237,7 +241,7 @@ A reputação da guilda com a população local define como a guilda é vista pe
 
 Os funcionários da guilda são essenciais para o funcionamento da sede. Eles podem variar em número, experiência e habilidades.
 
-Os funcionários podem influenciar a quantidade de frequentadores e de contratos disponíveis.
+Os funcionários podem influenciar a quantidade de frequentadores e de contratos disponíveis, assim como suas recompensas.
 
 | 1d20  | Funcionários |
 |-------|--------------|
@@ -291,13 +295,13 @@ Os recursos da guilda são influenciados pela relação com o governo e a popula
 
 > **Nota**: Some o modificador de ambas as relações (governo + população). Exemplo: relação péssima com governo (-3) + muito boa com população (+2) = modificador final de -1.
 
-## Frequentadores
+### Frequentadores
 
 A Guilda pode ser um ponto de encontro para aventureiros, mercadores e cidadãos comuns.
 
 Os frequentadores podem influenciar a quantidade de contratos disponíveis.
 
-### Dados por Tipo de Assentamento
+#### Dados por Tipo de Assentamento
 
 Para essa seção, utilize os seguintes dados:
 
@@ -307,7 +311,7 @@ Para essa seção, utilize os seguintes dados:
 - **Cidade grande**: 1d20
 - **Metrópole**: 1d20+5
 
-### Quantidade de Frequentadores
+#### Quantidade de Frequentadores
 
 | 1d20  | Quantidade |
 |-------|------------|
@@ -319,7 +323,7 @@ Para essa seção, utilize os seguintes dados:
 | 19    | Abarrotada |
 | 20+   | Lotada |
 
-### Modificadores de Frequentadores
+#### Modificadores de Frequentadores
 
 | Condição | Modificador |
 |----------|-------------|
@@ -332,3 +336,7 @@ Para essa seção, utilize os seguintes dados:
 | Recursos suficientes | +2 |
 | Recursos excedentes | +3 |
 | Recursos abundantes | +6 |
+
+### Nome da Sede da Guilda
+
+Cada sede da Guilda pode ter um nome próprio para fins de identificação e personalização. O nome pode refletir a localização, a história ou a reputação da sede, ou ser algo puraemente inventivo. Apesar dos diferentes nomes, toda sede da Guilda é, fundamentalmente, parte da mesma organização, "A Guilda".
