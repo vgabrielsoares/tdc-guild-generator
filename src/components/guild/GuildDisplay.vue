@@ -224,7 +224,16 @@ const guild = computed(() => guildStore.currentGuild)
 
 // Seletor de tipo de assentamento
 const selectedSettlementType = ref<SettlementType | 'random'>('random')
-const settlementTypes = Object.values(SettlementType)
+const settlementTypes = [
+  SettlementType.LUGAREJO,
+  SettlementType.POVOADO,
+  SettlementType.ALDEIA,
+  SettlementType.VILAREJO,
+  SettlementType.VILA_GRANDE,
+  SettlementType.CIDADELA,
+  SettlementType.CIDADE_GRANDE,
+  SettlementType.METROPOLE
+]
 
 // Edição do nome da guilda
 const isEditingName = ref(false)
