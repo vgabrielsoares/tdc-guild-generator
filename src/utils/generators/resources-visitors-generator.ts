@@ -3,26 +3,31 @@
  * Implementa a geração com aplicação de modificadores baseados em relações
  */
 
-import type { GuildResources, GuildVisitors } from '@/types/guild';
-import { ResourceLevel, VisitorLevel, RelationLevel } from '@/types/guild';
-import { BaseGenerator, type BaseGenerationConfig, type BaseGenerationResult } from './base-generator';
-import { findTableEntry } from '@/utils/table-operations';
-import { 
-  mapResourceStringToEnum, 
-  mapVisitorStringToEnum, 
+import type { GuildResources, GuildVisitors } from "@/types/guild";
+import { ResourceLevel, VisitorLevel, RelationLevel } from "@/types/guild";
+import {
+  BaseGenerator,
+  type BaseGenerationConfig,
+  type BaseGenerationResult,
+} from "./base-generator";
+import { findTableEntry } from "@/utils/table-operations";
+import {
+  mapResourceStringToEnum,
+  mapVisitorStringToEnum,
   mapSettlementTypeToTableKey,
-  mapResourceLevelToString
-} from '@/utils/enum-mappers';
+  mapResourceLevelToString,
+} from "@/utils/enum-mappers";
 import {
   SETTLEMENT_DICE,
   RESOURCE_MODIFIERS,
   VISITOR_FREQUENCY_MODIFIERS,
   RESOURCES_LEVEL_TABLE,
   VISITORS_FREQUENCY_TABLE,
-} from '@/data/tables/guild-structure';
+} from "@/data/tables/guild-structure";
 
 // Configuração específica para geração de recursos e visitantes
-export interface ResourcesVisitorsGenerationConfig extends BaseGenerationConfig {
+export interface ResourcesVisitorsGenerationConfig
+  extends BaseGenerationConfig {
   readonly customModifiers?: {
     readonly resources?: number;
     readonly visitors?: number;
@@ -48,13 +53,15 @@ export interface ResourcesVisitorsRolls {
 }
 
 // Resultado completo da geração
-export type ResourcesVisitorsGenerationResult = BaseGenerationResult<ResourcesVisitorsData, ResourcesVisitorsRolls>;
+export type ResourcesVisitorsGenerationResult = BaseGenerationResult<
+  ResourcesVisitorsData,
+  ResourcesVisitorsRolls
+>;
 
 /**
  * Calculadora de modificadores baseados em relações e outros fatores
  */
 export class ModifierCalculator {
-  
   /**
    * Mapeia enum de RelationLevel para string de governo
    */
@@ -62,7 +69,7 @@ export class ModifierCalculator {
     // Mapeamento direto para governo - usa os valores dos enums diretamente
     return relation as string;
   }
-  
+
   /**
    * Mapeia enum de RelationLevel para string de população
    */
@@ -82,14 +89,17 @@ export class ModifierCalculator {
       [RelationLevel.BOA_AJUDAM]: "Boa, ajudam com problemas",
       [RelationLevel.BOA_SEGUROS]: "Boa, nos mantêm seguros",
       [RelationLevel.MUITO_BOA]: "Muito boa, sem eles estaríamos perdidos",
-      [RelationLevel.MUITO_BOA_PERDIDOS]: "Muito boa, sem eles estaríamos perdidos",
-      [RelationLevel.EXCELENTE]: "Excelente, a guilda faz o assentamento funcionar",
-      [RelationLevel.EXCELENTE_FUNCIONAR]: "Excelente, a guilda faz o assentamento funcionar",
+      [RelationLevel.MUITO_BOA_PERDIDOS]:
+        "Muito boa, sem eles estaríamos perdidos",
+      [RelationLevel.EXCELENTE]:
+        "Excelente, a guilda faz o assentamento funcionar",
+      [RelationLevel.EXCELENTE_FUNCIONAR]:
+        "Excelente, a guilda faz o assentamento funcionar",
     };
-    
-    return mapping[relation] || relation as string;
+
+    return mapping[relation] || (relation as string);
   }
-  
+
   /**
    * Calcula modificadores para recursos baseado em relações
    */
@@ -98,26 +108,30 @@ export class ModifierCalculator {
     population?: RelationLevel
   ): number {
     let modifier = 0;
-    
+
     if (government) {
       const governmentString = this.mapGovernmentRelation(government);
-      const govModifier = (RESOURCE_MODIFIERS.government as Record<string, number>)[governmentString];
+      const govModifier = (
+        RESOURCE_MODIFIERS.government as Record<string, number>
+      )[governmentString];
       if (govModifier !== undefined) {
         modifier += govModifier;
       }
     }
-    
+
     if (population) {
       const populationString = this.mapPopulationRelation(population);
-      const popModifier = (RESOURCE_MODIFIERS.population as Record<string, number>)[populationString];
+      const popModifier = (
+        RESOURCE_MODIFIERS.population as Record<string, number>
+      )[populationString];
       if (popModifier !== undefined) {
         modifier += popModifier;
       }
     }
-    
+
     return modifier;
   }
-  
+
   /**
    * Calcula modificadores para visitantes baseado em funcionários e recursos
    */
@@ -126,39 +140,41 @@ export class ModifierCalculator {
     resources?: ResourceLevel
   ): number {
     let modifier = 0;
-    
+
     // Modificadores de funcionários - verifica palavras-chave conforme markdown
     if (employees) {
       const employeesLower = employees.toLowerCase();
-      
+
       // Funcionários despreparados (-1)
-      if (employeesLower.includes('despreparado')) {
+      if (employeesLower.includes("despreparado")) {
         modifier -= 1;
       }
       // Funcionários experientes (+1)
       else if (
-        employeesLower.includes('experiente') ||
-        employeesLower.includes('explorador') ||
-        employeesLower.includes('ex-membro') ||
-        employeesLower.includes('ex-aventureiro') ||
-        employeesLower.includes('clero') ||
-        employeesLower.includes('nobre') ||
-        employeesLower.includes('aventureiro') ||
-        employeesLower.includes('animal falante')
+        employeesLower.includes("experiente") ||
+        employeesLower.includes("explorador") ||
+        employeesLower.includes("ex-membro") ||
+        employeesLower.includes("ex-aventureiro") ||
+        employeesLower.includes("clero") ||
+        employeesLower.includes("nobre") ||
+        employeesLower.includes("aventureiro") ||
+        employeesLower.includes("animal falante")
       ) {
         modifier += 1;
       }
     }
-    
+
     // Modificadores de recursos
     if (resources) {
       const resourceString = mapResourceLevelToString(resources);
-      const resourceModifier = (VISITOR_FREQUENCY_MODIFIERS.resources as Record<string, number>)[resourceString];
+      const resourceModifier = (
+        VISITOR_FREQUENCY_MODIFIERS.resources as Record<string, number>
+      )[resourceString];
       if (resourceModifier !== undefined) {
         modifier += resourceModifier;
       }
     }
-    
+
     return modifier;
   }
 }
@@ -166,8 +182,10 @@ export class ModifierCalculator {
 /**
  * Gerador de recursos e visitantes da guilda
  */
-export class ResourcesVisitorsGenerator extends BaseGenerator<ResourcesVisitorsGenerationConfig, ResourcesVisitorsGenerationResult> {
-  
+export class ResourcesVisitorsGenerator extends BaseGenerator<
+  ResourcesVisitorsGenerationConfig,
+  ResourcesVisitorsGenerationResult
+> {
   protected doGenerate(): ResourcesVisitorsGenerationResult {
     this.validateConfig();
 
@@ -177,15 +195,16 @@ export class ResourcesVisitorsGenerator extends BaseGenerator<ResourcesVisitorsG
     const resourcesResult = this.generateResources(resourceModifier);
 
     // Calcular modificador de visitantes diretamente usando o valor de recursos gerado
-    const visitorsModifier = ModifierCalculator.calculateVisitorModifiers(
-      this.config.relationModifiers?.employees,
-      resourcesResult.level
-    ) + (this.config.customModifiers?.visitors || 0);
+    const visitorsModifier =
+      ModifierCalculator.calculateVisitorModifiers(
+        this.config.relationModifiers?.employees,
+        resourcesResult.level
+      ) + (this.config.customModifiers?.visitors || 0);
 
     if (visitorsModifier !== 0) {
       this.log(
         `Visitor modifiers: relations=${ModifierCalculator.calculateVisitorModifiers(this.config.relationModifiers?.employees, resourcesResult.level)}, custom=${this.config.customModifiers?.visitors || 0}, total=${visitorsModifier}`,
-        'MODIFIERS'
+        "MODIFIERS"
       );
     }
 
@@ -217,125 +236,201 @@ export class ResourcesVisitorsGenerator extends BaseGenerator<ResourcesVisitorsG
     const government = this.config.relationModifiers?.government;
     const population = this.config.relationModifiers?.population;
     const customModifier = this.config.customModifiers?.resources || 0;
-    
-    const relationModifier = ModifierCalculator.calculateResourceModifiers(government, population);
+
+    const relationModifier = ModifierCalculator.calculateResourceModifiers(
+      government,
+      population
+    );
     const totalModifier = relationModifier + customModifier;
-    
+
     if (totalModifier !== 0) {
       this.log(
         `Resource modifiers: relations=${relationModifier}, custom=${customModifier}, total=${totalModifier}`,
-        'MODIFIERS'
+        "MODIFIERS"
       );
     }
-    
+
     return totalModifier;
   }
-
-
 
   /**
    * Determina o range máximo baseado no tipo de dado e tabela
    */
-  private getDiceRange(dice: string, context: 'resources' | 'visitors' = 'resources'): { min: number; max: number } {
+  private getDiceRange(
+    dice: string,
+    context: "resources" | "visitors" = "resources"
+  ): { min: number; max: number } {
     switch (dice) {
-      case 'd8': return { min: 1, max: 8 };
-      case 'd10': return { min: 1, max: 10 };
-      case 'd12': return { min: 1, max: 12 };
-      case 'd20': 
+      case "d8":
+        return { min: 1, max: 8 };
+      case "d10":
+        return { min: 1, max: 10 };
+      case "d12":
+        return { min: 1, max: 12 };
+      case "d20":
         // A tabela de recursos D20 vai até 25 devido a modificadores
-        if (context === 'resources') return { min: 1, max: 25 };
+        if (context === "resources") return { min: 1, max: 25 };
         return { min: 1, max: 20 };
-      case 'd25': return { min: 1, max: 25 };
-      default: return { min: 1, max: 20 }; // fallback
+      case "d25":
+        return { min: 1, max: 25 };
+      default:
+        return { min: 1, max: 20 }; // fallback
     }
   }
 
   /**
    * Aplica clamp ao roll baseado no range do dado
    */
-  private clampRoll(roll: number, dice: string, context: 'resources' | 'visitors', logContext: string): number {
+  private clampRoll(
+    roll: number,
+    dice: string,
+    context: "resources" | "visitors",
+    logContext: string
+  ): number {
     const range = this.getDiceRange(dice, context);
     const clampedRoll = Math.max(range.min, Math.min(range.max, roll));
-    
+
     if (clampedRoll !== roll) {
       this.log(
-        `${logContext}: Roll ${roll} clamped to ${clampedRoll} for table range ${range.min}-${range.max}`, 
-        'MODIFIER'
+        `${logContext}: Roll ${roll} clamped to ${clampedRoll} for table range ${range.min}-${range.max}`,
+        "MODIFIER"
       );
     }
-    
+
     return clampedRoll;
   }
 
   /**
    * Gera recursos baseado no tipo de assentamento e modificadores
    */
-  private generateResources(modifier: number): { level: ResourceLevel; roll: number } {
-    const settlementKey = mapSettlementTypeToTableKey(this.config.settlementType);
-    const diceConfig = SETTLEMENT_DICE.structure[settlementKey as keyof typeof SETTLEMENT_DICE.structure];
-    
+  private generateResources(modifier: number): {
+    level: ResourceLevel;
+    roll: number;
+  } {
+    const settlementKey = mapSettlementTypeToTableKey(
+      this.config.settlementType
+    );
+    const diceConfig =
+      SETTLEMENT_DICE.structure[
+        settlementKey as keyof typeof SETTLEMENT_DICE.structure
+      ];
+
     const resourceTable = RESOURCES_LEVEL_TABLE;
-    
+
     if (!diceConfig) {
-      this.log(`Unknown settlement type: ${settlementKey}, using fallback d8`, 'WARNING');
-      const notation = modifier === 0 ? 'd8' : `d8${modifier >= 0 ? '+' : ''}${modifier}`;
-      
-      const rollResult = this.rollWithLog(notation, 'Resources (fallback)');
-      const clampedRoll = this.clampRoll(rollResult.result, 'd8', 'resources', 'Resources');
+      this.log(
+        `Unknown settlement type: ${settlementKey}, using fallback d8`,
+        "WARNING"
+      );
+      const notation =
+        modifier === 0 ? "d8" : `d8${modifier >= 0 ? "+" : ""}${modifier}`;
+
+      const rollResult = this.rollWithLog(notation, "Resources (fallback)");
+      const clampedRoll = this.clampRoll(
+        rollResult.result,
+        "d8",
+        "resources",
+        "Resources"
+      );
       const tableResult = findTableEntry(resourceTable, clampedRoll);
-      const level = mapResourceStringToEnum(tableResult || 'Limitados');
-      
+      const level = mapResourceStringToEnum(tableResult || "Limitados");
+
       return { level, roll: rollResult.result };
     }
-    
+
     const finalModifier = diceConfig.modifier + modifier;
-    const notation = finalModifier === 0 ? `1${diceConfig.dice}` : `1${diceConfig.dice}${finalModifier >= 0 ? '+' : ''}${finalModifier}`;
-    
-    const rollResult = this.rollWithLog(notation, `Resources (${settlementKey})`);
-    const clampedRoll = this.clampRoll(rollResult.result, diceConfig.dice, 'resources', 'Resources');
+    const notation =
+      finalModifier === 0
+        ? `1${diceConfig.dice}`
+        : `1${diceConfig.dice}${finalModifier >= 0 ? "+" : ""}${finalModifier}`;
+
+    const rollResult = this.rollWithLog(
+      notation,
+      `Resources (${settlementKey})`
+    );
+    const clampedRoll = this.clampRoll(
+      rollResult.result,
+      diceConfig.dice,
+      "resources",
+      "Resources"
+    );
     const tableResult = findTableEntry(resourceTable, clampedRoll);
-    const level = mapResourceStringToEnum(tableResult || 'Limitados');
-    
-    this.log(`Resource level: ${level}`, 'RESOURCES');
+    const level = mapResourceStringToEnum(tableResult || "Limitados");
+
+    this.log(`Resource level: ${level}`, "RESOURCES");
     return { level, roll: rollResult.result };
   }
 
   /**
    * Gera visitantes baseado no tipo de assentamento e modificadores
    */
-  private generateVisitors(modifier: number): { frequency: VisitorLevel; roll: number } {
-    const settlementKey = mapSettlementTypeToTableKey(this.config.settlementType);
-    const diceConfig = SETTLEMENT_DICE.visitors[settlementKey as keyof typeof SETTLEMENT_DICE.visitors];
-    
+  private generateVisitors(modifier: number): {
+    frequency: VisitorLevel;
+    roll: number;
+  } {
+    const settlementKey = mapSettlementTypeToTableKey(
+      this.config.settlementType
+    );
+    const diceConfig =
+      SETTLEMENT_DICE.visitors[
+        settlementKey as keyof typeof SETTLEMENT_DICE.visitors
+      ];
+
     const visitorTable = VISITORS_FREQUENCY_TABLE;
-    
+
     if (!diceConfig) {
-      this.log(`Unknown settlement type: ${settlementKey}, using fallback d8`, 'WARNING');
-      const notation = modifier === 0 ? 'd8' : `d8${modifier >= 0 ? '+' : ''}${modifier}`;
-      
-      const rollResult = this.rollWithLog(notation, 'Visitors (fallback)');
-      const clampedRoll = this.clampRoll(rollResult.result, 'd8', 'visitors', 'Visitors');
+      this.log(
+        `Unknown settlement type: ${settlementKey}, using fallback d8`,
+        "WARNING"
+      );
+      const notation =
+        modifier === 0 ? "d8" : `d8${modifier >= 0 ? "+" : ""}${modifier}`;
+
+      const rollResult = this.rollWithLog(notation, "Visitors (fallback)");
+      const clampedRoll = this.clampRoll(
+        rollResult.result,
+        "d8",
+        "visitors",
+        "Visitors"
+      );
       const tableResult = findTableEntry(visitorTable, clampedRoll);
-      const frequency = mapVisitorStringToEnum(tableResult || 'Nem muito nem pouco');
-      
+      const frequency = mapVisitorStringToEnum(
+        tableResult || "Nem muito nem pouco"
+      );
+
       return { frequency, roll: rollResult.result };
     }
-    
+
     const finalModifier = diceConfig.modifier + modifier;
-    const notation = finalModifier === 0 ? `1${diceConfig.dice}` : `1${diceConfig.dice}${finalModifier >= 0 ? '+' : ''}${finalModifier}`;
-    
-    const rollResult = this.rollWithLog(notation, `Visitors (${settlementKey})`);
-    const clampedRoll = this.clampRoll(rollResult.result, diceConfig.dice, 'visitors', 'Visitors');
+    const notation =
+      finalModifier === 0
+        ? `1${diceConfig.dice}`
+        : `1${diceConfig.dice}${finalModifier >= 0 ? "+" : ""}${finalModifier}`;
+
+    const rollResult = this.rollWithLog(
+      notation,
+      `Visitors (${settlementKey})`
+    );
+    const clampedRoll = this.clampRoll(
+      rollResult.result,
+      diceConfig.dice,
+      "visitors",
+      "Visitors"
+    );
     const tableResult = findTableEntry(visitorTable, clampedRoll);
-    const frequency = mapVisitorStringToEnum(tableResult || 'Nem muito nem pouco');
-    
-    this.log(`Visitor frequency: ${frequency}`, 'VISITORS');
+    const frequency = mapVisitorStringToEnum(
+      tableResult || "Nem muito nem pouco"
+    );
+
+    this.log(`Visitor frequency: ${frequency}`, "VISITORS");
     return { frequency, roll: rollResult.result };
   }
 }
 
 // Função de conveniência para geração rápida
-export function generateResourcesAndVisitors(config: ResourcesVisitorsGenerationConfig): ResourcesVisitorsGenerationResult {
+export function generateResourcesAndVisitors(
+  config: ResourcesVisitorsGenerationConfig
+): ResourcesVisitorsGenerationResult {
   const generator = new ResourcesVisitorsGenerator(config);
   return generator.generate();
 }
