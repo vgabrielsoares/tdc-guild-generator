@@ -15,10 +15,67 @@ import {
   POPULATION_RELATIONS_TABLE,
   VISITOR_TYPES_TABLE,
   RESOURCE_SPECIALTIES_TABLE,
+  RESOURCES_LEVEL_TABLE,
+  VISITORS_FREQUENCY_TABLE,
   getResourceSpecialtiesCount,
-  getVisitorFrequencyTable,
-  getResourceLevelTable,
+  getDiceNotationString,
 } from "@/data/tables/guild-structure";
+import { mapSettlementTypeToTableKey } from "@/utils/enum-mappers";
+import { rollDice } from "@/utils/dice";
+import type { TableEntry, RollModifier } from "@/types/tables";
+
+/**
+ * Roll on table using settlement-specific dice instead of auto-determined dice
+ */
+function rollOnTableWithSettlementDice<T>(
+  table: TableEntry<T>[],
+  settlementType: SettlementType,
+  modifiers: RollModifier[] = [],
+  context: string = ""
+): { result: T; finalRoll: number; entry: TableEntry<T> } {
+  const settlementKey = mapSettlementTypeToTableKey(settlementType);
+  const diceNotation = getDiceNotationString(settlementKey, 'structure');
+  
+  // Calculate total modifier value
+  const totalModifier = modifiers.reduce((sum, mod) => sum + mod.value, 0);
+  
+  // Parse the base dice notation to extract the base dice and any existing modifier
+  const baseDiceMatch = diceNotation.match(/^(\d*d\d+)([+-]\d+)?$/);
+  if (!baseDiceMatch) {
+    throw new Error(`Invalid base dice notation: ${diceNotation}`);
+  }
+  
+  const baseDice = baseDiceMatch[1]; // e.g., "1d20"
+  const existingModifier = baseDiceMatch[2] ? parseInt(baseDiceMatch[2]) : 0; // e.g., +4 becomes 4
+  
+  // Combine existing and new modifiers
+  const finalModifier = existingModifier + totalModifier;
+  
+  // Create final dice notation
+  const finalDiceNotation = finalModifier === 0
+    ? baseDice
+    : `${baseDice}${finalModifier > 0 ? `+${finalModifier}` : `${finalModifier}`}`;
+    
+  // Roll the dice
+  const diceRoll = rollDice({
+    notation: finalDiceNotation,
+    context,
+    logRoll: true,
+  });
+  
+  // Find result in table
+  const entry = table.find(entry => 
+    diceRoll.result >= entry.min && diceRoll.result <= entry.max
+  );
+  
+  const result = entry ? entry.result : table[table.length - 1].result;
+  
+  return {
+    result,
+    finalRoll: diceRoll.result,
+    entry: entry || table[table.length - 1]
+  };
+}
 
 export interface RelationsGenerationConfig {
   settlementType: SettlementType;
@@ -90,7 +147,12 @@ export function generateGovernmentRelations(
       ]
     : [];
 
-  const result = rollOnTable(GOVERNMENT_RELATIONS_TABLE, modifiers);
+  const result = rollOnTableWithSettlementDice(
+    GOVERNMENT_RELATIONS_TABLE,
+    config.settlementType,
+    modifiers,
+    `Relação com governo: ${config.settlementType}`
+  );
 
   // Handle 21+ case (Excelente result when roll > 20)
   let finalResult = result.result;
@@ -129,7 +191,12 @@ export function generatePopulationRelations(
       ]
     : [];
 
-  const result = rollOnTable(POPULATION_RELATIONS_TABLE, modifiers);
+  const result = rollOnTableWithSettlementDice(
+    POPULATION_RELATIONS_TABLE,
+    config.settlementType,
+    modifiers,
+    `Relação com população: ${config.settlementType}`
+  );
 
   // Handle 21+ case (Excelente result when roll > 20)
   let finalResult = result.result;
@@ -158,17 +225,7 @@ export function generatePopulationRelations(
 export function generateResourceLevel(
   config: RelationsGenerationConfig
 ): ResourceLevel {
-  // Map settlement type to string for table lookup
-  const settlementMapping: Record<SettlementType, string> = {
-    [SettlementType.LUGAREJO]: "Lugarejo",
-    [SettlementType.ALDEIA]: "Aldeia",
-    [SettlementType.CIDADE_PEQUENA]: "Cidadela",
-    [SettlementType.CIDADE_GRANDE]: "Cidade grande",
-    [SettlementType.METROPOLE]: "Metrópole",
-  };
-
-  const settlementKey = settlementMapping[config.settlementType] || "Aldeia";
-  const resourceTable = getResourceLevelTable(settlementKey);
+  const resourceTable = RESOURCES_LEVEL_TABLE;
 
   const modifiers = config.customModifiers?.resourcesMod
     ? [
@@ -311,17 +368,7 @@ function stringToVisitorLevel(value: string): VisitorLevel {
 export function generateVisitorLevel(
   config: RelationsGenerationConfig
 ): VisitorLevel {
-  // Map settlement type to string for table lookup
-  const settlementMapping: Record<SettlementType, string> = {
-    [SettlementType.LUGAREJO]: "Lugarejo",
-    [SettlementType.ALDEIA]: "Aldeia",
-    [SettlementType.CIDADE_PEQUENA]: "Cidadela",
-    [SettlementType.CIDADE_GRANDE]: "Cidade grande",
-    [SettlementType.METROPOLE]: "Metrópole",
-  };
-
-  const settlementKey = settlementMapping[config.settlementType] || "Aldeia";
-  const visitorsTable = getVisitorFrequencyTable(settlementKey);
+  const visitorsTable = VISITORS_FREQUENCY_TABLE;
 
   const modifiers = config.customModifiers?.visitorsMod
     ? [

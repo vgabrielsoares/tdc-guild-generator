@@ -17,8 +17,8 @@ import {
   SETTLEMENT_DICE,
   RESOURCE_MODIFIERS,
   VISITOR_FREQUENCY_MODIFIERS,
-  getVisitorFrequencyTable,
-  getResourceLevelTable,
+  RESOURCES_LEVEL_TABLE,
+  VISITORS_FREQUENCY_TABLE,
 } from '@/data/tables/guild-structure';
 
 // Configuração específica para geração de recursos e visitantes
@@ -282,7 +282,7 @@ export class ResourcesVisitorsGenerator extends BaseGenerator<ResourcesVisitorsG
     const settlementKey = mapSettlementTypeToTableKey(this.config.settlementType);
     const diceConfig = SETTLEMENT_DICE.structure[settlementKey as keyof typeof SETTLEMENT_DICE.structure];
     
-    const resourceTable = getResourceLevelTable(settlementKey);
+    const resourceTable = RESOURCES_LEVEL_TABLE;
     
     if (!diceConfig) {
       this.log(`Unknown settlement type: ${settlementKey}, using fallback d8`, 'WARNING');
@@ -315,7 +315,7 @@ export class ResourcesVisitorsGenerator extends BaseGenerator<ResourcesVisitorsG
     const settlementKey = mapSettlementTypeToTableKey(this.config.settlementType);
     const diceConfig = SETTLEMENT_DICE.visitors[settlementKey as keyof typeof SETTLEMENT_DICE.visitors];
     
-    const visitorTable = getVisitorFrequencyTable(settlementKey);
+    const visitorTable = VISITORS_FREQUENCY_TABLE;
     
     if (!diceConfig) {
       this.log(`Unknown settlement type: ${settlementKey}, using fallback d8`, 'WARNING');
