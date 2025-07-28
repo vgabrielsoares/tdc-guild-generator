@@ -126,7 +126,7 @@ export function rollDice(config: RollConfig): DiceRoll {
   }
 
   console.log(
-    `[DICE] Rolling ${config.notation}: [${individual.join(", ")}] + ${modifier} = ${result}`
+    `[DICE] Rolling ${config.notation}${config.context ? ` (${config.context})` : ''}: [${individual.join(", ")}] + ${modifier} = ${result}`
   );
 
   return diceRoll;
