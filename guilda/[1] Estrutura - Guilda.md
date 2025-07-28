@@ -70,7 +70,7 @@ Como toda organização, a Guilda tem regras que regem o comportamento de seus m
 
 Abaixo estão as principais diretrizes que todos os membros devem seguir:
 
-_(Código de Conduta para Membros Registrados)_
+### Código de Conduta para Membros Registrados
 
 1. **Lealdade Inquestionável**
 
@@ -308,6 +308,7 @@ A Guilda pode ser um ponto de encontro para aventureiros, mercadores e cidadãos
 
 Os frequentadores podem influenciar a quantidade de contratos disponíveis.
 
+<!-- markdownlint-disable-next-line MD024 -->
 #### Dados por Tipo de Assentamento
 
 Para essa seção, utilize os seguintes dados:
@@ -319,6 +320,8 @@ Para essa seção, utilize os seguintes dados:
 - **Metrópole**: 1d20+5
 
 #### Quantidade de Frequentadores
+
+A movimentação na sede da guilda varia conforme diversos fatores, incluindo o tamanho do assentamento, a reputação da guilda e os recursos disponíveis. Uma sede movimentada pode indicar prosperidade e confiança, enquanto uma sede vazia pode sugerir problemas ou desconfiança da população local.
 
 | 1d20  | Quantidade          |
 | ----- | ------------------- |
