@@ -467,9 +467,9 @@ export const SETTLEMENT_DICE = {
     'Povoado': { dice: 'd8', modifier: 0 },
     'Aldeia': { dice: 'd8', modifier: 0 },
     'Vilarejo': { dice: 'd12', modifier: 0 },
-    'Vila grande': { dice: 'd12', modifier: 0 },
+    'Vila Grande': { dice: 'd12', modifier: 0 },
     'Cidadela': { dice: 'd20', modifier: 0 },
-    'Cidade grande': { dice: 'd20', modifier: 4 },
+    'Cidade Grande': { dice: 'd20', modifier: 4 },
     'Metrópole': { dice: 'd20', modifier: 8 }
   },
   visitors: {
@@ -477,9 +477,9 @@ export const SETTLEMENT_DICE = {
     'Povoado': { dice: 'd8', modifier: 0 },
     'Aldeia': { dice: 'd8', modifier: 0 },
     'Vilarejo': { dice: 'd10', modifier: 0 },
-    'Vila grande': { dice: 'd10', modifier: 0 },
+    'Vila Grande': { dice: 'd10', modifier: 0 },
     'Cidadela': { dice: 'd12', modifier: 0 },
-    'Cidade grande': { dice: 'd20', modifier: 0 },
+    'Cidade Grande': { dice: 'd20', modifier: 0 },
     'Metrópole': { dice: 'd20', modifier: 5 }
   }
 } as const;

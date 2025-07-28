@@ -172,7 +172,7 @@ const badgeClasses = computed(() => ({
   'guild-info-card__badge--povoado': props.guild.settlementType === 'Povoado',
   'guild-info-card__badge--aldeia': props.guild.settlementType === 'Aldeia',
   'guild-info-card__badge--vilarejo': props.guild.settlementType === 'Vilarejo',
-  'guild-info-card__badge--vila-grande': props.guild.settlementType === 'Vila grande',
+  'guild-info-card__badge--vila-grande': props.guild.settlementType === 'Vila Grande',
   'guild-info-card__badge--cidadela': props.guild.settlementType === 'Cidadela',
   'guild-info-card__badge--grande': props.guild.settlementType === 'Cidade Grande',
   'guild-info-card__badge--metropole': props.guild.settlementType === 'Metrópole',

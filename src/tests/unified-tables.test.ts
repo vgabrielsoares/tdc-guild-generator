@@ -95,9 +95,9 @@ describe('Unified Table System', () => {
       expect(SETTLEMENT_DICE.structure.Vilarejo.dice).toBe('d12');
       expect(SETTLEMENT_DICE.visitors.Vilarejo.dice).toBe('d10');
       
-      expect(SETTLEMENT_DICE.structure['Cidade grande'].dice).toBe('d20');
-      expect(SETTLEMENT_DICE.structure['Cidade grande'].modifier).toBe(4);
-      expect(SETTLEMENT_DICE.visitors['Cidade grande'].dice).toBe('d20');
+      expect(SETTLEMENT_DICE.structure['Cidade Grande'].dice).toBe('d20');
+      expect(SETTLEMENT_DICE.structure['Cidade Grande'].modifier).toBe(4);
+      expect(SETTLEMENT_DICE.visitors['Cidade Grande'].dice).toBe('d20');
     });
 
     it('should demonstrate proper business logic of unified tables', () => {

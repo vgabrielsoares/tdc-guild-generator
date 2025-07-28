@@ -6,7 +6,7 @@ export enum SettlementType {
   POVOADO = "Povoado",
   ALDEIA = "Aldeia",
   VILAREJO = "Vilarejo",
-  VILA_GRANDE = "Vila grande",
+  VILA_GRANDE = "Vila Grande",
   CIDADELA = "Cidadela",
   CIDADE_GRANDE = "Cidade Grande",
   METROPOLE = "Metrópole",
