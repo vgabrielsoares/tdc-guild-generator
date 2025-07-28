@@ -10,8 +10,10 @@ import { mapSettlementTypeToTableKey } from '@/utils/enum-mappers';
 import {
   HEADQUARTERS_SIZE_TABLE,
   HEADQUARTERS_CHARACTERISTICS_TABLE,
+  HEADQUARTERS_TYPE_TABLE,
   EMPLOYEES_TABLE,
   SETTLEMENT_DICE,
+  getDiceNotationString,
 } from '@/data/tables/guild-structure';
 
 // Configuração específica para geração de estrutura
@@ -31,6 +33,7 @@ export interface StructureData {
 
 // Rolls específicos da estrutura
 export interface StructureRolls {
+  readonly headquartersType: number;
   readonly size: number;
   readonly characteristics: readonly number[];
   readonly employees: number;
@@ -48,26 +51,34 @@ export class StructureGenerator extends BaseGenerator<StructureGenerationConfig,
   protected doGenerate(): StructureGenerationResult {
     this.validateConfig();
     
-    // Gerar tamanho da sede
-    const sizeResult = this.generateSize();
+    // Primeiro, determinar se é uma Sede Matriz
+    const headquartersTypeResult = this.generateHeadquartersType();
+    
+    // Calcular modificador para Sede Matriz
+    const headquartersModifier = headquartersTypeResult.isHeadquarters ? 5 : 0;
+    
+    // Gerar tamanho da sede com modificador
+    const sizeResult = this.generateSize(headquartersModifier);
     
     // Gerar características baseadas no tamanho
     const characteristicsResult = this.generateCharacteristics(sizeResult.roll);
     
-    // Gerar funcionários
-    const employeesResult = this.generateEmployees();
+    // Gerar funcionários com modificador
+    const employeesResult = this.generateEmployees(headquartersModifier);
     
     return {
       data: {
         structure: {
           size: sizeResult.size,
           characteristics: characteristicsResult.characteristics,
+          isHeadquarters: headquartersTypeResult.isHeadquarters,
         },
         staff: {
           employees: employeesResult.employees,
         },
       },
       rolls: {
+        headquartersType: headquartersTypeResult.roll,
         size: sizeResult.roll,
         characteristics: characteristicsResult.rolls,
         employees: employeesResult.roll,
@@ -78,16 +89,45 @@ export class StructureGenerator extends BaseGenerator<StructureGenerationConfig,
   }
 
   /**
-   * Gera o tamanho da sede baseado no tipo de assentamento
+   * Gera o tipo de sede (Normal ou Matriz) baseado no tipo de assentamento
    */
-  private generateSize(): { size: string; roll: number } {
+  private generateHeadquartersType(): { isHeadquarters: boolean; roll: number } {
     const settlementKey = mapSettlementTypeToTableKey(this.config.settlementType);
     const diceConfig = SETTLEMENT_DICE.structure[settlementKey as keyof typeof SETTLEMENT_DICE.structure];
     
     if (!diceConfig) {
       this.log(`Unknown settlement type: ${settlementKey}, using fallback d8`, 'WARNING');
       const fallbackConfig = { dice: 'd8', modifier: 0 };
-      const modifier = this.config.customModifiers?.size || 0;
+      const notation = this.buildDiceNotation(fallbackConfig.dice, fallbackConfig.modifier);
+      
+      const rollResult = this.rollWithLog(notation, 'Headquarters type (fallback)');
+      const result = lookupTableValue(HEADQUARTERS_TYPE_TABLE, rollResult.result);
+      const isHeadquarters = result === 'Sede Matriz';
+      
+      this.log(`Headquarters type: ${result}`, 'STRUCTURE');
+      return { isHeadquarters, roll: rollResult.result };
+    }
+    
+    const notation = this.buildDiceNotation(diceConfig.dice, diceConfig.modifier);
+    const rollResult = this.rollWithLog(notation, `Headquarters type (${settlementKey})`);
+    const result = lookupTableValue(HEADQUARTERS_TYPE_TABLE, rollResult.result);
+    const isHeadquarters = result === 'Sede Matriz';
+    
+    this.log(`Headquarters type: ${result}${isHeadquarters ? ' (+5 to all structure rolls)' : ''}`, 'STRUCTURE');
+    return { isHeadquarters, roll: rollResult.result };
+  }
+
+  /**
+   * Gera o tamanho da sede baseado no tipo de assentamento
+   */
+  private generateSize(headquartersModifier: number = 0): { size: string; roll: number } {
+    const settlementKey = mapSettlementTypeToTableKey(this.config.settlementType);
+    const diceConfig = SETTLEMENT_DICE.structure[settlementKey as keyof typeof SETTLEMENT_DICE.structure];
+    
+    if (!diceConfig) {
+      this.log(`Unknown settlement type: ${settlementKey}, using fallback d8`, 'WARNING');
+      const fallbackConfig = { dice: 'd8', modifier: 0 };
+      const modifier = (this.config.customModifiers?.size || 0) + headquartersModifier;
       const notation = this.buildDiceNotation(fallbackConfig.dice, fallbackConfig.modifier + modifier);
       
       const rollResult = this.rollWithLog(notation, 'Headquarters size (fallback)');
@@ -96,7 +136,7 @@ export class StructureGenerator extends BaseGenerator<StructureGenerationConfig,
       return { size, roll: rollResult.result };
     }
     
-    const modifier = this.config.customModifiers?.size || 0;
+    const modifier = (this.config.customModifiers?.size || 0) + headquartersModifier;
     const notation = this.buildDiceNotation(diceConfig.dice, diceConfig.modifier + modifier);
     
     const rollResult = this.rollWithLog(notation, `Headquarters size (${settlementKey})`);
@@ -149,8 +189,12 @@ export class StructureGenerator extends BaseGenerator<StructureGenerationConfig,
   ): { characteristic: string; roll: number } {
     const maxAttempts = 50;
     
+    // Usar o dado específico do tipo de assentamento
+    const settlementKey = mapSettlementTypeToTableKey(this.config.settlementType);
+    const diceNotation = getDiceNotationString(settlementKey, 'structure');
+    
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-      const rollResult = this.rollWithLog('d20', `Characteristic ${attemptNumber} (attempt ${attempt})`);
+      const rollResult = this.rollWithLog(diceNotation, `Headquarters characteristics (${settlementKey})`);
       const characteristic = lookupTableValue(HEADQUARTERS_CHARACTERISTICS_TABLE, rollResult.result);
       
       if (!usedCharacteristics.has(characteristic)) {
@@ -167,7 +211,7 @@ export class StructureGenerator extends BaseGenerator<StructureGenerationConfig,
     
     // Esta linha nunca deveria ser alcançada devido à lógica do loop
     // Mantida apenas para satisfazer o TypeScript
-    const fallbackRoll = this.rollWithLog('d20', `Fallback characteristic ${attemptNumber}`);
+    const fallbackRoll = this.rollWithLog(diceNotation, `Fallback characteristic ${attemptNumber}`);
     const fallbackCharacteristic = lookupTableValue(HEADQUARTERS_CHARACTERISTICS_TABLE, fallbackRoll.result);
     this.log(`Fallback characteristic used: ${fallbackCharacteristic}`, 'WARNING');
     return { characteristic: fallbackCharacteristic, roll: fallbackRoll.result };
@@ -176,14 +220,14 @@ export class StructureGenerator extends BaseGenerator<StructureGenerationConfig,
   /**
    * Gera funcionários baseado no tipo de assentamento
    */
-  private generateEmployees(): { employees: string; roll: number } {
+  private generateEmployees(headquartersModifier: number = 0): { employees: string; roll: number } {
     const settlementKey = mapSettlementTypeToTableKey(this.config.settlementType);
     const diceConfig = SETTLEMENT_DICE.structure[settlementKey as keyof typeof SETTLEMENT_DICE.structure];
     
     if (!diceConfig) {
       this.log(`Unknown settlement type: ${settlementKey}, using fallback d8`, 'WARNING');
       const fallbackConfig = { dice: 'd8', modifier: 0 };
-      const modifier = this.config.customModifiers?.employees || 0;
+      const modifier = (this.config.customModifiers?.employees || 0) + headquartersModifier;
       const notation = this.buildDiceNotation(fallbackConfig.dice, fallbackConfig.modifier + modifier);
       
       const rollResult = this.rollWithLog(notation, 'Employees (fallback)');
@@ -192,7 +236,7 @@ export class StructureGenerator extends BaseGenerator<StructureGenerationConfig,
       return { employees, roll: rollResult.result };
     }
     
-    const modifier = this.config.customModifiers?.employees || 0;
+    const modifier = (this.config.customModifiers?.employees || 0) + headquartersModifier;
     const notation = this.buildDiceNotation(diceConfig.dice, diceConfig.modifier + modifier);
     
     const rollResult = this.rollWithLog(notation, `Employees (${settlementKey})`);
