@@ -131,43 +131,38 @@ Nessa tabela, todos os contratos rolam 1d100 sem modificadores. As modificaçõe
 | 66-67 | 2100 |
 | 68-69 | 2300 |
 | 70-71 | 2500 |
-| 72 | 2900 |	
-| 73 | 3300 |
-| 74 | 3700 |
-| 75 | 4100 |
-| 76 | 4500 |
-| 77 | 4900 |
-| 78 | 5300 |
-| 79 | 5700 |
-| 80 | 6100 |
-| 81 | 6600 |
-| 82 | 7100 |
-| 83 | 7600 |
-| 84 | 8100 |
-| 85 | 8600 |
-<!-- TODO: continuar os XP -->
-| 86 | 4500 |
-| 87 | 4800 |
-| 88 | 4900 |
-| 89 | 5100 |
-| 90 | 5700 |
-| 91 | 5900 |
-| 92 | 6300 |
-| 93 | 6500 |
-| 94 | 7200 |
-| 95 | 7300 |
-| 96 | 8500 |
-| 97 | 8800 |
-| 98 | 9500 |
-| 99 | 10900 |
-| 100 | 12700 |
-| 101+ | Valor anterior * 1.1 |
+| 72 | 2800 |	
+| 73 | 3200 |
+| 74 | 3600 |
+| 75 | 4000 |
+| 76 | 4400 |
+| 77 | 4800 |
+| 78 | 5200 |
+| 79 | 5600 |
+| 80 | 6000 |
+| 81 | 6400 |
+| 82 | 6800 |
+| 83 | 7200 |
+| 84 | 7600 |
+| 85 | 8000 |
+| 86 | 8500 |
+| 87 | 8900 |
+| 88 | 9300 |
+| 89 | 9700 |
+| 90 | 11000 |
+| 91 | 15000 |
+| 92 | 19000 |
+| 93 | 23000 |
+| 94 | 27000 |
+| 95 | 31000 |
+| 96 | 35000 |
+| 97 | 39000 |
+| 98 | 43000 |
+| 99 | 47000 |
+| 100 | 50000 |
+| 101+ | Valor anterior * 1,1 |
 
 > Role 1d100 sem modificadores para todos os contratos, independete do tipo de assentamento.
-
-#### Como usar os valores de Experiência e Ouro
-
-<!-- TODO: definir certinho depois a multiplicação do ouro (provavelmente 0.1 de PO), e em como o XP é usado pra montar o contrato. detalhar que a dificuldade de um contrato vai poder ser percebida pelos jogadores através da recompensa, e que não necessariamente os contratos vão estar nivelados com os jogadores -->
 
 ### Distância
 
@@ -216,18 +211,38 @@ A relação com a população e o governo local afetam o valor e a recompensa do
 | Muito boa | +5 | +5 |
 | Excelente | +5 | +10 |
 
-> **Exemplo**: Em um contrato você rolou resultado 40. Mas o contrato é com a população local e a relação deles com a guilda é péssima. Então você vai usar um 25 para determinar o valor em exp. e um 20 para determinar a recompensa. Instituições de Ofício são neutras (os contratantes são definidos em seções futuras do gerador)
+> **Exemplo**: Em um contrato você rolou resultado 40 nos Valores e Recompensas, mas o contrato é com a população local e a relação deles com a guilda é péssima. Então você vai usar um 45 para determinar o valor em exp (+5). e um 20 para determinar a recompensa (-20). Instituições de Ofício são neutras. (Os contratantes são definidos em seções futuras do gerador)
 
 ### Modificadores por Funcionários
 
-Funcionários podem influenciar o resultado dos contratos de diversas maneiras, dependendo de sua experiência e preparo. A análise dos requisitos e da verdadeira dificuldade são afetadas diretamente por esses fatores.
+Ao definir a estrutura de uma sede da guilda os funcionários são escolhidos, e suas definições afetam diretamente nos resultados dos contratos.
+
+#### Preparação dos Funcionários
+
+O preparo e experiência dos funcionários influenciam os contratos, já que a análise dos requisitos e da verdadeira dificuldade são afetadas diretamente por esses fatores.
 
 | Condição | Resultado |
 |----------|-----------|
-| Funcionários despreparados | Adicione -2 ao resultado final da recompensa |
-| Funcionários experientes | Adicione +2 ao resultado final da recompensa |
+| Funcionários despreparados | Adicione -2 à rolagem da recompensa |
+| Funcionários experientes | Adicione +2 à rolagem da recompensa |
 
 > Esse modificador é adicionado ao d100, e não ao valor em si
+
+#### Funcionários Diversos
+
+Os funcionários da guilda podem ser de diversos tipos, e cada tipo pode oferecer bônus ou penalidades aos contratos. Esses bônus são cumulativos, então, se houver mais de um funcionário do mesmo tipo, o bônus é adicionado ao valor final.
+
+| Tipo de Funcionário | Bônus |
+|---------------------|-------|
+| Membros do clero | +1d6 contratos envolvendo religião |
+| Ex-membros da guilda | +1d4 contratos |
+| Nobres e seus serviçais | +1d6 contratos com a nobreza (Adicione +10 à recompensa desses contratos) |
+| Aventureiro pagando dívidas | +1d4 contratos sem recompensa (O aventureiro se dispõe a ajudar) |
+| Experiente explorador | +1d4 contratos que envolvem apenas descobrir novos locais |
+| Animal falante | +1d6 contratos envolvendo magia e bestas mágicas |
+| Ex-aventureiros | -1d6 contratos (Eles guardam os melhores para seus amigos ainda em atividade) |
+
+> Dê um jeito de influenciar os objetivos desses contratos adicionais para ficar de acordo com o tipo de funcionário. É interessante que os jogadores possam notar as modificações desses funcionários.
 
 ### Dificuldade dos Contratos
 
@@ -239,28 +254,32 @@ A definição da dificuldade é a principal relação do balanço entre o valor 
 
 | 1d20 | Dificuldade | Multiplicador Valor | Modificador Recompensa |
 |------|-------------|---------------------|------------------------|
-| 1-10 | Fácil | Multiplique o valor por 2 | Retire 1/3 da recompensa |
-| 11-16 | Médio | Multiplique o valor por 4 | Mantenha a recompensa |
-| 17-19 | Difícil | Multiplique o valor por 6 | Dobre a recompensa |
+| 1-10 | Fácil | Mantenha o valor | Mantenha a recompensa |
+| 11-16 | Médio | Multiplique o valor por 2 | Multiplique a recompensa por 1,3 |
+| 17-19 | Difícil | Multiplique o valor por 4 | Dobre a recompensa |
 | 20 | Mortal | Multiplique o valor por 8 | Triplique a recompensa |
 
-## Funcionários Diferenciados
+### Como usar os Valores de Experiência e Ouro
 
-| Tipo de Funcionário | Bônus |
-|---------------------|-------|
-| Membros do clero | +1d6 contratos envolvendo religião |
-| Ex-membros da guilda | +1d4 contratos |
-| Nobres e seus serviçais | +1d6 contratos com a nobreza (Adicione +10 à recompensa para eles) |
-| Aventureiro pagando dívidas | +1d4 contratos sem recompensa (O aventureiro se dispõe a ajudar) |
-| Experiente explorador | +1d4 contratos que envolvem apenas descobrir novos locais |
-| Animal falante | +1d6 contratos envolvendo magia e bestas mágicas |
-| Ex-aventureiros | -1d6 contratos (Eles guardam os melhores para seus amigos ainda em atividade) |
+Ao definir o resultado individual do valor em XP e PO$ de um contrato, tenha em mente que a recompensa é ofertada em PO$ ao concluir o contrato. Multiplique o valor da recompensa por 0.1 para obter o valor em PO$ que será pago. O valor em XP é usado para determinar a dificuldade do contrato e os desafios que ele pode conter.
+
+> **Exemplo**: Se o valor do contrato for 1000 para o valor em XP e recompensa, a recompensa em PO$ será 100 (1000 * 0.1) e o valor em XP será 1000.
+
+Como narrador, o valor em XP é usado como "orçamento" para criar o contrato. Você pode gastar esse valor em desafios para os jogadores, como criaturas, armadilhas, portas secretas, pessoas que precisam ser convencidas, enigmas, viagens e outros elementos que podem estar o contrato. Use o bom senso e a criatividade para usar esse orçamento, e sempre use como parâmetro o objetivo do contrato, que será definida mais adiante.
+
+> Não necessariamente, ao concluir um contrato, os jogadores vão ganhar exatamente o valor em XP que foi definido. Pode ser que as escolhas dos jogadores evitem desafios estabelecidos, o que faz com que eles concluam o contrato com mais facilidade, mas, consequentemente, recebem menos XP.
+
+Os jogadores podem perceber a dificuldade de um contrato através da recompensa oferecida, já que o valor em XP não vai estar disponível para eles. Contratos com recompensas mais altas geralmente indicam desafios mais difíceis, enquanto recompensas mais baixas podem sugerir contratos mais simples. No entanto, isso não significa que todos os contratos estarão nivelados com os jogadores; os contratos são gerados aleatoriamente, então, por mais que seja apelativo para os jogadores aceitarem um contrato com uma recompensa alta, ele pode conter desafios que não estão necessariamente alinhados com seus níveis atuais.
 
 ## Pré-requisitos e Cláusulas
 
 De acordo com o resultado final de "Valor e Recompensa", role a tabela abaixo. Use o resultado de "Valor" para os pré-requisitos e o resultado de "Recompensa" para as cláusulas adicionais.
 
-### Dados por Resultado
+> **Nota**: Cada pré-requisito e cláusula adicional aumenta a recompensa do contrato em 5 pontos.
+
+### Pré-requisitos de Contratos
+
+#### Dados por Resultado de Valor e Recompensa
 
 | Resultado | Dado |
 |-----------|------|
@@ -269,61 +288,118 @@ De acordo com o resultado final de "Valor e Recompensa", role a tabela abaixo. U
 | 41-60 | 1d20+0 |
 | 61-80 | 1d20+5 |
 | 81-100 | 1d20+10 |
+| 101+ | 1d20+15 |
 
-### Pré-requisitos de Contratos
+#### Tabela de Pré-requisitos
 
 | 1d20 | Pré-requisito |
 |------|---------------|
 | 1-5 | Nenhum |
-| 6-7 | 5 de renome |
-| 8 | Um conjurador |
-| 9 | Perícia treinada que envolve força |
-| 10-11 | 10 de renome |
-| 12 | Perícia treinada que envolve destreza |
-| 13 | Perícia treinada que envolve sabedoria |
-| 14-15 | 15 de renome |
-| 16 | Perícia treinada que envolve carisma |
+| 6 | 5 de renome |
+| 7 | Um conjurador |
+| 8 | Proficiência com um Instrumento de Habilidade |
+| 9 | Perícia treinada que envolve Força |
+| 10 | 10 de renome |
+| 11 | Proficiência com um Idioma |
+| 12 | Perícia treinada que envolve Agilidade |
+| 13 | Veículo de carga (como um cavalo ou uma carroça) |
+| 14 | Perícia treinada que envolve Presença |
+| 15 | 15 de renome |
+| 16 | Perícia treinada que envolve Mente |
 | 17 | Um conjurador arcano e um divino |
-| 18 | Perícia treinada que envolve inteligência |
-| 19-20 | Ter 50 de renome |
+| 18 | Perícia treinada que envolve Influência |
+| 19 | Grupo de no mínimo 6 membros |
+| 20 | Ter 50 de renome |
 | 21+ | Role duas vezes e use ambos |
 
 ### Cláusulas Adicionais
+
+#### Dados por Resultado de Valor e Recompensa
+
+| Resultado | Dado |
+|-----------|------|
+| 1-20 | 1d20-2 |
+| 21-40 | 1d20-1 |
+| 41-60 | 1d20+0 |
+| 61-80 | 1d20+2 |
+| 81-100 | 1d20+5 |
+| 101+ | 1d20+7 |
+
+#### Tabela de Cláusulas Adicionais
 
 | 1d20 | Cláusula |
 |------|----------|
 | 1-7 | Nenhuma |
 | 8 | Nenhum inimigo deve ser morto |
 | 9 | Uma criatura específica não pode ser ferida |
-| 10-11 | Um troféu é exigido |
+| 10 | Um troféu é exigido |
+| 11 | O objetivo deve ser concluído sem ser detectado |
 | 12 | Proibido o uso de magia |
 | 13 | Outro grupo tem o mesmo contrato. Apenas o primeiro a completá-lo é agraciado com a recompensa |
 | 14 | Exterminar a fonte do problema |
-| 15-16 | Um supervisor deve ser protegido e acompanhar o contratado |
+| 15 | Um supervisor deve ser protegido e acompanhar o contratado |
+| 16 | Deve ser feito em um horário específico do dia (como manhã, tarde ou noite) |
 | 17 | Um relatório completo deve ser escrito ao concluir o contrato |
-| 18-19 | Todo tesouro conquistado é de posse do contratante |
+| 18 | Todo tesouro conquistado é de posse do contratante |
+| 19 | Deve se manter a própria identidade em segredo, e/ou estar sob disfarce |
 | 20 | Sigilo absoluto |
 | 21+ | Role duas vezes e use ambos |
 
-> **Nota**: Cada pré-requisito e cláusula adicional aumenta a recompensa do contrato em 5 pontos.
+### Quebra de Contrato
+
+Quebrar um contrato gera uma multa no valor de 10% da recompensa em PO$. Caso o contratado não tenha como pagar, a guilda toma providências para compensar, como entrar com um processo, ou perdoar a dívida por um contrato sem recompensa, ou até trabalhar na guilda por um tempo. Se a quebra for em decorrência de óbito a guilda pode, legalmente, se apropriar de seus bens para compensar as perdas. Alguns membros da guilda são conhecidos inclusive por recolher pertences perdidos em decorrência de fatalidades.
 
 ## Concluindo um Contrato ou Serviço
 
-Para a conclusão de um contrato ou serviço o contratado precisa da assinatura do contratante para afirmar que tudo foi feito corretamente. Caso seja um contrato com o governo é preciso do carimbo oficial do governo local e a assinatura do líder local.
+Para a conclusão de um contrato ou serviço, o contratado precisa da assinatura do contratante para afirmar que tudo foi feito corretamente. Caso seja um contrato com o governo é preciso do carimbo oficial do governo local e a assinatura do líder local.
 
 Em seguida o contrato deve ser apresentado na sede da guilda da qual foi originalmente feito e, só então, a recompensa pode ser retirada. A matriz da guilda é a única que aceita contratos de todas as outras sedes.
 
-Nem sempre a recompensa será inteiramente em ouro, mas a guilda faz questão de que a taxa de cada contrato seja paga em ouro. Algumas vezes também a recompensa será retirada diretamente com o contratante, junto a um documento emitido pela guilda. Na maioria dos assentamentos humanos falhar ao pagar os contratos, as taxas e as tributações, é considerado uma infração gravíssima à lei e sentenças fortes podem ser aplicadas a um contratante mal intencionado ou picareta.
+Nem sempre a recompensa será inteiramente em ouro, mas a guilda faz questão de que a taxa de cada contrato seja paga em ouro. Às vezes a recompensa poderá ser retirada diretamente com o contratante, junto a um documento emitido pela guilda. Na maioria dos assentamentos, falhar ao pagar os contratos, as taxas e as tributações, é considerado uma infração gravíssima à lei e sentenças fortes podem ser aplicadas a um contratante mal intencionado ou picareta.
 
 Use o bom senso para determinar quais contratantes têm condições de deixar, antecipadamente, a recompensa com a guilda e quais não têm. Esse pode ser um fator determinante para os jogadores decidirem, ou não, assinar um contrato. Você pode escolher também não fazer isso e deixar os dados decidirem.
 
-## Resoluções Contratuais e de Serviço
+### Tipo de Pagamento
 
-Role a tabela abaixo para saber em quantos dias você deve rolar a tabela de resoluções para contratos que foram firmados ou a tabela para contratos que não foram assinados (Seria como o tempo que outros humanoides levariam para cumprir ou não o objetivo desses contratos e serviços). Passado o tempo abaixo, nós descobriremos tudo que aconteceu com os outros contratos e serviços e se eles estarão disponíveis novamente para os jogadores. Por exemplo: talvez depois de 4 dias, aquele contrato que parecia bom tenha sido pego por outra criatura e um outro já foi até resolvido.
+Os contratantes podem optar por fazer um pagamento antecipado à guilda, garantindo assim que a recompensa será disponibilizada assim que o contrato for concluído. Esse pagamento pode ser total ou parcial, dependendo do acordo entre as partes.
+
+#### Dados por Resultado de Valor e Recompensa
+
+| Resultado | Dado |
+|-----------|------|
+| 1-20 | 1d20-2 |
+| 21-40 | 1d20-1 |
+| 41-60 | 1d20+0 |
+| 61-80 | 1d20+2 |
+| 81-100 | 1d20+5 |
+| 101+ | 1d20+7 |
+
+#### Tabela de Tipo de Pagamento
+
+| 1d20 | Tipo de Pagamento |
+|------|-------------------|
+| 1-3 | Pagemento em PO$ direto com contratante |
+| 4-6 | Metade com a guilda, metade com o contratante |
+| 7-9 | Metade com a guilda, metade, em bens, com o contratante |
+| 10-12 | Em materiais, joias, bens ou serviços do contratante |
+| 14-20 | Pagamento total na guilda em PO$ |
+| 21+ | Pagamento total na guilda em PO$ e serviços do contrante |
+
+## Conclusões Automáticas de Contratos e Serviços
+
+Contratos e serviços podem ser concluídos automaticamente após um certo período de tempo, mesmo que os jogadores não tenham retornado à guilda. Isso pode acontecer por diversos motivos, como a natureza do contrato, a urgência da tarefa ou conclusão por outros indivíduos.
 
 ### Tempo de Resolução
 
-| 1d20 | Contrato Firmado |
+Passado o tempo de resolução de um contrato ou serviço, nós descobriremos tudo que aconteceu  e se eles estarão disponíveis novamente para os jogadores.
+
+> Por exemplo: talvez depois de 4 dias, aquele contrato que parecia bom, agora tenha sido pego por outra criatura, e um outro já foi até resolvido.
+
+Role a tabela abaixo para saber em quantos dias você deve rolar a tabela de resoluções para contratos ou serviços que foram firmados, ou a tabela para contratos ou serviços que não foram assinados. 
+
+> Essas rolagens são feitas uma vez por guilda (para assinados e não-assinados), e não uma por contrato. Após as resoluções, devem ser rolados outros tempos de resolução.
+
+| 1d20 | Contrato ou Serviço Firmado |
 |------|------------------|
 | 1-6 | 1d6 dias |
 | 7-8 | 1 semana |
@@ -336,7 +412,7 @@ Role a tabela abaixo para saber em quantos dias você deve rolar a tabela de res
 | 19 | 3 semanas |
 | 20 | 2d8 dias |
 
-| 1d20 | Contrato Não-Assinado |
+| 1d20 | Contrato ou Serviço Não-Assinado |
 |------|----------------------|
 | 1-4 | 3 dias |
 | 5-6 | 4 dias |
@@ -362,7 +438,7 @@ Quando os jogadores chegam pela primeira vez em uma nova sede da guilda novos co
 | 17-18 | O contrato foi resolvido mas com ressalvas |
 | 19-20 | Ainda não se sabe (Role novamente junto com a próxima leva de contratos) |
 
-#### Motivos para Não Resolução
+##### Motivos para Não Resolução
 
 | 1d20 | Motivo |
 |------|--------|
@@ -372,6 +448,8 @@ Quando os jogadores chegam pela primeira vez em uma nova sede da guilda novos co
 | 15-17 | Prazo não cumprido ou contratados desaparecidos |
 | 18-19 | Quebra devido a cláusula adicional não cumprida |
 | 20 | Contratante morto ou desaparecido (anule o contrato caso seja da população local) |
+
+> Contratos anulados não voltam a ficar disponíveis para os jogadores
 
 > **Nota**: Serviços não são tão perigosos quanto contratos, então neles substitua "morte" por lesões, lesões graves ou gravíssimas.
 
@@ -385,9 +463,9 @@ Agora que você já sabe o que aconteceu com os contratos e serviços que foram 
 |------|-----------|
 | 1-2 | Nenhum foi assinado, todos continuam disponíveis |
 | 3-5 | Todos foram devidamente resolvidos |
-| 6-10 | Os mais fáceis foram resolvidos |
-| 11-12 | Contratos com as melhores recompensas foram resolvidos |
-| 13-14 | 1d6 contratos e 1d4 serviços são resolvidos |
+| 6-10 | Os de menor XP foram resolvidos |
+| 11-12 | Contratos com as melhores Recompensas foram resolvidos |
+| 13-14 | 1d6 contratos e 1d4 serviços aleatórios são resolvidos |
 | 16 | 1d4+2 contratos são assinados, porém não são resolvidos (Role a tabela Motivos para não resolução) |
 | 17-18 | 1d6+2 contratos e 1d4+1 serviços são resolvidos |
 | 19 | 2d6+2 contratos e 1d4+2 serviços são resolvidos |
@@ -395,17 +473,17 @@ Agora que você já sabe o que aconteceu com os contratos e serviços que foram 
 
 > **Nota**: Os contratos e serviços que não foram resolvidos voltam a ficar disponíveis, caso ninguém os aceite novamente, repita os mesmos processos.
 
-## Quebra de Contrato
+### Contratos Não Resolvidos
 
-Sempre que um contrato não for resolvido mas permanecer disponível, independente do motivo, aumente o seu nível de recompensa em 2, caso seja a quebra de contrato de um serviço consulte a tabela de "Taxa de recorrência" no próprio gerador de serviços. Essa recompensa adicional é totalmente oferecida pela guilda ou pelo governo local, com o objetivo de manterem a sua reputação.
-
-Quebrar um contrato gera uma multa no valor de 10% da recompensa. Caso o contratado não tenha como pagar, a guilda toma providências para compensar, como entrar com um processo, ou perdoar a dívida por um contrato sem recompensa, ou até trabalhar na guilda por um tempo. Se a quebra for em decorrência de óbito a guilda pode, legalmente, se apropriar de seus bens para compensar as perdas. Alguns membros da guilda são conhecidos inclusive por recolher pertences perdidos em decorrência de fatalidades.
+Sempre que um contrato não for resolvido mas permanecer disponível, independente do motivo, aumente o seu nível de recompensa em 2, caso seja a quebra de um serviço consulte a tabela de "Taxa de recorrência" no próprio gerador de serviços. Essa recompensa adicional é totalmente oferecida pela guilda ou pelo governo local, com o objetivo de manterem a sua reputação.
 
 ## Novos e Antigos Contratos e Serviços
 
-Depois de um certo tempo, mesmo que alguns contratos ainda não tenham sido resolvidos, novos contratos surgem. Role a tabela abaixo para descobrir em quantos dias você poderá gerar novos contratos (Role a tabela de contratos e serviços). Novos contratos estarão disponíveis em:
+Depois de um certo tempo, mesmo que alguns contratos ainda não tenham sido resolvidos, novos contratos surgem. 
 
-### Novos Contratos
+Role nas tabelas abaixo para descobrir em quantos dias você poderá gerar novos contratos e serviços.
+
+### Novos Contratos Em
 
 | 1d20 | Novos contratos |
 |------|-----------------|
@@ -420,7 +498,7 @@ Depois de um certo tempo, mesmo que alguns contratos ainda não tenham sido reso
 | 19 | 1d4 meses |
 | 20 | 1d4+1 meses |
 
-### Novos Serviços
+### Novos Serviços Em
 
 | 1d20 | Novos serviços |
 |------|----------------|
@@ -441,15 +519,17 @@ Os contratos são, em sua essência, missões de um mundo de RPG, ou uma aventur
 
 ### Contratante
 
+Para determinar quem é o contratante de cada contrato, role na tabela abaixo.
+
 | 1d20 | Contratante |
 |------|-------------|
 | 1-12 | Povo |
 | 13-14 | Instituição de ofício |
 | 15-20 | Governo |
 
-Ajuste o resultado de acordo com a relação com a população local e com o governo local:
-
 #### Modificadores por Relação
+
+Ajuste o resultado da rolagem de contratante de acordo com a relação com a população local e com o governo local:
 
 **Relação com a população local:**
 - Péssima: +4
@@ -467,7 +547,9 @@ Ajuste o resultado de acordo com a relação com a população local e com o gov
 - Muito boa: +2
 - Excelente: +5
 
-### Contratante do Governo
+#### Contratante do Governo
+
+Caso o contratante seja do governo, role na tabela abaixo para determinar quem é o contratante específico. Caso não seja do governo, ignore essa tabela.
 
 | 1d20 | Contratante do governo |
 |------|------------------------|
@@ -482,189 +564,218 @@ Ajuste o resultado de acordo com a relação com a população local e com o gov
 
 > **Nota**: A ideia "Agente burocrático" é ser alguém como um cobrador de impostos, um juiz, um advogado e coisas nessa linha de pensamento.
 
-### Tipo de Contrato
-
-| 1d20 | Tipo de contrato |
-|------|------------------|
-| 1-18 | Comum |
-| 19-20 | Incomum |
-
-Para contratos comuns, role normalmente abaixo. Para contratos incomuns, além de rolar as tabelas abaixo também role um vilão.
-
-## Objetivo
+### Objetivo
 
 Qual o objetivo do contrato?
 
-### Objetivo Principal
+#### Objetivo Principal
 
 | 1d20 | Objetivo |
 |------|----------|
-| 1-3 | Atacar ou destruir |
-| 4-6 | Encontrar ou recuperar |
-| 7-8 | Capturar |
-| 9 | Proteger ou salvar |
+| 1-2 | Atacar ou destruir |
+| 3-5 | Encontrar ou recuperar |
+| 6-7 | Capturar |
+| 8-9 | Proteger ou salvar |
 | 10-11 | Explorar ou descobrir |
-| 12 | Entregar ou receber |
-| 13 | Investigar ou sabotar |
-| 14-18 | Serviços perigosos |
+| 12-13 | Entregar ou receber |
+| 14 | Investigar ou sabotar |
+| 15-18 | Serviços perigosos |
 | 19 | Religioso |
 | 20 | Role duas vezes e use ambos |
 
-### Tipo de Local
+##### Especificações por Objetivo
 
-Role abaixo sempre que cair "Um local":
+Role nas tabelas correspondentes ao resultado do Objetivo Principal.
 
-| 1d20 | Tipo de local |
-|------|---------------|
-| 1-11 | Local ou território mundano |
-| 12 | Local mágico |
-| 13 | Local sagrado |
-| 14-15 | Local profano |
-| 16-20 | Local estranho |
+###### Atacar ou Destruir
 
-### Especificações por Objetivo
-
-#### Atacar ou Destruir
-
-| 1d10 | Atacar ou destruir |
+| 1d20 | Atacar ou destruir |
 |------|-------------------|
-| 1 | Uma criatura poderosa |
-| 2 | Uma organização |
-| 3 | Uma comunidade |
-| 4 | Um artefato |
-| 5 | Uma criatura |
-| 6 | Um local ou território |
-| 7 | Uma ideia, aliança ou reputação |
-| 8 | Recursos |
-| 9 | Um evento |
-| 10 | Role duas vezes e use ambos |
+| 1 | Uma pessoa poderosa |
+| 2-3 | Uma organização |
+| 4-5 | Uma comunidade |
+| 6 | Um artefato ou objeto |
+| 7-10 | Uma criatura ou monstro |
+| 11-12 | Um local ou território |
+| 13 | Uma ideia, aliança ou reputação |
+| 14 | Recursos |
+| 15 | Um evento |
+| 16 | Um veículo ou engenhoca |
+| 17-19 | Uma gangue ou quadrilha |
+| 20 | Role duas vezes e use ambos |
 
-#### Encontrar ou Recuperar
+###### Encontrar ou Recuperar
 
-| 1d10 | Encontrar ou recuperar |
+| 1d20 | Encontrar ou recuperar |
 |------|----------------------|
 | 1 | Um artefato mágico ou grimório |
-| 2 | Uma ou mais criaturas desaparecidas |
-| 3 | Um pergaminho único/conhecimento perdido |
-| 4 | Algo que foi perdido ou roubado |
-| 5 | Uma fonte de recursos |
-| 6 | Ingredientes ou materiais |
-| 7 | A entrada de uma ruína/masmorra |
-| 8 | Informações ou documentos importantes |
-| 9 | A fonte de uma calamidade |
-| 10 | A cura para uma maldição |
+| 2-3 | Uma ou mais criaturas desaparecidas ou sequestradas |
+| 4 | Um pergaminho único/conhecimento perdido |
+| 5-6 | Algo que foi perdido ou roubado |
+| 7 | Uma fonte de recursos |
+| 8 | Ingredientes ou materiais |
+| 9-10 | A entrada de uma ruína/masmorra |
+| 11 | Informações ou documentos importantes |
+| 12 | A fonte de uma calamidade |
+| 13 | A cura para uma maldição |
+| 14 | Um caminho ou rota segura |
+| 15-16 | Um local ou território |
+| 17-18 | Um lugar desaparecido ou oculto |
+| 19 | Um símbolo ou relíquia sagrada |
+| 20 | Role duas vezes e use ambos |
 
-#### Capturar
+###### Capturar
 
-| 1d10 | Capturar |
+| 1d20 | Capturar |
 |------|----------|
-| 1 | O líder de uma organização ou facção |
-| 2 | Uma criatura rara |
-| 3 | Uma criatura poderosa/influente |
-| 4 | Uma criatura infernal ou abissal |
-| 5 | Uma masmorra ou forte |
-| 6 | Um animal selvagem |
-| 7 | Um veículo ou comboio/caravana |
-| 8 | Os ocupantes de uma ruína próxima |
-| 9 | Um ou mais foras-da-lei |
-| 10 | Um tesouro |
+| 1-2 | O líder de uma organização ou facção |
+| 3-4 | Uma criatura ou monstro |
+| 5 | Uma pessoa poderosa/influente |
+| 6-8 | Um fugitivo |
+| 9-11 | Uma masmorra ou forte |
+| 12 | Um animal selvagem |
+| 13 | Um veículo ou comboio/caravana |
+| 14 | Os ocupantes de uma ruína próxima |
+| 15-16 | Um ou mais foras-da-lei |
+| 17 | Um objeto importante |
+| 18 | Um portal ou passagem/caminho |
+| 19 | Um local ou território |
+| 20 | Role duas vezes e use ambos |
 
-#### Proteger ou Salvar
+###### Proteger ou Salvar
 
-| 1d10 | Proteger ou salvar |
+| 1d20 | Proteger ou salvar |
 |------|-------------------|
-| 1 | Uma comunidade |
-| 2 | Um local ou território |
-| 3 | Uma criatura poderosa |
-| 4 | Um objeto importante |
-| 5 | Uma informação ou segredo |
-| 6 | Um tesouro |
-| 7 | Anomalia mágica |
+| 1-2 | Uma comunidade |
+| 3-4 | Um local ou território |
+| 5-6 | Uma pessoa poderosa |
+| 7 | Um objeto importante |
+| 8 | Uma informação ou segredo |
+| 9 | Um tesouro |
+| 10 | Anomalia mágica |
+| 11-12 | Um veículo ou comboio/caravana |
+| 13-14 | Um evento |
+| 15 | Prisioneiros |
+| 16-18 | Um grupo de pessoas |
+| 19 | Um recurso essencial |
+| 20 | Role duas vezes e use ambos |
+
+###### Explorar ou Descobrir
+
+| 1d20 | Explorar ou descobrir |
+|------|----------------------|
+| 1-3 | Uma ruína |
+| 4 | Um ambiente selvagem para mapeá-lo |
+| 5 | A verdade sobre uma lenda |
+| 6 | Zonas de magia morta ou selvagem |
+| 7-9 | Um covil ou masmorra |
+| 10 | Uma passagem misteriosa |
+| 11 | Um plano/fenda dimensional |
+| 12 | Resquícios de outra civilização |
+| 13 | Uma ilha exótica |
+| 14-15 | Um local ou território |
+| 16 | Um local de difícil acesso |
+| 17-18 | Um labirinto ou estrutura subterrânea |
+| 19 | Uma cidade ou assentamento perdido |
+| 20 | Role duas vezes e use ambos |
+
+###### Entregar ou Receber
+
+| 1d20 | Entregar ou receber |
+|------|-------------------|
+| 1-2 | Uma mensagem ou documento importante/sigiloso |
+| 3 | Um artefato mágico |
+| 4-5 | Uma mercadoria em grande quantidade |
+| 6 | Uma planta rara muito delicada |
+| 7-8 | Um prisioneiro perigoso |
+| 9 | Suprimentos para uma comunidade |
+| 10 | Um objeto de arte valioso |
+| 11 | Um mapa ou chave estranha |
+| 12 | Um objeto de magia instável |
+| 13 | Um animal exótico ou mágico |
+| 14 | Um presente diplomático |
+| 15 | Um equipamento ou ferramenta especial |
+| 16 | Um símbolo ou relíquia sagrad |
+| 17-19 | Role novamente, mas a carga é secreta |
+| 20 | Role duas vezes e use ambos |
+
+###### Investigar ou Sabotar
+
+| 1d20 | Investigar ou sabotar |
+|------|----------------------|
+| 1-2 | Uma organização |
+| 3 | Um enriquecimento suspeito |
+| 4 | Um assentamento que não se tem notícias |
+| 5-7 | Um crime |
 | 8 | Um veículo ou comboio/caravana |
-| 9 | Um evento |
-| 10 | Prisioneiros |
+| 9 | Um membro influente da sociedade |
+| 10 | Suposto posto avançado |
+| 11 | Anomalia mágica ou ritual |
+| 12 | Eventos sobrenaturais estranhos |
+| 13-14 | Rumores suspeitos |
+| 15-16 | Um desaparecimento misterioso |
+| 17 | Um local de acesso restrito |
+| 18-19 | Um local ou território |
+| 20 | Role duas vezes e use ambos |
 
-#### Explorar ou Descobrir
+###### Serviços Perigosos
 
-| 1d10 | Explorar ou descobrir |
-|------|----------------------|
-| 1 | Uma ruína |
-| 2 | Um ambiente selvagem para mapeá-lo |
-| 3 | A verdade sobre uma lenda |
-| 4 | Zonas de magia morta ou selvagem |
-| 5 | Um covil ou masmorra |
-| 6 | Uma passagem misteriosa |
-| 7 | Um plano/fenda dimensional |
-| 8 | Resquícios de outra civilização |
-| 9 | Uma ilha exótica |
-| 10 | Um local ou território |
-
-#### Entregar ou Receber
-
-| 1d10 | Entregar ou receber |
-|------|-------------------|
-| 1 | Uma mensagem ou documento importante/sigiloso |
-| 2 | Um artefato mágico |
-| 3 | Uma mercadoria em grande quantidade |
-| 4 | Uma planta rara muito delicada |
-| 5 | Um prisioneiro perigoso |
-| 6 | Suprimentos para uma comunidade |
-| 7 | Um objeto de arte valioso |
-| 8 | Um mapa ou chave estranha |
-| 9 | Um caldeirão de poção mágica instável |
-| 10 | Role novamente, mas a carga é secreta |
-
-#### Investigar ou Sabotar
-
-| 1d10 | Investigar ou sabotar |
-|------|----------------------|
-| 1 | Uma organização |
-| 2 | Enriquecimento duvidoso |
-| 3 | Um assentamento que não se tem notícias |
-| 4 | Um crime |
-| 5 | Um veículo ou comboio/caravana |
-| 6 | Um nobre poderoso |
-| 7 | Suposto posto avançado |
-| 8 | Anomalia mágica ou ritual |
-| 9 | Eventos sobrenaturais estranhos |
-| 10 | Rumores suspeitos |
-
-#### Serviços Perigosos
-
-| 1d10 | Serviços perigosos |
+| 1d20 | Serviços perigosos |
 |------|-------------------|
 | 1 | Treinar criatura selvagem |
 | 2 | Recrutar criatura hostil |
 | 3 | Curar enfermos extremamente contagiosos |
-| 4 | Negociar com criaturas do subterrâneo |
-| 5 | Extrair recursos em local perigoso |
-| 6 | Transportar artefatos amaldiçoados |
-| 7 | Mediar um conflito de longa data |
-| 8 | Construir em área selvagem |
-| 9 | Expurgar um local tóxico ou pútrido |
-| 10 | Desarmar armadilhas |
+| 4-5 | Negociar com criaturas do subterrâneo |
+| 6-7 | Extrair recursos em local perigoso |
+| 8-9 | Transportar artefatos amaldiçoados |
+| 10 | Mediar um conflito de longa data |
+| 11-12 | Construir em área selvagem |
+| 13 | Expurgar um local tóxico ou pútrido |
+| 14-15 | Desarmar armadilhas |
+| 16 | Reparar estrutura em ruínas instáveis |
+| 17 | Recolher espécimes tóxicos |
+| 18-19 | Extrair substância perigosa |
+| 20 | Role duas vezes e use ambos |
 
-#### Religioso
+###### Religioso
 
-| 1d10 | Religioso |
+| 1d20 | Religioso |
 |------|-----------|
-| 1 | Expulsar mortos-vivos de uma tumba |
-| 2 | Escoltar uma peregrinação por terras inóspitas |
-| 3 | Destituir um culto maligno |
-| 4 | Purificar local profano |
-| 5 | Exorcismo de entidade poderosa |
-| 6 | Ajudar um ressurgido |
-| 7 | Dar suporte a um celestial |
-| 8 | Recuperar ou proteger local sagrado |
-| 9 | Buscar ingredientes para uma magia divina |
-| 10 | Investigar corrupção interna |
+| 1-2 | Expulsar mortos-vivos de uma tumba ou cripta |
+| 3 | Escoltar uma peregrinação por terras inóspitas |
+| 4 | Destituir um culto maligno |
+| 5 | Purificar local profano |
+| 6 | Exorcismo de entidade poderosa |
+| 7 | Ajudar um ressurgido |
+| 8 | Dar suporte a um celestial |
+| 9-10 | Recuperar ou proteger local sagrado |
+| 11 | Buscar ingredientes para uma magia divina |
+| 12 | Investigar corrupção interna |
+| 13 | Conter manifestação de entidade desconhecida |
+| 14 | Descobrir a origem de um milagre recente |
+| 15 | Proteger um ritual sagrado contra sabotagem |
+| 16-17 | Libertar local tomado por forças profanas |
+| 18 | Mediar disputa entre duas religiões rivais |
+| 19 | Recuperar relíquia roubada de um templo |
+| 20 | Role duas vezes e use ambos |
 
+##### Tipo de Local
 
-## Localidades
+Role abaixo sempre que cair "Um local" nas Especificações por Objetivo:
 
-Onde isso está ou irá acontecer? Ou qual é a localidade importante e indispensável para o cumprimento do objetivo?
+| 1d20 | Tipo de local |
+|------|---------------|
+| 1-10 | Local ou território mundano |
+| 11-12 | Local mágico |
+| 13-14 | Local sagrado |
+| 15-16 | Local profano |
+| 17-20 | Local estranho |
 
-### Localidade Principal
+### Localidades
+
+Onde esse objetivo está ou irá acontecer? Ou qual é a localidade importante e indispensável para o cumprimento do objetivo?
+
+#### Localidade Principal
 
 | 1d20 | Localidades |
 |------|-------------|
@@ -679,24 +790,11 @@ Onde isso está ou irá acontecer? Ou qual é a localidade importante e indispen
 
 > **Nota**: Considere uma "Cidade grande" qualquer vila grande, cidadela ou, como o próprio nome diz, cidade grande.
 
-### Distrito Específico
+##### Características do Local
 
-Role abaixo sempre que cair "Um distrito":
+Abaixo estão as características que podem ser usadas para descrever o local onde o contrato será realizado. Essas características podem ajudar a definir a história e as peculiaridades do local.
 
-| 1d20 | Distrito |
-|------|----------|
-| 1-5 | Marginalizado |
-| 6-10 | Plebeu |
-| 11-13 | Corporações de ofício |
-| 14-15 | Comercial |
-| 16 | Religioso |
-| 17-18 | Nobre |
-| 19 | Próximo a um distrito, mas fora do assentamento |
-| 20 | Role duas vezes e use ambos |
-
-### Características do Local
-
-#### Importância do Local
+###### Importância do Local
 
 | 1d20 | Importância do local |
 |------|---------------------|
@@ -706,12 +804,12 @@ Role abaixo sempre que cair "Um distrito":
 | 14 | Local sagrado para algum culto |
 | 15 | Ponto de interesse de uma antiga civilização |
 | 16 | Local relevante para o contratante |
-| 17 | Berço de lendas/humanoides importantes |
-| 18 | Flutuação mágica na trama |
+| 17 | Berço de lendas/pessoas importantes |
+| 18 | Flutuação mágica na trama da magia |
 | 19 | Local estrategicamente vantajoso |
 | 20 | Relíquia esquecida |
 
-#### Peculiaridade
+###### Peculiaridade
 
 | 1d20 | Peculiaridade |
 |------|---------------|
@@ -726,41 +824,55 @@ Role abaixo sempre que cair "Um distrito":
 | 19 | Ponto de interesse de dragões |
 | 20 | Ponto de interesse de outros assentamentos |
 
-### Especificações por Localidade
+##### Especificações por Localidade
 
-#### Cidade Grande
+Role nas tabelas correspondentes ao resultado de Localidade Principal.
 
-| 1d10 | Cidade grande |
+###### Cidade Grande
+
+| 1d20 | Cidade grande |
 |------|---------------|
 | 1 | Esgotos/subterrâneo da cidade |
 | 2 | Na moradia do líder local |
-| 3 | Em um distrito específico |
-| 4 | Casarão nobre |
-| 5 | Em uma das tavernas |
-| 6 | Templo local |
-| 7 | Local de recuperação de enfermos |
-| 8 | Construção/local icônico |
-| 9 | Centro de treinamento/estudos |
-| 10 | Submundo urbano |
+| 3-4 | Em um distrito específico |
+| 5 | Casarão nobre |
+| 6 | Em uma das tavernas |
+| 7 | Templo local |
+| 8 | Local de recuperação de enfermos |
+| 9 | Construção/local icônico |
+| 10 | Centro de treinamento/estudos |
+| 11-12 | Submundo urbano |
+| 13-14 | Cemitério ou cripta |
+| 15 | Mercado ou praça central |
+| 16 | Quartel ou posto de guarda |
+| 17 | Área portuária ou entrada da cidade |
+| 18 | Armazém ou depósito |
+| 19 | Torre ou fortificação |
+| 20 | Role duas vezes e use ambos |
 
-#### Ruínas ou Masmorras
+###### Ruínas ou Masmorras
 
-| 1d10 | Ruínas ou masmorras |
+| 1d20 | Ruínas ou masmorras |
 |------|-------------------|
 | 1 | Complexo de cavernas |
 | 2 | Assentamento humanoide |
-| 3 | Torre/fortaleza esquecida |
-| 4 | Labirinto |
-| 5 | Mina abandonada |
-| 6 | Calabouço arruinado |
-| 7 | Tumba de um antigo Rei |
-| 8 | Estrutura soterrada/inundada |
-| 9 | Ilha amaldiçoada |
-| 10 | Masmorra |
+| 3-4 | Torre/fortaleza esquecida |
+| 5 | Labirinto |
+| 6-7 | Mina abandonada |
+| 8 | Calabouço arruinado |
+| 9 | Tumba de um antigo Rei |
+| 10 | Estrutura soterrada/inundada |
+| 11 | Ilha amaldiçoada |
+| 12-14 | Masmorra |
+| 15 | Encontradas em um distrito específico |
+| 16-17 | Templo em ruínas |
+| 18 | Prisão ou cativeiro antigo |
+| 19 | Cidade subterrânea perdida |
+| 20 | Role duas vezes e use ambos |
 
-#### Região Selvagem
+###### Região Selvagem
 
-| 1d10 | Região selvagem |
+| 1d20 | Região selvagem |
 |------|-----------------|
 | 1 | Floresta/bosque |
 | 2 | Deserto escaldante |
@@ -772,10 +884,20 @@ Role abaixo sempre que cair "Um distrito":
 | 8 | Desfiladeiro/ravina mortal |
 | 9 | Região vulcânica |
 | 10 | Cânions profundos |
+| 11 | Região costeira perigosa |
+| 12 | Platô isolado |
+| 13 | Estepe gelada |
+| 14 | Selva densa e hostil |
+| 15 | Território de geysers e fontes termais |
+| 16 | Planície alagada |
+| 17 | Penhasco gélido |
+| 18 | Oásis oculto |
+| 19 | Colinas traiçoeiras |
+| 20 | Role duas vezes e use ambos |
 
-#### Lugar Isolado
+###### Lugar Isolado
 
-| 1d10 | Lugar isolado |
+| 1d20 | Lugar isolado |
 |------|---------------|
 | 1 | Região não mapeada ou inexplorada |
 | 2 | Monastério |
@@ -787,10 +909,20 @@ Role abaixo sempre que cair "Um distrito":
 | 8 | Posto avançado em zona de conflito |
 | 9 | Engenhoca monumental |
 | 10 | Masmorra inóspita |
+| 11 | Vale oculto entre montanhas |
+| 12 | Caverna de difícil acesso |
+| 13 | Refúgio subterrâneo |
+| 14 | Pico nevado isolado |
+| 15 | Penhasco ou abismo remoto |
+| 16 | Minas desativadas |
+| 17 | Poço profundo no deserto |
+| 18 | Vila eremita ou de exilados |
+| 19 | Santuário natural protegido |
+| 20 | Role duas vezes e use ambos |
 
-#### Zona Rural
+###### Zona Rural
 
-| 1d10 | Zona rural |
+| 1d20 | Zona rural |
 |------|------------|
 | 1 | Pequena aldeia |
 | 2 | Vilarejo desprotegido |
@@ -802,10 +934,20 @@ Role abaixo sempre que cair "Um distrito":
 | 8 | Celeiro/moinho/estábulo |
 | 9 | Criadouro/abatedouro |
 | 10 | Pousada isolada |
+| 11 | Campo de cultivo |
+| 12 | Mercado rural |
+| 13 | Capela ou santuário na natureza |
+| 14 |  |
+| 15 | Escola ou posto em um campo |
+| 16 | Oficina rural |
+| 17 | Armazém de grãos |
+| 18 |  |
+| 19 | Área de pastagem | 
+| 20 | Role duas vezes e use ambos |
 
-#### Localidade Exótica
+###### Localidade Exótica
 
-| 1d10 | Localidade exótica |
+| 1d20 | Localidade exótica |
 |------|-------------------|
 | 1 | Plano feérico |
 | 2 | Dentro de um objeto pequeno |
@@ -817,10 +959,20 @@ Role abaixo sempre que cair "Um distrito":
 | 8 | Plano astral |
 | 9 | Abismo ou Inferno |
 | 10 | Umbra |
+| 11 |  |
+| 12 |  |
+| 13 | Labirinto dimensional |
+| 14 | Cidade voadora |
+| 15 |  |
+| 16 | Ilha flutuante |
+| 17 |  |
+| 18 | Biblioteca infinita |
+| 19 | Santuário cristalino |
+| 20 | Role duas vezes e use ambos |
 
-#### Profundezas
+###### Profundezas
 
-| 1d10 | Profundezas |
+| 1d20 | Profundezas |
 |------|-------------|
 | 1 | Complexo de cavernas |
 | 2 | Despenhadeiro |
@@ -832,10 +984,20 @@ Role abaixo sempre que cair "Um distrito":
 | 8 | Fenda submarina |
 | 9 | Cemiterio de monstruosidades |
 | 10 | Labirinto |
+| 11 | Mina abandonada |
+| 12 |  |
+| 13 | Sistema de túneis |
+| 14 | Gruta submersa |
+| 15 | Câmaras secretas |
+| 16 |  |
+| 17 |  |
+| 18 | Abismo rochoso |
+| 19 | Prisão subterrânea |
+| 20 | Role duas vezes e use ambos |
 
-#### Terras Mórbidas
+###### Terras Mórbidas
 
-| 1d10 | Terras mórbidas |
+| 1d20 | Terras mórbidas |
 |------|-----------------|
 | 1 | Cemitério esquecido |
 | 2 | Catacumbas |
@@ -846,13 +1008,38 @@ Role abaixo sempre que cair "Um distrito":
 | 7 | Assentamento proximo |
 | 8 | Ruína maldita |
 | 9 | Covil monstruoso |
-| 10 | Floresta assombrada |
+| 10 | Pântano sombrio |
+| 11 | Terra amaldiçoada |
+| 12 | Floresta necrótica |
+| 13 | Deserto de ossos |
+| 14 | Lago venenoso |
+| 15 | Montanha assombrada |
+| 16 | Cidade fantasma |
+| 17 |  |
+| 18 | Bosque corrompido |
+| 19 | Floresta assombrada |
+| 20 | Role duas vezes e use ambos |
 
-## Antagonistas
+##### Distrito Específico
+
+Role abaixo sempre que cair "Um distrito" nas Especificações por Localidade:
+
+| 1d20 | Distrito |
+|------|----------|
+| 1-5 | Marginalizado |
+| 6-10 | Plebeu |
+| 11-13 | Corporações de ofício |
+| 14-15 | Comercial |
+| 16 | Religioso |
+| 17-18 | Nobre |
+| 19 | Próximo a um distrito, mas fora do assentamento |
+| 20 | Role duas vezes e use ambos |
+
+### Antagonistas
 
 Qual o motivo pelo qual o contrato foi feito?
 
-### Tipos de Antagonistas
+#### Tipos de Antagonistas
 
 | 1d20 | Antagonistas |
 |------|--------------|
@@ -860,18 +1047,18 @@ Qual o motivo pelo qual o contrato foi feito?
 | 5-6 | Artefato mágico |
 | 7-9 | Organização |
 | 10-12 | Perigo iminente |
-| 13-14 | Entidade sobrenatural |
-| 15-16 | Anomalia |
-| 17 | Desastre ou acidente |
-| 18 | Crise |
+| 13 | Entidade sobrenatural |
+| 14 | Anomalia |
+| 15-16 | Desastre ou acidente |
+| 17-18 | Crise |
 | 19 | Mistério |
 | 20 | Role duas vezes e use ambos |
 
-### Detalhamento dos Antagonistas
+#### Detalhamento dos Antagonistas
 
-#### Humanoide Poderoso
+##### Humanoide Poderoso
 
-| 1d10 | Humanoide poderoso |
+| 1d20 | Humanoide poderoso |
 |------|-------------------|
 | 1 | Mercenário/assassino |
 | 2 | Conjurador |
@@ -883,25 +1070,45 @@ Qual o motivo pelo qual o contrato foi feito?
 | 8 | Herói/aventureiro |
 | 9 | Fanático religioso |
 | 10 | Fugitivo |
+| 11 | Comerciante corrupto |
+| 12 | General renegado |
+| 13 | Sacerdote caído |
+| 14 | Espião infiltrado |
+| 15 | Artista excêntrico |
+| 16 |  |
+| 17 | Diplomata traidor |
+| 18 | Revolucionário radical |
+| 19 | Mentor decaído |
+| 20 | Role duas vezes e use ambos |
 
-#### Artefato Mágico
+##### Artefato Mágico
 
-| 1d10 | Artefato mágico |
+| 1d20 | Artefato mágico |
 |------|-----------------|
 | 1 | Constructo descontrolado |
 | 2 | Relíquia divina |
 | 3 | Artefato alienígena |
-| 4 | Joia com a alma de um lich |
+| 4 | Joia com a alma de um ser poderoso |
 | 5 | Armadura enfeitiçada |
 | 6 | Arma senciente |
 | 7 | Grimório proibido |
 | 8 | Foco arcano danificado/corrompido |
 | 9 | Pergaminho milenar |
 | 10 | Objeto amaldiçoado |
+| 11 | Portal instável |
+| 12 | Cristal de energia |
+| 13 | Espelho dimensional |
+| 14 | Amuleto corruptor |
+| 15 | Instrumento musical mágico |
+| 16 | Totem ancestral |
+| 17 | Orbe de poder |
+| 18 | Máquina antiga |
+| 19 | Recipiente de almas |
+| 20 | Role duas vezes e use ambos |
 
-#### Organização
+##### Organização
 
-| 1d10 | Organização |
+| 1d20 | Organização |
 |------|-------------|
 | 1 | Grupo ameaçador |
 | 2 | Facção criminosa |
@@ -913,10 +1120,20 @@ Qual o motivo pelo qual o contrato foi feito?
 | 8 | Grupo de aventureiros |
 | 9 | Revolucionários |
 | 10 | Sindicato |
+| 11 | Uma guilda rival |
+| 12 | Irmandade militar |
+| 13 | Ordem de magos |
+| 14 | Companhia mercantil |
+| 15 | Conselho de anciãos |
+| 16 | Tribunal corrupto |
+| 17 | Colégio de bardos |
+| 18 | Rede de espionagem |
+| 19 | Pacto de druidas |
+| 20 | Role duas vezes e use ambos |
 
-#### Perigo Iminente
+##### Perigo Iminente
 
-| 1d10 | Perigo iminente |
+| 1d20 | Perigo iminente |
 |------|-----------------|
 | 1 | Humanoides tribais/canibais |
 | 2 | Animais selvagens |
@@ -928,40 +1145,70 @@ Qual o motivo pelo qual o contrato foi feito?
 | 8 | Elementais |
 | 9 | Criatura mitológica |
 | 10 | Animais atrozes |
+| 11 | Horda de mortos-vivos |
+| 12 | Bandidos organizados |
+| 13 | Predadores noturnos |
+| 14 | Criaturas subterrâneas |
+| 15 | Invasores planares |
+| 16 | Monstros aquáticos |
+| 17 | Feras corrompidas |
+| 18 | Aberrações antigas |
+| 19 | Espíritos vingativos |
+| 20 | Role duas vezes e use ambos |
 
-#### Entidade Sobrenatural
+##### Entidade Sobrenatural
 
-| 1d10 | Entidade sobrenatural |
+| 1d20 | Entidade sobrenatural |
 |------|----------------------|
 | 1 | Vampiro |
 | 2 | Ser incorpóreo |
 | 3 | Corruptor problemático |
 | 4 | Lich |
 | 5 | Morto-vivo poderoso |
-| 6 | Beholder |
+| 6 |  |
 | 7 | Celestial descontrolado |
 | 8 | Fada |
-| 9 | Abolete |
-| 10 | Devorador de mentes |
+| 9 |  |
+| 10 |  |
+| 11 | Demônio menor |
+| 12 | Anjo caído |
+| 13 | Espectro antigo |
+| 14 | Senhor das sombras |
+| 15 | Arquifada |
+| 16 | Entidade cósmica |
+| 17 | Espírito elemental |
+| 18 | Alma perdida |
+| 19 | Guardião corrompido |
+| 20 | Role duas vezes e use ambos |
 
-#### Anomalia
+##### Anomalia
 
-| 1d10 | Anomalia |
+| 1d20 | Anomalia |
 |------|----------|
 | 1 | Monstruosidade |
 | 2 | Demônio ou diabo |
 | 3 | Fenda planar |
-| 4 | Yuan-ti |
+| 4 | Híbrido ou Animalesco |
 | 5 | Névoa sobrenatural |
 | 6 | Invasão zumbi/esqueleto |
 | 7 | Limo |
 | 8 | Anormalidades na natureza |
 | 9 | Criatura poderosa adormecida |
 | 10 | Climática |
+| 11 | Zona de magia selvagem |
+| 12 | Distorção temporal |
+| 13 |  |
+| 14 |  |
+| 15 | Mutação descontrolada |
+| 16 |  |
+| 17 | Corrupção arcana |
+| 18 | Fissura na realidade |
+| 19 | Manifestação psíquica |
+| 20 | Role duas vezes e use ambos |
 
-#### Desastre ou Acidente
+##### Desastre ou Acidente
 
-| 1d10 | Desastre ou acidente |
+| 1d20 | Desastre ou acidente |
 |------|---------------------|
 | 1 | Inundação |
 | 2 | Terremoto |
@@ -973,10 +1220,20 @@ Qual o motivo pelo qual o contrato foi feito?
 | 8 | Meteoro |
 | 9 | Nevasca impetuosa |
 | 10 | Acidente de trabalho |
+| 11 | Deslizamento de terra |
+| 12 | Tempestade devastadora |
+| 13 | Explosão arcana |
+| 14 |  |
+| 15 | Praga de insetos |
+| 16 | Contaminação tóxica |
+| 17 | Falha em portal |
+| 18 | Acidente com criaturas |
+| 19 | Avalanche |
+| 20 | Role duas vezes e use ambos |
 
-#### Crise
+##### Crise
 
-| 1d10 | Crise |
+| 1d20 | Crise |
 |------|-------|
 | 1 | Conflito político |
 | 2 | Doença |
@@ -988,10 +1245,20 @@ Qual o motivo pelo qual o contrato foi feito?
 | 8 | Dragão |
 | 9 | Queda de uma figura importante |
 | 10 | Conflito religioso |
+| 11 | Crise diplomática |
+| 12 | Colapso de instituições |
+| 13 | Sucessão contestada |
+| 14 | Corrupção generalizada |
+| 15 | Cisma social |
+| 16 | Fuga em massa |
+| 17 | Boicote comercial |
+| 18 | Conspiração revelada |
+| 19 | Perda de confiança |
+| 20 | Role duas vezes e use ambos |
 
-#### Mistério
+##### Mistério
 
-| 1d10 | Mistério |
+| 1d20 | Mistério |
 |------|----------|
 | 1 | Conspiração |
 | 2 | Comportamento/fenômeno anormal |
@@ -1003,13 +1270,23 @@ Qual o motivo pelo qual o contrato foi feito?
 | 8 | Surtos de magia |
 | 9 | Rituais e símbolos |
 | 10 | Lenda urbana/local |
+| 11 | Memórias perdidas |
+| 12 | Identidade falsa |
+| 13 | Mensagens codificadas |
+| 14 | Testemunhas conflitantes |
+| 15 | Segredo familiar |
+| 16 | Artefato perdido |
+| 17 | Presságio sombrio |
+| 18 | Passado oculto |
+| 19 | Conexão inesperada |
+| 20 | Role duas vezes e use ambos |
 
 
-## Complicações
+### Complicações
 
 Nada é tão fácil quanto parece, há sempre algumas complicações e dificuldades pelo caminho.
 
-### Tipos de Complicações
+#### Tipos de Complicações
 
 | 1d20 | Complicações |
 |------|--------------|
@@ -1024,11 +1301,11 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 17 | Contra-tempo amistoso |
 | 18-20 | Encontro hostil |
 
-### Detalhamento das Complicações
+##### Detalhamento das Complicações
 
-#### Recursos
+###### Recursos
 
-| 1d10 | Recursos |
+| 1d20 | Recursos |
 |------|----------|
 | 1 | Um grande tesouro está em risco |
 | 2 | O inimigo possui recursos infindáveis |
@@ -1040,10 +1317,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Todos os tesouros são bugigangas |
 | 9 | Crise econômica |
 | 10 | Tesouro amaldiçoado |
+| 11 | Equipamentos se deterioram rapidamente |
+| 12 | Suprimentos escassos |
+| 13 | Moeda local desvalorizada |
+| 14 | Materiais de má qualidade |
+| 15 | Preços inflacionados |
+| 16 | Embargo comercial |
+| 17 | Recursos controlados por inimigos |
+| 18 | Ferramentas inadequadas |
+| 19 | Reservas esgotadas |
+| 20 | Role duas vezes e use ambos |
 
-#### Vítimas
+###### Vítimas
 
-| 1d10 | Vítimas |
+| 1d20 | Vítimas |
 |------|---------|
 | 1 | Grande número de inocentes afetados |
 | 2 | Rival afetado que pede ajuda |
@@ -1055,10 +1342,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Reféns com risco de morte |
 | 9 | Refugiados de zona de conflito |
 | 10 | Crianças/filhos do inimigo afetados |
+| 11 | Anciãos indefesos |
+| 12 |  |
+| 13 | Visitantes estrangeiros |
+| 14 | Comerciantes presos |
+| 15 | Estudiosos capturados |
+| 16 | Artistas perseguidos |
+| 17 |  |
+| 18 | Testemunhas importantes |
+| 19 | Líderes religiosos |
+| 20 | Role duas vezes e use ambos |
 
-#### Organização
+###### Organização
 
-| 1d10 | Organização |
+| 1d20 | Organização |
 |------|-------------|
 | 1 | Grupo rival de aventureiros |
 | 2 | Grupo de mercenários |
@@ -1070,10 +1367,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Realeza é contra a conclusão do objetivo |
 | 9 | Interesse direto da guilda |
 | 10 | Revolucionários têm o mesmo objetivo |
+| 11 | Ordem militar interferindo |
+| 12 | Conselho de magos opositores |
+| 13 | Tribunal corrupto |
+| 14 | Irmandade secreta |
+| 15 | Companhia rival |
+| 16 | Aliança de cidades inimigas |
+| 17 | Colégio de sábios contra |
+| 18 | Rede de espiões |
+| 19 | Círculo de druidas hostis |
+| 20 | Role duas vezes e use ambos |
 
-#### Miraculoso
+###### Miraculoso
 
-| 1d10 | Miraculoso |
+| 1d20 | Miraculoso |
 |------|------------|
 | 1 | Maldição ancestral |
 | 2 | Local sagrado para uma cultura |
@@ -1085,10 +1392,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Objetos mágicos têm mal funcionamento |
 | 9 | Comunicação impossível |
 | 10 | Magia impede de chegar ao local |
+| 11 | Intervenção divina misteriosa |
+| 12 | Profecia se cumprindo |
+| 13 | Milagres inesperados |
+| 14 | Presença celestial |
+| 15 | Bênção corrompida |
+| 16 | Ritual antigo ativado |
+| 17 | Portal divino aberto |
+| 18 | Revelação sobrenatural |
+| 19 |  |
+| 20 | Role duas vezes e use ambos |
 
-#### Ambiente Hostil
+###### Ambiente Hostil
 
-| 1d10 | Ambiente hostil |
+| 1d20 | Ambiente hostil |
 |------|-----------------|
 | 1 | Difícil acesso |
 | 2 | Habitantes hostis |
@@ -1100,10 +1417,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Profundezas oceânicas |
 | 9 | Tempestades frequentes |
 | 10 | Temperaturas extremas |
+| 11 | Terreno instável |
+| 12 | Radiação mágica |
+| 13 | Névoa densa permanente |
+| 14 | Predadores territoriais |
+| 15 | Labirinto natural |
+| 16 | Zona de magia morta |
+| 17 | Correntezas perigosas |
+| 18 | Plantas carnívoras |
+| 19 | Gravidade alterada |
+| 20 | Role duas vezes e use ambos |
 
-#### Inusitado
+###### Inusitado
 
-| 1d10 | Inusitado |
+| 1d20 | Inusitado |
 |------|-----------|
 | 1 | Dividido em 4 partes |
 | 2 | Não existe/está nesse plano |
@@ -1115,10 +1442,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Completamente esquecido |
 | 9 | Memórias roubadas |
 | 10 | Aliado confundido com inimigo |
+| 11 |  |
+| 12 | Existe apenas em sonhos |
+| 13 | Invisível para alguns |
+| 14 | Muda de forma constantemente |
+| 15 | Só existe em determinada hora |
+| 16 | Espelhado/invertido |
+| 17 | Fragmentado no tempo |
+| 18 | Compartilha consciência |
+| 19 | Reage ao contrário do esperado |
+| 20 | Role duas vezes e use ambos |
 
-#### Problemas Diplomáticos
+###### Problemas Diplomáticos
 
-| 1d10 | Problemas diplomáticos |
+| 1d20 | Problemas diplomáticos |
 |------|------------------------|
 | 1 | Problemas de jurisdição |
 | 2 | Interferência política |
@@ -1130,10 +1467,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Odeiam forasteiros |
 | 9 | Criminosos infiltrados |
 | 10 | Cumprir o objetivo pode iniciar uma guerra |
+| 11 | Protocolo rígido obrigatório |
+| 12 | Embaixador hostil |
+| 13 | Tratado violado |
+| 14 | Negociação fracassada |
+| 15 | Mediador corrompido |
+| 16 | Aliança frágil ameaçada |
+| 17 | Insulto cultural grave |
+| 18 | Refém diplomático |
+| 19 | Sanções comerciais |
+| 20 | Role duas vezes e use ambos |
 
-#### Proteção
+###### Proteção
 
-| 1d10 | Proteção |
+| 1d20 | Proteção |
 |------|----------|
 | 1 | Guardado por uma criatura poderosa |
 | 2 | Protegido por magias e maldições |
@@ -1145,10 +1492,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Construção anã antiga |
 | 9 | Protegido por um dragão adormecido |
 | 10 | Protegido por inocentes |
+| 11 | Barreira mágica poderosa |
+| 12 | Guardião artificial |
+| 13 | Sistema de vigilância arcano |
+| 14 | Proteção temporal |
+| 15 | Guardas de elite |
+| 16 | Fortaleza impenetrável |
+| 17 | Proteção divina ativa |
+| 18 | Armadilhas inteligentes |
+| 19 | Defesa psíquica |
+| 20 | Role duas vezes e use ambos |
 
-#### Contra-tempo Amistoso
+###### Contra-tempo Amistoso
 
-| 1d10 | Contra-tempo amistoso |
+| 1d20 | Contra-tempo amistoso |
 |------|----------------------|
 | 1 | Gnomos pregando peças |
 | 2 | Um grande herói tem o objetivo contrário |
@@ -1160,10 +1517,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Festividades e badernas que tiram o foco |
 | 9 | Clérigos que evitam conflito |
 | 10 | Contratante vai junto/manda um supervisor |
+| 11 | Criança perdida pede ajuda |
+| 12 | Animal ferido precisa de cuidados |
+| 13 | Ancião sábio oferece conselhos |
+| 14 | Bardo quer documentar a aventura |
+| 15 | Comerciante insiste em vender |
+| 16 | Inventor quer testar invenções |
+| 17 | Romântico persistente |
+| 18 | Guia perdido oferece direções erradas |
+| 19 | Grupo religioso quer converter |
+| 20 | Role duas vezes e use ambos |
 
-#### Encontro Hostil
+###### Encontro Hostil
 
-| 1d10 | Encontro hostil |
+| 1d20 | Encontro hostil |
 |------|-----------------|
 | 1 | Acontece um encontro hostil adicional por dia |
 | 2 | Para cada encontro hostil, acontece mais um |
@@ -1172,22 +1539,32 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 5 | Se o encontro não for hostil, ele não acontece |
 | 6 | Inimigos hostis são mais poderosos |
 | 7 | Oponentes tendem a ficar hostis mais facilmente |
-| 8 | Dobre os DV's de todos inimigos hostis |
+| 8 | Aumente os PV de todos inimigos hostis |
 | 9 | Inimigos hostis SEMPRE têm itens mágicos |
 | 10 | Caso estejam perdendo, fogem mas retornam para se vingar |
+| 11 | Encontros acontecem em momentos inconvenientes |
+| 12 | Inimigos trabalham em coordenação |
+| 13 | Adversários conhecem táticas do grupo |
+| 14 | Encontros são emboscadas planejadas |
+| 15 | Inimigos têm vantagem de terreno |
+| 16 | Oponentes são imunes a negociação |
+| 17 | Encontros escalam rapidamente |
+| 18 | Inimigos chamam reforços constantemente |
+| 19 | Adversários são persistentes |
+| 20 | Role duas vezes e use ambos |
 
-## Aliados
+### Aliados
 
-Às vezes no meio do caminho aliados podem surgir.
+Às vezes, no meio do caminho, aliados podem surgir.
 
-### Aparição de Aliados
+#### Aparição de Aliados
 
 | 1d20 | Aliados surgirão? |
 |------|-------------------|
 | 1-10 | Não |
 | 11-20 | Sim |
 
-### Tipos de Aliados
+#### Tipos de Aliados
 
 | 1d20 | Aliados |
 |------|---------|
@@ -1202,7 +1579,7 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 18-19 | Aventureiros |
 | 20 | Monstruosidade amigável |
 
-### Quando/Como Surgirão
+#### Quando/Como Surgirão
 
 | 1d20 | Quando/como surgirá |
 |------|-------------------|
@@ -1217,11 +1594,11 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 19 | Magicamente invocado |
 | 20 | Para salvar o dia |
 
-### Detalhamento dos Aliados
+##### Detalhamento dos Aliados
 
-#### Artefato
+###### Artefato
 
-| 1d10 | Artefato |
+| 1d20 | Artefato |
 |------|----------|
 | 1 | Runa antiga |
 | 2 | Amuleto que ajuda a chegar ao objetivo |
@@ -1233,10 +1610,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Artefato perdido de uma divindade menor |
 | 9 | Item amaldiçoado |
 | 10 | Engenhoca voadora |
+| 11 | Cristal de comunicação |
+| 12 | Mapa mágico que se atualiza |
+| 13 | Chave universal |
+| 14 | Espelho de revelação |
+| 15 | Cajado de proteção |
+| 16 | Anel de tradução |
+| 17 | Corda infinita |
+| 18 | Poção renovável |
+| 19 | Bússola dimensional |
+| 20 | Role duas vezes e use ambos |
 
-#### Criatura Poderosa
+###### Criatura Poderosa
 
-| 1d10 | Criatura poderosa |
+| 1d20 | Criatura poderosa |
 |------|-------------------|
 | 1 | Elemental |
 | 2 | Mercenário veterano |
@@ -1248,10 +1635,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Criatura de outro plano |
 | 9 | Criminoso influente do submundo |
 | 10 | Avatar de uma divindade |
+| 11 | Dragão jovem bondoso |
+| 12 | Celestial menor |
+| 13 | Arquimago sábio |
+| 14 | Paladino errante |
+| 15 | Druida ancião |
+| 16 | Espírito guardião |
+| 17 | Gigante benevolente |
+| 18 | Fada poderosa |
+| 19 | Um avatar |
+| 20 | Role duas vezes e use ambos |
 
-#### Inesperado
+###### Inesperado
 
-| 1d10 | Inesperado |
+| 1d20 | Inesperado |
 |------|------------|
 | 1 | Um antigo inimigo/rival |
 | 2 | Metamorfo |
@@ -1263,10 +1660,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Fã/interesse amoroso de um personagem |
 | 9 | Animal inteligente |
 | 10 | Informações de uma fonte inesperada |
+| 11 | Criança precoce |
+| 12 | Fantasma arrependido |
+| 13 | Rival reconciliado |
+| 14 | Ex-inimigo rehabilitado |
+| 15 | Duplo bondoso |
+| 16 | Reflexo de espelho mágico |
+| 17 |  |
+| 18 |  |
+| 19 |  |
+| 20 | Role duas vezes e use ambos |
 
-#### Ajuda Sobrenatural
+###### Ajuda Sobrenatural
 
-| 1d10 | Ajuda sobrenatural |
+| 1d20 | Ajuda sobrenatural |
 |------|-------------------|
 | 1 | Deus maligno menor |
 | 2 | Espectro |
@@ -1278,11 +1685,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Forças divinas misteriosas |
 | 9 | Ressurgido vingativo |
 | 10 | Celestial |
+| 11 |  |
+| 12 | Manifestação divina |
+| 13 | Oráculo místico |
+| 14 | Proteção ancestral |
+| 15 |  |
+| 16 | Bênção inesperada |
+| 17 | Guardião planar |
+| 18 | Alma benevolente |
+| 19 | Fenômeno cósmico |
+| 20 | Role duas vezes e use ambos |
 
+###### Civis Ordinários
 
-#### Civis Ordinários
-
-| 1d10 | Civis ordinários |
+| 1d20 | Civis ordinários |
 |------|------------------|
 | 1 | Taverneiro |
 | 2 | Grupo de nômades |
@@ -1291,13 +1707,23 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 5 | Aventureiro aposentado |
 | 6 | Trabalhador braçal |
 | 7 | Plebeu |
-| 8 | Prole |
+| 8 |  |
 | 9 | Adepto acadêmico/religioso |
 | 10 | Especialista |
+| 11 | Artesão habilidoso |
+| 12 | Guarda local |
+| 13 | Camponês sábio |
+| 14 | Marinheiro experiente |
+| 15 | Curandeiro local |
+| 16 | Escriba letrado |
+| 17 | Cocheiro veterano |
+| 18 | Minerador conhecedor |
+| 19 | Pastor de animais |
+| 20 | Role duas vezes e use ambos |
 
-#### Natureza
+###### Natureza
 
-| 1d10 | Natureza |
+| 1d20 | Natureza |
 |------|----------|
 | 1 | Matilha de lobos |
 | 2 | Águia/falcão |
@@ -1309,10 +1735,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Filhote de um monstro temido |
 | 9 | A própria flora local |
 | 10 | Besta grande ou atroz |
+| 11 | Espíritos da natureza |
+| 12 | Enxame protetor |
+| 13 | Corrente favorável |
+| 14 | Vento auxiliador |
+| 15 | Caminho natural revelado |
+| 16 | Fonte de água pura |
+| 17 | Abrigo natural |
+| 18 | Plantas medicinais |
+| 19 | Guia animal |
+| 20 | Role duas vezes e use ambos |
 
-#### Organização
+###### Organização
 
-| 1d10 | Organização |
+| 1d20 | Organização |
 |------|-------------|
 | 1 | Companhia de mercenários |
 | 2 | Ordem religiosa |
@@ -1324,10 +1760,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Companhia militar |
 | 9 | Revolucionários/rebeldes |
 | 10 | Espiões infiltrados |
+| 11 | Guilda de artesãos |
+| 12 | Conselho de anciãos |
+| 13 | Irmandade de magos |
+| 14 | Colégio de bardos |
+| 15 | Ordem de cavaleiros |
+| 16 | Círculo de druidas |
+| 17 | Casa nobre aliada |
+| 18 | Sociedade de estudiosos |
+| 19 | Rede de informantes |
+| 20 | Role duas vezes e use ambos |
 
-#### Refúgio
+###### Refúgio
 
-| 1d10 | Refúgio |
+| 1d20 | Refúgio |
 |------|---------|
 | 1 | Fortaleza abandonada |
 | 2 | Torre de arcanista vazia |
@@ -1339,8 +1785,18 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Fonte de cura |
 | 9 | Caverna/gruta segura |
 | 10 | Máquina de guerra inativa |
+| 11 | Templo abandonado |
+| 12 | Biblioteca protegida |
+| 13 | Portal de escape |
+| 14 | Abrigo dimensional |
+| 15 | Base subterrânea |
+| 16 | Navio encalhado |
+| 17 | Observatório antigo |
+| 18 | Jardim encantado |
+| 19 | Fortaleza flutuante |
+| 20 | Role duas vezes e use ambos |
 
-#### Aventureiros
+###### Aventureiros
 
 | 1d20 | Aventureiros |
 |------|--------------|
@@ -1351,43 +1807,52 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 9 | Clérigo fiel |
 | 10-11 | Paladino honrado |
 | 12-14 | Ladino sagaz |
-| 15-17 | Ranger talentoso |
+| 15-17 | Sentinela talentoso |
 | 18 | Monge disciplinado |
 | 19-20 | Bardo carismático |
 
-##### Nível do Aventureiro
+####### Nível do Aventureiro
 
-| 1d10 | Especificando aventureiro |
+| 1d20 | Especificando aventureiro |
 |------|---------------------------|
-| 1 | Dois dados de vida |
-| 2 | Três dados de vida |
-| 3 | Quatro dados de vida |
-| 4 | 3 DV + 2 DV de outra classe |
-| 5 | 4 DV + 2 DV de outra classe |
-| 6 | Dez dados de vida |
-| 7 | 6 DV e 3 classes |
-| 8 | 5 DV + 3 DV de outra classe |
-| 9 | 1 DV + 1 DV de outra classe |
-| 10 | Nove dados de vida |
+| 1 | NA 0 |
+| 2 | NA 1 |
+| 3 | NA 2 |
+| 4 | NA 3 |
+| 5 | NA 4 |
+| 6 | NA 5 |
+| 7 | NA 6 |
+| 8 | NA 7 |
+| 9 | NA 8 |
+| 10 | NA 9 |
+| 11 | NA 10 |
+| 12 | NA 11 |
+| 13 | NA 12 |
+| 14 | NA 13 |
+| 15 | NA 14 |
+| 16 | NA 15 |
+| 17 | NA 20 |
+| 18 | NA 25 |
+| 19 | NA 30 |
+| 20 | Role duas vezes e use ambos |
 
-#### Monstruosidade Amigável
+###### Monstruosidade Amigável
 
 | 1d20 | Monstruosidade amigável |
 |------|-------------------------|
 | 1-3 | Goblin |
-| 4 | Morto-vivo |
-| 5-7 | Kobold |
-| 8 | Hobgoblin |
-| 9-10 | Orc |
-| 11 | Gigante da colina |
-| 12 | Troll |
-| 13-17 | Bullywug |
-| 18-19 | Corruptor |
+| 4-5 | Morto-vivo |
+| 6 | Kobold |
+| 7-10 | Hobgoblin |
+| 11-13 | Orc |
+| 14 | Gigante da colina |
+| 15 | Troll |
+| 16-19 | Animalesco |
 | 20 | Dragão |
 
-##### Características da Monstruosidade
+####### Características da Monstruosidade
 
-| 1d10 | Especificando monstruosidade |
+| 1d20 | Especificando monstruosidade |
 |------|------------------------------|
 | 1 | Que acredita ser de outra raça |
 | 2 | Erudito |
@@ -1399,19 +1864,28 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Covarde |
 | 9 | Triste e desmotivado |
 | 10 | Amado pelos habitantes |
+| 11 | Artista habilidoso |
+| 12 | Comerciante astuto |
+| 13 | Guerreiro nobre |
+| 14 | Protetor zeloso |
+| 15 | Sábio conselheiro |
+| 16 | Explorador curioso |
+| 17 | Diplomata hábil |
+| 18 | Inventor criativo |
+| 19-20 | Role duas vezes e use ambos |
 
-## Recompensas e Incentivos
+### Recompensas e Incentivos
 
 Às vezes, durante um contrato, vão existir recompensas além do ouro pela conclusão do mesmo.
 
-### Chance de Recompensas
+#### Chance de Recompensas
 
 | 1d20 | Haverão recompensas? |
 |------|----------------------|
 | 1-13 | Não |
 | 14-20 | Sim |
 
-### Tipos de Recompensas
+#### Tipos de Recompensas
 
 | 1d20 | Recompensas e Incentivos |
 |------|--------------------------|
@@ -1428,13 +1902,13 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 
 > **Nota**: Em "pagamento diferenciado" não há recompensa extra. Apenas a recompensa pelo próprio contrato, porém o contratante não pagará com ouro, e sim com alguma coisa que tenha o mesmo valor ou o mais próximo disso.
 
-### Detalhamento das Recompensas
+##### Detalhamento das Recompensas
 
 <!-- TODO: Adicionar quais recompensas são visíveis para os players e quais não são (só são reveladas ao completar o contrato). Acho que um asterisco funciona bem. -->
 
-#### Riquezas
+###### Riquezas
 
-| 1d10 | Riquezas |
+| 1d20 | Riquezas |
 |------|----------|
 | 1 | Uma grande soma de ouro e prata |
 | 2 | Obra de arte/gema perdida |
@@ -1446,10 +1920,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Itens mundanos de alto valor e raridade |
 | 9 | Montaria/meio de transporte |
 | 10 | Engenhoca |
+| 11 | Pedras preciosas |
+| 12 |  |
+| 13 | Coleção de antiguidades |
+| 14 |  |
+| 15 | Participação em navio mercante |
+| 16 | Arsenal de armas finas |
+| 17 |  |
+| 18 | Tesouro pirata enterrado |
+| 19 | Herança nobre |
+| 20 | Role duas vezes e use ambos |
 
-#### Artefatos Mágicos
+###### Artefatos Mágicos
 
-| 1d10 | Artefatos mágicos |
+| 1d20 | Artefatos mágicos |
 |------|-------------------|
 | 1 | Arma mágica |
 | 2 | Pergaminho poderoso |
@@ -1461,10 +1945,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Anel mágico |
 | 9 | Bastão/cetro |
 | 10 | Item amaldiçoado |
+| 11 | Orbe de poder |
+| 12 | Amuleto raro |
+| 13 | Manto encantado |
+| 14 | Botas mágicas |
+| 15 | Elmo encantado |
+| 16 |  |
+| 17 |  |
+| 18 |  |
+| 19 |  |
+| 20 | Role duas vezes e use ambos |
 
-#### Poder
+###### Poder
 
-| 1d10 | Poder |
+| 1d20 | Poder |
 |------|-------|
 | 1 | Comando sobre um grupo |
 | 2 | Favor de alguém importante |
@@ -1476,10 +1970,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Pacto com entidade |
 | 9 | Vista grossa de autoridades da lei |
 | 10 | Bênção divina |
+| 11 | Autoridade sobre território |
+| 12 | Direito de coletar impostos |
+| 13 | Comando de forças militares |
+| 14 | Assento em um conselho |
+| 15 | Direito de julgar crimes |
+| 16 | Acesso a arquivos secretos |
+| 17 | Proteção real garantida |
+| 18 | Imunidade diplomática |
+| 19 |  |
+| 20 | Role duas vezes e use ambos |
 
-#### Conhecimento
+###### Conhecimento
 
-| 1d10 | Conhecimento |
+| 1d20 | Conhecimento |
 |------|--------------|
 | 1 | Verdades sobre uma lenda |
 | 2 | Paradeiro de um tesouro esquecido |
@@ -1491,13 +1995,23 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Corrupção descoberta |
 | 9 | Fraqueza de um inimigo |
 | 10 | Magia poderosa |
+| 11 | Localização de portal dimensional |
+| 12 | Identidade de espião infiltrado |
+| 13 |  |
+| 14 | História perdida de civilização |
+| 15 | Códigos de comunicação secreta |
+| 16 | Profecias não reveladas |
+| 17 | Mapas de rotas comerciais |
+| 18 | Segredo do governo local |
+| 19 | Nome verdadeiro de demônio |
+| 20 | Role duas vezes e use ambos |
 
-#### Influência e Renome
+###### Influência e Renome
 
-| 1d10 | Influência e renome |
+| 1d20 | Influência e renome |
 |------|-------------------|
 | 1 | Sobre uma casa nobre |
-| 2 | Com a guilda |
+| 2 | Com a Guilda |
 | 3 | Com uma facção criminosa/submundo |
 | 4 | Com uma sociedade secreta |
 | 5 | Ordem religiosa |
@@ -1506,10 +2020,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Tratado de aliança |
 | 9 | Organização/clã medíocre |
 | 10 | População local |
+| 11 | Entre aventureiros famosos |
+| 12 | Com líderes militares |
+| 13 | Entre estudiosos |
+| 14 | Com artesãos mestres |
+| 15 | Entre navegadores |
+| 16 | Com diplomatas |
+| 17 | Entre bardos e artistas |
+| 18 | Com exploradores |
+| 19 | Entre curandeiros |
+| 20 | Role duas vezes e use ambos |
 
-#### Glória
+###### Glória
 
-| 1d10 | Glória |
+| 1d20 | Glória |
 |------|--------|
 | 1 | Feriado em sua homenagem |
 | 2 | Título de nobreza |
@@ -1520,11 +2044,21 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 7 | Herói local |
 | 8 | Local relevante com seu nome |
 | 9 | Festa/banquete em sua homenagem |
-| 10 | Carta de Duelo de Criaturas envolvendo você |
+| 10 |  |
+| 11 | Canção épica composta |
+| 12 | Medalha de honra |
+| 13 | Brasão familiar concedido |
+| 14 | Arena nomeada em sua honra |
+| 15 | Lenda contada por gerações |
+| 16 | Ordem militar fundada |
+| 17 | Templo dedicado aos seus feitos |
+| 18 | Livro de história escrito |
+| 19 | Universidade nomeada |
+| 20 | Role duas vezes e use ambos |
 
-#### Moral
+###### Moral
 
-| 1d10 | Moral |
+| 1d20 | Moral |
 |------|-------|
 | 1 | Plebeus desafortunados salvos |
 | 2 | Prole nomeada em sua homenagem |
@@ -1536,10 +2070,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Economia local alavancada |
 | 9 | Crescimento turístico |
 | 10 | Aumento da defesa do assentamento |
+| 11 | Família reunificada |
+| 12 | Comunidade favorecida |
+| 13 | Órfãos adotados |
+| 14 |  |
+| 15 |  |
+| 16 | Injustiça corrigida |
+| 17 | Tradição restaurada |
+| 18 | Esperança renovada |
+| 19 | Reconciliação entre inimigos |
+| 20 | Role duas vezes e use ambos |
 
-#### Pagamento Diferenciado
+###### Pagamento Diferenciado
 
-| 1d10 | Pagamento diferenciado |
+| 1d20 | Pagamento diferenciado |
 |------|------------------------|
 | 1 | Trigo |
 | 2 | Vacas/bois |
@@ -1551,10 +2095,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | O bem mais valioso do contratante |
 | 9 | Ferro ou cobre |
 | 10 | Terras |
+| 11 | Serviços especializados |
+| 12 | Cartas de crédito |
+| 13 | Equipamentos raros |
+| 14 | Livros e manuscritos |
+| 15 | Instrumentos musicais |
+| 16 | Vinhos e licores |
+| 17 | Madeira nobre |
+| 18 | Pedras de construção |
+| 19 | Favores futuros |
+| 20 | Role duas vezes e use ambos |
 
-#### Recompensa Bizarra
+###### Recompensa Bizarra
 
-| 1d10 | Recompensa bizarra |
+| 1d20 | Recompensa bizarra |
 |------|-------------------|
 | 1 | Uma besta te vê como igual |
 | 2 | Tribo permite que faça o ritual de iniciação |
@@ -1565,11 +2119,21 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 7 | Uma criatura quer ser sua aprendiz |
 | 8 | O contratante se apaixona por você |
 | 9 | A melhor comida do assentamento tem seu nome |
-| 10 | Uma carta de Duelo de Criaturas |
+| 10 | Uma carta de coleção rara |
+| 11 | Animal falante como companheiro |
+| 12 | Sonhos proféticos regulares |
+| 13 | Habilidade de falar com plantas |
+| 14 | Imunidade a uma doença específica |
+| 15 | Capacidade de encontrar água |
+| 16 | Sorte incomum com jogos |
+| 17 | Animais selvagens te respeitam |
+| 18 | Capacidade de sentir mentiras |
+| 19 | Clima favorável onde você vai |
+| 20 | Role duas vezes e use ambos |
 
-#### Aparências Enganam
+###### Aparências Enganam
 
-| 1d10 | Aparências enganam |
+| 1d20 | Aparências enganam |
 |------|-------------------|
 | 1 | Mapa para um tesouro amaldiçoado |
 | 2 | Gemas e objetos de arte falsificados |
@@ -1581,19 +2145,31 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Caçado por caçadores de recompensa |
 | 9 | O contratante morre ou forja sua morte |
 | 10 | O contratante te leva para uma armadilha |
+| 11 | Recompensa é propriedade de outro |
+| 12 | Dívida transferida para você |
+| 13 | Recompensa é evidência de crime |
+| 14 | Item possui rastreamento mágico |
+| 15 | Recompensa expira rapidamente |
+| 16 | Outros reclamam direito sobre ela |
+| 17 | Recompensa vem com obrigações |
+| 18 | Pagamento em moeda desvalorizada |
+| 19 | Contrato tinha cláusulas ocultas |
+| 20 | Role duas vezes e use ambos |
 
-## Reviravoltas
+### Reviravoltas
 
-### Chance de Reviravolta
+#### Chance de Reviravolta
 
 | 1d20 | Haverá uma reviravolta? |
 |------|-------------------------|
 | 1-18 | Não |
 | 19-20 | Sim |
 
-### Elementos da Reviravolta
+<!-- TODO: Aumentar robustez das reviravoltas, adicionar mais opções. -->
 
-#### Quem?
+#### Elementos da Reviravolta
+
+##### Quem?
 
 | 1d6 | Quem? |
 |-----|-------|
@@ -1604,7 +2180,7 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 5 | A vítima/um inocente |
 | 6 | Um velho conhecido surge e... |
 
-#### Na verdade...
+##### Na verdade...
 
 | 1d6 | Na verdade... |
 |-----|---------------|
@@ -1615,7 +2191,7 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 5 | Auxilia o antagonista secretamente |
 | 6 | É um fantasma |
 
-#### Mas...
+##### Mas...
 
 | 1d6 | Mas... |
 |-----|--------|
@@ -1626,7 +2202,7 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 5 | Faz isso para proteger a natureza |
 | 6 | O objetivo exige um sacrifício |
 
-#### E... (primeira tabela)
+##### E... (primeira tabela)
 
 | 1d6 | E... |
 |-----|------|
@@ -1637,7 +2213,7 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 5 | O antagonista é um parente próximo |
 | 6 | Outro grupo cumpre o objetivo |
 
-#### E... (segunda tabela)
+##### E... (segunda tabela)
 
 | 1d6 | E... |
 |-----|------|
@@ -1648,7 +2224,7 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 5 | Tudo não passa de um sonho |
 | 6 | Tudo foi uma vingança friamente planejada |
 
-## Chance de Consequências Severas
+### Chance de Consequências Severas
 
 <!-- TODO: Essas são as consequências em caso de falha no contrato, explicar isso -->
 
@@ -1657,7 +2233,7 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 1-2 | Sim |
 | 3-20 | Não |
 
-### Tipos de Consequências Severas
+#### Tipos de Consequências Severas
 
 | 1d20 | Consequências severas |
 |------|----------------------|
@@ -1671,11 +2247,11 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 17-18 | Perseguição |
 | 19-20 | Morte de importantes |
 
-### Detalhamento das Consequências
+##### Detalhamento das Consequências
 
-#### Maldição
+###### Maldição
 
-| 1d10 | Maldição |
+| 1d20 | Maldição |
 |------|----------|
 | 1 | Doença incurável |
 | 2 | Transformação permanente |
@@ -1687,10 +2263,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Perseguição constante |
 | 9 | Perda da capacidade de comunicação |
 | 10 | Separação para sempre de quem amam |
+| 11 | Marca visível de vergonha |
+| 12 | Incapacidade de mentir |
+| 13 | Atração de monstros |
+| 14 | Pesadelos eternos |
+| 15 | Perda de memórias felizes |
+| 16 | Incapacidade de tocar ouro |
+| 17 | Sombra ganha vida própria |
+| 18 | Reflexo desaparece |
+| 19 | Fala apenas verdades dolorosas |
+| 20 | Role duas vezes e use ambos |
 
-#### Guerra
+###### Guerra
 
-| 1d10 | Guerra |
+| 1d20 | Guerra |
 |------|--------|
 | 1 | Entre duas facções locais |
 | 2 | Civil |
@@ -1702,10 +2288,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Contra um reino inimigo |
 | 9 | Expansão territorial |
 | 10 | Contra a natureza |
+| 11 |  |
+| 12 | Conflito geracional |
+| 13 | Guerra de sucessão |
+| 14 |  |
+| 15 | Guerra de recursos |
+| 16 | Conflito racial |
+| 17 | Guerra comercial violenta |
+| 18 | Contra rebeldes organizados |
+| 19 | Guerra de vingança |
+| 20 | Role duas vezes e use ambos |
 
-#### Calamidade Natural
+###### Calamidade Natural
 
-| 1d10 | Calamidade natural |
+| 1d20 | Calamidade natural |
 |------|-------------------|
 | 1 | Terremoto |
 | 2 | Vulcão ativo |
@@ -1717,10 +2313,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Meteoro |
 | 9 | Nevasca impetuosa |
 | 10 | Acidente de trabalho |
+| 11 | Seca prolongada |
+| 12 | Tempestade de granizo |
+| 13 | Deslizamento de terra |
+| 14 | Tromba d'água |
+| 15 | Geada devastadora |
+| 16 | Erosão acelerada |
+| 17 | Inversão de maré |
+| 18 | Ventos destrutivos |
+| 19 | Avalanche |
+| 20 | Role duas vezes e use ambos |
 
-#### Praga
+###### Praga
 
-| 1d10 | Praga |
+| 1d20 | Praga |
 |------|-------|
 | 1 | Febre mortal |
 | 2 | Torna as pessoas insanas |
@@ -1732,10 +2338,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Perda do desenvolvimento mental |
 | 9 | Transforma pessoas em monstros |
 | 10 | Amaldiçoa a magia das pessoas |
+| 11 | Cegueira progressiva |
+| 12 | Perda de memória coletiva |
+| 13 | Mutação corporal |
+| 14 | Sonambulismo violento |
+| 15 | Envenenamento do sangue |
+| 16 | Perda da fala |
+| 17 | Deterioração dos ossos |
+| 18 | Sensibilidade extrema à luz |
+| 19 | Paralisia gradual |
+| 20 | Role duas vezes e use ambos |
 
-#### Eventos Sobrenaturais
+###### Eventos Sobrenaturais
 
-| 1d10 | Eventos sobrenaturais |
+| 1d20 | Eventos sobrenaturais |
 |------|----------------------|
 | 1 | Surto de magia |
 | 2 | Aberturas pro submundo |
@@ -1747,10 +2363,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Portais através do tempo |
 | 9 | Alteração da realidade |
 | 10 | Invocação de deuses |
+| 11 | Fantasmas manifestados |
+| 12 | Objetos ganham vida |
+| 13 | Gravidade alterada |
+| 14 | Clima sobrenatural |
+| 15 | Ecos do passado |
+| 16 | Presságios sombrios |
+| 17 | Energia negativa |
+| 18 | Rituais espontâneos |
+| 19 | Manifestações psíquicas |
+| 20 | Role duas vezes e use ambos |
 
-#### Fome/Seca
+###### Fome/Seca
 
-| 1d10 | Fome/seca |
+| 1d20 | Fome/seca |
 |------|-----------|
 | 1 | Por muitos anos |
 | 2 | Pragas nas plantações |
@@ -1762,10 +2388,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Guerra longa |
 | 9 | Crescimento populacional descontrolado |
 | 10 | Má distribuição de renda |
+| 11 | Seca prolongada |
+| 12 | Inundações devastadoras |
+| 13 | Praga de insetos |
+| 14 | Solo contaminado |
+| 15 | Mudanças climáticas extremas |
+| 16 | Bloqueio comercial |
+| 17 | Desperdício de recursos |
+| 18 | Falhas na irrigação |
+| 19 | Competição por terras |
+| 20 | Role duas vezes e use ambos |
 
-#### Crise Econômica
+###### Crise Econômica
 
-| 1d10 | Crise econômica |
+| 1d20 | Crise econômica |
 |------|-----------------|
 | 1 | Falta de mão de obra |
 | 2 | Roubo de recursos |
@@ -1777,10 +2413,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Escravidão |
 | 9 | Grandes roubos e saques |
 | 10 | Desvio de verbas |
+| 11 | Inflação descontrolada |
+| 12 | Escassez de alimentos |
+| 13 | Desemprego em massa |
+| 14 | Colapso da moeda |
+| 15 | Pobreza extrema |
+| 16 | Mercado negro |
+| 17 | Falência de comércios |
+| 18 | Falta de recursos básicos |
+| 19 | Êxodo populacional |
+| 20 | Role duas vezes e use ambos |
 
-#### Perseguição
+###### Perseguição
 
-| 1d10 | Perseguição |
+| 1d20 | Perseguição |
 |------|-------------|
 | 1 | Por piratas |
 | 2 | Pelos líderes locais |
@@ -1792,10 +2438,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Por membros da família |
 | 9 | Por fanáticos |
 | 10 | Por magos |
+| 11 | Por mercenários |
+| 12 | Por cultistas |
+| 13 | Por inquisidores |
+| 14 | Por assassinos profissionais |
+| 15 | Por bestas selvagens |
+| 16 | Por espíritos vingativos |
+| 17 | Por autoridades corruptas |
+| 18 | Por rivais comerciais |
+| 19 | Por ex-aliados |
+| 20 | Role duas vezes e use ambos |
 
-#### Morte de Importantes
+###### Morte de Importantes
 
-| 1d10 | Morte de importantes |
+| 1d20 | Morte de importantes |
 |------|---------------------|
 | 1 | Família de um líder local |
 | 2 | Herói famoso |
@@ -1807,10 +2463,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Líder de uma facção criminosa |
 | 9 | Enviado/diplomata |
 | 10 | Toda a família real |
+| 11 | Guarda real |
+| 12 | Conselheiro do rei |
+| 13 | Mestre artesão |
+| 14 | General respeitado |
+| 15 | Líder religioso |
+| 16 | Sábio renomado |
+| 17 | Juiz respeitado |
+| 18 | Comandante de guilda |
+| 19 | Artista celebrado |
+| 20 | Role duas vezes e use ambos |
 
-### Consequências Adicionais
+#### Consequências Adicionais
 
-#### O que acontece com os contratados
+##### O que acontece com os contratados
 
 | 1d6 | Os contratados |
 |-----|----------------|
@@ -1821,7 +2487,7 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 5 | Têm um prêmio por suas cabeças |
 | 6 | Agora são odiados por uma raça específica |
 
-#### E...
+##### E...
 
 | 1d6 | E... |
 |-----|------|
@@ -2106,8 +2772,8 @@ Eventualmente os contratos ficarão repetitivos já que essa tabela será muito 
 
 ### Palavras-chave para Criatividade
 
-#### Conjunto 1 (d10)
-| d10 | Palavra-chave |
+#### Conjunto 1 (d20)
+| d20 | Palavra-chave |
 |-----|---------------|
 | 1   | Vazio         |
 | 2   | Demônio       |
@@ -2119,9 +2785,19 @@ Eventualmente os contratos ficarão repetitivos já que essa tabela será muito 
 | 8   | Vampiro       |
 | 9   | Amaldiçoado   |
 | 10  | Asas          |
+| 11  | Nebuloso      |
+| 12  | Dourado       |
+| 13  | Sussurro      |
+| 14  | Fragmento     |
+| 15  | Véu           |
+| 16  | Pulsante      |
+| 17  | Etéreo        |
+| 18  | Radiante      |
+| 19  | Gelado        |
+| 20  | Enigmático    |
 
-#### Conjunto 2 (d10)
-| d10 | Palavra-chave |
+#### Conjunto 2 (d20)
+| d20 | Palavra-chave |
 |-----|---------------|
 | 1   | Roubo         |
 | 2   | Tesouro       |
@@ -2133,9 +2809,19 @@ Eventualmente os contratos ficarão repetitivos já que essa tabela será muito 
 | 8   | Sujo          |
 | 9   | Molusco       |
 | 10  | Pirata        |
+| 11  | Espada        |
+| 12  | Navio         |
+| 13  | Mapa          |
+| 14  | Cofre         |
+| 15  | Joia          |
+| 16  | Corrente      |
+| 17  | Âncora        |
+| 18  | Leme          |
+| 19  | Gruta         |
+| 20  | Lenda         |
 
-#### Conjunto 3 (d10)
-| d10 | Palavra-chave |
+#### Conjunto 3 (d20)
+| d20 | Palavra-chave |
 |-----|---------------|
 | 1   | Anel          |
 | 2   | Braço         |
@@ -2147,9 +2833,19 @@ Eventualmente os contratos ficarão repetitivos já que essa tabela será muito 
 | 8   | Bastão        |
 | 9   | Brilho        |
 | 10  | Vingança      |
+| 11  | Amuleto       |
+| 12  | Coroa         |
+| 13  | Elmo          |
+| 14  | Escudo        |
+| 15  | Pergaminho    |
+| 16  | Poção         |
+| 17  | Armadura      |
+| 18  | Relíquia      |
+| 19  | Talismã       |
+| 20  | Artefato      |
 
-#### Conjunto 4 (d10)
-| d10 | Palavra-chave |
+#### Conjunto 4 (d20)
+| d20 | Palavra-chave |
 |-----|---------------|
 | 1   | Macabro       |
 | 2   | Sono          |
@@ -2161,9 +2857,19 @@ Eventualmente os contratos ficarão repetitivos já que essa tabela será muito 
 | 8   | Alívio        |
 | 9   | Euforia       |
 | 10  | Aconchego     |
+| 11  | Esperança     |
+| 12  | Felicidade    |
+| 13  | Inspiração    |
+| 14  | Serenidade    |
+| 15  | Coragem       |
+| 16  | Sabedoria     |
+| 17  | Harmonia      |
+| 18  | Liberdade     |
+| 19  | Gratidão      |
+| 20  | Triunfo       |
 
-#### Conjunto 5 (d10)
-| d10 | Palavra-chave |
+#### Conjunto 5 (d20)
+| d20 | Palavra-chave |
 |-----|---------------|
 | 1   | Maníaco       |
 | 2   | Raiva         |
@@ -2175,9 +2881,19 @@ Eventualmente os contratos ficarão repetitivos já que essa tabela será muito 
 | 8   | Ciúmes        |
 | 9   | Incapacidade  |
 | 10  | Confusão      |
+| 11  | Ansiedade     |
+| 12  | Tristeza      |
+| 13  | Ódio          |
+| 14  | Vergonha      |
+| 15  | Culpa         |
+| 16  | Frustração    |
+| 17  | Desconfiança  |
+| 18  | Arrependimento|
+| 19  | Melancolia    |
+| 20  | Tormento      |
 
-#### Conjunto 6 (d10)
-| d10 | Palavra-chave |
+#### Conjunto 6 (d20)
+| d20 | Palavra-chave |
 |-----|---------------|
 | 1   | Bebida        |
 | 2   | Bardo         |
@@ -2189,5 +2905,15 @@ Eventualmente os contratos ficarão repetitivos já que essa tabela será muito 
 | 8   | Violento      |
 | 9   | Bárbaro       |
 | 10  | Informações   |
+| 11  | Canção        |
+| 12  | Dança         |
+| 13  | Festa         |
+| 14  | Hospitaleiro  |
+| 15  | Jogo          |
+| 16  | Risada        |
+| 17  | Conversa      |
+| 18  | Amizade       |
+| 19  | Celebração    |
+| 20  | Entretenimento|
 
 -----------------------------
