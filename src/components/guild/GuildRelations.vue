@@ -85,14 +85,21 @@
           <ArrowRightOnRectangleIcon class="w-4 h-4 text-gray-400" />
           <span>Frequentadores</span>
         </h4>
-        <p class="text-white font-medium">{{ guild.visitors.frequency }}</p>
+        <p class="text-white font-medium">
+          <span 
+            class="inline-block px-2 py-1 rounded-md text-sm font-medium"
+            :class="getVisitorFrequencyColor(guild.visitors.frequency)"
+          >
+            {{ guild.visitors.frequency }}
+          </span>
+        </p>
         <div v-if="guild.visitors.types && guild.visitors.types.length > 0" class="mt-2">
           <p class="text-gray-300 text-sm mb-1">Tipos de visitantes:</p>
           <div class="flex flex-wrap gap-1">
             <span
               v-for="(type, index) in guild.visitors.types"
               :key="index"
-              class="inline-block px-2 py-1 bg-blue-800 text-blue-200 text-xs rounded-full border border-blue-600"
+              class="inline-block px-2 py-1 text-xs rounded-full font-medium bg-gray-600 text-gray-100 border border-gray-500"
             >
               {{ type }}
             </span>
@@ -129,6 +136,7 @@ import {
   BuildingLibraryIcon
 } from '@heroicons/vue/24/outline';
 import type { Guild } from '@/types/guild'
+import { getRelationColor, getResourceColor, getVisitorFrequencyColor } from '@/utils/colorHelpers'
 
 defineProps<{
   guild: Guild
@@ -137,48 +145,6 @@ defineProps<{
 defineEmits<{
   'regenerate-relations': []
 }>()
-
-const getRelationColor = (relation: string): string => {
-  const lowerRelation = relation.toLowerCase()
-  
-  if (lowerRelation.includes('hostil') || lowerRelation.includes('temida')) {
-    return 'bg-red-500'
-  } else if (lowerRelation.includes('suspeita') || lowerRelation.includes('desconfiada')) {
-    return 'bg-orange-500'
-  } else if (lowerRelation.includes('indiferente')) {
-    return 'bg-gray-400'
-  } else if (lowerRelation.includes('tolerante') || lowerRelation.includes('respeitada')) {
-    return 'bg-yellow-500'
-  } else if (lowerRelation.includes('cooperativa') || lowerRelation.includes('admirada')) {
-    return 'bg-blue-500'
-  } else if (lowerRelation.includes('aliada') || lowerRelation.includes('reverenciada')) {
-    return 'bg-green-500'
-  }
-  
-  return 'bg-gray-400'
-}
-
-const getResourceColor = (level: string): string => {
-  const lowerLevel = level.toLowerCase()
-  
-  if (lowerLevel.includes('escassos')) {
-    return 'bg-red-500'
-  } else if (lowerLevel.includes('limitados')) {
-    return 'bg-orange-500'
-  } else if (lowerLevel.includes('básicos')) {
-    return 'bg-yellow-500'
-  } else if (lowerLevel.includes('adequados')) {
-    return 'bg-blue-500'
-  } else if (lowerLevel.includes('abundantes')) {
-    return 'bg-green-500'
-  } else if (lowerLevel.includes('vastos')) {
-    return 'bg-cyan-500'
-  } else if (lowerLevel.includes('lendários')) {
-    return 'bg-amber-500'
-  }
-  
-  return 'bg-gray-400'
-}
 
 const formatDate = (date: Date | string | number): string => {
   try {
