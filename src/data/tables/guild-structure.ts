@@ -74,6 +74,7 @@ export const GOVERNMENT_RELATIONS_TABLE: TableEntry<string>[] = [
   { min: 15, max: 15, result: "Boa, mas o governo tenta miná-los secretamente", description: "Boa mas com tensão" },
   { min: 16, max: 17, result: "Boa", description: "Boa relação" },
   { min: 18, max: 20, result: "Muito boa, cooperam frequentemente", description: "Muito boa relação" },
+  { min: 21, max: 50, result: "Excelente, governo e guilda são quase como um", description: "Excelente relação" },
 ];
 
 // Reputação com a População Local (1d20)
@@ -85,6 +86,7 @@ export const POPULATION_RELATIONS_TABLE: TableEntry<string>[] = [
   { min: 15, max: 16, result: "Boa, ajudam com problemas", description: "Boa reputação" },
   { min: 17, max: 18, result: "Boa, nos mantêm seguros", description: "Vistos como protetores" },
   { min: 19, max: 20, result: "Muito boa, sem eles estaríamos perdidos", description: "Muito boa reputação" },
+  { min: 21, max: 50, result: "Excelente, a guilda faz o assentamento funcionar", description: "Excelente reputação" },
 ];
 
 // Nível de Frequentadores (1d8)
