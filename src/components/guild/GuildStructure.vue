@@ -25,6 +25,20 @@
         <p class="text-white font-medium">{{ guild.structure.size }}</p>
       </div>
 
+      <!-- Sede Matriz (se for) -->
+      <div v-if="guild.structure.isHeadquarters" class="bg-amber-900 rounded-lg p-4 border border-amber-700">
+        <h4 class="font-semibold text-amber-300 mb-2 flex items-center space-x-2">
+          <StarIcon class="w-4 h-4 text-amber-400" />
+          <span>Sede Matriz</span>
+        </h4>
+        <p class="text-amber-100 font-medium">
+          Esta é uma Sede Matriz, com recursos e influência superiores às sedes comuns.
+        </p>
+        <p class="text-amber-200 text-sm mt-1">
+          (+5 em todas as rolagens de estrutura)
+        </p>
+      </div>
+
       <!-- Características -->
       <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
         <h4 class="font-semibold text-gray-300 mb-2 flex items-center space-x-2">
@@ -92,7 +106,8 @@ import {
   MapPinIcon,
   DocumentTextIcon,
   UserGroupIcon,
-  BuildingOfficeIcon
+  BuildingOfficeIcon,
+  StarIcon
 } from '@heroicons/vue/24/solid'
 import type { Guild } from '@/types/guild'
 
