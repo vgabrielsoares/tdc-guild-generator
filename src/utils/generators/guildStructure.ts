@@ -384,10 +384,11 @@ export function generateVisitors(
       notation, 
       context: `Visitor frequency (${mappedSettlement})` 
     });
-    const result = findTableEntry(frequencyTable, diceRoll.result);
+    const clampedRoll = Math.max(1, diceRoll.result);
+    const result = findTableEntry(frequencyTable, clampedRoll);
     return {
       frequency: mapVisitorStringToEnum(result || "Nem muito nem pouco"),
-      roll: diceRoll.result,
+      roll: clampedRoll,
     };
   }
 
@@ -400,11 +401,12 @@ export function generateVisitors(
     notation, 
     context: `Visitor frequency (${mappedSettlement})` 
   });
-  const result = findTableEntry(frequencyTable, diceRoll.result);
+  const clampedRoll = Math.max(1, diceRoll.result);
+  const result = findTableEntry(frequencyTable, clampedRoll);
 
   return {
     frequency: mapVisitorStringToEnum(result || "Nem muito nem pouco"),
-    roll: diceRoll.result,
+    roll: clampedRoll,
   };
 }
 
@@ -458,10 +460,11 @@ export function generateResources(
       notation, 
       context: `Resources (${mappedSettlement})` 
     });
-    const result = findTableEntry(resourceTable, diceRoll.result);
+    const clampedRoll = Math.max(1, diceRoll.result);
+    const result = findTableEntry(resourceTable, clampedRoll);
     return {
       level: mapResourceStringToEnum(result || "Limitados"),
-      roll: diceRoll.result,
+      roll: clampedRoll,
     };
   }
 
@@ -471,11 +474,12 @@ export function generateResources(
     notation, 
     context: `Resources (${mappedSettlement})` 
   });
-  const result = findTableEntry(resourceTable, diceRoll.result);
+  const clampedRoll = Math.max(1, diceRoll.result);
+  const result = findTableEntry(resourceTable, clampedRoll);
 
   return {
     level: mapResourceStringToEnum(result || "Limitados"),
-    roll: diceRoll.result,
+    roll: clampedRoll,
   };
 }
 
