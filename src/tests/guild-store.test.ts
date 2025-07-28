@@ -222,7 +222,7 @@ describe("Issue 3.4 - Guild Store Complete", () => {
         settlementType: SettlementType.ALDEIA,
       });
       const guild2 = await store.generateGuild({
-        settlementType: SettlementType.CIDADE_PEQUENA,
+        settlementType: SettlementType.POVOADO,
       });
 
       expect(store.currentGuild?.id).toBe(guild2?.id);
@@ -271,7 +271,7 @@ describe("Issue 3.4 - Guild Store Complete", () => {
 
       await store.generateGuild({ settlementType: SettlementType.ALDEIA });
       await store.generateGuild({
-        settlementType: SettlementType.CIDADE_PEQUENA,
+        settlementType: SettlementType.POVOADO,
       });
 
       expect(store.historyCount).toBe(2);
@@ -348,7 +348,7 @@ describe("Issue 3.4 - Guild Store Complete", () => {
 
       await store.generateGuild({ settlementType: SettlementType.ALDEIA });
       await store.generateGuild({
-        settlementType: SettlementType.CIDADE_PEQUENA,
+        settlementType: SettlementType.POVOADO,
       });
 
       const exported = store.exportHistory();

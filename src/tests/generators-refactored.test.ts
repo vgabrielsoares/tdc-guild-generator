@@ -13,7 +13,7 @@ describe('Refactored Generators - Phase 3', () => {
   describe('StructureGenerator', () => {
     it('should generate valid structure for different settlement types', () => {
       const config = {
-        settlementType: SettlementType.CIDADE_PEQUENA,
+        settlementType: SettlementType.POVOADO,
         debug: false,
       };
       
@@ -137,7 +137,7 @@ describe('Refactored Generators - Phase 3', () => {
 
     it('should apply relation modifiers correctly', () => {
       const config = {
-        settlementType: SettlementType.CIDADE_PEQUENA,
+        settlementType: SettlementType.POVOADO,
         relationModifiers: {
           government: RelationLevel.PESSIMA,
           population: RelationLevel.BOA,
@@ -194,7 +194,7 @@ describe('Refactored Generators - Phase 3', () => {
   describe('GuildGenerator - Integration', () => {
     it('should generate complete guild with all systems integrated', () => {
       const config = {
-        settlementType: SettlementType.CIDADE_PEQUENA,
+        settlementType: SettlementType.POVOADO,
         name: 'Guilda de Teste',
         debug: false,
       };
@@ -205,7 +205,7 @@ describe('Refactored Generators - Phase 3', () => {
       // Verificar guild completa
       expect(result.data.guild).toBeDefined();
       expect(result.data.guild.name).toBe('Guilda de Teste');
-      expect(result.data.guild.settlementType).toBe(SettlementType.CIDADE_PEQUENA);
+      expect(result.data.guild.settlementType).toBe(SettlementType.POVOADO);
       
       // Verificar todas as seções
       expect(result.data.guild.structure).toBeDefined();

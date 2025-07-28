@@ -13,7 +13,7 @@ describe('Manual Save to History', () => {
     
     // Gerar uma guilda
     await guildStore.generateGuild({
-      settlementType: SettlementType.CIDADE_PEQUENA,
+      settlementType: SettlementType.POVOADO,
       saveToHistory: false
     });
     
@@ -50,7 +50,7 @@ describe('Manual Save to History', () => {
     
     // Gerar uma guilda
     await guildStore.generateGuild({
-      settlementType: SettlementType.CIDADE_PEQUENA,
+      settlementType: SettlementType.POVOADO,
       saveToHistory: false
     });
     

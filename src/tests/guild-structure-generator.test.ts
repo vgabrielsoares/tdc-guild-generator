@@ -14,7 +14,7 @@ import { SettlementType, ResourceLevel, VisitorLevel, RelationLevel } from '../t
 describe('Issue 3.2 - Guild Structure Generator', () => {
   describe('Individual Generator Functions', () => {
     it('should generate headquarters size with proper structure', () => {
-      const result = generateHeadquartersSize(SettlementType.CIDADE_PEQUENA);
+      const result = generateHeadquartersSize(SettlementType.POVOADO);
       
       expect(result.size).toBeTypeOf('string');
       expect(result.size.length).toBeGreaterThan(0);
@@ -28,7 +28,7 @@ describe('Issue 3.2 - Guild Structure Generator', () => {
       expect(smallResult.characteristics).toHaveLength(1);
       expect(smallResult.rolls).toHaveLength(1);
 
-      const mediumResult = generateHeadquartersCharacteristics(12, SettlementType.CIDADE_PEQUENA);
+      const mediumResult = generateHeadquartersCharacteristics(12, SettlementType.POVOADO);
       expect(mediumResult.characteristics).toHaveLength(2);
       expect(mediumResult.rolls).toHaveLength(2);
 
@@ -197,7 +197,7 @@ describe('Issue 3.2 - Guild Structure Generator', () => {
       let foundExperienced = false;
       
       for (let i = 0; i < 10 && !foundExperienced; i++) {
-        const config = { settlementType: SettlementType.CIDADE_PEQUENA };
+        const config = { settlementType: SettlementType.POVOADO };
         const result = generateGuildStructure(config);
         
         if (result.guild.staff.employees.includes('experiente')) {
@@ -266,7 +266,7 @@ describe('Issue 3.2 - Guild Structure Generator', () => {
         const smallResult = generateGuildStructure(smallConfig);
         expect(smallResult.guild.structure.isHeadquarters).toBe(false);
         
-        const townConfig = { settlementType: SettlementType.CIDADE_PEQUENA };
+        const townConfig = { settlementType: SettlementType.POVOADO };
         const townResult = generateGuildStructure(townConfig);
         expect(townResult.guild.structure.isHeadquarters).toBe(false);
       }

@@ -15,7 +15,7 @@ describe('Guild Improvements', () => {
       
       // Gerar uma guilda primeiro
       await guildStore.generateGuild({
-        settlementType: SettlementType.CIDADE_PEQUENA,
+        settlementType: SettlementType.POVOADO,
         saveToHistory: false
       });
       
@@ -42,7 +42,7 @@ describe('Guild Improvements', () => {
       const guildStore = useGuildStore();
       
       await guildStore.generateGuild({
-        settlementType: SettlementType.CIDADE_PEQUENA,
+        settlementType: SettlementType.POVOADO,
         saveToHistory: false
       });
       
@@ -57,7 +57,7 @@ describe('Guild Improvements', () => {
       
       // Gerar e salvar no histórico
       await guildStore.generateGuild({
-        settlementType: SettlementType.CIDADE_PEQUENA,
+        settlementType: SettlementType.POVOADO,
         saveToHistory: false
       });
       
@@ -77,7 +77,7 @@ describe('Guild Improvements', () => {
       const guildStore = useGuildStore();
       
       await guildStore.generateGuild({
-        settlementType: SettlementType.CIDADE_PEQUENA,
+        settlementType: SettlementType.POVOADO,
         saveToHistory: false
       });
       
@@ -102,7 +102,7 @@ describe('Guild Improvements', () => {
       const guildStore = useGuildStore();
       
       await guildStore.generateGuild({
-        settlementType: SettlementType.CIDADE_PEQUENA,
+        settlementType: SettlementType.POVOADO,
         saveToHistory: false
       });
       
@@ -123,7 +123,7 @@ describe('Guild Improvements', () => {
       
       // Gerar múltiplas guildas
       await guildStore.generateGuild({
-        settlementType: SettlementType.CIDADE_PEQUENA,
+        settlementType: SettlementType.POVOADO,
         saveToHistory: false
       });
       const guild1 = convertToGuild(guildStore.currentGuild!);

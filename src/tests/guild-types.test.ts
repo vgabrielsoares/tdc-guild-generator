@@ -61,7 +61,6 @@ describe("Issue 3.1 - Guild TypeScript Types", () => {
     it("should have correct SettlementType values", () => {
       expect(SettlementType.LUGAREJO).toBe("Lugarejo");
       expect(SettlementType.ALDEIA).toBe("Aldeia");
-      expect(SettlementType.CIDADE_PEQUENA).toBe("Cidade Pequena");
       expect(SettlementType.CIDADE_GRANDE).toBe("Cidade Grande");
       expect(SettlementType.METROPOLE).toBe("Metrópole");
     });
@@ -161,14 +160,14 @@ describe("Issue 3.1 - Guild TypeScript Types", () => {
         resources: {
           level: ResourceLevel.SUFICIENTES,
         },
-        settlementType: SettlementType.CIDADE_PEQUENA,
+        settlementType: SettlementType.POVOADO,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
 
       expect(guild.id).toBe("guild-001");
       expect(guild.name).toBe("Guilda dos Aventureiros");
-      expect(guild.settlementType).toBe(SettlementType.CIDADE_PEQUENA);
+      expect(guild.settlementType).toBe(SettlementType.POVOADO);
     });
   });
 
@@ -332,7 +331,7 @@ describe("Issue 3.1 - Guild TypeScript Types", () => {
         resources: {
           level: ResourceLevel.SUFICIENTES,
         },
-        settlementType: SettlementType.CIDADE_PEQUENA,
+        settlementType: SettlementType.POVOADO,
         createdAt: new Date(),
       };
 

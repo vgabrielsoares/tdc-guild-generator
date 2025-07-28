@@ -31,20 +31,20 @@ describe("Settlement Dice Constraints - Bug Fix Validation", () => {
 
     it("should allow appropriate ranges for larger settlements", () => {
       const results = Array.from({ length: 3 }, () => ({
-        cidadePequena: generateHeadquartersSize(ST.CIDADE_PEQUENA, 0),
+        povoado: generateHeadquartersSize(ST.POVOADO, 0),
         cidadeGrande: generateHeadquartersSize(ST.CIDADE_GRANDE, 0),
         metropole: generateHeadquartersSize(ST.METROPOLE, 0),
       }));
 
       results.forEach((result) => {
-        // Cidade Pequena mapeia para Cidadela (d20, máximo 20)
-        expect(result.cidadePequena.roll).toBeLessThanOrEqual(20);
-        expect(result.cidadePequena.roll).toBeGreaterThanOrEqual(1);
-        
+        // Povoado usa d8 (máximo 8)
+        expect(result.povoado.roll).toBeLessThanOrEqual(8);
+        expect(result.povoado.roll).toBeGreaterThanOrEqual(1);
+
         // Cidade Grande usa d20+4 (mínimo 5, máximo 24)
         expect(result.cidadeGrande.roll).toBeLessThanOrEqual(24);
         expect(result.cidadeGrande.roll).toBeGreaterThanOrEqual(5);
-        
+
         // Metrópole usa d20+8 (mínimo 9, máximo 28)
         expect(result.metropole.roll).toBeLessThanOrEqual(28);
         expect(result.metropole.roll).toBeGreaterThanOrEqual(9);
@@ -73,7 +73,7 @@ describe("Settlement Dice Constraints - Bug Fix Validation", () => {
 
     it("should show clear differences between settlement types", () => {
       const results: Record<string, ReturnType<typeof generateGuildStructure>[]> = {};
-      const settlementTypes = [ST.LUGAREJO, ST.ALDEIA, ST.CIDADE_PEQUENA, ST.CIDADE_GRANDE, ST.METROPOLE];
+      const settlementTypes = [ST.LUGAREJO, ST.POVOADO, ST.ALDEIA, ST.VILAREJO, ST.VILA_GRANDE, ST.CIDADELA, ST.CIDADE_GRANDE, ST.METROPOLE];
       
       // Gerar várias guildas para cada tipo de assentamento
       settlementTypes.forEach((settlementType) => {
@@ -97,7 +97,7 @@ describe("Settlement Dice Constraints - Bug Fix Validation", () => {
     });
 
     it("should handle all settlement types without errors", () => {
-      const settlementTypes = [ST.LUGAREJO, ST.ALDEIA, ST.CIDADE_PEQUENA, ST.CIDADE_GRANDE, ST.METROPOLE];
+      const settlementTypes = [ST.LUGAREJO, ST.POVOADO, ST.ALDEIA, ST.VILAREJO, ST.VILA_GRANDE, ST.CIDADELA, ST.CIDADE_GRANDE, ST.METROPOLE];
 
       settlementTypes.forEach((settlementType) => {
         expect(() => {
@@ -117,7 +117,7 @@ describe("Settlement Dice Constraints - Bug Fix Validation", () => {
     });
 
     it("should maintain consistency in regeneration logic", () => {
-      const settlementType = ST.CIDADE_PEQUENA;
+      const settlementType = ST.POVOADO;
       const config = { settlementType, useModifiers: false };
       
       // Gerar várias guildas com a mesma configuração
