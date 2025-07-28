@@ -21,7 +21,7 @@ import {
   getDiceNotationString,
 } from "@/data/tables/guild-structure";
 import { mapSettlementTypeToTableKey } from "@/utils/enum-mappers";
-import { rollDice } from "@/utils/dice";
+import { rollDice, parseDiceNotation } from "@/utils/dice";
 import type { TableEntry, RollModifier } from "@/types/tables";
 
 /**
@@ -39,37 +39,33 @@ function rollOnTableWithSettlementDice<T>(
   // Calculate total modifier value
   const totalModifier = modifiers.reduce((sum, mod) => sum + mod.value, 0);
   
-  // Parse the base dice notation to extract the base dice and any existing modifier
-  const baseDiceMatch = diceNotation.match(/^(\d*d\d+)([+-]\d+)?$/);
-  if (!baseDiceMatch) {
-    throw new Error(`Invalid base dice notation: ${diceNotation}`);
-  }
-  
-  const baseDice = baseDiceMatch[1]; // e.g., "1d20"
-  const existingModifier = baseDiceMatch[2] ? parseInt(baseDiceMatch[2]) : 0; // e.g., +4 becomes 4
-  
-  // Combine existing and new modifiers
+  // Usa utilitário para parsear a notação de dados
+
+  const parsed = parseDiceNotation(diceNotation);
+  // parsed: { count, sides, modifier }
+  const baseCount = parsed?.parsed?.count ?? 1;
+  const baseSides = parsed?.parsed?.sides ?? 20;
+  const existingModifier = parsed?.parsed?.modifier ?? 0;
+
+  // Soma todos os modificadores
   const finalModifier = existingModifier + totalModifier;
-  
-  // Create final dice notation
-  const finalDiceNotation = finalModifier === 0
-    ? baseDice
-    : `${baseDice}${finalModifier > 0 ? `+${finalModifier}` : `${finalModifier}`}`;
-    
+  // Monta a notação final
+  const finalDiceNotation = `${baseCount}d${baseSides}${finalModifier === 0 ? '' : (finalModifier > 0 ? `+${finalModifier}` : `${finalModifier}`)}`;
+
   // Roll the dice
   const diceRoll = rollDice({
     notation: finalDiceNotation,
     context,
     logRoll: true,
   });
-  
+
   // Find result in table
-  const entry = table.find(entry => 
+  const entry = table.find(entry =>
     diceRoll.result >= entry.min && diceRoll.result <= entry.max
   );
-  
+
   const result = entry ? entry.result : table[table.length - 1].result;
-  
+
   return {
     result,
     finalRoll: diceRoll.result,
