@@ -3,8 +3,11 @@ import { z } from "zod";
 // Enums para valores fixos - organizados por categoria
 export enum SettlementType {
   LUGAREJO = "Lugarejo",
+  POVOADO = "Povoado",
   ALDEIA = "Aldeia",
-  CIDADE_PEQUENA = "Cidade Pequena",
+  VILAREJO = "Vilarejo",
+  VILA_GRANDE = "Vila grande",
+  CIDADELA = "Cidadela",
   CIDADE_GRANDE = "Cidade Grande",
   METROPOLE = "Metrópole",
 }

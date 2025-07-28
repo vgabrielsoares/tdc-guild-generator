@@ -68,9 +68,12 @@ function lookupTableValue<T>(table: TableEntry<T>[], value: number): T {
 function mapSettlementType(settlementType: SettlementType): string {
   const mapping: Record<SettlementType, string> = {
     [SettlementType.LUGAREJO]: "Lugarejo",
+    [SettlementType.POVOADO]: "Povoado",
     [SettlementType.ALDEIA]: "Aldeia",
-    [SettlementType.CIDADE_PEQUENA]: "Cidadela",
-    [SettlementType.CIDADE_GRANDE]: "Cidade grande",
+    [SettlementType.VILAREJO]: "Vilarejo",
+    [SettlementType.VILA_GRANDE]: "Vila grande",
+    [SettlementType.CIDADELA]: "Cidadela",
+    [SettlementType.CIDADE_GRANDE]: "Cidade Grande",
     [SettlementType.METROPOLE]: "Metrópole",
   };
   return mapping[settlementType] || "Aldeia";
