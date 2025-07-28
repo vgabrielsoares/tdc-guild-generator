@@ -24,15 +24,15 @@ describe('Issue 3.2 - Guild Structure Generator', () => {
 
     it('should generate headquarters characteristics based on size roll', () => {
       // Test different size rolls for different number of characteristics
-      const smallResult = generateHeadquartersCharacteristics(5);
+      const smallResult = generateHeadquartersCharacteristics(5, SettlementType.ALDEIA);
       expect(smallResult.characteristics).toHaveLength(1);
       expect(smallResult.rolls).toHaveLength(1);
 
-      const mediumResult = generateHeadquartersCharacteristics(12);
+      const mediumResult = generateHeadquartersCharacteristics(12, SettlementType.CIDADE_PEQUENA);
       expect(mediumResult.characteristics).toHaveLength(2);
       expect(mediumResult.rolls).toHaveLength(2);
 
-      const largeResult = generateHeadquartersCharacteristics(18);
+      const largeResult = generateHeadquartersCharacteristics(18, SettlementType.CIDADE_GRANDE);
       expect(largeResult.characteristics).toHaveLength(3);
       expect(largeResult.rolls).toHaveLength(3);
     });
@@ -48,21 +48,21 @@ describe('Issue 3.2 - Guild Structure Generator', () => {
     });
 
     it('should generate government relations with valid enum', () => {
-      const result = generateStructureGovernmentRelations();
+      const result = generateStructureGovernmentRelations(SettlementType.CIDADE_GRANDE);
       
       expect(Object.values(RelationLevel)).toContain(result.relation);
       expect(result.roll).toBeTypeOf('number');
       expect(result.roll).toBeGreaterThan(0);
-      expect(result.roll).toBeLessThanOrEqual(20);
+      expect(result.roll).toBeLessThanOrEqual(28); // d20+8 max for Metrópole
     });
 
     it('should generate population relations with valid enum', () => {
-      const result = generateStructurePopulationRelations();
+      const result = generateStructurePopulationRelations(SettlementType.ALDEIA);
       
       expect(Object.values(RelationLevel)).toContain(result.relation);
       expect(result.roll).toBeTypeOf('number');
       expect(result.roll).toBeGreaterThan(0);
-      expect(result.roll).toBeLessThanOrEqual(20);
+      expect(result.roll).toBeLessThanOrEqual(8); // d8 max for Aldeia
     });
 
     it('should generate visitors with valid enum and settlement type', () => {
