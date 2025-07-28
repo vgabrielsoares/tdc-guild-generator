@@ -26,12 +26,21 @@ import {
 } from "../../data/tables/guild-structure";
 import { ModifierCalculator } from "./resources-visitors-generator";
 
+
 /**
  * Helper function to find table entry by roll value
  */
 function findTableEntry<T>(table: TableEntry<T>[], roll: number): T | null {
   const entry = table.find((entry) => roll >= entry.min && roll <= entry.max);
   return entry ? entry.result : null;
+}
+
+/**
+ * Helper to build dice notation string (e.g. 1d8+2, 1d20-1)
+ */
+function buildDiceNotation(dice: string, modifier: number): string {
+  if (!modifier) return `1${dice}`;
+  return `1${dice}${modifier >= 0 ? "+" : ""}${modifier}`;
 }
 
 /**
@@ -71,7 +80,7 @@ function mapSettlementType(settlementType: SettlementType): string {
     [SettlementType.POVOADO]: "Povoado",
     [SettlementType.ALDEIA]: "Aldeia",
     [SettlementType.VILAREJO]: "Vilarejo",
-    [SettlementType.VILA_GRANDE]: "Vila grande",
+    [SettlementType.VILA_GRANDE]: "Vila Grande",
     [SettlementType.CIDADELA]: "Cidadela",
     [SettlementType.CIDADE_GRANDE]: "Cidade Grande",
     [SettlementType.METROPOLE]: "Metrópole",
@@ -95,14 +104,14 @@ export function generateHeadquartersType(settlementType: SettlementType): {
   if (!diceConfig) {
     // Fallback to d8 for unknown settlement types
     const fallbackConfig = { dice: "d8", modifier: 0 };
-    const notation = `1${fallbackConfig.dice}${fallbackConfig.modifier >= 0 ? "+" : ""}${fallbackConfig.modifier}`;
+    const notation = buildDiceNotation(fallbackConfig.dice, fallbackConfig.modifier);
     const diceRoll = rollDice({ notation, context: "Headquarters type (fallback)" });
     const result = lookupTableValue(HEADQUARTERS_TYPE_TABLE, diceRoll.result);
     const isHeadquarters = result === 'Sede Matriz';
     return { isHeadquarters, roll: diceRoll.result };
   }
 
-  const notation = `1${diceConfig.dice}${diceConfig.modifier >= 0 ? "+" : ""}${diceConfig.modifier}`;
+  const notation = buildDiceNotation(diceConfig.dice, diceConfig.modifier);
   const diceRoll = rollDice({ notation, context: `Headquarters type (${mappedSettlement})` });
   const result = lookupTableValue(HEADQUARTERS_TYPE_TABLE, diceRoll.result);
   const isHeadquarters = result === 'Sede Matriz';
@@ -126,13 +135,13 @@ export function generateHeadquartersSize(
   if (!diceConfig) {
     // Fallback to d8 for unknown settlement types
     const fallbackConfig = { dice: "d8", modifier: 0 };
-    const notation = `1${fallbackConfig.dice}${fallbackConfig.modifier + modifier >= 0 ? "+" : ""}${fallbackConfig.modifier + modifier}`;
+    const notation = buildDiceNotation(fallbackConfig.dice, fallbackConfig.modifier + modifier);
     const diceRoll = rollDice({ notation });
     const size = lookupTableValue(HEADQUARTERS_SIZE_TABLE, diceRoll.result);
     return { size, roll: diceRoll.result };
   }
 
-  const notation = `1${diceConfig.dice}${diceConfig.modifier + modifier >= 0 ? "+" : ""}${diceConfig.modifier + modifier}`;
+  const notation = buildDiceNotation(diceConfig.dice, diceConfig.modifier + modifier);
   const diceRoll = rollDice({ notation });
   const size = lookupTableValue(HEADQUARTERS_SIZE_TABLE, diceRoll.result);
 
@@ -169,13 +178,14 @@ export function generateHeadquartersCharacteristics(
   const baseModifier = diceConfig ? diceConfig.modifier : 0;
   const totalModifier = baseModifier + headquartersModifier;
 
+
   for (let i = 0; i < numCharacteristics; i++) {
     let attempts = 0;
     let result: string;
     let diceRoll: { result: number };
 
     do {
-      const notation = `${baseDice}${totalModifier >= 0 ? "+" : ""}${totalModifier}`;
+      const notation = buildDiceNotation(baseDice, totalModifier);
       diceRoll = rollDice({ notation, context: `Headquarters characteristics (${mappedSettlement})` });
       result = lookupTableValue(
         HEADQUARTERS_CHARACTERISTICS_TABLE,
@@ -219,7 +229,7 @@ export function generateEmployees(
     // Fallback to d8 for unknown settlement types
     const fallbackConfig = { dice: "d8", modifier: 0 };
     const totalModifier = fallbackConfig.modifier + modifier;
-    const notation = `1${fallbackConfig.dice}${totalModifier >= 0 ? "+" : ""}${totalModifier}`;
+    const notation = buildDiceNotation(fallbackConfig.dice, totalModifier);
     const diceRoll = rollDice({ 
       notation, 
       context: `Employees (${mappedSettlement})` 
@@ -229,7 +239,7 @@ export function generateEmployees(
   }
 
   const totalModifier = diceConfig.modifier + modifier;
-  const notation = `1${diceConfig.dice}${totalModifier >= 0 ? "+" : ""}${totalModifier}`;
+  const notation = buildDiceNotation(diceConfig.dice, totalModifier);
   const diceRoll = rollDice({ 
     notation, 
     context: `Employees (${mappedSettlement})` 
@@ -306,7 +316,7 @@ export function generateStructureGovernmentRelations(
   const baseModifier = diceConfig ? diceConfig.modifier : 0;
   const totalModifier = baseModifier + modifier;
 
-  const notation = `${baseDice}${totalModifier >= 0 ? "+" : ""}${totalModifier}`;
+  const notation = buildDiceNotation(baseDice, totalModifier);
   const diceRoll = rollDice({
     notation,
     context: `Government relations (${mappedSettlement})`
@@ -339,7 +349,7 @@ export function generateStructurePopulationRelations(
   const baseModifier = diceConfig ? diceConfig.modifier : 0;
   const totalModifier = baseModifier + modifier;
 
-  const notation = `${baseDice}${totalModifier >= 0 ? "+" : ""}${totalModifier}`;
+  const notation = buildDiceNotation(baseDice, totalModifier);
   const diceRoll = rollDice({
     notation,
     context: `Population relations (${mappedSettlement})`
@@ -376,10 +386,7 @@ export function generateVisitors(
     // Fallback to d8 for unknown settlement types
     const fallbackConfig = { dice: "d8", modifier: 0 };
     const finalModifier = (fallbackConfig.modifier || 0) + modifier;
-    const notation =
-      finalModifier === 0
-        ? `1${fallbackConfig.dice}`
-        : `1${fallbackConfig.dice}${finalModifier >= 0 ? "+" : ""}${finalModifier}`;
+    const notation = buildDiceNotation(fallbackConfig.dice, finalModifier);
     const diceRoll = rollDice({ 
       notation, 
       context: `Visitor frequency (${mappedSettlement})` 
@@ -393,10 +400,7 @@ export function generateVisitors(
   }
 
   const finalModifier = (diceConfig.modifier || 0) + modifier;
-  const notation =
-    finalModifier === 0
-      ? `1${diceConfig.dice}`
-      : `1${diceConfig.dice}${finalModifier >= 0 ? "+" : ""}${finalModifier}`;
+  const notation = buildDiceNotation(diceConfig.dice, finalModifier);
   const diceRoll = rollDice({ 
     notation, 
     context: `Visitor frequency (${mappedSettlement})` 
@@ -455,7 +459,7 @@ export function generateResources(
     // Fallback to d8 for unknown settlement types
     const fallbackConfig = { dice: "d8", modifier: 0 };
     const totalModifier = fallbackConfig.modifier + modifier;
-    const notation = `1${fallbackConfig.dice}${totalModifier >= 0 ? "+" : ""}${totalModifier}`;
+    const notation = buildDiceNotation(fallbackConfig.dice, totalModifier);
     const diceRoll = rollDice({ 
       notation, 
       context: `Resources (${mappedSettlement})` 
@@ -469,7 +473,7 @@ export function generateResources(
   }
 
   const totalModifier = diceConfig.modifier + modifier;
-  const notation = `1${diceConfig.dice}${totalModifier >= 0 ? "+" : ""}${totalModifier}`;
+  const notation = buildDiceNotation(diceConfig.dice, totalModifier);
   const diceRoll = rollDice({ 
     notation, 
     context: `Resources (${mappedSettlement})` 
