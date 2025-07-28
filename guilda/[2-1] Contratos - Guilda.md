@@ -924,48 +924,42 @@ Role nas tabelas correspondentes ao resultado de Localidade Principal.
 
 | 1d20 | Zona rural |
 |------|------------|
-| 1 | Pequena aldeia |
-| 2 | Vilarejo desprotegido |
-| 3 | Grande plantação/vinhedo |
-| 4 | Lugarejo |
-| 5 | Povoado humilde |
-| 6 | Fazenda |
-| 7 | Comunidade itinerante |
-| 8 | Celeiro/moinho/estábulo |
-| 9 | Criadouro/abatedouro |
-| 10 | Pousada isolada |
-| 11 | Campo de cultivo |
-| 12 | Mercado rural |
-| 13 | Capela ou santuário na natureza |
-| 14 |  |
+| 1-2 | Pequena aldeia |
+| 3 | Vilarejo desprotegido |
+| 4 | Grande plantação/vinhedo |
+| 5 | Lugarejo |
+| 6 | Povoado humilde |
+| 7 | Fazenda |
+| 8 | Comunidade itinerante |
+| 9 | Celeiro/moinho/estábulo |
+| 10 | Criadouro/abatedouro |
+| 11 | Pousada isolada |
+| 12 | Campo de cultivo |
+| 13 | Mercado rural |
+| 14 | Capela ou santuário na natureza |
 | 15 | Escola ou posto em um campo |
 | 16 | Oficina rural |
 | 17 | Armazém de grãos |
-| 18 |  |
-| 19 | Área de pastagem | 
-| 20 | Role duas vezes e use ambos |
+| 18 | Área de pastagem | 
+| 19-20 | Role duas vezes e use ambos |
 
 ###### Localidade Exótica
 
 | 1d20 | Localidade exótica |
 |------|-------------------|
-| 1 | Plano feérico |
-| 2 | Dentro de um objeto pequeno |
-| 3 | Floresta mágica |
-| 4 | Plano elemental |
-| 5 | Dentro de uma criatura |
-| 6 | Pirâmide/zigurate |
-| 7 | Assentamento submarino |
-| 8 | Plano astral |
-| 9 | Abismo ou Inferno |
-| 10 | Umbra |
-| 11 |  |
-| 12 |  |
-| 13 | Labirinto dimensional |
-| 14 | Cidade voadora |
-| 15 |  |
-| 16 | Ilha flutuante |
-| 17 |  |
+| 1-2 | Plano feérico |
+| 3 | Dentro de um objeto pequeno |
+| 4-6 | Floresta mágica |
+| 7 | Plano elemental |
+| 8 | Dentro de uma criatura |
+| 9-10 | Pirâmide/zigurate |
+| 11 | Assentamento submarino |
+| 12 | Plano astral |
+| 13 | Abismo ou Inferno |
+| 14 | Umbra |
+| 15 | Labirinto dimensional |
+| 16 | Cidade voadora |
+| 17 | Ilha flutuante |
 | 18 | Biblioteca infinita |
 | 19 | Santuário cristalino |
 | 20 | Role duas vezes e use ambos |
@@ -978,20 +972,16 @@ Role nas tabelas correspondentes ao resultado de Localidade Principal.
 | 2 | Despenhadeiro |
 | 3 | Ravina subterrânea |
 | 4 | Fossa abissal |
-| 5 | Tumba esquecida |
-| 6 | Cripta |
-| 7 | Assentamento de humanoides |
-| 8 | Fenda submarina |
-| 9 | Cemitério de monstruosidades |
-| 10 | Labirinto |
-| 11 | Mina abandonada |
-| 12 |  |
-| 13 | Sistema de túneis |
-| 14 | Gruta submersa |
-| 15 | Câmaras secretas |
-| 16 |  |
-| 17 |  |
-| 18 | Abismo rochoso |
+| 5-6 | Tumba esquecida |
+| 7-8 | Cripta |
+| 9-10 | Assentamento de humanoides |
+| 11 | Fenda submarina |
+| 12 | Cemitério de monstruosidades |
+| 13 | Labirinto |
+| 14-15 | Mina abandonada |
+| 16 | Sistema de túneis |
+| 17 | Gruta submersa |
+| 18 | Câmaras secretas |
 | 19 | Prisão subterrânea |
 | 20 | Role duas vezes e use ambos |
 
@@ -1015,9 +1005,8 @@ Role nas tabelas correspondentes ao resultado de Localidade Principal.
 | 14 | Lago venenoso |
 | 15 | Montanha assombrada |
 | 16 | Cidade fantasma |
-| 17 |  |
-| 18 | Bosque corrompido |
-| 19 | Floresta assombrada |
+| 17 | Bosque corrompido |
+| 18-19 | Floresta assombrada |
 | 20 | Role duas vezes e use ambos |
 
 ##### Distrito Específico
@@ -1075,11 +1064,10 @@ Qual o motivo pelo qual o contrato foi feito?
 | 13 | Sacerdote caído |
 | 14 | Espião infiltrado |
 | 15 | Artista excêntrico |
-| 16 |  |
-| 17 | Diplomata traidor |
-| 18 | Revolucionário radical |
-| 19 | Mentor decaído |
-| 20 | Role duas vezes e use ambos |
+| 16 | Diplomata traidor |
+| 17 | Revolucionário radical |
+| 18 | Mentor decaído |
+| 19-20 | Role duas vezes e use ambos |
 
 ##### Artefato Mágico
 
@@ -1160,24 +1148,19 @@ Qual o motivo pelo qual o contrato foi feito?
 
 | 1d20 | Entidade sobrenatural |
 |------|----------------------|
-| 1 | Vampiro |
-| 2 | Ser incorpóreo |
-| 3 | Corruptor problemático |
-| 4 | Lich |
-| 5 | Morto-vivo poderoso |
-| 6 |  |
-| 7 | Celestial descontrolado |
-| 8 | Fada |
-| 9 |  |
-| 10 |  |
-| 11 | Demônio menor |
-| 12 | Anjo caído |
-| 13 | Espectro antigo |
-| 14 | Senhor das sombras |
-| 15 | Arquifada |
-| 16 | Entidade cósmica |
-| 17 | Espírito elemental |
-| 18 | Alma perdida |
+| 1-3 | Vampiro |
+| 4 | Ser incorpóreo |
+| 5-7 | Morto-vivo poderoso |
+| 8 | Celestial descontrolado |
+| 9 | Fada |
+| 10-11 | Demônio menor |
+| 11 | Anjo caído |
+| 12 | Espectro antigo |
+| 13 | Senhor das sombras |
+| 14 | Arquifada |
+| 15 | Entidade cósmica |
+| 16 | Espírito elemental |
+| 17-18 | Alma perdida |
 | 19 | Guardião corrompido |
 | 20 | Role duas vezes e use ambos |
 
@@ -1185,22 +1168,19 @@ Qual o motivo pelo qual o contrato foi feito?
 
 | 1d20 | Anomalia |
 |------|----------|
-| 1 | Monstruosidade |
-| 2 | Demônio ou diabo |
-| 3 | Fenda planar |
-| 4 | Híbrido ou Animalesco |
-| 5 | Névoa sobrenatural |
-| 6 | Invasão zumbi/esqueleto |
-| 7 | Limo |
-| 8 | Anormalidades na natureza |
-| 9 | Criatura poderosa adormecida |
-| 10 | Climática |
-| 11 | Zona de magia selvagem |
-| 12 | Distorção temporal |
-| 13 |  |
-| 14 |  |
-| 15 | Mutação descontrolada |
-| 16 |  |
+| 1-2 | Monstruosidade |
+| 3-4 | Demônio ou diabo |
+| 5 | Fenda planar |
+| 6 | Híbrido ou Animalesco |
+| 7 | Névoa sobrenatural |
+| 8 | Invasão zumbi/esqueleto |
+| 9 | Limo |
+| 10 | Anormalidades na natureza |
+| 11 | Criatura poderosa adormecida |
+| 12 | Climática |
+| 13-14 | Zona de magia selvagem |
+| 15 | Distorção temporal |
+| 16 | Mutação descontrolada |
 | 17 | Corrupção arcana |
 | 18 | Fissura na realidade |
 | 19 | Manifestação psíquica |
@@ -1223,13 +1203,12 @@ Qual o motivo pelo qual o contrato foi feito?
 | 11 | Deslizamento de terra |
 | 12 | Tempestade devastadora |
 | 13 | Explosão arcana |
-| 14 |  |
-| 15 | Praga de insetos |
-| 16 | Contaminação tóxica |
-| 17 | Falha em portal |
-| 18 | Acidente com criaturas |
-| 19 | Avalanche |
-| 20 | Role duas vezes e use ambos |
+| 14 | Praga de insetos |
+| 15 | Contaminação tóxica |
+| 16 | Falha em portal |
+| 17 | Acidente com criaturas |
+| 18 | Avalanche |
+| 19-20 | Role duas vezes e use ambos |
 
 ##### Crise
 
@@ -1332,26 +1311,24 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 
 | 1d20 | Vítimas |
 |------|---------|
-| 1 | Grande número de inocentes afetados |
-| 2 | Rival afetado que pede ajuda |
-| 3 | Nobre orgulhoso |
-| 4 | Entidade sobrenatural |
-| 5 | Inocente levando a culpa |
-| 6 | Criatura amada em perigo |
-| 7 | Vítimas agem como vilões |
-| 8 | Reféns com risco de morte |
-| 9 | Refugiados de zona de conflito |
-| 10 | Crianças/filhos do inimigo afetados |
-| 11 | Anciãos indefesos |
-| 12 |  |
+| 1-2 | Grande número de inocentes afetados |
+| 3 | Rival afetado que pede ajuda |
+| 4 | Nobre orgulhoso |
+| 5 | Entidade sobrenatural |
+| 6 | Inocente levando a culpa |
+| 7 | Criatura amada em perigo |
+| 8 | Vítimas agem como vilões |
+| 9 | Reféns com risco de morte |
+| 10 | Refugiados de zona de conflito |
+| 11 | Crianças/filhos do inimigo afetados |
+| 12 | Anciãos indefesos |
 | 13 | Visitantes estrangeiros |
 | 14 | Comerciantes presos |
 | 15 | Estudiosos capturados |
 | 16 | Artistas perseguidos |
-| 17 |  |
-| 18 | Testemunhas importantes |
-| 19 | Líderes religiosos |
-| 20 | Role duas vezes e use ambos |
+| 17 | Testemunhas importantes |
+| 18 | Líderes religiosos |
+| 19-20 | Role duas vezes e use ambos |
 
 ###### Organização
 
@@ -1400,8 +1377,7 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 16 | Ritual antigo ativado |
 | 17 | Portal divino aberto |
 | 18 | Revelação sobrenatural |
-| 19 |  |
-| 20 | Role duas vezes e use ambos |
+| 19-20 | Role duas vezes e use ambos |
 
 ###### Ambiente Hostil
 
@@ -1442,16 +1418,15 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 8 | Completamente esquecido |
 | 9 | Memórias roubadas |
 | 10 | Aliado confundido com inimigo |
-| 11 |  |
-| 12 | Existe apenas em sonhos |
-| 13 | Invisível para alguns |
-| 14 | Muda de forma constantemente |
-| 15 | Só existe em determinada hora |
-| 16 | Espelhado/invertido |
-| 17 | Fragmentado no tempo |
-| 18 | Compartilha consciência |
-| 19 | Reage ao contrário do esperado |
-| 20 | Role duas vezes e use ambos |
+| 11 | Existe apenas em sonhos |
+| 12 | Invisível para alguns |
+| 13 | Muda de forma constantemente |
+| 14 | Só existe em determinada hora |
+| 15 | Espelhado/invertido |
+| 16 | Fragmentado no tempo |
+| 17 | Compartilha consciência |
+| 18 | Reage ao contrário do esperado |
+| 19-20 | Role duas vezes e use ambos |
 
 ###### Problemas Diplomáticos
 
@@ -1650,25 +1625,22 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 
 | 1d20 | Inesperado |
 |------|------------|
-| 1 | Um antigo inimigo/rival |
-| 2 | Metamorfo |
-| 3 | Constructo |
-| 4 | Criatura do próximo encontro aleatório |
-| 5 | Inimigo desertor |
-| 6 | Objeto animado |
-| 7 | Velho conhecido de um dos jogadores |
-| 8 | Fã/interesse amoroso de um personagem |
-| 9 | Animal inteligente |
-| 10 | Informações de uma fonte inesperada |
-| 11 | Criança precoce |
-| 12 | Fantasma arrependido |
-| 13 | Rival reconciliado |
-| 14 | Ex-inimigo rehabilitado |
-| 15 | Duplo bondoso |
-| 16 | Reflexo de espelho mágico |
-| 17 |  |
-| 18 |  |
-| 19 |  |
+| 1-2 | Um antigo inimigo/rival |
+| 3 | Metamorfo |
+| 4 | Constructo |
+| 5 | Criatura do próximo encontro aleatório |
+| 6 | Inimigo desertor |
+| 7 | Objeto animado |
+| 8-10 | Velho conhecido de um dos jogadores |
+| 11 | Fã/interesse amoroso de um personagem |
+| 12 | Animal inteligente |
+| 13 | Informações de uma fonte inesperada |
+| 14 | Criança precoce |
+| 15 | Fantasma arrependido |
+| 16 | Rival reconciliado |
+| 17 | Ex-inimigo rehabilitado |
+| 18 | Duplo bondoso |
+| 19 | Reflexo de espelho mágico |
 | 20 | Role duas vezes e use ambos |
 
 ###### Ajuda Sobrenatural
@@ -1678,21 +1650,19 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 1 | Deus maligno menor |
 | 2 | Espectro |
 | 3 | Infectados |
-| 4 | Sonhos/pesadelos/visões |
-| 5 | Portal mágico |
-| 6 | Elo mental |
-| 7 | Pseudo-dragão |
-| 8 | Forças divinas misteriosas |
-| 9 | Ressurgido vingativo |
-| 10 | Celestial |
-| 11 |  |
+| 4-5 | Sonhos/pesadelos/visões |
+| 6 | Portal mágico |
+| 7 | Elo mental |
+| 8 | Pseudo-dragão |
+| 9 | Forças divinas misteriosas |
+| 10 | Ressurgido vingativo |
+| 11 | Celestial |
 | 12 | Manifestação divina |
 | 13 | Oráculo místico |
 | 14 | Proteção ancestral |
-| 15 |  |
-| 16 | Bênção inesperada |
-| 17 | Guardião planar |
-| 18 | Alma benevolente |
+| 15 | Bênção inesperada |
+| 16 | Guardião planar |
+| 17-18 | Alma benevolente |
 | 19 | Fenômeno cósmico |
 | 20 | Role duas vezes e use ambos |
 
@@ -1707,19 +1677,18 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 5 | Aventureiro aposentado |
 | 6 | Trabalhador braçal |
 | 7 | Plebeu |
-| 8 |  |
-| 9 | Adepto acadêmico/religioso |
-| 10 | Especialista |
-| 11 | Artesão habilidoso |
-| 12 | Guarda local |
-| 13 | Camponês sábio |
-| 14 | Marinheiro experiente |
-| 15 | Curandeiro local |
-| 16 | Escriba letrado |
-| 17 | Cocheiro veterano |
-| 18 | Minerador conhecedor |
-| 19 | Pastor de animais |
-| 20 | Role duas vezes e use ambos |
+| 8 | Adepto acadêmico/religioso |
+| 9 | Especialista |
+| 10 | Artesão habilidoso |
+| 11 | Guarda local |
+| 12 | Camponês sábio |
+| 13 | Marinheiro experiente |
+| 14 | Curandeiro local |
+| 15 | Escriba letrado |
+| 16 | Cocheiro veterano |
+| 17 | Minerador conhecedor |
+| 18 | Pastor de animais |
+| 19-20 | Role duas vezes e use ambos |
 
 ###### Natureza
 
@@ -1910,23 +1879,20 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 
 | 1d20 | Riquezas |
 |------|----------|
-| 1 | Uma grande soma de ouro e prata |
-| 2 | Obra de arte/gema perdida |
-| 3 | Partes do lucro de um estabelecimento |
-| 4 | Escritura de um estabelecimento/construção |
-| 5 | Prole de criatura rara |
-| 6 | Item mágico |
-| 7 | Terras/fazendas |
-| 8 | Itens mundanos de alto valor e raridade |
-| 9 | Montaria/meio de transporte |
-| 10 | Engenhoca |
-| 11 | Pedras preciosas |
-| 12 |  |
-| 13 | Coleção de antiguidades |
-| 14 |  |
-| 15 | Participação em navio mercante |
-| 16 | Arsenal de armas finas |
-| 17 |  |
+| 1-2 | Uma grande soma de ouro e prata |
+| 3 | Obra de arte/gema perdida |
+| 4 | Partes do lucro de um estabelecimento |
+| 5 | Escritura de um estabelecimento/construção |
+| 6 | Prole de criatura rara |
+| 7-8 | Item mágico |
+| 9 | Terras/fazendas |
+| 10 | Itens mundanos de alto valor e raridade |
+| 11 | Montaria/meio de transporte |
+| 12 | Engenhoca |
+| 13-14 | Pedras preciosas |
+| 15 | Coleção de antiguidades |
+| 16 | Participação em navio mercante |
+| 17 | Arsenal de armas finas |
 | 18 | Tesouro pirata enterrado |
 | 19 | Herança nobre |
 | 20 | Role duas vezes e use ambos |
@@ -1950,10 +1916,7 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 13 | Manto encantado |
 | 14 | Botas mágicas |
 | 15 | Elmo encantado |
-| 16 |  |
-| 17 |  |
-| 18 |  |
-| 19 |  |
+
 | 20 | Role duas vezes e use ambos |
 
 ###### Poder
