@@ -67,7 +67,11 @@ export abstract class BaseGenerator<TConfig extends BaseGenerationConfig, TResul
     description: string,
     category: string = 'ROLL'
   ): { result: number; details: string } {
-    const roll = rollDice({ notation });
+    const roll = rollDice({ 
+      notation, 
+      context: description,
+      logRoll: true 
+    });
     const details = `${description}: ${notation} = ${roll.result}`;
     this.log(details, category);
     

@@ -3,8 +3,11 @@ import { z } from "zod";
 // Enums para valores fixos - organizados por categoria
 export enum SettlementType {
   LUGAREJO = "Lugarejo",
+  POVOADO = "Povoado",
   ALDEIA = "Aldeia",
-  CIDADE_PEQUENA = "Cidade Pequena",
+  VILAREJO = "Vilarejo",
+  VILA_GRANDE = "Vila Grande",
+  CIDADELA = "Cidadela",
   CIDADE_GRANDE = "Cidade Grande",
   METROPOLE = "Metrópole",
 }
@@ -58,6 +61,7 @@ export interface GuildStructure {
   readonly characteristics: readonly string[];
   readonly location?: string;
   readonly description?: string;
+  readonly isHeadquarters?: boolean;
 }
 
 export interface GuildRelations {
@@ -145,6 +149,7 @@ export const GuildStructureSchema = z.object({
     .min(1, "At least one characteristic is required"),
   location: z.string().optional(),
   description: z.string().optional(),
+  isHeadquarters: z.boolean().optional(),
 });
 
 export const GuildRelationsSchema = z.object({

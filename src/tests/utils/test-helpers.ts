@@ -49,7 +49,7 @@ export const createTestGuild = (overrides: Partial<Guild> = {}): Guild => {
       level: ResourceLevel.LIMITADOS,
       description: 'Recursos limitados mas suficientes',
     },
-    settlementType: SettlementType.CIDADE_PEQUENA,
+    settlementType: SettlementType.CIDADELA,
     createdAt: new Date(),
     locked: false,
     ...overrides,

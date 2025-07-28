@@ -74,6 +74,7 @@ export const GOVERNMENT_RELATIONS_TABLE: TableEntry<string>[] = [
   { min: 15, max: 15, result: "Boa, mas o governo tenta miná-los secretamente", description: "Boa mas com tensão" },
   { min: 16, max: 17, result: "Boa", description: "Boa relação" },
   { min: 18, max: 20, result: "Muito boa, cooperam frequentemente", description: "Muito boa relação" },
+  { min: 21, max: 50, result: "Excelente, governo e guilda são quase como um", description: "Excelente relação" },
 ];
 
 // Reputação com a População Local (1d20)
@@ -85,6 +86,7 @@ export const POPULATION_RELATIONS_TABLE: TableEntry<string>[] = [
   { min: 15, max: 16, result: "Boa, ajudam com problemas", description: "Boa reputação" },
   { min: 17, max: 18, result: "Boa, nos mantêm seguros", description: "Vistos como protetores" },
   { min: 19, max: 20, result: "Muito boa, sem eles estaríamos perdidos", description: "Muito boa reputação" },
+  { min: 21, max: 50, result: "Excelente, a guilda faz o assentamento funcionar", description: "Excelente reputação" },
 ];
 
 // Nível de Frequentadores (1d8)
@@ -205,46 +207,6 @@ export const VISITOR_TYPES_TABLE: TableEntry<string>[] = [
   },
 ];
 
-// Recursos - Tabelas específicas por tipo de assentamento
-export const RESOURCES_LEVEL_TABLE_D8: TableEntry<string>[] = [
-  { min: 1, max: 1, result: "Em débito", description: "A guilda deve dinheiro" },
-  { min: 2, max: 2, result: "Nenhum", description: "Sem recursos" },
-  { min: 3, max: 4, result: "Escassos", description: "Recursos muito limitados" },
-  { min: 5, max: 5, result: "Escassos e obtidos com muito esforço e honestidade", description: "Recursos honestos mas difíceis" },
-  { min: 6, max: 6, result: "Limitados", description: "Recursos suficientes para sobreviver" },
-  { min: 7, max: 7, result: "Suficientes", description: "Recursos adequados" },
-  { min: 8, max: 8, result: "Excedentes", description: "Recursos em abundância" },
-];
-
-export const RESOURCES_LEVEL_TABLE_D12: TableEntry<string>[] = [
-  { min: 1, max: 1, result: "Em débito", description: "A guilda deve dinheiro" },
-  { min: 2, max: 3, result: "Nenhum", description: "Sem recursos" },
-  { min: 4, max: 5, result: "Escassos", description: "Recursos muito limitados" },
-  { min: 6, max: 6, result: "Escassos e obtidos com muito esforço e honestidade", description: "Recursos honestos mas difíceis" },
-  { min: 7, max: 8, result: "Limitados", description: "Recursos suficientes para sobreviver" },
-  { min: 9, max: 10, result: "Suficientes", description: "Recursos adequados" },
-  { min: 11, max: 11, result: "Excedentes", description: "Recursos em abundância" },
-  { min: 12, max: 12, result: "Abundantes", description: "Recursos muito abundantes" },
-];
-
-export const RESOURCES_LEVEL_TABLE_D20: TableEntry<string>[] = [
-  { min: 1, max: 2, result: "Em débito", description: "A guilda deve dinheiro" },
-  { min: 3, max: 5, result: "Nenhum", description: "Sem recursos" },
-  { min: 6, max: 8, result: "Escassos", description: "Recursos muito limitados" },
-  { min: 9, max: 9, result: "Escassos e obtidos com muito esforço e honestidade", description: "Recursos honestos mas difíceis" },
-  { min: 10, max: 11, result: "Limitados", description: "Recursos suficientes para sobreviver" },
-  { min: 12, max: 12, result: "Limitados", description: "Recursos suficientes para sobreviver" },
-  { min: 13, max: 15, result: "Suficientes", description: "Recursos adequados" },
-  { min: 16, max: 16, result: "Excedentes", description: "Recursos em abundância" },
-  { min: 17, max: 17, result: "Excedentes mas alimenta fins malignos", description: "Recursos questionáveis" },
-  { min: 18, max: 19, result: "Abundantes porém quase todo vindo do governo de um assentamento próximo", description: "Recursos governamentais" },
-  { min: 20, max: 20, result: "Abundantes", description: "Recursos muito abundantes" },
-  { min: 21, max: 25, result: "Abundantes vindos de muitos anos de serviço", description: "Recursos de longa data" },
-];
-
-// Tabela legada para compatibilidade
-export const RESOURCES_LEVEL_TABLE = RESOURCES_LEVEL_TABLE_D20;
-
 // Especialidades de Recursos (1d10, role múltiplas vezes baseado no nível)
 export const RESOURCE_SPECIALTIES_TABLE: TableEntry<string>[] = [
   {
@@ -307,6 +269,23 @@ export const RESOURCE_SPECIALTIES_TABLE: TableEntry<string>[] = [
     result: "Financeiro",
     description: "Grandes quantias de ouro e crédito",
   },
+];
+
+export const RESOURCES_LEVEL_TABLE: TableEntry<string>[] = [
+  // Extensão para valores negativos devido a modificadores
+  { min: -20, max: 0, result: "Em débito", description: "A guilda deve dinheiro" },
+  { min: 1, max: 2, result: "Em débito", description: "A guilda deve dinheiro" },
+  { min: 3, max: 5, result: "Nenhum", description: "Sem recursos" },
+  { min: 6, max: 8, result: "Escassos", description: "Recursos muito limitados" },
+  { min: 9, max: 9, result: "Escassos e obtidos com muito esforço e honestidade", description: "Recursos honestos mas difíceis" },
+  { min: 10, max: 12, result: "Limitados", description: "Recursos suficientes para sobreviver" },
+  { min: 13, max: 15, result: "Suficientes", description: "Recursos adequados" },
+  { min: 16, max: 16, result: "Excedentes", description: "Recursos em abundância" },
+  { min: 17, max: 17, result: "Excedentes mas alimenta fins malignos", description: "Recursos questionáveis" },
+  { min: 18, max: 19, result: "Abundantes porém quase todo vindo do governo de um assentamento próximo", description: "Recursos governamentais" },
+  { min: 20, max: 20, result: "Abundantes", description: "Recursos muito abundantes" },
+  // Extensão para valores altos devido a modificadores (21+)
+  { min: 21, max: 50, result: "Abundantes vindos de muitos anos de serviço", description: "Recursos de longa data" },
 ];
 
 // Modificadores de Tamanho para Recursos
@@ -408,45 +387,18 @@ export const EMPLOYEES_TABLE: TableEntry<string>[] = [
   { min: 21, max: 25, result: '1d6+3 funcionários experientes', description: 'Equipe experiente' }
 ];
 
-// Quantidade de Frequentadores - Tabelas específicas por tipo de assentamento
-export const VISITORS_FREQUENCY_TABLE_D8: TableEntry<string>[] = [
-  { min: 1, max: 2, result: "Vazia", description: "Nenhum visitante" },
-  { min: 3, max: 3, result: "Quase deserta", description: "Muito poucos visitantes" },
-  { min: 4, max: 5, result: "Pouco movimentada", description: "Poucos visitantes" },
-  { min: 6, max: 7, result: "Nem muito nem pouco", description: "Quantidade normal de visitantes" },
-  { min: 8, max: 8, result: "Muito frequentada", description: "Muitos visitantes" },
-];
-
-export const VISITORS_FREQUENCY_TABLE_D10: TableEntry<string>[] = [
-  { min: 1, max: 2, result: "Vazia", description: "Nenhum visitante" },
-  { min: 3, max: 4, result: "Quase deserta", description: "Muito poucos visitantes" },
-  { min: 5, max: 6, result: "Pouco movimentada", description: "Poucos visitantes" },
-  { min: 7, max: 8, result: "Nem muito nem pouco", description: "Quantidade normal de visitantes" },
-  { min: 9, max: 9, result: "Muito frequentada", description: "Muitos visitantes" },
-  { min: 10, max: 10, result: "Abarrotada", description: "Quantidade excessiva de visitantes" },
-];
-
-export const VISITORS_FREQUENCY_TABLE_D12: TableEntry<string>[] = [
-  { min: 1, max: 3, result: "Vazia", description: "Nenhum visitante" },
-  { min: 4, max: 5, result: "Quase deserta", description: "Muito poucos visitantes" },
-  { min: 6, max: 7, result: "Pouco movimentada", description: "Poucos visitantes" },
-  { min: 8, max: 9, result: "Nem muito nem pouco", description: "Quantidade normal de visitantes" },
-  { min: 10, max: 11, result: "Muito frequentada", description: "Muitos visitantes" },
-  { min: 12, max: 12, result: "Abarrotada", description: "Quantidade excessiva de visitantes" },
-];
-
-export const VISITORS_FREQUENCY_TABLE_D20: TableEntry<string>[] = [
+export const VISITORS_FREQUENCY_TABLE: TableEntry<string>[] = [
+  // Extensão para valores negativos devido a modificadores
+  { min: -20, max: 0, result: "Vazia", description: "Nenhum visitante" },
   { min: 1, max: 5, result: "Vazia", description: "Nenhum visitante" },
   { min: 6, max: 9, result: "Quase deserta", description: "Muito poucos visitantes" },
   { min: 10, max: 12, result: "Pouco movimentada", description: "Poucos visitantes" },
   { min: 13, max: 16, result: "Nem muito nem pouco", description: "Quantidade normal de visitantes" },
   { min: 17, max: 18, result: "Muito frequentada", description: "Muitos visitantes" },
   { min: 19, max: 19, result: "Abarrotada", description: "Quantidade excessiva de visitantes" },
-  { min: 20, max: 25, result: "Lotada", description: "Superlotação" },
+  // Extensão para valores altos devido a modificadores (20+)
+  { min: 20, max: 50, result: "Lotada", description: "Superlotação" },
 ];
-
-// Tabela legada para compatibilidade
-export const VISITORS_FREQUENCY_TABLE = VISITORS_FREQUENCY_TABLE_D20;
 
 // Modificadores para recursos baseado nas relações
 export const RESOURCE_MODIFIERS = {
@@ -515,9 +467,9 @@ export const SETTLEMENT_DICE = {
     'Povoado': { dice: 'd8', modifier: 0 },
     'Aldeia': { dice: 'd8', modifier: 0 },
     'Vilarejo': { dice: 'd12', modifier: 0 },
-    'Vila grande': { dice: 'd12', modifier: 0 },
+    'Vila Grande': { dice: 'd12', modifier: 0 },
     'Cidadela': { dice: 'd20', modifier: 0 },
-    'Cidade grande': { dice: 'd20', modifier: 4 },
+    'Cidade Grande': { dice: 'd20', modifier: 4 },
     'Metrópole': { dice: 'd20', modifier: 8 }
   },
   visitors: {
@@ -525,9 +477,9 @@ export const SETTLEMENT_DICE = {
     'Povoado': { dice: 'd8', modifier: 0 },
     'Aldeia': { dice: 'd8', modifier: 0 },
     'Vilarejo': { dice: 'd10', modifier: 0 },
-    'Vila grande': { dice: 'd10', modifier: 0 },
+    'Vila Grande': { dice: 'd10', modifier: 0 },
     'Cidadela': { dice: 'd12', modifier: 0 },
-    'Cidade grande': { dice: 'd20', modifier: 0 },
+    'Cidade Grande': { dice: 'd20', modifier: 0 },
     'Metrópole': { dice: 'd20', modifier: 5 }
   }
 } as const;
@@ -540,41 +492,6 @@ export function getDiceNotationString(settlementType: string, category: 'structu
                      diceNotation.modifier > 0 ? `+${diceNotation.modifier}` : 
                      `${diceNotation.modifier}`;
   return `1${diceNotation.dice}${modifierStr}`;
-}
-
-// Funções para obter a tabela correta baseada no tipo de assentamento
-export function getVisitorFrequencyTable(settlementType: string): TableEntry<string>[] {
-  const diceConfig = SETTLEMENT_DICE.visitors[settlementType as keyof typeof SETTLEMENT_DICE.visitors];
-  if (!diceConfig) return VISITORS_FREQUENCY_TABLE_D8; // fallback
-  
-  switch (diceConfig.dice) {
-    case 'd8':
-      return VISITORS_FREQUENCY_TABLE_D8;
-    case 'd10':
-      return VISITORS_FREQUENCY_TABLE_D10;
-    case 'd12':
-      return VISITORS_FREQUENCY_TABLE_D12;
-    case 'd20':
-      return VISITORS_FREQUENCY_TABLE_D20;
-    default:
-      return VISITORS_FREQUENCY_TABLE_D20;
-  }
-}
-
-export function getResourceLevelTable(settlementType: string): TableEntry<string>[] {
-  const diceConfig = SETTLEMENT_DICE.structure[settlementType as keyof typeof SETTLEMENT_DICE.structure];
-  if (!diceConfig) return RESOURCES_LEVEL_TABLE_D8; // fallback
-  
-  switch (diceConfig.dice) {
-    case 'd8':
-      return RESOURCES_LEVEL_TABLE_D8;
-    case 'd12':
-      return RESOURCES_LEVEL_TABLE_D12;
-    case 'd20':
-      return RESOURCES_LEVEL_TABLE_D20;
-    default:
-      return RESOURCES_LEVEL_TABLE_D20;
-  }
 }
 
 export function validateSimpleDiceNotation(notation: DiceNotation): boolean {
@@ -599,6 +516,12 @@ export const HEADQUARTERS_EXISTENCE_TABLE = {
     { min: 21, max: 25, value: 'Sim' }
   ]
 };
+
+// Tabela de tipo de sede
+export const HEADQUARTERS_TYPE_TABLE: TableEntry<string>[] = [
+  { min: 1, max: 20, result: 'Sede Normal' },
+  { min: 21, max: 25, result: 'Sede Matriz' }
+];
 
 // Legacy exports for backward compatibility
 export const GUILD_SIZE_TABLE = HEADQUARTERS_SIZE_TABLE;

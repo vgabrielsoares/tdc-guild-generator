@@ -1,4 +1,5 @@
 export * from "./dice";
+export * from "./colorHelpers";
 
 export {
   validateTable,

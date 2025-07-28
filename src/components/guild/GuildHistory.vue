@@ -42,7 +42,14 @@
         <!-- Informações da Guilda -->
         <div class="guild-info" @click="loadGuild(guild.id)">
           <div class="guild-main-info">
-            <h4 class="guild-name">{{ guild.name }}</h4>
+            <h4 class="guild-name flex items-center gap-2">
+              {{ guild.name }}
+              <StarIcon 
+                v-if="guild.structure.isHeadquarters"
+                class="w-4 h-4 text-amber-400"
+                title="Sede Matriz"
+              />
+            </h4>
             <span class="guild-settlement">{{ guild.settlementType }}</span>
           </div>
           
@@ -135,7 +142,8 @@ import {
   LockClosedIcon,
   LockOpenIcon,
   XMarkIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
+  StarIcon
 } from '@heroicons/vue/24/solid';
 import { useGuildStore } from '@/stores/guild';
 import { useToast } from '@/composables/useToast';

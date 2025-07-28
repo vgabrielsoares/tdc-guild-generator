@@ -24,7 +24,7 @@ describe("Issue 3.3 - Guild Relations Generator", () => {
 
   beforeEach(() => {
     config = {
-      settlementType: SettlementType.CIDADE_PEQUENA,
+      settlementType: SettlementType.POVOADO,
     };
 
     // Mock console.log to avoid spam in tests
@@ -270,7 +270,7 @@ describe("Issue 3.3 - Guild Relations Generator", () => {
 
     it("should handle extreme modifiers gracefully", () => {
       const extremeConfig: RelationsGenerationConfig = {
-        settlementType: SettlementType.CIDADE_PEQUENA,
+        settlementType: SettlementType.POVOADO,
         customModifiers: {
           governmentMod: 100,
           populationMod: -100,

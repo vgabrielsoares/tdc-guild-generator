@@ -65,6 +65,14 @@
               <ArrowDownTrayIcon class="w-4 h-4" />
               <span>Exportar</span>
             </button>
+            <button
+              @click="clearGuild"
+              class="btn btn-outline-danger flex items-center space-x-2"
+              :disabled="guildStore.isGenerating"
+            >
+              <TrashIcon class="w-4 h-4" />
+              <span>Limpar</span>
+            </button>
           </div>
         </div>
         
@@ -216,7 +224,16 @@ const guild = computed(() => guildStore.currentGuild)
 
 // Seletor de tipo de assentamento
 const selectedSettlementType = ref<SettlementType | 'random'>('random')
-const settlementTypes = Object.values(SettlementType)
+const settlementTypes = [
+  SettlementType.LUGAREJO,
+  SettlementType.POVOADO,
+  SettlementType.ALDEIA,
+  SettlementType.VILAREJO,
+  SettlementType.VILA_GRANDE,
+  SettlementType.CIDADELA,
+  SettlementType.CIDADE_GRANDE,
+  SettlementType.METROPOLE
+]
 
 // Edição do nome da guilda
 const isEditingName = ref(false)
