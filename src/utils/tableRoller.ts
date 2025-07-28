@@ -78,7 +78,8 @@ function getDiceNotationForRange(maxValue: number, range: number): string {
  */
 export function rollOnTable<T>(
   table: TableEntry<T>[],
-  modifiers: RollModifier[] = []
+  modifiers: RollModifier[] = [],
+  context?: string
 ): TableRollResult<T> {
   if (!table || table.length === 0) {
     throw new Error("Table is empty or undefined");
@@ -110,7 +111,7 @@ export function rollOnTable<T>(
   // Roll the dice
   const diceRoll = rollDice({
     notation: finalDiceNotation,
-    context: "Table roll",
+    context: context || "Table roll",
     logRoll: true,
   });
 
