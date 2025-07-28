@@ -58,6 +58,7 @@ export interface GuildStructure {
   readonly characteristics: readonly string[];
   readonly location?: string;
   readonly description?: string;
+  readonly isHeadquarters?: boolean;
 }
 
 export interface GuildRelations {
@@ -145,6 +146,7 @@ export const GuildStructureSchema = z.object({
     .min(1, "At least one characteristic is required"),
   location: z.string().optional(),
   description: z.string().optional(),
+  isHeadquarters: z.boolean().optional(),
 });
 
 export const GuildRelationsSchema = z.object({
