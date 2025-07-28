@@ -170,14 +170,35 @@ export class ResourcesVisitorsGenerator extends BaseGenerator<ResourcesVisitorsG
   
   protected doGenerate(): ResourcesVisitorsGenerationResult {
     this.validateConfig();
-    
-    // Calcular modificadores baseados em relações
+
+    // Calcular modificador de recursos
     const resourceModifier = this.calculateResourceModifier();
-    const visitorsModifier = this.calculateVisitorsModifier();
-    
     // Gerar recursos com modificadores
     const resourcesResult = this.generateResources(resourceModifier);
-    
+
+    // Atualizar o valor de recursos para o cálculo do modificador de visitantes
+    // Clona config para não mutar original
+    const updatedConfig = {
+      ...this.config,
+      relationModifiers: {
+        ...this.config.relationModifiers,
+        currentResources: resourcesResult.level,
+      },
+    };
+
+    // Calcular modificador de visitantes com o valor atualizado de recursos
+    const visitorsModifier = ModifierCalculator.calculateVisitorModifiers(
+      updatedConfig.relationModifiers?.employees,
+      updatedConfig.relationModifiers?.currentResources
+    ) + (updatedConfig.customModifiers?.visitors || 0);
+
+    if (visitorsModifier !== 0) {
+      this.log(
+        `Visitor modifiers: relations=${ModifierCalculator.calculateVisitorModifiers(updatedConfig.relationModifiers?.employees, updatedConfig.relationModifiers?.currentResources)}, custom=${updatedConfig.customModifiers?.visitors || 0}, total=${visitorsModifier}`,
+        'MODIFIERS'
+      );
+    }
+
     // Gerar visitantes com modificadores
     const visitorsResult = this.generateVisitors(visitorsModifier);
     
@@ -220,26 +241,7 @@ export class ResourcesVisitorsGenerator extends BaseGenerator<ResourcesVisitorsG
     return totalModifier;
   }
 
-  /**
-   * Calcula modificador para visitantes baseado em funcionários e recursos
-   */
-  private calculateVisitorsModifier(): number {
-    const employees = this.config.relationModifiers?.employees;
-    const resources = this.config.relationModifiers?.currentResources;
-    const customModifier = this.config.customModifiers?.visitors || 0;
-    
-    const relationModifier = ModifierCalculator.calculateVisitorModifiers(employees, resources);
-    const totalModifier = relationModifier + customModifier;
-    
-    if (totalModifier !== 0) {
-      this.log(
-        `Visitor modifiers: relations=${relationModifier}, custom=${customModifier}, total=${totalModifier}`,
-        'MODIFIERS'
-      );
-    }
-    
-    return totalModifier;
-  }
+
 
   /**
    * Determina o range máximo baseado no tipo de dado e tabela
