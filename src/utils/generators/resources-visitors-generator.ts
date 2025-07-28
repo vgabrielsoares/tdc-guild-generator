@@ -176,32 +176,22 @@ export class ResourcesVisitorsGenerator extends BaseGenerator<ResourcesVisitorsG
     // Gerar recursos com modificadores
     const resourcesResult = this.generateResources(resourceModifier);
 
-    // Atualizar o valor de recursos para o cálculo do modificador de visitantes
-    // Clona config para não mutar original
-    const updatedConfig = {
-      ...this.config,
-      relationModifiers: {
-        ...this.config.relationModifiers,
-        currentResources: resourcesResult.level,
-      },
-    };
-
-    // Calcular modificador de visitantes com o valor atualizado de recursos
+    // Calcular modificador de visitantes diretamente usando o valor de recursos gerado
     const visitorsModifier = ModifierCalculator.calculateVisitorModifiers(
-      updatedConfig.relationModifiers?.employees,
-      updatedConfig.relationModifiers?.currentResources
-    ) + (updatedConfig.customModifiers?.visitors || 0);
+      this.config.relationModifiers?.employees,
+      resourcesResult.level
+    ) + (this.config.customModifiers?.visitors || 0);
 
     if (visitorsModifier !== 0) {
       this.log(
-        `Visitor modifiers: relations=${ModifierCalculator.calculateVisitorModifiers(updatedConfig.relationModifiers?.employees, updatedConfig.relationModifiers?.currentResources)}, custom=${updatedConfig.customModifiers?.visitors || 0}, total=${visitorsModifier}`,
+        `Visitor modifiers: relations=${ModifierCalculator.calculateVisitorModifiers(this.config.relationModifiers?.employees, resourcesResult.level)}, custom=${this.config.customModifiers?.visitors || 0}, total=${visitorsModifier}`,
         'MODIFIERS'
       );
     }
 
     // Gerar visitantes com modificadores
     const visitorsResult = this.generateVisitors(visitorsModifier);
-    
+
     return {
       data: {
         resources: {
