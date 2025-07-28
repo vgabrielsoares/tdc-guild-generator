@@ -2,7 +2,7 @@
 
 Os contratos são uma parte essencial da dinâmica de uma guilda, permitindo que aventureiros se unam para cumprir missões, resolver problemas e ganhar recompensas. Este gerador ajuda a criar contratos variados, desde simples tarefas até desafios épicos.
 
-Cada contrato pode funcionar como uma "missão" ou "aventura" em um RPG. 
+Cada contrato pode funcionar como uma "missão" ou "aventura" em um RPG.
 
 A primeira vez que os jogadores entrarem na sede da guilda, role para descobrir quantos contratos disponíveis existem.
 
@@ -98,7 +98,7 @@ Enquanto alguns prazos são puramente arbitrários, outros possuem uma janela de
 
 A tabela de Valores e Recompensas determina o valor de cada contrato individualmente. O valor representa, além da recompensa paga em ouro (PO$), a experiência que você pode usar para estruturar um contrato. Por exemplo: um valor de 1000 significa que você tem, inicialmente, 1k de XP para "comprar" monstros, desafios e conflitos, e 1k de PO$ para oferecer de recompensa no contrato. Esses valores são independentes, então é possível que um valor seja maior ou menor que o outro.
 
-Nessa tabela, todos os contratos rolam 1d100 sem modificadores. As modificações são aplicadas após a rolagem, nas próximas seções. Guarde o valor de ouro e experiência individualmente, mas use a mesma rolagem para definir o valor inicial (ambos comecam com o mesmo valor e são modificados ao longo da geração do contrato).
+Nessa tabela, todos os contratos rolam 1d100 sem modificadores. As modificações são aplicadas após a rolagem, nas próximas seções. Guarde o valor de ouro e experiência individualmente, mas use a mesma rolagem para definir o valor inicial (ambos começam com o mesmo valor e são modificados ao longo da geração do contrato).
 
 ### Tabela de Valores e Recompensas
 
@@ -116,12 +116,12 @@ Nessa tabela, todos os contratos rolam 1d100 sem modificadores. As modificaçõe
 | 36-37 | 400 |
 | 38-39 | 450 |
 | 40-41 | 500 |
-| 42-43 | 550 |	
+| 42-43 | 550 |
 | 44-45 | 600 |
 | 46-47 | 700 |
 | 48-49 | 800 |
-| 50-51 | 900 | 
-| 52-53 | 1000 | 
+| 50-51 | 900 |
+| 52-53 | 1000 |
 | 54-55 | 1100 |
 | 56-57 | 1200 |
 | 58-59 | 1300 |
@@ -131,7 +131,7 @@ Nessa tabela, todos os contratos rolam 1d100 sem modificadores. As modificaçõe
 | 66-67 | 2100 |
 | 68-69 | 2300 |
 | 70-71 | 2500 |
-| 72 | 2800 |	
+| 72 | 2800 |
 | 73 | 3200 |
 | 74 | 3600 |
 | 75 | 4000 |
@@ -248,7 +248,7 @@ Os funcionários da guilda podem ser de diversos tipos, e cada tipo pode oferece
 
 A dificuldade de um contrato é determinada por diversos fatores, incluindo a complexidade da tarefa, os perigos envolvidos e os recursos necessários. Essa dificuldade pode ser percebida pelos jogadores através da recompensa oferecida, que deve refletir o desafio que o contrato representa.
 
-A definição da dificuldade é a principal relação do balanço entre o valor em XP e a recompensa em PO$ do contrato. 
+A definição da dificuldade é a principal relação do balanço entre o valor em XP e a recompensa em PO$ do contrato.
 
 #### Tabela de Dificuldade
 
@@ -267,7 +267,7 @@ Ao definir o resultado individual do valor em XP e PO$ de um contrato, tenha em 
 
 Como narrador, o valor em XP é usado como "orçamento" para criar o contrato. Você pode gastar esse valor em desafios para os jogadores, como criaturas, armadilhas, portas secretas, pessoas que precisam ser convencidas, enigmas, viagens e outros elementos que podem estar o contrato. Use o bom senso e a criatividade para usar esse orçamento, e sempre use como parâmetro o objetivo do contrato, que será definida mais adiante.
 
-> Não necessariamente, ao concluir um contrato, os jogadores vão ganhar exatamente o valor em XP que foi definido. Pode ser que as escolhas dos jogadores evitem desafios estabelecidos, o que faz com que eles concluam o contrato com mais facilidade, mas, consequentemente, recebem menos XP.
+> Não necessariamente, ao concluir um contrato, os jogadores vão ganhar exatamente o valor em XP que foi definido. Pode ser que as escolhas dos jogadores evitem desafios estabelecidos, o que faz com que eles concluam o contrato com mais facilidade, mas, consequentemente, recebam menos XP.
 
 Os jogadores podem perceber a dificuldade de um contrato através da recompensa oferecida, já que o valor em XP não vai estar disponível para eles. Contratos com recompensas mais altas geralmente indicam desafios mais difíceis, enquanto recompensas mais baixas podem sugerir contratos mais simples. No entanto, isso não significa que todos os contratos estarão nivelados com os jogadores; os contratos são gerados aleatoriamente, então, por mais que seja apelativo para os jogadores aceitarem um contrato com uma recompensa alta, ele pode conter desafios que não estão necessariamente alinhados com seus níveis atuais.
 
@@ -279,7 +279,7 @@ De acordo com o resultado final de "Valor e Recompensa", role a tabela abaixo. U
 
 ### Pré-requisitos de Contratos
 
-#### Dados por Resultado de Valor e Recompensa
+#### Dados por Resultado de Valor e Recompensa: Pré-requisitos
 
 | Resultado | Dado |
 |-----------|------|
@@ -314,7 +314,7 @@ De acordo com o resultado final de "Valor e Recompensa", role a tabela abaixo. U
 
 ### Cláusulas Adicionais
 
-#### Dados por Resultado de Valor e Recompensa
+#### Dados por Resultado de Valor e Recompensa: Cláusulas Adicionais
 
 | Resultado | Dado |
 |-----------|------|
@@ -363,7 +363,7 @@ Use o bom senso para determinar quais contratantes têm condições de deixar, a
 
 Os contratantes podem optar por fazer um pagamento antecipado à guilda, garantindo assim que a recompensa será disponibilizada assim que o contrato for concluído. Esse pagamento pode ser total ou parcial, dependendo do acordo entre as partes.
 
-#### Dados por Resultado de Valor e Recompensa
+#### Dados por Resultado de Valor e Recompensa: Tipo de Pagamento
 
 | Resultado | Dado |
 |-----------|------|
@@ -378,12 +378,12 @@ Os contratantes podem optar por fazer um pagamento antecipado à guilda, garanti
 
 | 1d20 | Tipo de Pagamento |
 |------|-------------------|
-| 1-3 | Pagemento em PO$ direto com contratante |
+| 1-3 | Pagamento em PO$ direto com contratante |
 | 4-6 | Metade com a guilda, metade com o contratante |
 | 7-9 | Metade com a guilda, metade, em bens, com o contratante |
 | 10-12 | Em materiais, joias, bens ou serviços do contratante |
 | 14-20 | Pagamento total na guilda em PO$ |
-| 21+ | Pagamento total na guilda em PO$ e serviços do contrante |
+| 21+ | Pagamento total na guilda em PO$ e serviços do contratante |
 
 ## Conclusões Automáticas de Contratos e Serviços
 
@@ -395,7 +395,7 @@ Passado o tempo de resolução de um contrato ou serviço, nós descobriremos tu
 
 > Por exemplo: talvez depois de 4 dias, aquele contrato que parecia bom, agora tenha sido pego por outra criatura, e um outro já foi até resolvido.
 
-Role a tabela abaixo para saber em quantos dias você deve rolar a tabela de resoluções para contratos ou serviços que foram firmados, ou a tabela para contratos ou serviços que não foram assinados. 
+Role a tabela abaixo para saber em quantos dias você deve rolar a tabela de resoluções para contratos ou serviços que foram firmados, ou a tabela para contratos ou serviços que não foram assinados.
 
 > Essas rolagens são feitas uma vez por guilda (para assinados e não-assinados), e não uma por contrato. Após as resoluções, devem ser rolados outros tempos de resolução.
 
@@ -425,11 +425,15 @@ Role a tabela abaixo para saber em quantos dias você deve rolar a tabela de res
 | 18-19 | 1d20 dias |
 | 20 | 1 dia |
 
+> Contratos anulados não voltam a ficar disponíveis para os jogadores
+
 ### Contratos e Serviços Assinados
 
 Quando os jogadores chegam pela primeira vez em uma nova sede da guilda novos contratos e serviços são gerados, mas isso você já deve ter percebido. Desses contratos e serviços alguns estão indisponíveis pois já foram assinados por outros aventureiros. A tabela abaixo te permite descobrir o que aconteceu com os contratos assinados por outras criaturas.
 
 #### Resoluções para Contratos Firmados
+
+Quando contratos são assinados por outros aventureiros, diversos fatores podem influenciar se eles serão bem-sucedidos ou não. Esta tabela determina o destino desses contratos e se eles retornarão à disponibilidade para outros aventureiros.
 
 | 1d20 | Resultado |
 |------|-----------|
@@ -449,8 +453,6 @@ Quando os jogadores chegam pela primeira vez em uma nova sede da guilda novos co
 | 18-19 | Quebra devido a cláusula adicional não cumprida |
 | 20 | Contratante morto ou desaparecido (anule o contrato caso seja da população local) |
 
-> Contratos anulados não voltam a ficar disponíveis para os jogadores
-
 > **Nota**: Serviços não são tão perigosos quanto contratos, então neles substitua "morte" por lesões, lesões graves ou gravíssimas.
 
 ### Contratos Não Assinados
@@ -458,6 +460,8 @@ Quando os jogadores chegam pela primeira vez em uma nova sede da guilda novos co
 Agora que você já sabe o que aconteceu com os contratos e serviços que foram firmados, deve estar se perguntando: "e os contratos e serviços que ninguém pegou?". A tabela abaixo responderá essa questão.
 
 #### Resolução para Contratos que Não Foram Assinados
+
+Contratos que permanecem na guilda sem serem aceitos por aventureiros não ficam para sempre disponíveis. Com o passar do tempo, outras circunstâncias podem resolver os problemas, ou a urgência pode levar outras pessoas a tomar ação.
 
 | 1d20 | Resultado |
 |------|-----------|
@@ -479,7 +483,7 @@ Sempre que um contrato não for resolvido mas permanecer disponível, independen
 
 ## Novos e Antigos Contratos e Serviços
 
-Depois de um certo tempo, mesmo que alguns contratos ainda não tenham sido resolvidos, novos contratos surgem. 
+Depois de um certo tempo, mesmo que alguns contratos ainda não tenham sido resolvidos, novos contratos surgem.
 
 Role nas tabelas abaixo para descobrir em quantos dias você poderá gerar novos contratos e serviços.
 
@@ -532,6 +536,7 @@ Para determinar quem é o contratante de cada contrato, role na tabela abaixo.
 Ajuste o resultado da rolagem de contratante de acordo com a relação com a população local e com o governo local:
 
 **Relação com a população local:**
+
 - Péssima: +4
 - Ruim: +2
 - Dividida: +0
@@ -540,6 +545,7 @@ Ajuste o resultado da rolagem de contratante de acordo com a relação com a pop
 - Excelente: -5
 
 **Relação com o governo local:**
+
 - Péssima: -4
 - Ruim: -2
 - Diplomática: +0
@@ -569,6 +575,8 @@ Caso o contratante seja do governo, role na tabela abaixo para determinar quem �
 Qual o objetivo do contrato?
 
 #### Objetivo Principal
+
+O objetivo principal define a natureza fundamental do que deve ser realizado no contrato. Esta é a tarefa central que os aventureiros devem cumprir para considerar o contrato concluído. Cada tipo de objetivo pode levar a diferentes abordagens e estratégias.
 
 | 1d20 | Objetivo |
 |------|----------|
@@ -940,7 +948,7 @@ Role nas tabelas correspondentes ao resultado de Localidade Principal.
 | 15 | Escola ou posto em um campo |
 | 16 | Oficina rural |
 | 17 | Armazém de grãos |
-| 18 | Área de pastagem | 
+| 18 | Área de pastagem |
 | 19-20 | Role duas vezes e use ambos |
 
 ###### Localidade Exótica
@@ -1029,6 +1037,8 @@ Role abaixo sempre que cair "Um distrito" nas Especificações por Localidade:
 Qual o motivo pelo qual o contrato foi feito?
 
 #### Tipos de Antagonistas
+
+Os antagonistas são as forças ou entidades que se opõem ao cumprimento do objetivo do contrato. Eles podem ser ativos ou passivos, conscientes ou inconscientes da interferência que causam. Compreender o tipo de antagonista ajuda a definir a abordagem necessária para o contrato.
 
 | 1d20 | Antagonistas |
 |------|--------------|
@@ -1260,12 +1270,13 @@ Qual o motivo pelo qual o contrato foi feito?
 | 19 | Conexão inesperada |
 | 20 | Role duas vezes e use ambos |
 
-
 ### Complicações
 
 Nada é tão fácil quanto parece, há sempre algumas complicações e dificuldades pelo caminho.
 
 #### Tipos de Complicações
+
+As complicações são obstáculos adicionais que surgem durante a execução do contrato, tornando-o mais desafiador do que inicialmente aparentava. Elas podem ser conhecidas desde o início ou descobertas apenas durante a missão, adicionando camadas de complexidade à tarefa.
 
 | 1d20 | Complicações |
 |------|--------------|
@@ -1330,6 +1341,7 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 18 | Líderes religiosos |
 | 19-20 | Role duas vezes e use ambos |
 
+<!-- markdownlint-disable-next-line MD024 -->
 ###### Organização
 
 | 1d20 | Organização |
@@ -1534,12 +1546,16 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 
 #### Aparição de Aliados
 
+Durante a execução de um contrato, pode haver a chance de encontrar aliados inesperados que podem auxiliar na missão. Estes aliados podem aparecer por acaso, serem atraídos pela natureza do contrato, ou terem seus próprios interesses no resultado.
+
 | 1d20 | Aliados surgirão? |
 |------|-------------------|
 | 1-10 | Não |
 | 11-20 | Sim |
 
 #### Tipos de Aliados
+
+Os aliados que podem surgir durante um contrato variam enormemente em natureza, poder e motivação. Alguns podem ser temporários, outros duradouros; alguns poderosos, outros humildes mas essenciais no momento certo.
 
 | 1d20 | Aliados |
 |------|---------|
@@ -1555,6 +1571,8 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 20 | Monstruosidade amigável |
 
 #### Quando/Como Surgirão
+
+O momento e a forma como os aliados aparecem pode ser crucial para o desenvolvimento do contrato. Alguns surgem no momento exato de maior necessidade, outros aparecem logo no início, e alguns podem até mesmo estar presentes antes mesmo do contrato começar.
 
 | 1d20 | Quando/como surgirá |
 |------|-------------------|
@@ -1638,7 +1656,7 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 14 | Criança precoce |
 | 15 | Fantasma arrependido |
 | 16 | Rival reconciliado |
-| 17 | Ex-inimigo rehabilitado |
+| 17 | Ex-inimigo reabilitado |
 | 18 | Duplo bondoso |
 | 19 | Reflexo de espelho mágico |
 | 20 | Role duas vezes e use ambos |
@@ -1715,7 +1733,7 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 19 | Guia animal |
 | 20 | Role duas vezes e use ambos |
 
-###### Organização
+###### Organizações Aliadas
 
 | 1d20 | Organização |
 |------|-------------|
@@ -1780,7 +1798,8 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 18 | Monge disciplinado |
 | 19-20 | Bardo carismático |
 
-####### Nível do Aventureiro
+---
+Nível do Aventureiro
 
 | 1d20 | Especificando aventureiro |
 |------|---------------------------|
@@ -1819,7 +1838,8 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 16-19 | Animalesco |
 | 20 | Dragão |
 
-####### Características da Monstruosidade
+---
+Características da Monstruosidade
 
 | 1d20 | Especificando monstruosidade |
 |------|------------------------------|
@@ -1849,12 +1869,16 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 
 #### Chance de Recompensas
 
+Além da recompensa básica do contrato, há a possibilidade de recompensas adicionais surgirem durante ou após a conclusão da missão. Estas podem vir do contratante satisfeito, de descobertas durante a aventura, ou de consequências positivas das ações realizadas.
+
 | 1d20 | Haverão recompensas? |
 |------|----------------------|
 | 1-13 | Não |
 | 14-20 | Sim |
 
 #### Tipos de Recompensas
+
+As recompensas adicionais podem assumir diversas formas, desde riquezas materiais até benefícios intangíveis como conhecimento, influência ou poderes especiais. Algumas podem ser imediatamente úteis, outras podem ter valor a longo prazo ou em situações específicas.
 
 | 1d20 | Recompensas e Incentivos |
 |------|--------------------------|
@@ -1872,8 +1896,6 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 > **Nota**: Em "pagamento diferenciado" não há recompensa extra. Apenas a recompensa pelo próprio contrato, porém o contratante não pagará com ouro, e sim com alguma coisa que tenha o mesmo valor ou o mais próximo disso.
 
 ##### Detalhamento das Recompensas
-
-<!-- TODO: Adicionar quais recompensas são visíveis para os players e quais não são (só são reveladas ao completar o contrato). Acho que um asterisco funciona bem. -->
 
 ###### Riquezas
 
@@ -1901,22 +1923,21 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 
 | 1d20 | Artefatos mágicos |
 |------|-------------------|
-| 1 | Arma mágica |
-| 2 | Pergaminho poderoso |
-| 3 | Grimório |
-| 4 | Itens maravilhosos |
-| 5 | Proteção mágica |
-| 6 | Varinha |
-| 7 | Cajado |
-| 8 | Anel mágico |
-| 9 | Bastão/cetro |
-| 10 | Item amaldiçoado |
-| 11 | Orbe de poder |
-| 12 | Amuleto raro |
-| 13 | Manto encantado |
-| 14 | Botas mágicas |
-| 15 | Elmo encantado |
-
+| 1-2 | Arma mágica |
+| 3 | Pergaminho poderoso |
+| 4 | Grimório |
+| 5-6 | Itens maravilhosos |
+| 7 | Proteção mágica |
+| 8 | Varinha |
+| 9 | Cajado |
+| 10-11 | Anel mágico |
+| 12 | Bastão/cetro |
+| 13-14 | Item amaldiçoado |
+| 15 | Orbe de poder |
+| 16 | Amuleto raro |
+| 17 | Manto encantado |
+| 18 | Botas mágicas |
+| 19 | Elmo encantado |
 | 20 | Role duas vezes e use ambos |
 
 ###### Poder
@@ -1924,24 +1945,23 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 1d20 | Poder |
 |------|-------|
 | 1 | Comando sobre um grupo |
-| 2 | Favor de alguém importante |
-| 3 | Contrato de casamento com figura poderosa |
-| 4 | Lugar de destaque em uma organização poderosa |
-| 5 | Contatos da classe alta local |
-| 6 | Cargo importante no governo local |
-| 7 | Permissão para explorar local restrito |
-| 8 | Pacto com entidade |
-| 9 | Vista grossa de autoridades da lei |
-| 10 | Bênção divina |
-| 11 | Autoridade sobre território |
-| 12 | Direito de coletar impostos |
-| 13 | Comando de forças militares |
-| 14 | Assento em um conselho |
-| 15 | Direito de julgar crimes |
-| 16 | Acesso a arquivos secretos |
-| 17 | Proteção real garantida |
-| 18 | Imunidade diplomática |
-| 19 |  |
+| 2-3 | Favor de alguém importante |
+| 4 | Contrato de casamento com figura poderosa |
+| 5 | Lugar de destaque em uma organização poderosa |
+| 6 | Contatos da classe alta local |
+| 7 | Cargo importante no governo local |
+| 8 | Permissão para explorar local restrito |
+| 9 | Pacto com entidade |
+| 10 | Vista grossa de autoridades da lei |
+| 11 | Bênção divina |
+| 12 | Autoridade sobre território |
+| 13 | Direito de coletar impostos |
+| 14 | Comando de forças militares |
+| 15 | Assento em um conselho |
+| 16 | Direito de julgar crimes |
+| 17 | Acesso a arquivos secretos |
+| 18 | Proteção real garantida |
+| 19 | Imunidade diplomática |
 | 20 | Role duas vezes e use ambos |
 
 ###### Conhecimento
@@ -1960,12 +1980,11 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 10 | Magia poderosa |
 | 11 | Localização de portal dimensional |
 | 12 | Identidade de espião infiltrado |
-| 13 |  |
-| 14 | História perdida de civilização |
-| 15 | Códigos de comunicação secreta |
-| 16 | Profecias não reveladas |
-| 17 | Mapas de rotas comerciais |
-| 18 | Segredo do governo local |
+| 13 | História perdida de civilização |
+| 14 | Códigos de comunicação secreta |
+| 15 | Profecias não reveladas |
+| 16 | Mapas de rotas comerciais |
+| 17-18 | Segredo do governo local |
 | 19 | Nome verdadeiro de demônio |
 | 20 | Role duas vezes e use ambos |
 
@@ -2004,10 +2023,9 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 4 | Conto sobre sua história |
 | 5 | Fama entre ladrões |
 | 6 | Magia/item com seu nome |
-| 7 | Herói local |
-| 8 | Local relevante com seu nome |
-| 9 | Festa/banquete em sua homenagem |
-| 10 |  |
+| 7-8 | Herói local |
+| 9 | Local relevante com seu nome |
+| 10 | Festa/banquete em sua homenagem |
 | 11 | Canção épica composta |
 | 12 | Medalha de honra |
 | 13 | Brasão familiar concedido |
@@ -2036,13 +2054,11 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 11 | Família reunificada |
 | 12 | Comunidade favorecida |
 | 13 | Órfãos adotados |
-| 14 |  |
-| 15 |  |
-| 16 | Injustiça corrigida |
-| 17 | Tradição restaurada |
-| 18 | Esperança renovada |
-| 19 | Reconciliação entre inimigos |
-| 20 | Role duas vezes e use ambos |
+| 14 | Injustiça corrigida |
+| 15 | Tradição restaurada |
+| 16 | Esperança renovada |
+| 17 | Reconciliação entre inimigos |
+| 18-20 | Role duas vezes e use ambos |
 
 ###### Pagamento Diferenciado
 
@@ -2123,73 +2139,145 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 
 #### Chance de Reviravolta
 
+Nem todos os contratos são exatamente como parecem na superfície. Há sempre uma chance de que revelações importantes mudem completamente a natureza da missão, forçando os aventureiros a reconsiderar suas ações e estratégias.
+
 | 1d20 | Haverá uma reviravolta? |
 |------|-------------------------|
 | 1-18 | Não |
 | 19-20 | Sim |
 
-<!-- TODO: Aumentar robustez das reviravoltas, adicionar mais opções. -->
-
 #### Elementos da Reviravolta
 
 ##### Quem?
 
-| 1d6 | Quem? |
-|-----|-------|
+| 1d20 | Quem? |
+|------|-------|
 | 1 | O contratante |
 | 2 | Um aliado |
 | 3 | A complicação |
 | 4 | O objetivo |
 | 5 | A vítima/um inocente |
 | 6 | Um velho conhecido surge e... |
+| 7 | Um funcionário da guilda |
+| 8 | Um espectador aparentemente neutro |
+| 9 | Um informante |
+| 10 | A autoridade local |
+| 11 | Um mercador envolvido |
+| 12 | O guarda que patrulha a área |
+| 13 | A pessoa que forneceu as pistas |
+| 14 | Um membro da família real |
+| 15 | O curandeiro/sábio consultado |
+| 16 | A criança que ninguém nota |
+| 17 | Um rival de longa data |
+| 18 | Um dos mortos/desaparecidos |
+| 19 | Um benfeitor anônimo |
+| 20 | A própria terra/local |
 
+<!-- markdownlint-disable-next-line MD026 -->
 ##### Na verdade...
 
-| 1d6 | Na verdade... |
-|-----|---------------|
+| 1d20 | Na verdade... |
+|------|---------------|
 | 1 | É o verdadeiro inimigo |
 | 2 | É um parente próximo |
 | 3 | É um herói lendário dado como morto |
 | 4 | Não é o que parece |
 | 5 | Auxilia o antagonista secretamente |
 | 6 | É um fantasma |
+| 7 | É um espião infiltrado |
+| 8 | É controlado/possuído por outra entidade |
+| 9 | É uma ilusão ou disfarce |
+| 10 | É de outra dimensão/plano |
+| 11 | É um clone ou impostor |
+| 12 | É muito mais poderoso do que aparenta |
+| 13 | Perdeu a memória de quem realmente é |
+| 14 | É um metamorfo |
+| 15 | Está sendo chantageado |
+| 16 | É uma criação artificial |
+| 17 | Vem do futuro ou passado |
+| 18 | É um deus disfarçado |
+| 19 | É a reencarnação de alguém importante |
+| 20 | São múltiplas pessoas agindo como uma |
 
+<!-- markdownlint-disable-next-line MD026 -->
 ##### Mas...
 
-| 1d6 | Mas... |
-|-----|--------|
+| 1d20 | Mas... |
+|------|--------|
 | 1 | Faz isso pelas crianças |
 | 2 | O antagonista não tem culpa |
 | 3 | Ele é assassinado misteriosamente |
 | 4 | O objetivo está ligado a uma profecia |
 | 5 | Faz isso para proteger a natureza |
 | 6 | O objetivo exige um sacrifício |
+| 7 | Está tentando salvar alguém querido |
+| 8 | Foi forçado por uma maldição |
+| 9 | Acredita estar fazendo o bem |
+| 10 | Está cumprindo uma promessa antiga |
+| 11 | É a única forma de evitar algo pior |
+| 12 | Está protegendo um segredo terrível |
+| 13 | Tem apenas dias de vida |
+| 14 | Está sendo manipulado sem saber |
+| 15 | Precisa salvar sua alma |
+| 16 | Está tentando desfazer um erro do passado |
+| 17 | É o único que pode fazer isso |
+| 18 | Está honrando a memória de alguém |
+| 19 | Precisa provar seu valor/inocência |
+| 20 | O tempo está se esgotando |
 
 ##### E... (primeira tabela)
 
-| 1d6 | E... |
-|-----|------|
+| 1d20 | E... |
+|------|------|
 | 1 | Todos já estão mortos |
 | 2 | O contratado é o verdadeiro vilão |
 | 3 | Um novo antagonista surge em paralelo |
 | 4 | As informações fornecidas são falsas |
 | 5 | O antagonista é um parente próximo |
 | 6 | Outro grupo cumpre o objetivo |
+| 7 | O objetivo nunca existiu realmente |
+| 8 | Há uma conspiração maior por trás |
+| 9 | O local está amaldiçoado |
+| 10 | Tudo é um teste de caráter |
+| 11 | O tempo está em loop |
+| 12 | Existem múltiplas versões da realidade |
+| 13 | O contrato é uma distração para outro plano |
+| 14 | Alguém está observando e julgando |
+| 15 | O verdadeiro objetivo é completamente diferente |
+| 16 | Há um traidor no grupo |
+| 17 | O problema se resolve sozinho |
+| 18 | Tudo faz parte de um ritual maior |
+| 19 | O antagonista está certo |
+| 20 | As consequências são irreversíveis |
 
 ##### E... (segunda tabela)
 
-| 1d6 | E... |
-|-----|------|
+| 1d20 | E... |
+|------|------|
 | 1 | Há cumplicidade da(s) vítima(s) com o vilão |
 | 2 | Era tudo parte de um jogo |
 | 3 | Cumprir o objetivo afeta negativamente outro plano |
 | 4 | O contratado está sendo manipulado por dois antagonistas |
 | 5 | Tudo não passa de um sonho |
 | 6 | Tudo foi uma vingança friamente planejada |
+| 7 | O problema era uma ilusão coletiva |
+| 8 | Existe uma versão alternativa dos eventos |
+| 9 | Alguém está reescrevendo a história |
+| 10 | O conflito é cíclico e se repete eternamente |
+| 11 | Todos os envolvidos são peças de um jogo maior |
+| 12 | A solução cria um problema ainda maior |
+| 13 | Nada do que aconteceu pode ser desfeito |
+| 14 | O verdadeiro poder está nas mãos de uma criança |
+| 15 | A morte não é permanente neste caso |
+| 16 | Há observadores de outras dimensões |
+| 17 | O local tem sua própria consciência |
+| 18 | O tempo flui diferente para cada pessoa |
+| 19 | As memórias de todos estão sendo alteradas |
+| 20 | A realidade está se desfazendo lentamente |
 
 ### Chance de Consequências Severas
 
-<!-- TODO: Essas são as consequências em caso de falha no contrato, explicar isso -->
+Quando um contrato falha ou é abandonado, pode haver consequências muito mais graves do que a simples perda da recompensa. Esta rolagem determina se eventos realmente severos ocorrerão, afetando não só os contratados, mas também a região, organizações ou até o mundo ao redor. Use as tabelas abaixo para definir o tipo de consequência, caso ela ocorra.
 
 | 1d20 | Haverão consequências mais severas? |
 |------|-----------------------------------|
@@ -2197,6 +2285,8 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 3-20 | Não |
 
 #### Tipos de Consequências Severas
+
+As consequências descritas a seguir são exemplos do que pode acontecer em caso de falha. Adapte conforme o contexto do contrato.
 
 | 1d20 | Consequências severas |
 |------|----------------------|
@@ -2245,21 +2335,19 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 | 2 | Civil |
 | 3 | Contra os líderes locais |
 | 4 | Revolução |
-| 5 | Contra uma criatura poderosa |
-| 6 | Contra um reino aliado |
-| 7 | Para colonizar terras indígenas |
-| 8 | Contra um reino inimigo |
-| 9 | Expansão territorial |
-| 10 | Contra a natureza |
-| 11 |  |
+| 5-6 | Contra uma criatura poderosa |
+| 7 | Contra um reino aliado |
+| 8 | Para colonizar terras indígenas |
+| 9 | Contra um reino inimigo |
+| 10 | Expansão territorial |
+| 11 | Contra a natureza |
 | 12 | Conflito geracional |
 | 13 | Guerra de sucessão |
-| 14 |  |
-| 15 | Guerra de recursos |
-| 16 | Conflito racial |
-| 17 | Guerra comercial violenta |
-| 18 | Contra rebeldes organizados |
-| 19 | Guerra de vingança |
+| 14 | Guerra de recursos |
+| 15 | Conflito racial |
+| 16 | Guerra comercial violenta |
+| 17 | Contra rebeldes organizados |
+| 18-19 | Guerra de vingança |
 | 20 | Role duas vezes e use ambos |
 
 ###### Calamidade Natural
@@ -2441,31 +2529,60 @@ Nada é tão fácil quanto parece, há sempre algumas complicações e dificulda
 
 ##### O que acontece com os contratados
 
-| 1d6 | Os contratados |
-|-----|----------------|
+| 1d20 | Os contratados |
+|------|----------------|
 | 1 | Acabam enfurecendo uma divindade |
 | 2 | Acabam tendo sua reputação manchada |
 | 3 | Saem de mãos abanando |
 | 4 | Criam uma inimizade forte com um dragão metálico |
 | 5 | Têm um prêmio por suas cabeças |
 | 6 | Agora são odiados por uma raça específica |
+| 7 | São perseguidos por um ser poderoso |
+| 8 | São marcados por uma maldição menor |
+| 9 | Perdem acesso a um local importante |
+| 10 | Tornam-se fugitivos da lei |
+| 11 | Ganham inimigos na nobreza local |
+| 12 | São expulsos de uma organização |
+| 13 | Perdem a confiança de aliados próximos |
+| 14 | Ficam endividados com alguém perigoso |
+| 15 | São considerados heróis por uma facção |
+| 16 | Ganham uma obsessão ou vício |
+| 17 | São banidos de um reino |
+| 18 | Atraem a atenção de caçadores |
+| 19 | Perdem algo valioso como pagamento |
+| 20 | Descobrem um segredo que não queriam saber |
 
+<!-- markdownlint-disable-next-line MD026 -->
 ##### E...
 
-| 1d6 | E... |
-|-----|------|
+| 1d20 | E... |
+|------|------|
 | 1 | Acabam enfurecendo um dragão cromático |
 | 2 | Atrapalham os planos de um Lich vingativo |
 | 3 | Ajudam na conclusão de um ritual maligno |
 | 4 | Auxiliaram conquistadores de outras terras |
 | 5 | Não são mais bem-vindos em um assentamento importante |
 | 6 | As ações afetam negativamente muitos inocentes |
+| 7 | Despertam uma antiga maldição familiar |
+| 8 | Interferem no equilíbrio natural de uma região |
+| 9 | Tornam-se peças em um jogo político maior |
+| 10 | Provocam uma guerra entre facções |
+| 11 | Libertam algo que deveria permanecer preso |
+| 12 | Destroem um artefato histórico importante |
+| 13 | Causam uma crise de fé numa religião local |
+| 14 | Atraem a atenção de entidades planares |
+| 15 | Comprometem uma missão diplomática crucial |
+| 16 | Criam um precedente perigoso para outros |
+| 17 | Violam um tabu cultural antigo |
+| 18 | Inadvertidamente ajudam um culto maligno |
+| 19 | Alteram o curso de eventos proféticos |
+| 20 | Desencadeiam uma série de eventos catastróficos |
 
-## Palavras-chave Temáticas
+### Palavras-chave Temáticas
 
 Eventualmente os contratos ficarão repetitivos já que essa tabela será muito usada. Pensando nisso role 1d6-1 palavras-chave e tente incorporá-las ao contrato do jeito que achar melhor. Um resultado 0 significa, obviamente, que não haverão palavras-chave.
 
-### Primeira Tabela Temática
+#### Primeira Tabela Temática
 
 | 1d20 | Palavra-chave |
 |------|---------------|
@@ -2490,7 +2607,7 @@ Eventualmente os contratos ficarão repetitivos já que essa tabela será muito 
 | 19 | Cemitério |
 | 20 | Trevas |
 
-### Segunda Tabela Temática
+#### Segunda Tabela Temática
 
 | 1d20 | Palavra-chave |
 |------|---------------|
@@ -2515,7 +2632,7 @@ Eventualmente os contratos ficarão repetitivos já que essa tabela será muito 
 | 19 | Conquista |
 | 20 | Espólios |
 
-### Terceira Tabela Temática
+#### Terceira Tabela Temática
 
 | 1d20 | Palavra-chave |
 |------|---------------|
@@ -2540,7 +2657,7 @@ Eventualmente os contratos ficarão repetitivos já que essa tabela será muito 
 | 19 | Fazendeiro |
 | 20 | Brasão |
 
-### Quarta Tabela Temática
+#### Quarta Tabela Temática
 
 | 1d20 | Palavra-chave |
 |------|---------------|
@@ -2565,7 +2682,7 @@ Eventualmente os contratos ficarão repetitivos já que essa tabela será muito 
 | 19 | Fumaça |
 | 20 | Óleo |
 
-### Quinta Tabela Temática
+#### Quinta Tabela Temática
 
 | 1d20 | Palavra-chave |
 |------|---------------|
@@ -2590,7 +2707,7 @@ Eventualmente os contratos ficarão repetitivos já que essa tabela será muito 
 | 19 | Covil |
 | 20 | Cadáveres |
 
-### Sexta Tabela Temática
+#### Sexta Tabela Temática
 
 | 1d20 | Palavra-chave |
 |------|---------------|
@@ -2615,19 +2732,25 @@ Eventualmente os contratos ficarão repetitivos já que essa tabela será muito 
 | 19 | Repressão |
 | 20 | Alienação |
 
-
------
--CONTRATANTES INUSITADOS
+---
 
 ### Contratantes Inusitados
 
+Nem todos os contratantes são cidadãos comuns com problemas convencionais. Alguns possuem naturezas, motivações ou circunstâncias peculiares que podem adicionar camadas de complexidade e interesse aos contratos. Estes contratantes podem oferecer aventuras únicas e desafios inesperados.
+
 #### Teste de Excentricidade
+
+Antes de determinar se um contratante será inusitado, role para verificar se haverá algo peculiar sobre ele. A maioria dos contratantes são pessoas normais, mas ocasionalmente aparecem figuras verdadeiramente excêntricas.
+
 | d20 | O contratante é biruta? |
 |-----|-------------------------|
 | 1   | Sim                     |
 | 2-20| Não                     |
 
 #### Tabela de Contratantes (d100)
+
+Esta tabela contém uma variedade de contratantes únicos, cada um com suas próprias motivações, histórias e peculiaridades. Use esta tabela quando o teste de excentricidade indicar que um contratante inusitado está envolvido.
+
 | d100 | Contratante |
 |------|-------------|
 | 1    | Família nobre em desgraça por conta de conspiração política |
@@ -2733,9 +2856,12 @@ Eventualmente os contratos ficarão repetitivos já que essa tabela será muito 
 
 > **Dica:** Eventualmente os contratantes ficarão repetitivos já que essa tabela será muito usada. Pensando nisso role 1d6 palavras aleatórias de diferentes tabelas e tente incorporá-las criativamente ao contratante.
 
-### Palavras-chave para Criatividade
+#### Palavras-chave para Criatividade
 
-#### Conjunto 1 (d20)
+Para evitar a repetitividade dos contratantes inusitados, use palavras-chave aleatórias para inspirar características únicas. Role 1d6 palavras de diferentes conjuntos e incorpore-as criativamente ao contratante, seja em sua aparência, motivação, história pessoal ou maneirismos.
+
+##### Conjunto 1 (d20)
+
 | d20 | Palavra-chave |
 |-----|---------------|
 | 1   | Vazio         |
@@ -2759,7 +2885,8 @@ Eventualmente os contratos ficarão repetitivos já que essa tabela será muito 
 | 19  | Gelado        |
 | 20  | Enigmático    |
 
-#### Conjunto 2 (d20)
+##### Conjunto 2 (d20)
+
 | d20 | Palavra-chave |
 |-----|---------------|
 | 1   | Roubo         |
@@ -2783,7 +2910,8 @@ Eventualmente os contratos ficarão repetitivos já que essa tabela será muito 
 | 19  | Gruta         |
 | 20  | Lenda         |
 
-#### Conjunto 3 (d20)
+##### Conjunto 3 (d20)
+
 | d20 | Palavra-chave |
 |-----|---------------|
 | 1   | Anel          |
@@ -2807,7 +2935,8 @@ Eventualmente os contratos ficarão repetitivos já que essa tabela será muito 
 | 19  | Talismã       |
 | 20  | Artefato      |
 
-#### Conjunto 4 (d20)
+##### Conjunto 4 (d20)
+
 | d20 | Palavra-chave |
 |-----|---------------|
 | 1   | Macabro       |
@@ -2831,7 +2960,8 @@ Eventualmente os contratos ficarão repetitivos já que essa tabela será muito 
 | 19  | Gratidão      |
 | 20  | Triunfo       |
 
-#### Conjunto 5 (d20)
+##### Conjunto 5 (d20)
+
 | d20 | Palavra-chave |
 |-----|---------------|
 | 1   | Maníaco       |
@@ -2855,7 +2985,8 @@ Eventualmente os contratos ficarão repetitivos já que essa tabela será muito 
 | 19  | Melancolia    |
 | 20  | Tormento      |
 
-#### Conjunto 6 (d20)
+##### Conjunto 6 (d20)
+
 | d20 | Palavra-chave |
 |-----|---------------|
 | 1   | Bebida        |
@@ -2878,5 +3009,3 @@ Eventualmente os contratos ficarão repetitivos já que essa tabela será muito 
 | 18  | Amizade       |
 | 19  | Celebração    |
 | 20  | Entretenimento|
-
------------------------------
