@@ -112,6 +112,136 @@ export const getResourceColor = (level: string): string => {
 };
 
 /**
+ * Retorna classes CSS para coloração progressiva de frequência de visitantes (círculos)
+ * Sistema: vermelho (pior) → laranja → amarelo → azul → verde (melhor)
+ */
+export const getVisitorFrequencyCircleColor = (frequency: string): string => {
+  const lowerFrequency = frequency.toLowerCase();
+  
+  // Vazia - Vermelho escuro
+  if (lowerFrequency.includes('vazia')) {
+    return 'bg-red-600';
+  }
+  
+  // Quase deserta - Vermelho
+  if (lowerFrequency.includes('quase deserta')) {
+    return 'bg-red-500';
+  }
+  
+  // Pouco movimentada - Laranja
+  if (lowerFrequency.includes('pouco movimentada')) {
+    return 'bg-orange-500';
+  }
+  
+  // Nem muito nem pouco - Amarelo
+  if (lowerFrequency.includes('nem muito nem pouco')) {
+    return 'bg-yellow-500';
+  }
+  
+  // Muito frequentada - Azul
+  if (lowerFrequency.includes('muito frequentada')) {
+    return 'bg-blue-500';
+  }
+  
+  // Abarrotada - Verde
+  if (lowerFrequency.includes('abarrotada')) {
+    return 'bg-green-500';
+  }
+  
+  // Lotada - Verde escuro
+  if (lowerFrequency.includes('lotada')) {
+    return 'bg-green-600';
+  }
+  
+  return 'bg-gray-400'; // Fallback
+};
+
+/**
+ * Retorna classes CSS para coloração progressiva de relações (círculos)
+ * Sistema: vermelho (pior) → laranja → amarelo → azul → verde (melhor)
+ */
+export const getRelationCircleColor = (relation: string): string => {
+  const lowerRelation = relation.toLowerCase();
+  
+  // Péssima - Vermelho escuro
+  if (lowerRelation.includes('péssima') || lowerRelation.includes('puro ódio')) {
+    return 'bg-red-600';
+  }
+  
+  // Ruim - Vermelho/Laranja
+  if (lowerRelation.includes('ruim') || lowerRelation.includes('mercenários') || lowerRelation.includes('só causam problemas')) {
+    return 'bg-red-500';
+  }
+  
+  // Diplomática/Dividida - Amarelo
+  if (lowerRelation.includes('diplomática') || lowerRelation.includes('opinião dividida') || lowerRelation.includes('cordialidade')) {
+    return 'bg-yellow-500';
+  }
+  
+  // Boa - Azul
+  if (lowerRelation.includes('boa') || lowerRelation.includes('ajudam') || lowerRelation.includes('mantêm seguros') || lowerRelation.includes('miná-los')) {
+    return 'bg-blue-500';
+  }
+  
+  // Muito boa - Verde
+  if (lowerRelation.includes('muito boa') || lowerRelation.includes('cooperam') || lowerRelation.includes('estaríamos perdidos')) {
+    return 'bg-green-500';
+  }
+  
+  // Excelente - Verde escuro
+  if (lowerRelation.includes('excelente') || lowerRelation.includes('assentamento funcionar') || lowerRelation.includes('quase como um')) {
+    return 'bg-green-600';
+  }
+  
+  return 'bg-gray-400'; // Fallback
+};
+
+/**
+ * Retorna classes CSS para coloração progressiva de recursos (círculos)
+ * Sistema: vermelho (pior) → laranja → amarelo → azul → verde (melhor)
+ */
+export const getResourceCircleColor = (level: string): string => {
+  const lowerLevel = level.toLowerCase();
+  
+  // Em débito - Vermelho escuro
+  if (lowerLevel.includes('em débito')) {
+    return 'bg-red-700';
+  }
+  
+  // Nenhum - Vermelho
+  if (lowerLevel.includes('nenhum')) {
+    return 'bg-red-600';
+  }
+  
+  // Escassos - Laranja
+  if (lowerLevel.includes('escassos')) {
+    return 'bg-orange-500';
+  }
+  
+  // Limitados - Amarelo
+  if (lowerLevel.includes('limitados')) {
+    return 'bg-yellow-500';
+  }
+  
+  // Suficientes - Azul
+  if (lowerLevel.includes('suficientes')) {
+    return 'bg-blue-500';
+  }
+  
+  // Excedentes - Verde claro
+  if (lowerLevel.includes('excedentes')) {
+    return 'bg-green-500';
+  }
+  
+  // Abundantes - Verde escuro
+  if (lowerLevel.includes('abundantes')) {
+    return 'bg-green-600';
+  }
+  
+  return 'bg-gray-400'; // Fallback
+};
+
+/**
  * Retorna classes CSS para coloração progressiva de frequência de visitantes
  * Sistema: vermelho (pior) → laranja → amarelo → azul → verde (melhor)
  */
