@@ -54,6 +54,7 @@ export interface GuildData {
 // Todos os rolls realizados durante a geração
 export interface GuildRolls {
   readonly structure: {
+    readonly headquartersType: number;
     readonly size: number;
     readonly characteristics: readonly number[];
     readonly employees: number;
@@ -98,14 +99,18 @@ export class GuildGenerator {
       // Fase 1: Gerar estrutura e funcionários
       const structureResult = this.generateStructure();
       
-      // Fase 2: Gerar relações (independentes)
-      const relationsResult = this.generateRelations();
+      // Extrair informação de Sede Matriz
+      const headquartersModifier = structureResult.data.structure.isHeadquarters ? 5 : 0;
       
-      // Fase 3: Gerar recursos (aplicando modificadores de relações)
+      // Fase 2: Gerar relações
+      const relationsResult = this.generateRelations(headquartersModifier);
+      
+      // Fase 3: Gerar recursos (aplicando modificadores de relações e Sede Matriz)
       const resourcesVisitorsResult = this.generateResourcesAndVisitors(
         structureResult.data.staff.employees,
         relationsResult.data.relations.government,
-        relationsResult.data.relations.population
+        relationsResult.data.relations.population,
+        headquartersModifier
       );
       
       // Fase 4: Montar a guilda final
@@ -121,6 +126,7 @@ export class GuildGenerator {
         data: { guild },
         rolls: {
           structure: {
+            headquartersType: structureResult.rolls.headquartersType,
             size: structureResult.rolls.size,
             characteristics: structureResult.rolls.characteristics,
             employees: structureResult.rolls.employees,
@@ -165,12 +171,15 @@ export class GuildGenerator {
   /**
    * Gera as relações da guilda com governo e população
    */
-  private generateRelations() {
+  private generateRelations(headquartersModifier: number = 0) {
     this.log(`--- Phase 2: Generating relations ---`, 'PHASE');
     
     const config: RelationsGenerationConfig = {
       settlementType: this.config.settlementType,
-      customModifiers: this.config.customModifiers?.relations,
+      customModifiers: {
+        government: (this.config.customModifiers?.relations?.government || 0) + headquartersModifier,
+        population: (this.config.customModifiers?.relations?.population || 0) + headquartersModifier,
+      },
       debug: this.debug,
     };
     
@@ -189,15 +198,16 @@ export class GuildGenerator {
   private generateResourcesAndVisitors(
     employees: string,
     government: import('@/types/guild').RelationLevel,
-    population: import('@/types/guild').RelationLevel
+    population: import('@/types/guild').RelationLevel,
+    headquartersModifier: number = 0
   ) {
     this.log(`--- Phase 3: Generating resources and visitors ---`, 'PHASE');
     
     const config: ResourcesVisitorsGenerationConfig = {
       settlementType: this.config.settlementType,
       customModifiers: {
-        resources: this.config.customModifiers?.resources?.level,
-        visitors: this.config.customModifiers?.visitors?.frequency,
+        resources: (this.config.customModifiers?.resources?.level || 0) + headquartersModifier,
+        visitors: (this.config.customModifiers?.visitors?.frequency || 0) + headquartersModifier,
       },
       relationModifiers: {
         government,
