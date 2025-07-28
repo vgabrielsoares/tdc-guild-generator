@@ -65,6 +65,14 @@
               <ArrowDownTrayIcon class="w-4 h-4" />
               <span>Exportar</span>
             </button>
+            <button
+              @click="clearGuild"
+              class="btn btn-outline-danger flex items-center space-x-2"
+              :disabled="guildStore.isGenerating"
+            >
+              <TrashIcon class="w-4 h-4" />
+              <span>Limpar</span>
+            </button>
           </div>
         </div>
         
