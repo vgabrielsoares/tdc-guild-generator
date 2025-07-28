@@ -15,13 +15,14 @@ import type { TableEntry } from "../../types/tables";
 import {
   HEADQUARTERS_SIZE_TABLE,
   HEADQUARTERS_CHARACTERISTICS_TABLE,
+  HEADQUARTERS_TYPE_TABLE,
   EMPLOYEES_TABLE,
   GOVERNMENT_RELATIONS_TABLE,
   POPULATION_RELATIONS_TABLE,
+  RESOURCES_LEVEL_TABLE,
+  VISITORS_FREQUENCY_TABLE,
   SETTLEMENT_DICE,
   RESOURCE_MODIFIERS,
-  getVisitorFrequencyTable,
-  getResourceLevelTable,
 } from "../../data/tables/guild-structure";
 import { ModifierCalculator } from "./resources-visitors-generator";
 
@@ -76,6 +77,37 @@ function mapSettlementType(settlementType: SettlementType): string {
 }
 
 /**
+ * Generates the headquarters type (Normal or Sede Matriz) based on settlement type
+ */
+export function generateHeadquartersType(settlementType: SettlementType): {
+  isHeadquarters: boolean;
+  roll: number;
+} {
+  const mappedSettlement = mapSettlementType(settlementType);
+  const diceConfig =
+    SETTLEMENT_DICE.structure[
+      mappedSettlement as keyof typeof SETTLEMENT_DICE.structure
+    ];
+
+  if (!diceConfig) {
+    // Fallback to d8 for unknown settlement types
+    const fallbackConfig = { dice: "d8", modifier: 0 };
+    const notation = `1${fallbackConfig.dice}${fallbackConfig.modifier >= 0 ? "+" : ""}${fallbackConfig.modifier}`;
+    const diceRoll = rollDice({ notation, context: "Headquarters type (fallback)" });
+    const result = lookupTableValue(HEADQUARTERS_TYPE_TABLE, diceRoll.result);
+    const isHeadquarters = result === 'Sede Matriz';
+    return { isHeadquarters, roll: diceRoll.result };
+  }
+
+  const notation = `1${diceConfig.dice}${diceConfig.modifier >= 0 ? "+" : ""}${diceConfig.modifier}`;
+  const diceRoll = rollDice({ notation, context: `Headquarters type (${mappedSettlement})` });
+  const result = lookupTableValue(HEADQUARTERS_TYPE_TABLE, diceRoll.result);
+  const isHeadquarters = result === 'Sede Matriz';
+
+  return { isHeadquarters, roll: diceRoll.result };
+}
+
+/**
  * Generates the headquarters size based on settlement type and modifiers
  */
 export function generateHeadquartersSize(
@@ -105,9 +137,13 @@ export function generateHeadquartersSize(
 }
 
 /**
- * Generates headquarters characteristics based on size roll
+ * Generates headquarters characteristics based on size roll and settlement type
  */
-export function generateHeadquartersCharacteristics(sizeRoll: number): {
+export function generateHeadquartersCharacteristics(
+  sizeRoll: number, 
+  settlementType: SettlementType,
+  headquartersModifier: number = 0
+): {
   characteristics: string[];
   rolls: number[];
 } {
@@ -121,13 +157,23 @@ export function generateHeadquartersCharacteristics(sizeRoll: number): {
 
   const usedCharacteristics = new Set<string>();
 
+  // Get settlement-specific dice configuration
+  const mappedSettlement = mapSettlementType(settlementType);
+  const diceConfig = SETTLEMENT_DICE.structure[mappedSettlement as keyof typeof SETTLEMENT_DICE.structure];
+  
+  // Use settlement dice or fallback to d20
+  const baseDice = diceConfig ? diceConfig.dice : "d20";
+  const baseModifier = diceConfig ? diceConfig.modifier : 0;
+  const totalModifier = baseModifier + headquartersModifier;
+
   for (let i = 0; i < numCharacteristics; i++) {
     let attempts = 0;
     let result: string;
     let diceRoll: { result: number };
 
     do {
-      diceRoll = rollDice({ notation: "d20" });
+      const notation = `${baseDice}${totalModifier >= 0 ? "+" : ""}${totalModifier}`;
+      diceRoll = rollDice({ notation, context: `Headquarters characteristics (${mappedSettlement})` });
       result = lookupTableValue(
         HEADQUARTERS_CHARACTERISTICS_TABLE,
         diceRoll.result
@@ -152,7 +198,10 @@ export function generateHeadquartersCharacteristics(sizeRoll: number): {
 /**
  * Generates employees for the guild
  */
-export function generateEmployees(settlementType: SettlementType): {
+export function generateEmployees(
+  settlementType: SettlementType,
+  modifier: number = 0
+): {
   employees: string;
   roll: number;
 } {
@@ -166,14 +215,22 @@ export function generateEmployees(settlementType: SettlementType): {
   if (!diceConfig) {
     // Fallback to d8 for unknown settlement types
     const fallbackConfig = { dice: "d8", modifier: 0 };
-    const notation = `1${fallbackConfig.dice}${fallbackConfig.modifier >= 0 ? "+" : ""}${fallbackConfig.modifier}`;
-    const diceRoll = rollDice({ notation });
+    const totalModifier = fallbackConfig.modifier + modifier;
+    const notation = `1${fallbackConfig.dice}${totalModifier >= 0 ? "+" : ""}${totalModifier}`;
+    const diceRoll = rollDice({ 
+      notation, 
+      context: `Employees (${mappedSettlement})` 
+    });
     const result = lookupTableValue(EMPLOYEES_TABLE, diceRoll.result);
     return { employees: result, roll: diceRoll.result };
   }
 
-  const notation = `1${diceConfig.dice}${diceConfig.modifier >= 0 ? "+" : ""}${diceConfig.modifier}`;
-  const diceRoll = rollDice({ notation });
+  const totalModifier = diceConfig.modifier + modifier;
+  const notation = `1${diceConfig.dice}${totalModifier >= 0 ? "+" : ""}${totalModifier}`;
+  const diceRoll = rollDice({ 
+    notation, 
+    context: `Employees (${mappedSettlement})` 
+  });
   const result = lookupTableValue(EMPLOYEES_TABLE, diceRoll.result);
 
   return { employees: result, roll: diceRoll.result };
@@ -230,12 +287,26 @@ function mapPopulationRelationToEnum(tableResult: string): RelationLevel {
 /**
  * Generates government relations for guild structure
  */
-export function generateStructureGovernmentRelations(modifier: number = 0): {
+export function generateStructureGovernmentRelations(
+  settlementType: SettlementType,
+  modifier: number = 0
+): {
   relation: string;
   roll: number;
 } {
+  // Get settlement-specific dice configuration
+  const mappedSettlement = mapSettlementType(settlementType);
+  const diceConfig = SETTLEMENT_DICE.structure[mappedSettlement as keyof typeof SETTLEMENT_DICE.structure];
+  
+  // Use settlement dice or fallback to d20
+  const baseDice = diceConfig ? diceConfig.dice : "d20";
+  const baseModifier = diceConfig ? diceConfig.modifier : 0;
+  const totalModifier = baseModifier + modifier;
+
+  const notation = `${baseDice}${totalModifier >= 0 ? "+" : ""}${totalModifier}`;
   const diceRoll = rollDice({
-    notation: `d20${modifier >= 0 ? "+" : ""}${modifier}`,
+    notation,
+    context: `Government relations (${mappedSettlement})`
   });
   const tableResult = findTableEntry(
     GOVERNMENT_RELATIONS_TABLE,
@@ -249,12 +320,26 @@ export function generateStructureGovernmentRelations(modifier: number = 0): {
 /**
  * Generates population relations for guild structure
  */
-export function generateStructurePopulationRelations(modifier: number = 0): {
+export function generateStructurePopulationRelations(
+  settlementType: SettlementType,
+  modifier: number = 0
+): {
   relation: string;
   roll: number;
 } {
+  // Get settlement-specific dice configuration
+  const mappedSettlement = mapSettlementType(settlementType);
+  const diceConfig = SETTLEMENT_DICE.structure[mappedSettlement as keyof typeof SETTLEMENT_DICE.structure];
+  
+  // Use settlement dice or fallback to d20
+  const baseDice = diceConfig ? diceConfig.dice : "d20";
+  const baseModifier = diceConfig ? diceConfig.modifier : 0;
+  const totalModifier = baseModifier + modifier;
+
+  const notation = `${baseDice}${totalModifier >= 0 ? "+" : ""}${totalModifier}`;
   const diceRoll = rollDice({
-    notation: `d20${modifier >= 0 ? "+" : ""}${modifier}`,
+    notation,
+    context: `Population relations (${mappedSettlement})`
   });
   const tableResult = findTableEntry(
     POPULATION_RELATIONS_TABLE,
@@ -281,8 +366,8 @@ export function generateVisitors(
       mappedSettlement as keyof typeof SETTLEMENT_DICE.visitors
     ];
 
-  // Get the appropriate table for this settlement type
-  const frequencyTable = getVisitorFrequencyTable(mappedSettlement);
+  // Use the unified frequency table - let the dice result determine what we can get
+  const frequencyTable = VISITORS_FREQUENCY_TABLE;
 
   if (!diceConfig) {
     // Fallback to d8 for unknown settlement types
@@ -292,7 +377,10 @@ export function generateVisitors(
       finalModifier === 0
         ? `1${fallbackConfig.dice}`
         : `1${fallbackConfig.dice}${finalModifier >= 0 ? "+" : ""}${finalModifier}`;
-    const diceRoll = rollDice({ notation });
+    const diceRoll = rollDice({ 
+      notation, 
+      context: `Visitor frequency (${mappedSettlement})` 
+    });
     const result = findTableEntry(frequencyTable, diceRoll.result);
     return {
       frequency: mapVisitorStringToEnum(result || "Nem muito nem pouco"),
@@ -305,7 +393,10 @@ export function generateVisitors(
     finalModifier === 0
       ? `1${diceConfig.dice}`
       : `1${diceConfig.dice}${finalModifier >= 0 ? "+" : ""}${finalModifier}`;
-  const diceRoll = rollDice({ notation });
+  const diceRoll = rollDice({ 
+    notation, 
+    context: `Visitor frequency (${mappedSettlement})` 
+  });
   const result = findTableEntry(frequencyTable, diceRoll.result);
 
   return {
@@ -352,14 +443,18 @@ export function generateResources(
       mappedSettlement as keyof typeof SETTLEMENT_DICE.structure
     ];
 
-  // Get the appropriate table for this settlement type
-  const resourceTable = getResourceLevelTable(mappedSettlement);
+  // Use the unified resource table - let the dice result determine what we can get
+  const resourceTable = RESOURCES_LEVEL_TABLE;
 
   if (!diceConfig) {
     // Fallback to d8 for unknown settlement types
     const fallbackConfig = { dice: "d8", modifier: 0 };
-    const notation = `1${fallbackConfig.dice}${fallbackConfig.modifier + modifier >= 0 ? "+" : ""}${fallbackConfig.modifier + modifier}`;
-    const diceRoll = rollDice({ notation });
+    const totalModifier = fallbackConfig.modifier + modifier;
+    const notation = `1${fallbackConfig.dice}${totalModifier >= 0 ? "+" : ""}${totalModifier}`;
+    const diceRoll = rollDice({ 
+      notation, 
+      context: `Resources (${mappedSettlement})` 
+    });
     const result = findTableEntry(resourceTable, diceRoll.result);
     return {
       level: mapResourceStringToEnum(result || "Limitados"),
@@ -367,8 +462,12 @@ export function generateResources(
     };
   }
 
-  const notation = `1${diceConfig.dice}${diceConfig.modifier + modifier >= 0 ? "+" : ""}${diceConfig.modifier + modifier}`;
-  const diceRoll = rollDice({ notation });
+  const totalModifier = diceConfig.modifier + modifier;
+  const notation = `1${diceConfig.dice}${totalModifier >= 0 ? "+" : ""}${totalModifier}`;
+  const diceRoll = rollDice({ 
+    notation, 
+    context: `Resources (${mappedSettlement})` 
+  });
   const result = findTableEntry(resourceTable, diceRoll.result);
 
   return {
@@ -489,19 +588,26 @@ export function generateGuildStructure(
     );
   }
 
-  // Step 1: Generate employees first
-  const employeesResult = generateEmployees(config.settlementType);
+  // Step 1: Generate headquarters type (Normal or Sede Matriz)
+  const headquartersTypeResult = generateHeadquartersType(config.settlementType);
+  const headquartersModifier = headquartersTypeResult.isHeadquarters ? 5 : 0;
+  logs.push(
+    `Headquarters type: ${headquartersTypeResult.roll} -> ${headquartersTypeResult.isHeadquarters ? 'Sede Matriz (+5 to all rolls)' : 'Sede Normal'}`
+  );
+
+  // Step 2: Generate employees with headquarters modifier
+  const employeesResult = generateEmployees(config.settlementType, headquartersModifier);
   logs.push(
     `Employees rolled: ${employeesResult.roll} -> ${employeesResult.employees}`
   );
 
-  // Step 2: Generate base relations (no modifiers initially)
-  const governmentResult = generateStructureGovernmentRelations(0);
+  // Step 3: Generate base relations (headquarters modifier applied internally if needed)
+  const governmentResult = generateStructureGovernmentRelations(config.settlementType, headquartersModifier);
   logs.push(
     `Government relations: ${governmentResult.roll} -> ${governmentResult.relation}`
   );
 
-  const populationResult = generateStructurePopulationRelations(0);
+  const populationResult = generateStructurePopulationRelations(config.settlementType, headquartersModifier);
   logs.push(
     `Population relations: ${populationResult.roll} -> ${populationResult.relation}`
   );
@@ -514,10 +620,11 @@ export function generateGuildStructure(
     populationResult.relation
   );
 
-  // Step 4: Generate resources with relation modifiers
+  // Step 4: Generate resources with relation modifiers and headquarters bonus
+  const totalResourceModifier = relationModifiers.resourceModifier + headquartersModifier;
   const resourcesResult = generateResources(
     config.settlementType,
-    relationModifiers.resourceModifier
+    totalResourceModifier
   );
   logs.push(
     `Resources rolled: ${resourcesResult.roll} -> ${resourcesResult.level}`
@@ -532,21 +639,26 @@ export function generateGuildStructure(
     `Calculated modifiers: visitor=${finalModifiers.visitorsModifier >= 0 ? "+" : ""}${finalModifiers.visitorsModifier}, resource=${relationModifiers.resourceModifier >= 0 ? "+" : ""}${relationModifiers.resourceModifier}`
   );
 
-  // Step 6: Generate headquarters (no modifiers from markdown)
-  const sizeResult = generateHeadquartersSize(config.settlementType, 0);
-  logs.push(`Headquarters size: ${sizeResult.roll} -> ${sizeResult.size}`);
+  // Step 6: Generate headquarters size with headquarters modifier
+  const customStructureModifier = config.customModifiers?.structure || 0;
+  const totalSizeModifier = headquartersModifier + customStructureModifier;
+  const sizeResult = generateHeadquartersSize(config.settlementType, totalSizeModifier);
+  logs.push(`Headquarters size: ${sizeResult.roll} -> ${sizeResult.size}${headquartersModifier > 0 ? ' (with Sede Matriz bonus)' : ''}`);
 
   const characteristicsResult = generateHeadquartersCharacteristics(
-    sizeResult.roll
+    sizeResult.roll,
+    config.settlementType,
+    headquartersModifier
   );
   logs.push(
     `Headquarters characteristics: ${characteristicsResult.characteristics.join(", ")}`
   );
 
   // Step 7: Generate visitors with final modifiers
+  const totalVisitorsModifier = finalModifiers.visitorsModifier + headquartersModifier;
   const visitorsResult = generateVisitors(
     config.settlementType,
-    finalModifiers.visitorsModifier
+    totalVisitorsModifier
   );
   logs.push(`Visitors: ${visitorsResult.roll} -> ${visitorsResult.frequency}`);
 
@@ -557,6 +669,7 @@ export function generateGuildStructure(
     structure: {
       size: sizeResult.size,
       characteristics: characteristicsResult.characteristics,
+      isHeadquarters: headquartersTypeResult.isHeadquarters,
     },
     relations: {
       government: governmentResult.relation as RelationLevel,
