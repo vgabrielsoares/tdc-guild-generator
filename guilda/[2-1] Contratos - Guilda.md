@@ -982,7 +982,7 @@ Role nas tabelas correspondentes ao resultado de Localidade Principal.
 | 6 | Cripta |
 | 7 | Assentamento de humanoides |
 | 8 | Fenda submarina |
-| 9 | Cemiterio de monstruosidades |
+| 9 | Cemitério de monstruosidades |
 | 10 | Labirinto |
 | 11 | Mina abandonada |
 | 12 |  |
@@ -1004,8 +1004,8 @@ Role nas tabelas correspondentes ao resultado de Localidade Principal.
 | 3 | Templo profanado |
 | 4 | Campo de batalha devastado |
 | 5 | Zona morta |
-| 6 | Vales runicos |
-| 7 | Assentamento proximo |
+| 6 | Vales rúnicos |
+| 7 | Assentamento próximo |
 | 8 | Ruína maldita |
 | 9 | Covil monstruoso |
 | 10 | Pântano sombrio |
