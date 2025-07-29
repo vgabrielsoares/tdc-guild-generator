@@ -45,7 +45,7 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { useToastStore, ToastType } from '@/stores/toast';
+import { useToastStore, ToastType } from '../../stores/toast';
 import { watch, onUnmounted } from 'vue';
 
 const { toasts } = storeToRefs(useToastStore());
@@ -108,7 +108,7 @@ function clearToastTimeout(id: string) {
   }
 }
 
-import type { Toast } from '@/stores/toast';
+import type { Toast } from '../../stores/toast';
 function setToastTimeout(toast: Toast) {
   clearToastTimeout(toast.id);
   const duration = toast.duration ?? 3500;
@@ -152,7 +152,7 @@ watch(
     }
     // Remove timeouts de toasts removidos
     for (const toast of oldToasts) {
-      if (!newToasts.find((t: any) => t.id === toast.id)) {
+      if (!newToasts.find((t: Toast) => t.id === toast.id)) {
         clearToastTimeout(toast.id);
       }
     }
