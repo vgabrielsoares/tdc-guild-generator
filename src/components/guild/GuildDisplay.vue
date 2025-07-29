@@ -218,7 +218,7 @@ import GuildStructure from './GuildStructure.vue'
 import GuildRelations from './GuildRelations.vue'
 
 const guildStore = useGuildStore()
-const { showSuccess, showError, showWarning } = useToast()
+const toast = useToast()
 
 const guild = computed(() => guildStore.currentGuild)
 
@@ -345,16 +345,15 @@ const saveToHistory = () => {
       const guildToSave = guildCopy as Guild;
       guildStore.addToHistory(guildToSave);
       
-      // Usar toast em vez de alert
-      showSuccess('Guilda salva no histórico com sucesso!');
+      toast.success('Guilda salva no histórico com sucesso!');
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Erro completo:', error);
       const message = error instanceof Error ? error.message : 'Erro desconhecido ao salvar guilda';
-      showError(`Erro ao salvar guilda: ${message}`);
+      toast.error('Erro ao salvar guilda', message);
     }
   } else {
-    showWarning('Nenhuma guilda para salvar');
+    toast.warning('Nenhuma guilda para salvar');
   }
 }
 
@@ -390,13 +389,13 @@ const saveGuildName = async () => {
     const success = guildStore.updateGuildName(newName)
     if (success) {
       isEditingName.value = false
-      showSuccess('Nome da guilda atualizado com sucesso!')
+      toast.success('Nome da guilda atualizado com sucesso!')
     } else {
-      showError('Erro ao atualizar nome da guilda')
+      toast.error('Erro ao atualizar nome da guilda')
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erro desconhecido'
-    showError(`Erro ao atualizar nome: ${message}`)
+    toast.error('Erro ao atualizar nome', message)
   }
 }
 
