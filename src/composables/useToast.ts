@@ -1,32 +1,38 @@
-import { type Toast } from '@/components/common/ToastManager.vue';
+interface ToastOptions {
+  type?: ToastType;
+  title: string;
+  message?: string;
+  duration?: number;
+}
+import { useToastStore, ToastType } from "@/stores/toast";
 
-export const useToast = () => {
-  const showToast = (toast: Omit<Toast, 'id'>) => {
-    const event = new CustomEvent('show-toast', { detail: toast });
-    window.dispatchEvent(event);
-  };
+export function useToast() {
+  const toastStore = useToastStore();
 
-  const showSuccess = (message: string, duration?: number) => {
-    showToast({ message, type: 'success', duration });
-  };
+  function show({
+    type = ToastType.INFO,
+    title,
+    message,
+    duration,
+  }: ToastOptions) {
+    toastStore.showToast({ type, title, message, duration });
+  }
 
-  const showError = (message: string, duration?: number) => {
-    showToast({ message, type: 'error', duration });
-  };
+  function success(title: string, message?: string, duration?: number) {
+    show({ type: ToastType.SUCCESS, title, message, duration });
+  }
 
-  const showWarning = (message: string, duration?: number) => {
-    showToast({ message, type: 'warning', duration });
-  };
+  function error(title: string, message?: string, duration?: number) {
+    show({ type: ToastType.ERROR, title, message, duration });
+  }
 
-  const showInfo = (message: string, duration?: number) => {
-    showToast({ message, type: 'info', duration });
-  };
+  function info(title: string, message?: string, duration?: number) {
+    show({ type: ToastType.INFO, title, message, duration });
+  }
 
-  return {
-    showToast,
-    showSuccess,
-    showError,
-    showWarning,
-    showInfo
-  };
-};
+  function warning(title: string, message?: string, duration?: number) {
+    show({ type: ToastType.WARNING, title, message, duration });
+  }
+
+  return { show, success, error, info, warning };
+}

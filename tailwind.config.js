@@ -4,6 +4,14 @@ export default {
     "./index.html",
     "./src/**/*.{vue,js,ts,jsx,tsx}",
   ],
+  safelist: [
+    'toast-fade-enter-active',
+    'toast-fade-leave-active',
+    'toast-fade-enter-from',
+    'toast-fade-leave-to',
+    'toast-fade-enter-to',
+    'toast-fade-leave-from',
+  ],
   theme: {
     extend: {
       colors: {
