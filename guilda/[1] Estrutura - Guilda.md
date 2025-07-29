@@ -349,4 +349,225 @@ A movimentação na sede da guilda varia conforme diversos fatores, incluindo o 
 
 ### Nome da Sede da Guilda
 
-Cada sede da Guilda pode ter um nome próprio para fins de identificação e personalização. O nome pode refletir a localização, a história ou a reputação da sede, ou ser algo puraemente inventivo. Apesar dos diferentes nomes, toda sede da Guilda é, fundamentalmente, parte da mesma organização, "A Guilda".
+Cada sede da Guilda pode ter um nome próprio para fins de identificação e personalização. O nome pode refletir a localização, a história, a reputação da sede, ou ser algo puramente inventivo. Apesar dos diferentes nomes, toda sede da Guilda é, fundamentalmente, parte da mesma organização, "A Guilda".
+
+#### Gerador de Nomes de Sede da Guilda
+
+Para criar nomes variados e evocativos, role 1d100 em cada uma das duas tabelas abaixo e combine os resultados:
+
+- **Primeira tabela:** representa o início do nome, podendo ser um título, conceito, local ou símbolo marcante.
+- **Segunda tabela:** representa o complemento, podendo ser um grupo, qualidade, localidade, cor, elemento ou ideia.
+
+Exemplo: Se você rolar 37 e 82, o nome pode ser "Códice do Espinho" ou "Zênite Sagrado".
+
+Sinta-se livre para ajustar a ordem ou adaptar para soar melhor!
+
+##### Tabela 1 – Prefixos/Substantivos (1d100)
+
+| d100 | Prefixo/Substantivo |
+| ---- | ------------------- |
+| 1    | Guilda              |
+| 2    | Irmandade           |
+| 3    | Sociedade           |
+| 4    | Companhia           |
+| 5    | Círculo             |
+| 6    | Ordem               |
+| 7    | Conclave            |
+| 8    | Aliança             |
+| 9    | Legião              |
+| 10   | Vigília             |
+| 11   | Torre               |
+| 12   | Refúgio             |
+| 13   | Bastião             |
+| 14   | Sentinela           |
+| 15   | Trono               |
+| 16   | Arsenal             |
+| 17   | Lança               |
+| 18   | Rosa                |
+| 19   | Prisma              |
+| 20   | Portal              |
+| 21   | Presa               |
+| 22   | Castelo             |
+| 23   | Porta               |
+| 24   | Chama               |
+| 25   | Lâmina              |
+| 26   | Eco                 |
+| 27   | Véu                 |
+| 28   | Miragem             |
+| 29   | Horizonte           |
+| 30   | Forja               |
+| 31   | Escudo              |
+| 32   | Falcão              |
+| 33   | Oásis               |
+| 34   | Vale                |
+| 35   | Labirinto           |
+| 36   | Domo                |
+| 37   | Códice              |
+| 38   | Bastilha            |
+| 39   | Lótus               |
+| 40   | Lince               |
+| 41   | Luar                |
+| 42   | Grifo               |
+| 43   | Relíquia            |
+| 44   | Cristal             |
+| 45   | Caverna             |
+| 46   | Cume                |
+| 47   | Cúpula              |
+| 48   | Bastão              |
+| 49   | Lenda               |
+| 50   | Lobo                |
+| 51   | Machado             |
+| 52   | Muralha             |
+| 53   | Ninho               |
+| 54   | Orbe                |
+| 55   | Pedra               |
+| 56   | Pilar               |
+| 57   | Espiral             |
+| 58   | Profundezas         |
+| 59   | Relâmpago           |
+| 60   | Rocha               |
+| 61   | Coroa               |
+| 62   | Rubi                |
+| 63   | Ruína               |
+| 64   | Sábio               |
+| 65   | Salão               |
+| 66   | Santuário           |
+| 67   | Selo                |
+| 68   | Sepulcro            |
+| 69   | Silêncio            |
+| 70   | Sol                 |
+| 71   | Sombras             |
+| 72   | Tempestade          |
+| 73   | Tesouro             |
+| 74   | Torreão             |
+| 75   | Ígnea               |
+| 76   | Auréola             |
+| 77   | Vento               |
+| 78   | Vigia               |
+| 79   | Vila                |
+| 80   | Vínculo             |
+| 81   | Vórtice             |
+| 82   | Zênite              |
+| 83   | Abismo              |
+| 84   | Alvorada            |
+| 85   | Âncora              |
+| 86   | Anel                |
+| 87   | Antro               |
+| 88   | Arco                |
+| 89   | Areia               |
+| 90   | Gália               |
+| 91   | Asas                |
+| 92   | Ato                 |
+| 93   | Aurora              |
+| 94   | Égide               |
+| 95   | Clareira            |
+| 96   | Cicatriz            |
+| 97   | Penumbra            |
+| 98   | Fragmento           |
+| 99   | Mirante             |
+| 100  | Guardião            |
+
+##### Tabela 2 – Sufixos/Adjetivos (1d100)
+
+| d100 | Sufixo/Adjetivo  |
+| ---- | ---------------- |
+| 1    | dos Aventureiros |
+| 2    | dos Artesãos     |
+| 3    | da Lâmina        |
+| 4    | do Norte         |
+| 5    | do Horizonte     |
+| 6    | do Carvalho      |
+| 7    | do Dragão        |
+| 8    | do Véu           |
+| 9    | do Martelo       |
+| 10   | do Escudo        |
+| 11   | do Falcão        |
+| 12   | do Prisma        |
+| 13   | do Bastião       |
+| 14   | do Oásis         |
+| 15   | do Crepúsculo    |
+| 16   | do Amanhecer     |
+| 17   | do Silêncio      |
+| 18   | do Sul           |
+| 19   | do Domo          |
+| 20   | do Refúgio       |
+| 21   | Verde            |
+| 22   | Vermelho         |
+| 23   | Dourado          |
+| 24   | Sombrio          |
+| 25   | Antigo           |
+| 26   | Azul             |
+| 27   | Prateado         |
+| 28   | Sábio            |
+| 29   | Esquecido        |
+| 30   | Moderno          |
+| 31   | Oculto           |
+| 32   | Sagrado          |
+| 33   | Rápido           |
+| 34   | Feroz            |
+| 35   | Silencioso       |
+| 36   | Eterno           |
+| 37   | Bravio           |
+| 38   | Celeste          |
+| 39   | Profundo         |
+| 40   | Radiante         |
+| 41   | dos Mercenários  |
+| 42   | da Colina        |
+| 43   | do Rio           |
+| 44   | da Aurora        |
+| 45   | do Mercado       |
+| 46   | do Porto         |
+| 47   | do Bosque        |
+| 48   | da Ponte         |
+| 49   | do Vale          |
+| 50   | do Cálamo        |
+| 51   | do Penhasco      |
+| 52   | do Labirinto     |
+| 53   | do Farol         |
+| 54   | do Desfiladeiro  |
+| 55   | da Ilha          |
+| 56   | do Castelo       |
+| 57   | do Jardim        |
+| 58   | do Santuário     |
+| 59   | do Pântano       |
+| 60   | da Montanha      |
+| 61   | dos Sábios       |
+| 62   | do Destino       |
+| 63   | do Éter          |
+| 64   | das Lendas       |
+| 65   | do Vácuo         |
+| 66   | das Estrelas     |
+| 67   | do Pesadelo      |
+| 68   | do Inverno       |
+| 69   | do Tempo         |
+| 70   | do Abismo        |
+| 71   | da Fênix         |
+| 72   | do Rubi          |
+| 73   | do Vendaval      |
+| 74   | do Sol           |
+| 75   | do Chama         |
+| 76   | do Granito       |
+| 77   | do Manto         |
+| 78   | do Alvorada      |
+| 79   | do Ciclo         |
+| 80   | do Éden          |
+| 81   | do Relâmpago     |
+| 82   | do Espinho       |
+| 83   | do Eco           |
+| 84   | do Lince         |
+| 85   | do Luar          |
+| 86   | do Grifo         |
+| 87   | da Relíquia      |
+| 88   | do Cristal       |
+| 89   | da Caverna       |
+| 90   | do Cume          |
+| 91   | do Códice        |
+| 92   | da Cúpula        |
+| 93   | do Bastão        |
+| 94   | da Lenda         |
+| 95   | da Lança         |
+| 96   | do Lobo          |
+| 97   | do Machado       |
+| 98   | da Muralha       |
+| 99   | do Ninho         |
+| 100  | do Orbe          |
