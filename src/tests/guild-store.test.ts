@@ -3,6 +3,7 @@ import { setActivePinia, createPinia } from "pinia";
 import { useGuildStore } from "@/stores/guild";
 import { SettlementType } from "@/types/guild";
 import { GUILD_NAME_CONFIG } from "@/data/guild-names";
+import { type Guild } from "@/types/guild";
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -495,6 +496,61 @@ describe("Issue 3.4 - Guild Store Complete", () => {
       const isValidName =
         traditionalPattern.test(guildName!) || specialPattern.test(guildName!);
       expect(isValidName).toBe(true);
+    });
+
+    describe("Manual Save to History (migrado)", () => {
+      beforeEach(() => {
+        setActivePinia(createPinia());
+      });
+
+      it("should save guild to history manually with correct date conversion", async () => {
+        const guildStore = useGuildStore();
+        await guildStore.generateGuild({
+          settlementType: SettlementType.POVOADO,
+          saveToHistory: false,
+        });
+        expect(guildStore.currentGuild).toBeTruthy();
+        expect(guildStore.guildHistory).toHaveLength(0);
+        const currentGuild = guildStore.currentGuild!;
+        const guildCopy = JSON.parse(JSON.stringify(currentGuild));
+        if (guildCopy.createdAt && typeof guildCopy.createdAt === "string")
+          guildCopy.createdAt = new Date(guildCopy.createdAt);
+        if (guildCopy.updatedAt && typeof guildCopy.updatedAt === "string")
+          guildCopy.updatedAt = new Date(guildCopy.updatedAt);
+        const guildToSave = guildCopy as Guild;
+        guildStore.addToHistory(guildToSave);
+        expect(guildStore.guildHistory).toHaveLength(1);
+        expect(guildStore.guildHistory[0].id).toBe(currentGuild.id);
+        expect(guildStore.guildHistory[0].createdAt).toBeInstanceOf(Date);
+      });
+
+      it("should not duplicate guild in history", async () => {
+        const guildStore = useGuildStore();
+        await guildStore.generateGuild({
+          settlementType: SettlementType.POVOADO,
+          saveToHistory: false,
+        });
+        const currentGuild = guildStore.currentGuild!;
+        const processGuildForSave = (guild: typeof currentGuild) => {
+          const guildCopy = JSON.parse(JSON.stringify(guild));
+          if (guildCopy.createdAt && typeof guildCopy.createdAt === "string")
+            guildCopy.createdAt = new Date(guildCopy.createdAt);
+          if (guildCopy.updatedAt && typeof guildCopy.updatedAt === "string")
+            guildCopy.updatedAt = new Date(guildCopy.updatedAt);
+          return guildCopy as Guild;
+        };
+        guildStore.addToHistory(processGuildForSave(currentGuild));
+        expect(guildStore.guildHistory).toHaveLength(1);
+        guildStore.addToHistory(processGuildForSave(currentGuild));
+        expect(guildStore.guildHistory).toHaveLength(1);
+      });
+
+      it("should validate guild object before saving", () => {
+        const guildStore = useGuildStore();
+        expect(() => {
+          guildStore.addToHistory({} as Guild);
+        }).toThrow("Invalid guild object");
+      });
     });
   });
 });
