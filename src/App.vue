@@ -33,6 +33,7 @@
     <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
       <div class="px-4 py-6 sm:px-0">
         <router-view />
+        <Toast />
       </div>
     </main>
 
@@ -45,7 +46,6 @@
       </div>
     </footer>
 
-    <ToastManager />
   </div>
 </template>
 
@@ -53,7 +53,7 @@
 import { useRoute } from 'vue-router'
 import { SparklesIcon } from '@heroicons/vue/24/outline'
 import PWAManager from '@/components/common/PWAManager.vue'
-import ToastManager from '@/components/common/ToastManager.vue'
+import Toast from '@/components/common/Toast.vue'
 
 const route = useRoute()
 
