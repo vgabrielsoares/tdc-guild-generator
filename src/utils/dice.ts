@@ -126,7 +126,7 @@ export function rollDice(config: RollConfig): DiceRoll {
   }
 
   console.log(
-    `[DICE] Rolling ${config.notation}${config.context ? ` (${config.context})` : ''}: [${individual.join(", ")}] + ${modifier} = ${result}`
+    `[DICE] Rolling ${config.notation}${config.context ? ` (${config.context})` : ""}: [${individual.join(", ")}] + ${modifier} = ${result}`
   );
 
   return diceRoll;
@@ -135,8 +135,8 @@ export function rollDice(config: RollConfig): DiceRoll {
 /**
  * Simple dice roll function (backward compatibility)
  */
-export function rollDiceSimple(notation: string): DiceResult {
-  const diceRoll = rollDice({ notation, logRoll: false });
+export function rollDiceSimple(notation: string, context?: string): DiceResult {
+  const diceRoll = rollDice({ notation, logRoll: false, context });
   return {
     total: diceRoll.result,
     rolls: diceRoll.individual,
@@ -157,33 +157,38 @@ const tableLookupCache = new Map<string, Map<number, TableEntry>>();
  * Create an optimized lookup map for a table
  * Uses a Map for O(1) average case lookup instead of O(n) array find
  */
-function createTableLookupMap<T>(table: TableEntry<T>[]): Map<number, TableEntry<T>> {
+function createTableLookupMap<T>(
+  table: TableEntry<T>[]
+): Map<number, TableEntry<T>> {
   const lookupMap = new Map<number, TableEntry<T>>();
-  
+
   for (const entry of table) {
     // Map each possible roll value to its corresponding entry
     for (let value = entry.min; value <= entry.max; value++) {
       lookupMap.set(value, entry);
     }
   }
-  
+
   return lookupMap;
 }
 
 /**
  * Get cached lookup map or create new one
  */
-function getTableLookupMap<T>(table: TableEntry<T>[], cacheKey?: string): Map<number, TableEntry<T>> {
+function getTableLookupMap<T>(
+  table: TableEntry<T>[],
+  cacheKey?: string
+): Map<number, TableEntry<T>> {
   if (cacheKey && tableLookupCache.has(cacheKey)) {
     return tableLookupCache.get(cacheKey)! as Map<number, TableEntry<T>>;
   }
-  
+
   const lookupMap = createTableLookupMap(table);
-  
+
   if (cacheKey) {
     tableLookupCache.set(cacheKey, lookupMap as Map<number, TableEntry>);
   }
-  
+
   return lookupMap;
 }
 
@@ -191,19 +196,19 @@ function getTableLookupMap<T>(table: TableEntry<T>[], cacheKey?: string): Map<nu
  * Binary search for table entry (for very large sparse tables)
  */
 function binarySearchTable<T>(
-  table: TableEntry<T>[], 
+  table: TableEntry<T>[],
   value: number
 ): TableEntry<T> | null {
   // Sort table by min value if not already sorted
   const sortedTable = [...table].sort((a, b) => a.min - b.min);
-  
+
   let left = 0;
   let right = sortedTable.length - 1;
-  
+
   while (left <= right) {
     const mid = Math.floor((left + right) / 2);
     const entry = sortedTable[mid];
-    
+
     if (value >= entry.min && value <= entry.max) {
       return entry;
     } else if (value < entry.min) {
@@ -212,7 +217,7 @@ function binarySearchTable<T>(
       left = mid + 1;
     }
   }
-  
+
   return null;
 }
 
@@ -262,11 +267,11 @@ export function rollOnTable<T>(config: TableRollConfig<T>): TableRoll<T> {
 
   // Choose lookup strategy based on table characteristics
   let tableEntry: TableEntry<T> | null = null;
-  
+
   const tableRange = maxValue - minValue + 1;
   const tableSize = table.length;
   const density = tableSize / tableRange; // How dense is the table
-  
+
   if (tableSize >= 50) {
     // Use binary search for large tables regardless of density
     tableEntry = binarySearchTable(table, roll.result);
@@ -277,9 +282,10 @@ export function rollOnTable<T>(config: TableRollConfig<T>): TableRoll<T> {
     tableEntry = lookupMap.get(roll.result) || null;
   } else {
     // Use linear search for small or very sparse tables
-    tableEntry = table.find(
-      (entry) => roll.result >= entry.min && roll.result <= entry.max
-    ) || null;
+    tableEntry =
+      table.find(
+        (entry) => roll.result >= entry.min && roll.result <= entry.max
+      ) || null;
   }
 
   if (!tableEntry) {
@@ -357,10 +363,10 @@ export function getCacheStats(): { cacheSize: number; totalEntries: number } {
   for (const cache of tableLookupCache.values()) {
     totalEntries += cache.size;
   }
-  
+
   return {
     cacheSize: tableLookupCache.size,
-    totalEntries
+    totalEntries,
   };
 }
 
