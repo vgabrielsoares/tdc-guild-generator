@@ -56,7 +56,7 @@
 
     <!-- Offline Indicator -->
     <div v-if="!isOnline"
-      class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-yellow-800 border border-yellow-600 rounded-lg px-4 py-2 shadow-lg z-50">
+      class="fixed top-4 right-4 bg-yellow-800 border border-yellow-600 rounded-lg px-4 py-2 shadow-lg z-50">
       <div class="flex items-center space-x-2 text-yellow-200">
         <span>
           <SignalIcon class="w-4 h-4" />
