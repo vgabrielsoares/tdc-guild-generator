@@ -10,11 +10,11 @@ A primeira vez que os jogadores entrarem na sede da guilda, role para descobrir 
 
 ## Quantidade e Prazos
 
-Primeiro é preciso estabelecer a quantidade de contratos e serviços disponíveis, e o prazo para conclusão de cada um deles. Esses dados são determinados pelo tamanho da sede da guilda, a quantidade de funcionários e a condição deles.
+Primeiro é preciso estabelecer a quantidade de contratos disponíveis, e o prazo para conclusão de cada um deles. Esses dados são determinados pelo tamanho da sede da guilda, a quantidade de funcionários e a condição deles.
 
 ### Dados por Tamanho da Sede
 
-Quanto maior a sede, maior a quantidade de contratantes querendo firmar um novo contrato ou serviço. Consequentemente, mais contratos estarão disponíveis.
+Quanto maior a sede, maior a quantidade de contratantes querendo firmar um novo contrato. Consequentemente, mais contratos estarão disponíveis.
 
 Os dados usados em 'Quantidade e Prazos' é equivalente à estrutura da sede da guilda:
 
@@ -41,33 +41,33 @@ Os dados usados em 'Quantidade e Prazos' é equivalente à estrutura da sede da 
 
 ### Quantidade Disponível
 
-| 1d20  | Quantidade Disponível            |
-| ----- | -------------------------------- |
-| 1-4   | 1 contrato e 1d4+1 serviços      |
-| 5-6   | 1d4 contratos e 1d4+2 serviços   |
-| 7-9   | 1d4 contratos e 1d6+2 serviços   |
-| 10    | 1d6+1 contratos e 1d4+1 serviços |
-| 11    | 2d6 contratos e 1d4+2 serviços   |
-| 12-13 | 3d6 contratos                    |
-| 14-16 | 2d6+2 contratos e 2d4+1 serviços |
-| 17-18 | 1d12 contratos e 5d6 serviços    |
-| 19    | 3d6 contratos e 3d4 serviços     |
-| 20    | 5d6 contratos                    |
-| 21+   | 3d6 contratos e 3d6 serviços     |
+| 1d20  | Quantidade Disponível |
+| ----- | --------------------- |
+| 1-4   | 1 contrato            |
+| 5-6   | 1d4 contratos         |
+| 7-9   | 1d4+1 contratos       |
+| 10    | 1d6 contratos         |
+| 11    | 1d6+1 contratos       |
+| 12-13 | 2d6 contratos         |
+| 14-16 | 2d6+1 contratos       |
+| 17-18 | 3d6 contratos         |
+| 19    | 3d6+1 contratos       |
+| 20    | 4d6 contratos         |
+| 21+   | 5d6 contratos         |
 
 #### Redução por Frequentadores
 
 De acordo com aqueles que frequentam a guilda, a quantidade de contratos disponíveis pode diminuir.
 
-| Frequentadores      | Redução                                         |
-| ------------------- | ----------------------------------------------- |
-| Vazia               | Todos os contratos e serviços estão disponíveis |
-| Quase deserta       | -1 contrato e -1 serviço                        |
-| Pouco movimentada   | -1d4 contratos e -1d4 serviços                  |
-| Nem muito nem pouco | -1d6+1 contratos e -1d6+1 serviços              |
-| Muito frequentada   | -2d6 contratos e -2d4 serviços                  |
-| Abarrotada          | -3d6 contratos e -2d4+2 serviços                |
-| Lotada              | -4d6 contratos e -3d4 serviços                  |
+| Frequentadores      | Redução                              |
+| ------------------- | ------------------------------------ |
+| Vazia               | Todos os contratos estão disponíveis |
+| Quase deserta       | -1 contrato                          |
+| Pouco movimentada   | -1d4 contratos                       |
+| Nem muito nem pouco | -1d6+1 contratos                     |
+| Muito frequentada   | -2d6 contratos                       |
+| Abarrotada          | -3d6 contratos                       |
+| Lotada              | -4d6 contratos                       |
 
 > **Nota**: Caso o saldo fique negativo, retire o valor dos próximos contratos rolados.
 
@@ -349,9 +349,9 @@ De acordo com o resultado final de "Valor e Recompensa", role a tabela abaixo. U
 
 Quebrar um contrato gera uma multa no valor de 10% da recompensa em PO$. Caso o contratado não tenha como pagar, a guilda toma providências para compensar, como entrar com um processo, ou perdoar a dívida por um contrato sem recompensa, ou até trabalhar na guilda por um tempo. Se a quebra for em decorrência de óbito a guilda pode, legalmente, se apropriar de seus bens para compensar as perdas. Alguns membros da guilda são conhecidos inclusive por recolher pertences perdidos em decorrência de fatalidades.
 
-## Concluindo um Contrato ou Serviço
+## Concluindo um Contrato
 
-Para a conclusão de um contrato ou serviço, o contratado precisa da assinatura do contratante para afirmar que tudo foi feito corretamente. Caso seja um contrato com o governo é preciso do carimbo oficial do governo local e a assinatura do líder local.
+Para a conclusão de um contrato, o contratado precisa da assinatura do contratante para afirmar que tudo foi feito corretamente. Caso seja um contrato com o governo é preciso do carimbo oficial do governo local e a assinatura do líder local.
 
 Em seguida o contrato deve ser apresentado na sede da guilda da qual foi originalmente feito e, só então, a recompensa pode ser retirada. A matriz da guilda é a única que aceita contratos de todas as outras sedes.
 
@@ -385,51 +385,51 @@ Os contratantes podem optar por fazer um pagamento antecipado à guilda, garanti
 | 14-20 | Pagamento total na guilda em PO$                           |
 | 21+   | Pagamento total na guilda em PO$ e serviços do contratante |
 
-## Conclusões Automáticas de Contratos e Serviços
+## Conclusões Automáticas de Contratos
 
-Contratos e serviços podem ser concluídos automaticamente após um certo período de tempo, mesmo que os jogadores não tenham retornado à guilda. Isso pode acontecer por diversos motivos, como a natureza do contrato, a urgência da tarefa ou conclusão por outros indivíduos.
+Contratos podem ser concluídos automaticamente após um certo período de tempo, mesmo que os jogadores não tenham retornado à guilda. Isso pode acontecer por diversos motivos, como a natureza do contrato, a urgência da tarefa ou conclusão por outros indivíduos.
 
 ### Tempo de Resolução
 
-Passado o tempo de resolução de um contrato ou serviço, nós descobriremos tudo que aconteceu e se eles estarão disponíveis novamente para os jogadores.
+Passado o tempo de resolução de um contrato, nós descobriremos tudo que aconteceu e se eles estarão disponíveis novamente para os jogadores.
 
 > Por exemplo: talvez depois de 4 dias, aquele contrato que parecia bom, agora tenha sido pego por outra criatura, e um outro já foi até resolvido.
 
-Role a tabela abaixo para saber em quantos dias você deve rolar a tabela de resoluções para contratos ou serviços que foram firmados, ou a tabela para contratos ou serviços que não foram assinados.
+Role a tabela abaixo para saber em quantos dias você deve rolar a tabela de resoluções para contratos que foram firmados, ou a tabela para contratos que não foram assinados.
 
 > Essas rolagens são feitas uma vez por guilda (para assinados e não-assinados), e não uma por contrato. Após as resoluções, devem ser rolados outros tempos de resolução.
 
-| 1d20  | Contrato ou Serviço Firmado |
-| ----- | --------------------------- |
-| 1-6   | 1d6 dias                    |
-| 7-8   | 1 semana                    |
-| 9     | 2d6+3 dias                  |
-| 10-11 | 1d8+1 dias                  |
-| 12    | 2 semanas                   |
-| 13    | 2d10 dias                   |
-| 14-15 | 1d4 dias                    |
-| 16-18 | 1d6+3 dias                  |
-| 19    | 3 semanas                   |
-| 20    | 2d8 dias                    |
+| 1d20  | Contrato Firmado |
+| ----- | ---------------- |
+| 1-6   | 1d6 dias         |
+| 7-8   | 1 semana         |
+| 9     | 2d6+3 dias       |
+| 10-11 | 1d8+1 dias       |
+| 12    | 2 semanas        |
+| 13    | 2d10 dias        |
+| 14-15 | 1d4 dias         |
+| 16-18 | 1d6+3 dias       |
+| 19    | 3 semanas        |
+| 20    | 2d8 dias         |
 
-| 1d20  | Contrato ou Serviço Não-Assinado |
-| ----- | -------------------------------- |
-| 1-4   | 3 dias                           |
-| 5-6   | 4 dias                           |
-| 7-9   | 1d4 dias                         |
-| 10-11 | 1d6 dias                         |
-| 12-13 | 1 semana                         |
-| 14-15 | 5 dias                           |
-| 16    | 1d8 dias                         |
-| 17    | 1d12 dias                        |
-| 18-19 | 1d20 dias                        |
-| 20    | 1 dia                            |
+| 1d20  | Contrato Não-Assinado |
+| ----- | --------------------- |
+| 1-4   | 3 dias                |
+| 5-6   | 4 dias                |
+| 7-9   | 1d4 dias              |
+| 10-11 | 1d6 dias              |
+| 12-13 | 1 semana              |
+| 14-15 | 5 dias                |
+| 16    | 1d8 dias              |
+| 17    | 1d12 dias             |
+| 18-19 | 1d20 dias             |
+| 20    | 1 dia                 |
 
 > Contratos anulados não voltam a ficar disponíveis para os jogadores
 
-### Contratos e Serviços Assinados
+### Contratos Assinados
 
-Quando os jogadores chegam pela primeira vez em uma nova sede da guilda novos contratos e serviços são gerados, mas isso você já deve ter percebido. Desses contratos e serviços alguns estão indisponíveis pois já foram assinados por outros aventureiros. A tabela abaixo te permite descobrir o que aconteceu com os contratos assinados por outras criaturas.
+Quando os jogadores chegam pela primeira vez em uma nova sede da guilda, novos contratos são gerados, mas isso você já deve ter percebido. Desses contratos alguns estão indisponíveis pois já foram assinados por outros aventureiros. A tabela abaixo te permite descobrir o que aconteceu com os contratos assinados por outras criaturas.
 
 #### Resoluções para Contratos Firmados
 
@@ -442,7 +442,29 @@ Quando contratos são assinados por outros aventureiros, diversos fatores podem 
 | 17-18 | O contrato foi resolvido mas com ressalvas                               |
 | 19-20 | Ainda não se sabe (Role novamente junto com a próxima leva de contratos) |
 
-##### Motivos para Não Resolução
+### Contratos Não Assinados
+
+Agora que você já sabe o que aconteceu com os contratos que foram firmados, deve estar se perguntando: "e os contratos que ninguém pegou?". A tabela abaixo responderá essa questão.
+
+#### Resolução para Contratos que Não Foram Assinados
+
+Contratos que permanecem na guilda sem serem aceitos por aventureiros não ficam para sempre disponíveis. Com o passar do tempo, outras circunstâncias podem resolver os problemas, ou a urgência pode levar outras pessoas a tomar ação.
+
+| 1d20  | Resultado                                                                                          |
+| ----- | -------------------------------------------------------------------------------------------------- |
+| 1-2   | Nenhum foi assinado, todos continuam disponíveis                                                   |
+| 3-5   | Todos foram devidamente resolvidos                                                                 |
+| 6-10  | Os de menor XP foram resolvidos                                                                    |
+| 11-12 | Contratos com as melhores Recompensas foram resolvidos                                             |
+| 13-14 | 1d6 contratos aleatórios são resolvidos                                                            |
+| 16    | 1d4+2 contratos são assinados, porém não são resolvidos (Role a tabela Motivos para não resolução) |
+| 17-18 | 1d6+2 contratos são resolvidos                                                                     |
+| 19    | 2d6+2 contratos são resolvidos                                                                     |
+| 20    | Nenhum foi assinado, e há algum motivo estranho para isso                                          |
+
+> **Nota**: Os contratos que não foram resolvidos voltam a ficar disponíveis, caso ninguém os aceite novamente, repita os mesmos processos.
+
+#### Motivos para Não Resolução
 
 | 1d20  | Motivo                                                                            |
 | ----- | --------------------------------------------------------------------------------- |
@@ -455,41 +477,19 @@ Quando contratos são assinados por outros aventureiros, diversos fatores podem 
 
 > **Nota**: Serviços não são tão perigosos quanto contratos, então neles substitua "morte" por lesões, lesões graves ou gravíssimas.
 
-### Contratos Não Assinados
-
-Agora que você já sabe o que aconteceu com os contratos e serviços que foram firmados, deve estar se perguntando: "e os contratos e serviços que ninguém pegou?". A tabela abaixo responderá essa questão.
-
-#### Resolução para Contratos que Não Foram Assinados
-
-Contratos que permanecem na guilda sem serem aceitos por aventureiros não ficam para sempre disponíveis. Com o passar do tempo, outras circunstâncias podem resolver os problemas, ou a urgência pode levar outras pessoas a tomar ação.
-
-| 1d20  | Resultado                                                                                          |
-| ----- | -------------------------------------------------------------------------------------------------- |
-| 1-2   | Nenhum foi assinado, todos continuam disponíveis                                                   |
-| 3-5   | Todos foram devidamente resolvidos                                                                 |
-| 6-10  | Os de menor XP foram resolvidos                                                                    |
-| 11-12 | Contratos com as melhores Recompensas foram resolvidos                                             |
-| 13-14 | 1d6 contratos e 1d4 serviços aleatórios são resolvidos                                             |
-| 16    | 1d4+2 contratos são assinados, porém não são resolvidos (Role a tabela Motivos para não resolução) |
-| 17-18 | 1d6+2 contratos e 1d4+1 serviços são resolvidos                                                    |
-| 19    | 2d6+2 contratos e 1d4+2 serviços são resolvidos                                                    |
-| 20    | Nenhum foi assinado, e há algum motivo estranho para isso                                          |
-
-> **Nota**: Os contratos e serviços que não foram resolvidos voltam a ficar disponíveis, caso ninguém os aceite novamente, repita os mesmos processos.
-
 ### Contratos Não Resolvidos
 
-Sempre que um contrato não for resolvido mas permanecer disponível, independente do motivo, aumente o seu nível de recompensa em 2, caso seja a quebra de um serviço consulte a tabela de "Taxa de recorrência" no próprio gerador de serviços. Essa recompensa adicional é totalmente oferecida pela guilda ou pelo governo local, com o objetivo de manterem a sua reputação.
+Sempre que um contrato não for resolvido mas permanecer disponível, independente do motivo, aumente o seu nível de recompensa em 2. Essa recompensa adicional é totalmente oferecida pela guilda ou pelo governo local, com o objetivo de manterem a sua reputação.
 
-## Novos e Antigos Contratos e Serviços
+## Novos e Antigos Contratos
 
 Depois de um certo tempo, mesmo que alguns contratos ainda não tenham sido resolvidos, novos contratos surgem.
 
-Role nas tabelas abaixo para descobrir em quantos dias você poderá gerar novos contratos e serviços.
+Role nas tabelas abaixo para descobrir em quantos dias você poderá gerar novos contratos.
 
 ### Novos Contratos Em
 
-| 1d20  | Novos contratos |
+| 1d20  | Novos Contratos |
 | ----- | --------------- |
 | 1     | 1d6 dias        |
 | 2     | 1 semana        |
@@ -502,21 +502,6 @@ Role nas tabelas abaixo para descobrir em quantos dias você poderá gerar novos
 | 19    | 1d4 meses       |
 | 20    | 1d4+1 meses     |
 
-### Novos Serviços Em
-
-| 1d20  | Novos serviços |
-| ----- | -------------- |
-| 1-4   | 1 semana       |
-| 5-8   | 2 semanas      |
-| 9-10  | 1d4+1 semanas  |
-| 11-12 | 2d6 dias       |
-| 13-14 | 4d6 dias       |
-| 15    | 2d4+1 semanas  |
-| 16    | 1 mês          |
-| 17-18 | 2 meses        |
-| 19    | 1d4 meses      |
-| 20    | 2d4+1 meses    |
-
 ## Gerador de Contratos
 
 Os contratos são, em sua essência, missões de um mundo de RPG, ou uma aventura se assim você preferir. Elas podem ser simples ou tão loucas quanto sua imaginação permitir. Claro que os contratados não terão todas as informações que você, como mestre, terá, mas tente ser coerente e tentar, de alguma forma, deixar claro que os desafios são pesados com base na recompensa, e não nos níveis dos contratados.
@@ -528,7 +513,7 @@ Para determinar quem é o contratante de cada contrato, role na tabela abaixo.
 | 1d20  | Contratante           |
 | ----- | --------------------- |
 | 1-12  | Povo                  |
-| 13-14 | Instituição de ofício |
+| 13-14 | Instituição de Ofício |
 | 15-20 | Governo               |
 
 #### Modificadores por Relação
