@@ -5,8 +5,6 @@
 
 import type { GuildStructure, GuildStaff } from '@/types/guild';
 import { BaseGenerator, type BaseGenerationConfig, type BaseGenerationResult } from './base-generator';
-import { lookupTableValue } from '@/utils/table-operations';
-import { mapSettlementTypeToTableKey } from '@/utils/enum-mappers';
 import {
   HEADQUARTERS_SIZE_TABLE,
   HEADQUARTERS_CHARACTERISTICS_TABLE,
@@ -15,6 +13,9 @@ import {
   SETTLEMENT_DICE,
   getDiceNotationString,
 } from '@/data/tables/guild-structure';
+import { lookupTableValue } from '@/utils/table-operations';
+import { mapSettlementTypeToTableKey } from '@/utils/enum-mappers';
+import { rollDiceSimple } from '@/utils/dice';
 
 // Configuração específica para geração de estrutura
 export interface StructureGenerationConfig extends BaseGenerationConfig {
@@ -220,30 +221,49 @@ export class StructureGenerator extends BaseGenerator<StructureGenerationConfig,
   /**
    * Gera funcionários baseado no tipo de assentamento
    */
-  private generateEmployees(headquartersModifier: number = 0): { employees: string; roll: number } {
+  private generateEmployees(headquartersModifier: number = 0): { employees: string; count?: number; roll: number } {
     const settlementKey = mapSettlementTypeToTableKey(this.config.settlementType);
     const diceConfig = SETTLEMENT_DICE.structure[settlementKey as keyof typeof SETTLEMENT_DICE.structure];
-    
+    let employeesRaw: string;
+    let rollValue: number;
     if (!diceConfig) {
       this.log(`Unknown settlement type: ${settlementKey}, using fallback d8`, 'WARNING');
       const fallbackConfig = { dice: 'd8', modifier: 0 };
       const modifier = (this.config.customModifiers?.employees || 0) + headquartersModifier;
       const notation = this.buildDiceNotation(fallbackConfig.dice, fallbackConfig.modifier + modifier);
-      
       const rollResult = this.rollWithLog(notation, 'Employees (fallback)');
-      const employees = lookupTableValue(EMPLOYEES_TABLE, rollResult.result);
-      
-      return { employees, roll: rollResult.result };
+      employeesRaw = lookupTableValue(EMPLOYEES_TABLE, rollResult.result);
+      rollValue = rollResult.result;
+    } else {
+      const modifier = (this.config.customModifiers?.employees || 0) + headquartersModifier;
+      const notation = this.buildDiceNotation(diceConfig.dice, diceConfig.modifier + modifier);
+      const rollResult = this.rollWithLog(notation, `Employees (${settlementKey})`);
+      employeesRaw = lookupTableValue(EMPLOYEES_TABLE, rollResult.result);
+      rollValue = rollResult.result;
     }
-    
-    const modifier = (this.config.customModifiers?.employees || 0) + headquartersModifier;
-    const notation = this.buildDiceNotation(diceConfig.dice, diceConfig.modifier + modifier);
-    
-    const rollResult = this.rollWithLog(notation, `Employees (${settlementKey})`);
-    const employees = lookupTableValue(EMPLOYEES_TABLE, rollResult.result);
-    
-    this.log(`Employees determined: ${employees}`, 'STRUCTURE');
-    return { employees, roll: rollResult.result };
+
+    // Detecta notação de dados no início da string
+    const diceMatch = employeesRaw.match(/^(\d*d\d+[+-]?\d*)\s+(.*)$/i);
+    if (diceMatch) {
+      const [, diceNotation, desc] = diceMatch;
+      const context = `Employees numbers: ${diceNotation} ${desc} (${settlementKey})`;
+      const diceResult = rollDiceSimple(diceNotation, context);
+      const employees = `${diceResult.total} ${desc}`;
+      this.log(`Employees determined: ${employees} (rolled ${diceNotation} = ${diceResult.total})`, 'STRUCTURE');
+      return { employees, count: diceResult.total, roll: rollValue };
+    } else {
+      // Tenta detectar número fixo
+      const numMatch = employeesRaw.match(/^(\d+)\s+(.*)$/);
+      if (numMatch) {
+        const [, num, desc] = numMatch;
+        const employees = `${num} ${desc}`;
+        this.log(`Employees determined: ${employees}`, 'STRUCTURE');
+        return { employees, count: parseInt(num, 10), roll: rollValue };
+      }
+      // Caso não detecte nada, retorna string original
+      this.log(`Employees determined: ${employeesRaw}`, 'STRUCTURE');
+      return { employees: employeesRaw, roll: rollValue };
+    }
   }
 
   /**
