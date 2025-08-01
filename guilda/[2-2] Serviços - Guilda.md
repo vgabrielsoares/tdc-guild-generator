@@ -223,6 +223,8 @@ Os serviços são mais rápidos, mais fáceis, e menos recompensadores que um co
 
 ### Contratante do Serviço
 
+Para determinar quem é o contratante de cada serviço, role na tabela abaixo.
+
 | 1d20  | Contratante           |
 | ----- | --------------------- |
 | 1-6   | Povo                  |
@@ -272,7 +274,9 @@ Caso o contratante seja do governo, role na tabela abaixo para determinar quem �
 
 ### Objetivo do Serviço
 
-Qual o objetivo do serviço?
+O objetivo define a tarefa central a ser realizada, assim como nos contratos, mas com foco em demandas cotidianas, rápidas e de menor risco. Cada serviço possui um objetivo principal, que pode variar de treinar alguém, curar, negociar, construir, até realizar tarefas religiosas ou específicas.
+
+Role nas tabelas correspondentes para detalhar o objetivo, para quem é destinado e possíveis complicações, garantindo variedade e fidelidade.
 
 #### Tipos de Objetivo
 
@@ -426,7 +430,9 @@ Como as tabelas possuem três colunas, role um dado para cada coluna e una os re
 
 ### A Raiz do Problema
 
-O que possivelmente gerou esse serviço?
+Todo serviço nasce de uma necessidade real ou circunstância específica. Assim como nos contratos, é fundamental entender o que originou a demanda: pode ser um conflito familiar, corrupção, eventos naturais ou até mesmo a ação de criaturas de fora do assentamento. Identificar a raiz do problema ajuda a contextualizar o serviço, tornando-o mais interessante e alinhado ao cenário proposto.
+
+Use a tabela para determinar a origem e inspire-se para criar motivações e obstáculos autênticos.
 
 #### Origem do Problema
 
@@ -460,6 +466,10 @@ O que possivelmente gerou esse serviço?
 
 ### Complicações do Serviço
 
+Nem todo serviço é simples: há sempre a chance de surgirem complicações inesperadas, como a desaprovação do governo local, interesse de facções ou rivalidades. Assim como nos contratos, as complicações tornam a missão mais desafiadora e imprevisível.
+
+Utilize as tabelas para determinar se haverá complicações, quais serão e suas consequências, enriquecendo a narrativa e exigindo criatividade dos jogadores para superá-las.
+
 #### Chance de Complicações
 
 | 1d20  | Haverão complicações? |
@@ -491,6 +501,10 @@ O que possivelmente gerou esse serviço?
 
 ### Rivais
 
+Alguns serviços podem atrair a atenção de rivais, sejam eles outros aventureiros, facções ou indivíduos com interesses conflitantes. Inspirado na lógica dos contratos, a presença de rivais adiciona tensão e competição, podendo alterar o rumo do serviço.
+
+Role nas tabelas para definir se há rivais envolvidos, suas ações e motivações, tornando a experiência mais dinâmica e imprevisível.
+
 #### Chance de Rivais
 
 | 1d20  | Algum rival envolvido? |
@@ -513,7 +527,7 @@ O que possivelmente gerou esse serviço?
 | 17-18 | Oferecerá valiosas informações    |
 | 19-20 | Tentará te subornar ou ameaçar    |
 
-### Motivação do Rival
+#### Motivação do Rival
 
 | 1d20 | Mas...                              |
 | ---- | ----------------------------------- |
@@ -530,7 +544,9 @@ O que possivelmente gerou esse serviço?
 
 ### Desafio Adicional
 
-Essas ideias aqui são birutas. Às vezes vão parecer até outro objetivo ou ir diretamente contra o objetivo original do serviço. Para resolver isso eu tenho uma ótima dica: se vira, tu não é o mestrão e pa?! Dá um jeito de juntar tudo aí, boa sorte!
+Os desafios adicionais representam obstáculos únicos e variados que podem surgir durante a execução do serviço. Eles não seguem um padrão fixo e exigem criatividade do mestre para serem integrados de forma orgânica à missão. Podem envolver eventos climáticos, intervenções mágicas, dilemas morais ou situações inusitadas.
+
+Use-os para surpreender os jogadores e enriquecer a narrativa, adaptando-os ao contexto do serviço e ao estilo do grupo.
 
 #### Chance de Desafio Adicional
 
@@ -644,9 +660,9 @@ Essas ideias aqui são birutas. Às vezes vão parecer até outro objetivo ou ir
 | 99   | Um monge pede ajuda à criatura para que não deixem que ninguém o interrompa por 7 dias inteiros enquanto medita                         |
 | 100  | Um pescador pede para que você consiga um peixe raro que é um dos preferidos dos dragões                                                |
 
-Eventualmente os desafios ficarão repetitivos já que essa tabela será muito usada. Pensando nisso role 1d6 palavras aleatórias de diferentes tabelas e tente incorporá-las criativamente ao desafio ou serviço.
-
 #### Palavras-chave Adicionais para Criatividade
+
+Eventualmente os desafios ficarão repetitivos já que essa tabela será muito usada. Pensando nisso role 1d6 palavras aleatórias de diferentes tabelas e tente incorporá-las criativamente ao desafio ou serviço.
 
 ##### Conjunto 7 (d10)
 
