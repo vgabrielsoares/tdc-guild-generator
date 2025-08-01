@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: /sitemap.xml
+
+# PWA specific
+Allow: /manifest.json
+Allow: /sw.js
+Allow: /workbox-*.js
+
+# Static assets
+Allow: /assets/
+Allow: /icons/
+Allow: *.css
+Allow: *.js
+Allow: *.png
+Allow: *.svg
+Allow: *.ico
