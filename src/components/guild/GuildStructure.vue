@@ -14,7 +14,7 @@
         content="Regenera apenas a estrutura física (tamanho, características, funcionários) mantendo as relações."
         title="Regenerar Estrutura">
         <button @click="$emit('regenerate-structure')" class="btn btn-sm btn-outline flex items-center space-x-1"
-          title="Regenerar estrutura">
+          title="Regenerar estrutura" :disabled="guild.locked">
           <ArrowPathIcon class="w-4 h-4" />
           <span class="text-xs">Regenerar</span>
         </button>
