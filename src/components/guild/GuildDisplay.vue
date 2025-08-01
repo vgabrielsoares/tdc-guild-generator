@@ -95,7 +95,11 @@
       <!-- Componentes de Estrutura e Relações -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <GuildStructure :guild="guild" @regenerate-structure="regenerateStructure" />
-        <GuildRelations :guild="guild" @regenerate-relations="regenerateRelations" />
+        <GuildRelations 
+          :guild="guild" 
+          @regenerate-relations="regenerateRelations" 
+          @regenerate-visitors="regenerateVisitors"
+        />
       </div>
 
       <!-- Ações Rápidas -->
@@ -323,6 +327,14 @@ const regenerateStructure = async () => {
 const regenerateRelations = async () => {
   try {
     await guildStore.regenerateRelations()
+  } catch (error) {
+    // Erro será tratado pelo store
+  }
+}
+
+const regenerateVisitors = async () => {
+  try {
+    await guildStore.regenerateVisitors()
   } catch (error) {
     // Erro será tratado pelo store
   }

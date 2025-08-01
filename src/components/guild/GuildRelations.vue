@@ -81,10 +81,20 @@
 
       <!-- Frequentadores -->
       <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
-        <h4 class="font-semibold text-gray-300 mb-2 flex items-center space-x-2">
-          <ArrowRightOnRectangleIcon class="w-4 h-4 text-gray-400" />
-          <span>Frequentadores</span>
-        </h4>
+        <div class="flex items-center justify-between mb-2">
+          <h4 class="font-semibold text-gray-300 flex items-center space-x-2">
+            <ArrowRightOnRectangleIcon class="w-4 h-4 text-gray-400" />
+            <span>Frequentadores</span>
+          </h4>
+          <button
+            @click="$emit('regenerate-visitors')"
+            class="btn btn-sm btn-outline flex items-center space-x-1"
+            title="Regenerar frequentadores"
+          >
+            <ArrowPathIcon class="w-3 h-3" />
+            <span class="text-xs">Regenerar</span>
+          </button>
+        </div>
         <div class="flex items-center space-x-2">
           <span class="inline-block w-3 h-3 rounded-full" :class="getVisitorFrequencyCircleColor(guild.visitors.frequency)"></span>
           <span class="text-white font-medium">{{ guild.visitors.frequency }}</span>
@@ -140,6 +150,7 @@ defineProps<{
 
 defineEmits<{
   'regenerate-relations': []
+  'regenerate-visitors': []
 }>()
 
 const formatDate = (date: Date | string | number): string => {
