@@ -2,11 +2,11 @@
 // Will be implemented in Phase 4
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import type { Contrato } from "@/types/contract";
+import type { Contract } from "@/types/contract";
 
 export const useContractsStore = defineStore("contracts", () => {
   // State
-  const contracts = ref<Contrato[]>([]);
+  const contracts = ref<Contract[]>([]);
   const isLoading = ref(false);
 
   // Actions (placeholder)
