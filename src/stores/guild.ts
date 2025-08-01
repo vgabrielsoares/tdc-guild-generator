@@ -145,6 +145,11 @@ export const useGuildStore = defineStore('guild', () => {
       throw new Error('Cannot regenerate: no current guild or config');
     }
 
+    // Verificar se a guilda está bloqueada
+    if (currentGuild.value.locked) {
+      throw new Error('Cannot regenerate: guild is locked');
+    }
+
     const originalId = currentGuild.value.id;
 
     const options: GenerateGuildOptions = {
@@ -174,6 +179,11 @@ export const useGuildStore = defineStore('guild', () => {
   async function regenerateStructure(): Promise<void> {
     if (!currentGuild.value || !lastConfig.value) {
       throw new Error('Cannot regenerate: no current guild or config');
+    }
+
+    // Verificar se a guilda está bloqueada
+    if (currentGuild.value.locked) {
+      throw new Error('Cannot regenerate structure: guild is locked');
     }
 
     const originalId = currentGuild.value.id;
@@ -222,6 +232,11 @@ export const useGuildStore = defineStore('guild', () => {
   async function regenerateRelations(): Promise<void> {
     if (!currentGuild.value || !lastConfig.value) {
       throw new Error('Cannot regenerate: no current guild or config');
+    }
+
+    // Verificar se a guilda está bloqueada
+    if (currentGuild.value.locked) {
+      throw new Error('Cannot regenerate relations: guild is locked');
     }
 
     const originalId = currentGuild.value.id;
@@ -279,6 +294,7 @@ export const useGuildStore = defineStore('guild', () => {
     const originalSettlementType = currentGuild.value.settlementType;
     const originalName = currentGuild.value.name;
     const originalCreatedAt = currentGuild.value.createdAt;
+    const originalLocked = currentGuild.value.locked;
 
     // Gerar uma nova guilda para obter novos frequentadores
     const options: GenerateGuildOptions = {
@@ -301,6 +317,7 @@ export const useGuildStore = defineStore('guild', () => {
       resources: originalResources,
       settlementType: originalSettlementType,
       createdAt: originalCreatedAt,
+      locked: originalLocked,
     };
     
     currentGuild.value = regeneratedGuild;
