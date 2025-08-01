@@ -129,11 +129,14 @@
           </button>
           <button @click="toggleLock" :class="[
             'btn flex items-center justify-center space-x-2',
-            guild?.locked ? 'btn-outline-danger' : 'btn-outline'
-          ]" :disabled="!guild || guildStore.isGenerating">
+            guild?.locked ? 'btn-outline-danger' : (isGuildInHistory ? 'btn-outline' : 'btn-outline opacity-60')
+          ]" :disabled="!guild || guildStore.isGenerating || !isGuildInHistory">
             <LockClosedIcon v-if="guild?.locked" class="w-4 h-4" />
             <LockOpenIcon v-else class="w-4 h-4" />
-            <span>{{ guild?.locked ? 'Desbloquear' : 'Bloquear' }}</span>
+            <span>{{ 
+              guild?.locked ? 'Desbloquear' : 
+              isGuildInHistory ? 'Bloquear' : 'Salvar p/ Bloquear'
+            }}</span>
           </button>
           <button @click="saveToHistory" :class="[
             'btn flex items-center justify-center space-x-2',
@@ -441,6 +444,15 @@ const cancelEditingName = () => {
 // Função de toggle do lock
 const toggleLock = () => {
   if (!guild.value) return
+  
+  // Verificar se a guilda está salva no histórico
+  if (!isGuildInHistory.value) {
+    toast.warning(
+      'Esta guilda precisa estar salva no histórico para ser bloqueada. Salve-a primeiro usando o botão "Salvar no Histórico".',
+      'Guilda não salva no histórico'
+    )
+    return
+  }
   
   try {
     const success = guildStore.toggleGuildLock(guild.value.id)
