@@ -36,7 +36,7 @@ export const useGuildStore = defineStore('guild', () => {
   const guildHistory = ref<Guild[]>([]);
   const isGenerating = ref(false);
   const lastGenerationResult = ref<GuildGenerationResult | null>(null);
-  const lastConfig = ref<GuildGenerationConfig | null>(null);
+  const lastConfig = ref<GenerateGuildOptions | null>(null);
   const error = ref<string | null>(null);
 
   // Getters computados
@@ -412,7 +412,16 @@ export const useGuildStore = defineStore('guild', () => {
   // Selecionar guilda do histórico
   function selectGuildFromHistory(guildId: string): boolean {
     const guild = loadGuildFromHistory(guildId);
-    return guild !== null;
+    if (guild !== null) {
+      lastConfig.value = {
+        settlementType: guild.settlementType,
+        name: guild.name,
+        customModifiers: {}, // Não temos os modificadores originais, usar padrão
+        saveToHistory: false, // Para regenerações, não salvar automaticamente
+      };
+      return true;
+    }
+    return false;
   }
 
   // Gerenciamento de estado
