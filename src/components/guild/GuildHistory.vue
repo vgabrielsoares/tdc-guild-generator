@@ -149,7 +149,7 @@ import { useGuildStore } from '@/stores/guild';
 import { useToast } from '@/composables/useToast';
 
 const guildStore = useGuildStore();
-const { showSuccess, showError, showWarning } = useToast();
+const toast = useToast();
 
 const showConfirmClear = ref(false);
 
@@ -170,9 +170,9 @@ const formatDate = (date: Date): string => {
 const loadGuild = (guildId: string) => {
   const success = guildStore.selectGuildFromHistory(guildId);
   if (success) {
-    showSuccess('Guilda carregada do histórico');
+    toast.success('Guilda carregada do histórico');
   } else {
-    showError('Erro ao carregar guilda do histórico');
+    toast.error('Erro ao carregar guilda do histórico');
   }
 };
 
@@ -181,12 +181,12 @@ const toggleLock = (guildId: string) => {
   if (success) {
     const guild = guildStore.guildHistory.find(g => g.id === guildId);
     if (guild?.locked) {
-      showSuccess('Guilda bloqueada - não será removida ao limpar histórico');
+      toast.success('Guilda bloqueada - não será removida ao limpar histórico');
     } else {
-      showWarning('Guilda desbloqueada - pode ser removida ao limpar histórico');
+      toast.warning('Guilda desbloqueada - pode ser removida ao limpar histórico');
     }
   } else {
-    showError('Erro ao alterar bloqueio da guilda');
+    toast.error('Erro ao alterar bloqueio da guilda');
   }
 };
 
@@ -194,15 +194,15 @@ const removeGuild = (guildId: string) => {
   const guild = guildStore.guildHistory.find(g => g.id === guildId);
   
   if (guild?.locked) {
-    showWarning('Esta guilda está bloqueada e não pode ser removida');
+    toast.warning('Esta guilda está bloqueada e não pode ser removida');
     return;
   }
   
   const success = guildStore.removeFromHistory(guildId);
   if (success) {
-    showSuccess('Guilda removida do histórico');
+    toast.success('Guilda removida do histórico');
   } else {
-    showError('Erro ao remover guilda do histórico');
+    toast.error('Erro ao remover guilda do histórico');
   }
 };
 
@@ -211,9 +211,9 @@ const confirmClearHistory = () => {
   showConfirmClear.value = false;
   
   if (lockedCount.value > 0) {
-    showSuccess(`Histórico limpo. ${lockedCount.value} guilda(s) bloqueada(s) mantida(s).`);
+    toast.success(`Histórico limpo. ${lockedCount.value} guilda(s) bloqueada(s) mantida(s).`);
   } else {
-    showSuccess('Histórico limpo com sucesso');
+    toast.success('Histórico limpo com sucesso');
   }
 };
 </script>
