@@ -453,5 +453,10 @@ export function rollAdvanced(
   return result;
 }
 
-// Export for testing and debugging
-export { rollLogs };
+
+/**
+ * Export for testing and debugging
+ */
+export function getRollLogs(): ReadonlyArray<RollLog> {
+  return [...rollLogs];
+}
