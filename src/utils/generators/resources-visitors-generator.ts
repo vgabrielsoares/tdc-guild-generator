@@ -364,7 +364,7 @@ export class ResourcesVisitorsGenerator extends BaseGenerator<
   /**
    * Gera visitantes baseado no tipo de assentamento e modificadores
    */
-  private generateVisitors(modifier: number): {
+  protected generateVisitors(modifier: number): {
     frequency: VisitorLevel;
     roll: number;
   } {
@@ -433,4 +433,84 @@ export function generateResourcesAndVisitors(
 ): ResourcesVisitorsGenerationResult {
   const generator = new ResourcesVisitorsGenerator(config);
   return generator.generate();
+}
+
+/**
+ * Regenera apenas visitantes preservando recursos e outros dados originais
+ * Usa os modificadores corretos baseados nos dados originais da guilda
+ */
+export function regenerateVisitorsOnly(
+  settlementType: import('@/types/guild').SettlementType,
+  employees: string,
+  resources: import('@/types/guild').ResourceLevel,
+  customModifiers?: { visitors?: number },
+  debug = false
+): { frequency: import('@/types/guild').VisitorLevel; roll: number; logs: readonly string[] } {
+  // Calcular modificador de visitantes usando dados originais preservados
+  const relationModifier = ModifierCalculator.calculateVisitorModifiers(employees, resources);
+  const customModifier = customModifiers?.visitors || 0;
+  const totalVisitorsModifier = relationModifier + customModifier;
+
+  // Criar uma configuração especial que força o uso dos modificadores preservados
+  const config: ResourcesVisitorsGenerationConfig = {
+    settlementType,
+    customModifiers: {
+      // Zeramos os modificadores de recursos para não influenciar
+      resources: 0,
+      // Passamos o modificador total de visitantes como custom
+      visitors: totalVisitorsModifier,
+    },
+    // Não passamos relationModifiers para evitar recálculos
+    relationModifiers: {},
+    debug,
+  };
+
+  // Usar uma classe especializada que gera apenas visitantes
+  class VisitorOnlyGenerator extends ResourcesVisitorsGenerator {
+    protected doGenerate(): ResourcesVisitorsGenerationResult {
+      this.validateConfig();
+
+      // Pular geração de recursos e usar um valor fixo
+      const resourcesResult = { level: resources };
+
+      // Usar o modificador já calculado externamente
+      const visitorsModifier = this.config.customModifiers?.visitors || 0;
+
+      if (visitorsModifier !== 0) {
+        this.log(
+          `Visitor modifiers (regeneration): preserved modifier=${visitorsModifier}`,
+          "MODIFIERS"
+        );
+      }
+
+      // Gerar visitantes com modificadores preservados
+      const visitorsResult = this.generateVisitors(visitorsModifier);
+
+      return {
+        data: {
+          resources: {
+            level: resourcesResult.level,
+          },
+          visitors: {
+            frequency: visitorsResult.frequency,
+          },
+        },
+        rolls: {
+          resources: 0, // Não foi gerado
+          visitors: visitorsResult.roll,
+        },
+        logs: this.getLogs(),
+        timestamp: new Date(),
+      };
+    }
+  }
+
+  const generator = new VisitorOnlyGenerator(config);
+  const result = generator.generate();
+
+  return {
+    frequency: result.data.visitors.frequency,
+    roll: result.rolls.visitors,
+    logs: result.logs,
+  };
 }
