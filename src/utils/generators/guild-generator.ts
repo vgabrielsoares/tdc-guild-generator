@@ -259,7 +259,7 @@ export class GuildGenerator {
    * Gera um ID único para a guilda
    */
   private generateGuildId(): string {
-    return `guild_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `guild_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
   }
 
   /**
