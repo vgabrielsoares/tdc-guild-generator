@@ -43,7 +43,7 @@
             <Tooltip content="Gera uma nova guilda com estrutura, relações e características completamente diferentes."
               title="Regenerar Guilda">
               <button @click="regenerateGuild" class="btn btn-secondary flex items-center space-x-2"
-                :disabled="guildStore.isGenerating">
+                :disabled="guildStore.isGenerating || guild?.locked">
                 <ArrowPathIcon class="w-4 h-4" />
                 <span>Regenerar</span>
               </button>
@@ -118,19 +118,19 @@
         <h3 class="text-lg font-semibold text-amber-400 mb-4">Ações Rápidas</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <button @click="regenerateStructure" class="btn btn-outline flex items-center justify-center space-x-2"
-            :disabled="guildStore.isGenerating">
+            :disabled="guildStore.isGenerating || guild?.locked">
             <BuildingOffice2Icon class="w-4 h-4" />
             <span>Regenerar Estrutura</span>
           </button>
           <button @click="regenerateRelations" class="btn btn-outline flex items-center justify-center space-x-2"
-            :disabled="guildStore.isGenerating">
+            :disabled="guildStore.isGenerating || guild?.locked">
             <UserGroupIcon class="w-4 h-4" />
             <span>Regenerar Relações</span>
           </button>
           <button @click="saveToHistory" :class="[
-              'btn flex items-center justify-center space-x-2',
-              isGuildInHistory ? 'btn-success' : 'btn-outline'
-            ]" :disabled="!guild || guildStore.isGenerating || isGuildInHistory">
+            'btn flex items-center justify-center space-x-2',
+            isGuildInHistory ? 'btn-success' : 'btn-outline'
+          ]" :disabled="!guild || guildStore.isGenerating || isGuildInHistory">
             <CheckIcon v-if="isGuildInHistory" class="w-4 h-4" />
             <BookmarkIcon v-else class="w-4 h-4" />
             <span>{{ isGuildInHistory ? 'Já no Histórico' : 'Salvar no Histórico' }}</span>
@@ -306,6 +306,11 @@ const generateNewGuild = async () => {
 }
 
 const regenerateGuild = async () => {
+  if (guild.value?.locked) {
+    toast.warning('Esta guilda está bloqueada. Desbloqueie no histórico para permitir regeneração.');
+    return;
+  }
+
   try {
     await guildStore.regenerateCurrentGuild()
   } catch (error) {
@@ -314,6 +319,11 @@ const regenerateGuild = async () => {
 }
 
 const regenerateStructure = async () => {
+  if (guild.value?.locked) {
+    toast.warning('Esta guilda está bloqueada. Desbloqueie no histórico para permitir regeneração da estrutura.');
+    return;
+  }
+
   try {
     await guildStore.regenerateStructure()
   } catch (error) {
@@ -322,6 +332,11 @@ const regenerateStructure = async () => {
 }
 
 const regenerateRelations = async () => {
+  if (guild.value?.locked) {
+    toast.warning('Esta guilda está bloqueada. Desbloqueie no histórico para permitir regeneração das relações.');
+    return;
+  }
+
   try {
     await guildStore.regenerateRelations()
   } catch (error) {

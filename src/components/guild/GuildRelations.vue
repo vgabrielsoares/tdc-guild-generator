@@ -14,7 +14,7 @@
         content="Regenera as relações com governo e população, além de recalcular recursos baseado nas novas relações."
         title="Regenerar Relações">
         <button @click="$emit('regenerate-relations')" class="btn btn-sm btn-outline flex items-center space-x-1"
-          title="Regenerar relações">
+          title="Regenerar relações" :disabled="guild.locked">
           <ArrowPathIcon class="w-4 h-4" />
           <span class="text-xs">Regenerar</span>
         </button>
@@ -268,7 +268,7 @@ const getRelationModifier = (relation: string): number => {
     'Excelente, governo e guilda são quase como um': 3,
     'Excelente, a guilda faz o assentamento funcionar': 3
   }
-  
+
   return relationMap[relation] || 0
 }
 
