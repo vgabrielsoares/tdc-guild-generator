@@ -286,44 +286,33 @@ export const useGuildStore = defineStore('guild', () => {
       throw new Error('Cannot regenerate: no current guild or config');
     }
 
-    const originalId = currentGuild.value.id;
-    const originalStructure = currentGuild.value.structure;
-    const originalRelations = currentGuild.value.relations;
-    const originalStaff = currentGuild.value.staff;
-    const originalResources = currentGuild.value.resources;
-    const originalSettlementType = currentGuild.value.settlementType;
-    const originalName = currentGuild.value.name;
-    const originalCreatedAt = currentGuild.value.createdAt;
-    const originalLocked = currentGuild.value.locked;
+    const originalGuild = currentGuild.value;
 
-    // Gerar uma nova guilda para obter novos frequentadores
-    const options: GenerateGuildOptions = {
-      settlementType: lastConfig.value.settlementType,
-      name: lastConfig.value.name,
-      customModifiers: lastConfig.value.customModifiers,
-      saveToHistory: false,
-    };
+    const { regenerateVisitorsOnly } = await import('@/utils/generators/resources-visitors-generator');
 
-    const newGuild = await generateGuild(options);
+    // Regenerar visitantes preservando todos os modificadores originais
+    const visitorsResult = regenerateVisitorsOnly(
+      originalGuild.settlementType,
+      originalGuild.staff.description || '',
+      originalGuild.resources.level,
+      lastConfig.value.customModifiers?.visitors 
+        ? { visitors: lastConfig.value.customModifiers.visitors.frequency }
+        : undefined,
+      lastConfig.value.debug || false
+    );
     
-    // Criar guilda com novos frequentadores mas mantendo o resto
+    // Criar guilda com novos frequentadores mas mantendo todo o resto igual
     const regeneratedGuild: Guild = {
-      id: originalId,
-      name: originalName,
-      structure: originalStructure,
-      relations: originalRelations,
-      staff: originalStaff,
-      visitors: newGuild.visitors,
-      resources: originalResources,
-      settlementType: originalSettlementType,
-      createdAt: originalCreatedAt,
-      locked: originalLocked,
+      ...originalGuild,
+      visitors: {
+        frequency: visitorsResult.frequency,
+      },
     };
     
     currentGuild.value = regeneratedGuild;
     
     // Atualizar no histórico se existir
-    const historyIndex = guildHistory.value.findIndex(g => g.id === originalId);
+    const historyIndex = guildHistory.value.findIndex(g => g.id === originalGuild.id);
     if (historyIndex !== -1) {
       guildHistory.value[historyIndex] = regeneratedGuild;
     }
