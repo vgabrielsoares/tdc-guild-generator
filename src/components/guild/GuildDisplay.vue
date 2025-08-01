@@ -116,7 +116,7 @@
       <!-- Ações Rápidas -->
       <div class="mt-6 bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
         <h3 class="text-lg font-semibold text-amber-400 mb-4">Ações Rápidas</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
           <button @click="regenerateStructure" class="btn btn-outline flex items-center justify-center space-x-2"
             :disabled="guildStore.isGenerating || guild?.locked">
             <BuildingOffice2Icon class="w-4 h-4" />
@@ -126,6 +126,14 @@
             :disabled="guildStore.isGenerating || guild?.locked">
             <UserGroupIcon class="w-4 h-4" />
             <span>Regenerar Relações</span>
+          </button>
+          <button @click="toggleLock" :class="[
+            'btn flex items-center justify-center space-x-2',
+            guild?.locked ? 'btn-outline-danger' : 'btn-outline'
+          ]" :disabled="!guild || guildStore.isGenerating">
+            <LockClosedIcon v-if="guild?.locked" class="w-4 h-4" />
+            <LockOpenIcon v-else class="w-4 h-4" />
+            <span>{{ guild?.locked ? 'Desbloquear' : 'Bloquear' }}</span>
           </button>
           <button @click="saveToHistory" :class="[
             'btn flex items-center justify-center space-x-2',
@@ -206,7 +214,9 @@ import {
   UserGroupIcon,
   BookmarkIcon,
   TrashIcon,
-  PlusIcon
+  PlusIcon,
+  LockClosedIcon,
+  LockOpenIcon
 } from '@heroicons/vue/24/solid'
 import { BuildingStorefrontIcon } from '@heroicons/vue/24/outline'
 import { useGuildStore } from '@/stores/guild'
@@ -426,6 +436,25 @@ const saveGuildName = async () => {
 const cancelEditingName = () => {
   isEditingName.value = false
   editingGuildName.value = ''
+}
+
+// Função de toggle do lock
+const toggleLock = () => {
+  if (!guild.value) return
+  
+  try {
+    const success = guildStore.toggleGuildLock(guild.value.id)
+    if (success) {
+      const isNowLocked = guild.value.locked
+      const message = isNowLocked ? 'Guilda bloqueada com sucesso!' : 'Guilda desbloqueada com sucesso!'
+      toast.success(message)
+    } else {
+      toast.error('Erro ao alterar status de bloqueio da guilda')
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Erro desconhecido'
+    toast.error('Erro ao alterar bloqueio', message)
+  }
 }
 
 // Sistema de Ajuda
