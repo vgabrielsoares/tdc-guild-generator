@@ -265,6 +265,55 @@ export const useGuildStore = defineStore('guild', () => {
     await saveToStorage();
   }
 
+  // Regenerar apenas os frequentadores
+  async function regenerateVisitors(): Promise<void> {
+    if (!currentGuild.value || !lastConfig.value) {
+      throw new Error('Cannot regenerate: no current guild or config');
+    }
+
+    const originalId = currentGuild.value.id;
+    const originalStructure = currentGuild.value.structure;
+    const originalRelations = currentGuild.value.relations;
+    const originalStaff = currentGuild.value.staff;
+    const originalResources = currentGuild.value.resources;
+    const originalSettlementType = currentGuild.value.settlementType;
+    const originalName = currentGuild.value.name;
+    const originalCreatedAt = currentGuild.value.createdAt;
+
+    // Gerar uma nova guilda para obter novos frequentadores
+    const options: GenerateGuildOptions = {
+      settlementType: lastConfig.value.settlementType,
+      name: lastConfig.value.name,
+      customModifiers: lastConfig.value.customModifiers,
+      saveToHistory: false,
+    };
+
+    const newGuild = await generateGuild(options);
+    
+    // Criar guilda com novos frequentadores mas mantendo o resto
+    const regeneratedGuild: Guild = {
+      id: originalId,
+      name: originalName,
+      structure: originalStructure,
+      relations: originalRelations,
+      staff: originalStaff,
+      visitors: newGuild.visitors,
+      resources: originalResources,
+      settlementType: originalSettlementType,
+      createdAt: originalCreatedAt,
+    };
+    
+    currentGuild.value = regeneratedGuild;
+    
+    // Atualizar no histórico se existir
+    const historyIndex = guildHistory.value.findIndex(g => g.id === originalId);
+    if (historyIndex !== -1) {
+      guildHistory.value[historyIndex] = regeneratedGuild;
+    }
+    
+    await saveToStorage();
+  }
+
   // CRUD do histórico
   function addToHistory(guild: Guild): void {
     if (!isGuild(guild)) {
@@ -580,6 +629,7 @@ export const useGuildStore = defineStore('guild', () => {
     regenerateCurrentGuild,
     regenerateStructure,
     regenerateRelations,
+    regenerateVisitors,
     addToHistory,
     removeFromHistory,
     clearHistory,
