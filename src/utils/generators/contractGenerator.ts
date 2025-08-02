@@ -18,11 +18,15 @@ import {
   ContractorType,
   DeadlineType,
   PaymentType,
+  ObjectiveCategory,
+  LocationCategory,
 } from "../../types/contract";
 import type {
   Contract,
   ContractValue,
   ContractModifiers,
+  ContractObjective,
+  ContractLocation,
 } from "../../types/contract";
 import type { Guild } from "../../types/guild";
 import { VisitorLevel, RelationLevel } from "../../types/guild";
@@ -102,18 +106,38 @@ export class ContractGenerator {
     );
     const difficulty = difficultyEntry?.result.difficulty || ContractDifficulty.MEDIO;
 
-    // 7. Estrutura básica do contrato
+    // 7. Gerar contratante seguindo as regras do markdown
+    const contractor = this.generateContractor(guild);
+
+    // 8. Gerar objetivo conforme tabela do markdown
+    const objective = this.generateObjective();
+
+    // 9. Gerar localidade conforme tabela do markdown
+    const location = this.generateLocation();
+
+    // 10. Gerar pré-requisitos baseados no valor
+    const prerequisites = this.generatePrerequisites(valueResult.experienceValue);
+
+    // 11. Gerar cláusulas especiais
+    const clauses = this.generateClauses();
+
+    // 12. Gerar tipo de pagamento
+    const paymentType = this.generatePaymentType();
+
+    // 13. Estrutura básica do contrato
     const contract: Contract = {
       id: this.generateId(),
-      title: `Contrato #${Math.floor(Math.random() * 1000) + 1}`,
-      description: "Contrato gerado automaticamente",
+      title: `Contrato #${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
+      description: `${objective.description} | Local: ${location.description} | Contratante: ${contractor.description}${prerequisites.length > 0 ? ` | Pré-requisitos: ${prerequisites.join(", ")}` : ""}${clauses.length > 0 ? ` | Cláusulas: ${clauses.join(", ")}` : ""}`,
       status: ContractStatus.DISPONIVEL,
       difficulty,
-      contractorType: ContractorType.POVO,
-      contractorName: "Contratante Automático",
+      contractorType: contractor.type,
+      contractorName: contractor.name,
+      objective,
+      location,
       value: valueResult,
       deadline,
-      paymentType: PaymentType.TOTAL_GUILDA,
+      paymentType,
       generationData: {
         baseRoll,
         distanceRoll,
@@ -472,5 +496,664 @@ export class ContractGenerator {
       isFlexible: result.isFlexible,
       isArbitrary: result.isArbitrary,
     };
+  }
+
+  /**
+   * Gera o contratante
+   * 1. Rola 1d20 para determinar tipo (Povo/Instituição/Governo)
+   * 2. Aplica modificadores por relação com população e governo
+   * 3. Se for governo, gera contratante específico
+   */
+  private static generateContractor(guild: Guild): { type: ContractorType; name: string; description: string } {
+    // 1. Rolagem base 1d20
+    let contractorRoll = rollDice({ notation: "1d20" }).result;
+
+    // 2. Aplicar modificadores por relação com população
+    const populationRelation = this.mapRelationLevelToString(guild.relations.population);
+    switch (populationRelation) {
+      case "Péssima":
+        contractorRoll += 4;
+        break;
+      case "Ruim":
+        contractorRoll += 2;
+        break;
+      case "Dividida":
+        contractorRoll += 0;
+        break;
+      case "Boa":
+        contractorRoll -= 1;
+        break;
+      case "Muito boa":
+        contractorRoll -= 2;
+        break;
+      case "Excelente":
+        contractorRoll -= 5;
+        break;
+    }
+
+    // 3. Aplicar modificadores por relação com governo
+    const governmentRelation = this.mapRelationLevelToString(guild.relations.government);
+    switch (governmentRelation) {
+      case "Péssima":
+        contractorRoll -= 4;
+        break;
+      case "Ruim":
+        contractorRoll -= 2;
+        break;
+      case "Diplomática":
+        contractorRoll += 0;
+        break;
+      case "Boa":
+        contractorRoll += 1;
+        break;
+      case "Muito boa":
+        contractorRoll += 2;
+        break;
+      case "Excelente":
+        contractorRoll += 5;
+        break;
+    }
+
+    // 4. Determinar tipo de contratante baseado no resultado modificado
+    let contractorType: ContractorType;
+    let description = "";
+
+    if (contractorRoll <= 12) {
+      contractorType = ContractorType.POVO;
+      description = "Membro da população local";
+    } else if (contractorRoll <= 14) {
+      contractorType = ContractorType.INSTITUICAO;
+      description = "Representante de uma instituição de ofício";
+    } else {
+      contractorType = ContractorType.GOVERNO;
+      description = "Representante do governo local";
+    }
+
+    // 5. Gerar nome básico do contratante
+    let contractorName = this.generateBasicContractorName(contractorType);
+
+    // 6. Se for governo, determinar contratante específico
+    if (contractorType === ContractorType.GOVERNO) {
+      const governmentDetail = this.generateGovernmentContractor();
+      contractorName = governmentDetail.name;
+      description = governmentDetail.description;
+    }
+
+    return {
+      type: contractorType,
+      name: contractorName,
+      description,
+    };
+  }
+
+  /**
+   * Gera contratante específico do governo conforme tabela do markdown
+   */
+  private static generateGovernmentContractor(): { name: string; description: string } {
+    const governmentRoll = rollDice({ notation: "1d20" }).result;
+
+    if (governmentRoll <= 2) {
+      return {
+        name: "Arcanista Diplomata",
+        description: "Um mago experiente que representa os interesses arcanos do governo",
+      };
+    } else if (governmentRoll <= 5) {
+      return {
+        name: "Membro Importante do Clero",
+        description: "Um alto sacerdote com influência política significativa",
+      };
+    } else if (governmentRoll <= 10) {
+      return {
+        name: "Nobre Poderoso",
+        description: "Um aristocrata com considerável poder político e econômico",
+      };
+    } else if (governmentRoll <= 15) {
+      return {
+        name: "Círculo Familiar dos Governantes",
+        description: "Um membro da família real ou do círculo íntimo dos líderes",
+      };
+    } else if (governmentRoll === 16) {
+      return {
+        name: "Agente Burocrático",
+        description: "Um funcionário público de alto escalão (juiz, cobrador de impostos, advogado)",
+      };
+    } else if (governmentRoll === 17) {
+      return {
+        name: "Militar de Alto Escalão",
+        description: "Um general ou comandante das forças armadas locais",
+      };
+    } else if (governmentRoll <= 19) {
+      return {
+        name: "Membro do Governo de Outro Assentamento",
+        description: "Representante diplomático de outra cidade ou região",
+      };
+    } else {
+      return {
+        name: "Líder Local",
+        description: "O próprio governante ou seu representante direto",
+      };
+    }
+  }
+
+  /**
+   * Gera nome básico para o contratante baseado apenas no tipo
+   */
+  private static generateBasicContractorName(type: ContractorType): string {
+    switch (type) {
+      case ContractorType.POVO:
+        return "Cidadão Local";
+      case ContractorType.INSTITUICAO:
+        return "Representante Institucional";
+      case ContractorType.GOVERNO:
+      default:
+        return "Agente Governamental";
+    }
+  }
+
+  /**
+   * Gera objetivo principal e especificações seguindo as tabelas do markdown
+   */
+  private static generateObjective(): ContractObjective {
+    // 1. Rolar objetivo principal (1d20)
+    const objectiveRoll = rollDice({ notation: "1d20" }).result;
+    
+    let category: string;
+    let rollTwice = false;
+    
+    if (objectiveRoll <= 2) {
+      category = "Atacar ou destruir";
+    } else if (objectiveRoll <= 5) {
+      category = "Encontrar ou recuperar";
+    } else if (objectiveRoll <= 7) {
+      category = "Capturar";
+    } else if (objectiveRoll <= 9) {
+      category = "Proteger ou salvar";
+    } else if (objectiveRoll <= 11) {
+      category = "Explorar ou descobrir";
+    } else if (objectiveRoll <= 13) {
+      category = "Entregar ou receber";
+    } else if (objectiveRoll === 14) {
+      category = "Investigar ou sabotar";
+    } else if (objectiveRoll <= 18) {
+      category = "Serviços perigosos";
+    } else if (objectiveRoll === 19) {
+      category = "Religioso";
+    } else {
+      rollTwice = true;
+      category = "Múltiplos objetivos";
+    }
+
+    // 2. Gerar especificação baseada na categoria
+    const specification = this.generateObjectiveSpecification(category, rollTwice);
+
+    return {
+      category: ObjectiveCategory.ELIMINACAO, // Usar enum padrão por enquanto
+      specificObjective: specification.target,
+      description: specification.description,
+      urgencyLevel: this.generateUrgencyLevel(),
+      isSecretMission: Math.random() < 0.1, // 10% chance de ser missão secreta
+      specifications: {
+        minimumPartySize: this.generateMinimumPartySize(),
+        requiredSkills: this.generateRequiredSkills(category),
+        forbiddenActions: this.generateForbiddenActions(),
+        specialEquipment: this.generateSpecialEquipment(category),
+        timeWindow: this.generateTimeWindow(),
+      },
+    };
+  }
+
+  /**
+   * Gera especificação do objetivo baseado na categoria
+   */
+  private static generateObjectiveSpecification(category: string, rollTwice: boolean): { target: string; description: string } {
+    if (rollTwice) {
+      // Para múltiplos objetivos, combinar dois objetivos
+      const firstObjective = this.generateSingleObjectiveSpecification();
+      const secondObjective = this.generateSingleObjectiveSpecification();
+      return {
+        target: `${firstObjective.target} e ${secondObjective.target}`,
+        description: `${firstObjective.description} Além disso, ${secondObjective.description}`,
+      };
+    }
+
+    return this.generateSingleObjectiveSpecification(category);
+  }
+
+  /**
+   * Gera uma especificação individual de objetivo
+   */
+  private static generateSingleObjectiveSpecification(category?: string): { target: string; description: string } {
+    if (!category) {
+      // Rolar categoria aleatória
+      const categories = [
+        "Atacar ou destruir",
+        "Encontrar ou recuperar", 
+        "Capturar",
+        "Proteger ou salvar",
+        "Explorar ou descobrir",
+        "Entregar ou receber",
+        "Investigar ou sabotar",
+        "Serviços perigosos",
+        "Religioso"
+      ];
+      category = categories[Math.floor(Math.random() * categories.length)];
+    }
+
+    const specRoll = rollDice({ notation: "1d20" }).result;
+
+    switch (category) {
+      case "Atacar ou destruir":
+        return this.generateAttackDestroySpec(specRoll);
+      case "Encontrar ou recuperar":
+        return this.generateFindRecoverSpec(specRoll);
+      case "Capturar":
+        return this.generateCaptureSpec(specRoll);
+      case "Proteger ou salvar":
+        return this.generateProtectSaveSpec(specRoll);
+      case "Explorar ou descobrir":
+        return this.generateExploreDiscoverSpec(specRoll);
+      case "Entregar ou receber":
+        return this.generateDeliverReceiveSpec(specRoll);
+      case "Investigar ou sabotar":
+        return this.generateInvestigateSabotageSpec(specRoll);
+      case "Serviços perigosos":
+        return this.generateDangerousServicesSpec(specRoll);
+      case "Religioso":
+        return this.generateReligiousSpec(specRoll);
+      default:
+        return {
+          target: "Objetivo indeterminado",
+          description: "Um objetivo complexo que requer análise detalhada",
+        };
+    }
+  }
+
+  // Métodos para gerar especificações por categoria (implementação simplificada)
+  private static generateAttackDestroySpec(roll: number): { target: string; description: string } {
+    if (roll === 1) return { target: "Uma pessoa poderosa", description: "Eliminar ou neutralizar uma figura influente" };
+    if (roll <= 3) return { target: "Uma organização", description: "Desmantelar ou destruir uma organização criminosa" };
+    if (roll <= 5) return { target: "Uma comunidade", description: "Atacar ou dispersar uma comunidade hostil" };
+    if (roll === 6) return { target: "Um artefato ou objeto", description: "Destruir um item perigoso ou mágico" };
+    if (roll <= 10) return { target: "Uma criatura ou monstro", description: "Eliminar uma ameaça bestial" };
+    if (roll <= 12) return { target: "Um local ou território", description: "Tomar ou destruir uma fortificação" };
+    if (roll === 13) return { target: "Uma ideia, aliança ou reputação", description: "Sabotar relacionamentos ou reputações" };
+    if (roll === 14) return { target: "Recursos", description: "Destruir suprimentos ou recursos estratégicos" };
+    if (roll === 15) return { target: "Um evento", description: "Impedir ou sabotar um evento importante" };
+    if (roll === 16) return { target: "Um veículo ou engenhoca", description: "Destruir meio de transporte ou máquina" };
+    if (roll <= 19) return { target: "Uma gangue ou quadrilha", description: "Eliminar grupo de criminosos organizados" };
+    return { target: "Múltiplos alvos", description: "Eliminar vários alvos relacionados" };
+  }
+
+  private static generateFindRecoverSpec(roll: number): { target: string; description: string } {
+    if (roll === 1) return { target: "Uma pessoa", description: "Localizar e recuperar pessoa desaparecida" };
+    if (roll <= 3) return { target: "Um objeto", description: "Encontrar item perdido ou roubado" };
+    if (roll <= 5) return { target: "Uma criatura", description: "Capturar criatura específica viva" };
+    if (roll <= 7) return { target: "Informação", description: "Descobrir segredos ou inteligência" };
+    if (roll <= 9) return { target: "Um local", description: "Encontrar localização perdida ou secreta" };
+    if (roll <= 11) return { target: "Recursos", description: "Localizar e recuperar recursos valiosos" };
+    if (roll <= 13) return { target: "Prova ou evidência", description: "Encontrar evidências de crime ou conspiração" };
+    if (roll <= 15) return { target: "Aliado perdido", description: "Resgatar aliado capturado ou perdido" };
+    if (roll <= 17) return { target: "Artefato mágico", description: "Recuperar item com poderes sobrenaturais" };
+    if (roll <= 19) return { target: "Conhecimento ancestral", description: "Descobrir sabedoria ou técnicas perdidas" };
+    return { target: "Múltiplos itens", description: "Recuperar vários objetos relacionados" };
+  }
+
+  private static generateCaptureSpec(roll: number): { target: string; description: string } {
+    if (roll <= 5) return { target: "Criminoso", description: "Capturar fugitivo da justiça" };
+    if (roll <= 10) return { target: "Criatura específica", description: "Capturar viva criatura para estudo" };
+    if (roll <= 15) return { target: "Espião ou infiltrado", description: "Capturar agente inimigo" };
+    return { target: "Alvo de alto valor", description: "Capturar pessoa muito importante" };
+  }
+
+  private static generateProtectSaveSpec(roll: number): { target: string; description: string } {
+    if (roll <= 5) return { target: "Pessoa importante", description: "Proteger VIP de ameaças" };
+    if (roll <= 10) return { target: "Local estratégico", description: "Defender posição importante" };
+    if (roll <= 15) return { target: "Caravana ou grupo", description: "Escoltar grupo em viagem perigosa" };
+    return { target: "Evento especial", description: "Garantir segurança de evento importante" };
+  }
+
+  private static generateExploreDiscoverSpec(roll: number): { target: string; description: string } {
+    if (roll <= 5) return { target: "Território desconhecido", description: "Explorar e mapear região inexplorada" };
+    if (roll <= 10) return { target: "Ruínas antigas", description: "Investigar sítio arqueológico" };
+    if (roll <= 15) return { target: "Fenômeno estranho", description: "Estudar evento ou anomalia inexplicável" };
+    return { target: "Rota comercial", description: "Estabelecer nova rota segura" };
+  }
+
+  private static generateDeliverReceiveSpec(roll: number): { target: string; description: string } {
+    if (roll <= 5) return { target: "Mensagem importante", description: "Entregar comunicação confidencial" };
+    if (roll <= 10) return { target: "Carga valiosa", description: "Transportar bens preciosos" };
+    if (roll <= 15) return { target: "Suprimentos", description: "Entregar mantimentos ou equipamentos" };
+    return { target: "Pessoa", description: "Transportar indivíduo com segurança" };
+  }
+
+  private static generateInvestigateSabotageSpec(roll: number): { target: string; description: string } {
+    if (roll <= 5) return { target: "Investigar conspiração", description: "Descobrir trama contra autoridades" };
+    if (roll <= 10) return { target: "Sabotar operação", description: "Impedir planos inimigos" };
+    if (roll <= 15) return { target: "Infiltrar organização", description: "Obter informações de dentro" };
+    return { target: "Desmantelar rede", description: "Destruir organização por dentro" };
+  }
+
+  private static generateDangerousServicesSpec(roll: number): { target: string; description: string } {
+    if (roll <= 5) return { target: "Trabalho perigoso", description: "Realizar tarefa com alto risco" };
+    if (roll <= 10) return { target: "Missão de resgate", description: "Salvar vítimas em situação perigosa" };
+    if (roll <= 15) return { target: "Operação especial", description: "Executar missão militar especializada" };
+    return { target: "Serviço único", description: "Realizar tarefa que requer habilidades específicas" };
+  }
+
+  private static generateReligiousSpec(roll: number): { target: string; description: string } {
+    if (roll <= 5) return { target: "Missão sagrada", description: "Cumprir tarefa de natureza divina" };
+    if (roll <= 10) return { target: "Purificar local", description: "Limpar área de influência maligna" };
+    if (roll <= 15) return { target: "Recuperar relíquia", description: "Resgatar item sagrado" };
+    return { target: "Cerimônia especial", description: "Participar ou proteger ritual importante" };
+  }
+
+  // Métodos auxiliares para gerar características do objetivo
+  private static generateUrgencyLevel(): "Baixa" | "Média" | "Alta" | "Crítica" {
+    const roll = Math.random();
+    if (roll < 0.4) return "Baixa";
+    if (roll < 0.7) return "Média";
+    if (roll < 0.9) return "Alta";
+    return "Crítica";
+  }
+
+  private static generateMinimumPartySize(): number {
+    return Math.floor(Math.random() * 4) + 1; // 1-4 pessoas
+  }
+
+  private static generateRequiredSkills(category: string): string[] {
+    const skillsByCategory: Record<string, string[]> = {
+      "Atacar ou destruir": ["Combate", "Táticas"],
+      "Encontrar ou recuperar": ["Investigação", "Rastreamento"],
+      "Capturar": ["Combate não-letal", "Intimidação"],
+      "Proteger ou salvar": ["Vigilância", "Primeiros socorros"],
+      "Explorar ou descobrir": ["Sobrevivência", "Navegação"],
+      "Entregar ou receber": ["Viagem", "Diplomacia"],
+      "Investigar ou sabotar": ["Furtividade", "Investigação"],
+      "Serviços perigosos": ["Especialização específica"],
+      "Religioso": ["Conhecimento religioso"],
+    };
+    
+    return skillsByCategory[category] || ["Habilidades gerais"];
+  }
+
+  private static generateForbiddenActions(): string[] {
+    const forbidden = ["Sem mortes", "Discrição total", "Sem magia", "Sem violência"];
+    const count = Math.floor(Math.random() * 3);
+    return forbidden.slice(0, count);
+  }
+
+  private static generateSpecialEquipment(category: string): string[] {
+    const equipmentByCategory: Record<string, string[]> = {
+      "Atacar ou destruir": ["Armas especiais"],
+      "Encontrar ou recuperar": ["Equipamento de rastreamento"],
+      "Capturar": ["Redes", "Cordas"],
+      "Proteger ou salvar": ["Armaduras", "Escudos"],
+      "Explorar ou descobrir": ["Equipamento de exploração"],
+      "Entregar ou receber": ["Veículo"],
+      "Investigar ou sabotar": ["Ferramentas de espionagem"],
+      "Serviços perigosos": ["Equipamento especializado"],
+      "Religioso": ["Símbolos sagrados"],
+    };
+    
+    return equipmentByCategory[category] || [];
+  }
+
+  private static generateTimeWindow(): string {
+    const windows = ["Durante o dia", "Durante a noite", "Em lua nova", "Em festivais", "Em qualquer momento"];
+    return windows[Math.floor(Math.random() * windows.length)];
+  }
+
+  /**
+   * Gera localidade do contrato seguindo as regras do markdown
+   */
+  private static generateLocation(): ContractLocation {
+    // Rolar tipo de localidade (1d20)
+    const locationRoll = rollDice({ notation: "1d20" }).result;
+    
+    let specificLocation: string;
+    let name: string;
+    let description: string;
+    
+    if (locationRoll <= 5) {
+      const urban = this.generateUrbanLocation();
+      specificLocation = urban.type;
+      name = urban.name;
+      description = urban.description;
+    } else if (locationRoll <= 10) {
+      const rural = this.generateRuralLocation();
+      specificLocation = rural.type;
+      name = rural.name;
+      description = rural.description;
+    } else if (locationRoll <= 15) {
+      const wild = this.generateWildLocation();
+      specificLocation = wild.type;
+      name = wild.name;
+      description = wild.description;
+    } else {
+      const underground = this.generateUndergroundLocation();
+      specificLocation = underground.type;
+      name = underground.name;
+      description = underground.description;
+    }
+
+    return {
+      category: LocationCategory.URBANO, // Usar enum padrão por enquanto
+      specificLocation,
+      name,
+      description,
+      characteristics: {
+        dangerLevel: this.generateDangerLevel(),
+        accessibility: this.generateAccessibility(),
+        population: this.generatePopulationLevel(),
+        civilizationLevel: this.generateCivilizationLevel(),
+      },
+      modifiers: {
+        experienceBonus: this.generateExperienceBonus(),
+        rewardModifier: this.generateRewardModifier(),
+        difficultyIncrease: this.generateDifficultyIncrease(),
+      },
+      travel: {
+        distanceInHexes: this.generateDistance(),
+        estimatedTravelTime: this.generateTravelTime(),
+        transportRequired: Math.random() < 0.3,
+        specialRequirements: this.generateSpecialRequirements(),
+      },
+    };
+  }
+
+  private static generateUrbanLocation(): { type: string; name: string; description: string } {
+    const types = [
+      { type: "Taverna local", name: "A Candeia Dourada", description: "Uma taverna movimentada no centro da cidade" },
+      { type: "Mansão de nobre", name: "Solar dos Corvos", description: "Residência aristocrática nos altos da cidade" },
+      { type: "Distrito pobre", name: "Quarteirão da Lama", description: "Área carente com becos estreitos" },
+      { type: "Mercado", name: "Praça do Comércio", description: "Centro comercial com dezenas de bancas" },
+      { type: "Templo", name: "Catedral da Luz", description: "Grande templo dedicado às divindades locais" },
+    ];
+    return types[Math.floor(Math.random() * types.length)];
+  }
+
+  private static generateRuralLocation(): { type: string; name: string; description: string } {
+    const types = [
+      { type: "Fazenda isolada", name: "Fazenda Pedraverde", description: "Propriedade rural distante do centro" },
+      { type: "Vila pequena", name: "Vilarejo do Riacho", description: "Pequena comunidade rural" },
+      { type: "Estrada comercial", name: "Rota dos Mercadores", description: "Estrada principal entre cidades" },
+      { type: "Ponte importante", name: "Ponte dos Dois Rios", description: "Travessia estratégica sobre o rio" },
+      { type: "Moinhos", name: "Moinhos do Vento Sul", description: "Complexo de moinhos na colina" },
+    ];
+    return types[Math.floor(Math.random() * types.length)];
+  }
+
+  private static generateWildLocation(): { type: string; name: string; description: string } {
+    const types = [
+      { type: "Floresta densa", name: "Mata do Eco Sombrio", description: "Floresta fechada com árvores centenárias" },
+      { type: "Montanhas", name: "Picos da Névoa", description: "Cadeia montanhosa de difícil acesso" },
+      { type: "Pântano", name: "Charco das Almas", description: "Área alagadiça perigosa e misteriosa" },
+      { type: "Deserto", name: "Areias Vermelhas", description: "Vasta extensão de dunas ardentes" },
+      { type: "Cavernas", name: "Gruta dos Cristais", description: "Sistema de cavernas naturais" },
+    ];
+    return types[Math.floor(Math.random() * types.length)];
+  }
+
+  private static generateUndergroundLocation(): { type: string; name: string; description: string } {
+    const types = [
+      { type: "Esgotos", name: "Canais Subterrâneos", description: "Sistema de drenagem da cidade" },
+      { type: "Catacumbas", name: "Túmulos Ancestrais", description: "Cemitério subterrâneo antigo" },
+      { type: "Minas", name: "Poços de Ferro", description: "Minas abandonadas nas montanhas" },
+      { type: "Túneis", name: "Passagens Secretas", description: "Rede de túneis sob a cidade" },
+      { type: "Masmorra", name: "Prisões Esquecidas", description: "Calabouços em ruínas" },
+    ];
+    return types[Math.floor(Math.random() * types.length)];
+  }
+
+  // Métodos auxiliares para características da localidade
+  private static generateDangerLevel(): "Seguro" | "Baixo" | "Moderado" | "Alto" | "Extremo" {
+    const levels: Array<"Seguro" | "Baixo" | "Moderado" | "Alto" | "Extremo"> = ["Seguro", "Baixo", "Moderado", "Alto", "Extremo"];
+    return levels[Math.floor(Math.random() * levels.length)];
+  }
+
+  private static generateAccessibility(): "Fácil" | "Moderado" | "Difícil" | "Muito difícil" {
+    const levels: Array<"Fácil" | "Moderado" | "Difícil" | "Muito difícil"> = ["Fácil", "Moderado", "Difícil", "Muito difícil"];
+    return levels[Math.floor(Math.random() * levels.length)];
+  }
+
+  private static generatePopulationLevel(): "Desabitado" | "Pouco habitado" | "Moderado" | "Povoado" | "Densamente povoado" {
+    const levels: Array<"Desabitado" | "Pouco habitado" | "Moderado" | "Povoado" | "Densamente povoado"> = 
+      ["Desabitado", "Pouco habitado", "Moderado", "Povoado", "Densamente povoado"];
+    return levels[Math.floor(Math.random() * levels.length)];
+  }
+
+  private static generateCivilizationLevel(): "Primitivo" | "Rural" | "Civilizado" | "Avançado" {
+    const levels: Array<"Primitivo" | "Rural" | "Civilizado" | "Avançado"> = ["Primitivo", "Rural", "Civilizado", "Avançado"];
+    return levels[Math.floor(Math.random() * levels.length)];
+  }
+
+  private static generateExperienceBonus(): number {
+    return Math.floor(Math.random() * 21); // 0-20
+  }
+
+  private static generateRewardModifier(): number {
+    return Math.floor(Math.random() * 41) - 20; // -20 a +20
+  }
+
+  private static generateDifficultyIncrease(): number {
+    return Math.floor(Math.random() * 11); // 0-10
+  }
+
+  private static generateDistance(): number {
+    return Math.floor(Math.random() * 20) + 1; // 1-20 hexes
+  }
+
+  private static generateTravelTime(): string {
+    const times = ["1 dia", "2-3 dias", "1 semana", "2 semanas", "1 mês"];
+    return times[Math.floor(Math.random() * times.length)];
+  }
+
+  private static generateSpecialRequirements(): string[] {
+    const requirements = ["Guia local", "Equipamento especial", "Autorização", "Suprimentos extras"];
+    const count = Math.floor(Math.random() * 3);
+    return requirements.slice(0, count);
+  }
+
+  /**
+   * Gera pré-requisitos seguindo as tabelas do markdown
+   */
+  private static generatePrerequisites(contractValue: number): string[] {
+    const prerequisites: string[] = [];
+    
+    // Determinar se deve ter pré-requisitos baseado no valor
+    if (contractValue < 200) {
+      return prerequisites; // Contratos simples não têm pré-requisitos
+    }
+
+    // Rolar na tabela de pré-requisitos (1d20)
+    const prereqRoll = rollDice({ notation: "1d20" }).result;
+    
+    if (prereqRoll <= 5) {
+      prerequisites.push("Nenhum pré-requisito específico");
+    } else if (prereqRoll <= 8) {
+      prerequisites.push("Renome mínimo de 5 pontos");
+    } else if (prereqRoll <= 10) {
+      prerequisites.push("Pelo menos um conjurador no grupo");
+    } else if (prereqRoll <= 12) {
+      prerequisites.push("Habilidade específica requerida");
+    } else if (prereqRoll <= 14) {
+      prerequisites.push("Proficiência com ferramentas específicas");
+    } else if (prereqRoll <= 16) {
+      prerequisites.push("Veículo ou montaria necessária");
+    } else if (prereqRoll <= 18) {
+      prerequisites.push("Grupo de pelo menos 3 pessoas");
+    } else {
+      prerequisites.push("Múltiplos pré-requisitos");
+      // Rolar novamente para pré-requisitos adicionais
+      const additional = this.generatePrerequisites(contractValue / 2);
+      prerequisites.push(...additional.slice(0, 2));
+    }
+
+    return prerequisites;
+  }
+
+  /**
+   * Gera cláusulas especiais seguindo as tabelas do markdown
+   */
+  private static generateClauses(): string[] {
+    const clauses: string[] = [];
+    
+    // 20% de chance de ter cláusula especial
+    if (Math.random() > 0.8) {
+      return clauses; // Sem cláusulas especiais
+    }
+
+    // Rolar na tabela de cláusulas (1d20)
+    const clauseRoll = rollDice({ notation: "1d20" }).result;
+    
+    if (clauseRoll <= 2) {
+      clauses.push("Proibido matar qualquer criatura");
+    } else if (clauseRoll <= 4) {
+      clauses.push("Proteger criatura específica durante a missão");
+    } else if (clauseRoll <= 6) {
+      clauses.push("Troféu ou prova necessária");
+    } else if (clauseRoll <= 8) {
+      clauses.push("Missão deve ser completada em total discrição");
+    } else if (clauseRoll <= 10) {
+      clauses.push("Proibido o uso de magia");
+    } else if (clauseRoll <= 12) {
+      clauses.push("Competição com outros grupos");
+    } else if (clauseRoll <= 14) {
+      clauses.push("Exterminar completamente a fonte do problema");
+    } else if (clauseRoll <= 16) {
+      clauses.push("Supervisor acompanhará o grupo");
+    } else if (clauseRoll === 17) {
+      clauses.push("Restrição de tempo específica");
+    } else if (clauseRoll === 18) {
+      clauses.push("Relatório detalhado obrigatório");
+    } else if (clauseRoll === 19) {
+      clauses.push("Todo tesouro conquistado é de posse do contratante");
+    } else {
+      clauses.push("Identidade secreta obrigatória");
+    }
+
+    return clauses;
+  }
+
+  /**
+   * Gera tipo de pagamento seguindo as tabelas do markdown
+   */
+  private static generatePaymentType(): PaymentType {
+    // Rolar na tabela de tipo de pagamento (1d20)
+    const paymentRoll = rollDice({ notation: "1d20" }).result;
+    
+    if (paymentRoll <= 3) {
+      return PaymentType.DIRETO_CONTRATANTE;
+    } else if (paymentRoll <= 6) {
+      return PaymentType.METADE_GUILDA_METADE_CONTRATANTE;
+    } else if (paymentRoll <= 9) {
+      return PaymentType.METADE_GUILDA_METADE_BENS;
+    } else if (paymentRoll <= 11) {
+      return PaymentType.BENS_SERVICOS;
+    } else if (paymentRoll <= 18) {
+      return PaymentType.TOTAL_GUILDA;
+    } else {
+      return PaymentType.TOTAL_GUILDA_MAIS_SERVICOS;
+    }
   }
 }
