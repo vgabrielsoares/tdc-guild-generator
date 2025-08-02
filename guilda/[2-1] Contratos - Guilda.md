@@ -162,7 +162,7 @@ Nessa tabela, todos os contratos rolam 1d100 sem modificadores. As modificaçõe
 | 100   | 50000                 |
 | 101+  | Valor anterior \* 1,1 |
 
-> Role 1d100 sem modificadores para todos os contratos, independete do tipo de assentamento.
+> Role 1d100 sem modificadores para todos os contratos, independente do tipo de assentamento.
 
 ### Distância
 
@@ -688,7 +688,7 @@ Role nas tabelas correspondentes ao resultado do Objetivo Principal.
 | 13    | Um animal exótico ou mágico                   |
 | 14    | Um presente diplomático                       |
 | 15    | Um equipamento ou ferramenta especial         |
-| 16    | Um símbolo ou relíquia sagrad                 |
+| 16    | Um símbolo ou relíquia sagrada                |
 | 17-19 | Role novamente, mas a carga é secreta         |
 | 20    | Role duas vezes e use ambos                   |
 
