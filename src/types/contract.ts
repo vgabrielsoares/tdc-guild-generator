@@ -125,6 +125,10 @@ export interface Contract {
   contractorType: ContractorType;
   contractorName?: string;
 
+  // Objetivo e localização do contrato
+  objective?: ContractObjective;
+  location?: ContractLocation;
+
   // Valores e recompensas
   value: ContractValue;
 
@@ -200,6 +204,8 @@ export const ContractSchema = z.object({
   difficulty: z.nativeEnum(ContractDifficulty),
   contractorType: z.nativeEnum(ContractorType),
   contractorName: z.string().optional(),
+  objective: z.lazy(() => ContractObjectiveSchema).optional(),
+  location: z.lazy(() => ContractLocationSchema).optional(),
   value: ContractValueSchema,
   deadline: DeadlineSchema,
   paymentType: z.nativeEnum(PaymentType),
