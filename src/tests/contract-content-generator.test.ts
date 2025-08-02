@@ -28,7 +28,7 @@ describe("Contract Content Generator (Issue 4.12)", () => {
       id: "test-guild",
       name: "Guilda de Teste",
       structure: {
-        size: "Médio (12m x 12m)",
+        size: "Grande (12m x 12m)",
         description: "Estrutura padrão",
         characteristics: ["Segura", "Moderada", "Fácil acesso"]
       },

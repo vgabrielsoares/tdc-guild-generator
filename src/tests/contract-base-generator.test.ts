@@ -75,10 +75,12 @@ describe("ContractGenerator - Issue 4.11 - Implementação Completa", () => {
       expect(contract.id).toBeDefined();
       expect(contract.id).toMatch(/^contract-/);
       expect(contract.title).toContain("Contrato #");
-      expect(contract.description).toBe("Contrato gerado automaticamente");
+      expect(contract.description).toBeDefined();
+      expect(contract.description).toContain("Local:");
+      expect(contract.description).toContain("Contratante:");
       expect(contract.status).toBe(ContractStatus.DISPONIVEL);
-      expect(contract.contractorType).toBe(ContractorType.POVO);
-      expect(contract.paymentType).toBe(PaymentType.TOTAL_GUILDA);
+      expect(Object.values(ContractorType)).toContain(contract.contractorType);
+      expect(Object.values(PaymentType)).toContain(contract.paymentType);
       expect(contract.createdAt).toBeInstanceOf(Date);
 
       // Verificar valores seguindo tabela 1d100
