@@ -411,40 +411,203 @@ export interface ContractLocation {
 // ===== ANTAGONISTAS =====
 
 export enum AntagonistCategory {
-  HUMANOIDE = "Humanoide",
-  BESTA = "Besta",
-  MORTO_VIVO = "Morto-vivo",
-  ABERRACAO = "Aberração",
-  CELESTIAL = "Celestial",
-  CONSTRUTO = "Construto",
-  DRAGAO = "Dragão",
-  ELEMENTAL = "Elemental",
-  FEY = "Fey",
-  DEMONIO = "Demônio/Diabo",
-  GIGANTE = "Gigante",
-  PLANTA = "Planta",
+  HUMANOIDE_PODEROSO = "Humanoide poderoso",
+  ARTEFATO_MAGICO = "Artefato mágico",
   ORGANIZACAO = "Organização",
+  PERIGO_IMINENTE = "Perigo iminente",
+  ENTIDADE_SOBRENATURAL = "Entidade sobrenatural",
+  ANOMALIA = "Anomalia",
+  DESASTRE_ACIDENTE = "Desastre ou acidente",
+  CRISE = "Crise",
+  MISTERIO = "Mistério",
 }
 
 export enum HumanoidAntagonist {
-  BANDIDOS = "Grupo de bandidos",
-  CULTISTAS = "Cultistas fanáticos",
-  MERCENARIOS = "Mercenários hostis",
-  NOBRES_CORRUPTOS = "Nobres corruptos",
-  PIRATAS = "Piratas ou corsários",
-  ESPIAS = "Rede de espionagem",
-  ASSASSINOS = "Guilda de assassinos",
-  REVOLUCIONARIOS = "Grupo revolucionário",
+  MERCENARIO_ASSASSINO = "Mercenário/assassino",
+  CONJURADOR = "Conjurador",
+  NOBRE = "Nobre",
+  LIDER_IMPORTANTE = "Líder importante",
+  DUPLO = "Duplo",
+  ALQUIMISTA_PERTURBADO = "Alquimista perturbado",
+  RIVAL_CONTRATANTE = "Rival do contratante",
+  HEROI_AVENTUREIRO = "Herói/aventureiro",
+  FANATICO_RELIGIOSO = "Fanático religioso",
+  FUGITIVO = "Fugitivo",
+  COMERCIANTE_CORRUPTO = "Comerciante corrupto",
+  GENERAL_RENEGADO = "General renegado",
+  SACERDOTE_CAIDO = "Sacerdote caído",
+  ESPIAO_INFILTRADO = "Espião infiltrado",
+  ARTISTA_EXCENTRICO = "Artista excêntrico",
+  DIPLOMATA_TRAIDOR = "Diplomata traidor",
+  REVOLUCIONARIO_RADICAL = "Revolucionário radical",
+  MENTOR_DECAIDO = "Mentor decaído",
 }
 
-export enum BeastAntagonist {
-  LOBOS = "Alcateia de lobos",
-  URSOS = "Urso territorial",
-  ARANHAS_GIGANTES = "Aranhas gigantes",
-  SERPENTES = "Serpentes venenosas",
-  JAVALIS = "Javalis selvagens",
-  AVES_PREDADORAS = "Aves de rapina gigantes",
-  FELINOS = "Grandes felinos",
+export enum MagicalArtifactAntagonist {
+  CONSTRUCTO_DESCONTROLADO = "Constructo descontrolado",
+  RELIQUIA_DIVINA = "Relíquia divina",
+  ARTEFATO_ALIENIGENA = "Artefato alienígena",
+  JOIA_ALMA_PODEROSA = "Joia com a alma de um ser poderoso",
+  ARMADURA_ENFEITICADA = "Armadura enfeitiçada",
+  ARMA_SENCIENTE = "Arma senciente",
+  GRIMORIO_PROIBIDO = "Grimório proibido",
+  FOCO_ARCANO_CORROMPIDO = "Foco arcano danificado/corrompido",
+  PERGAMINHO_MILENAR = "Pergaminho milenar",
+  OBJETO_AMALDICOADO = "Objeto amaldiçoado",
+  PORTAL_INSTAVEL = "Portal instável",
+  CRISTAL_ENERGIA = "Cristal de energia",
+  ESPELHO_DIMENSIONAL = "Espelho dimensional",
+  AMULETO_CORRUPTOR = "Amuleto corruptor",
+  INSTRUMENTO_MUSICAL_MAGICO = "Instrumento musical mágico",
+  TOTEM_ANCESTRAL = "Totem ancestral",
+  ORBE_PODER = "Orbe de poder",
+  MAQUINA_ANTIGA = "Máquina antiga",
+  RECIPIENTE_ALMAS = "Recipiente de almas",
+}
+
+export enum OrganizationAntagonist {
+  GRUPO_AMEACADOR = "Grupo ameaçador",
+  FACCAO_CRIMINOSA = "Facção criminosa",
+  SEITA_CULTISTA = "Seita cultista",
+  ALTA_SOCIEDADE = "Alta sociedade",
+  CORTE_REAL_INIMIGA = "Corte real inimiga",
+  CLA_FAMILIA_PODEROSA = "Clã/família poderosa",
+  SOCIEDADE_SECRETA = "Sociedade secreta",
+  GRUPO_AVENTUREIROS = "Grupo de aventureiros",
+  REVOLUCIONARIOS = "Revolucionários",
+  SINDICATO = "Sindicato",
+  GUILDA_RIVAL = "Uma guilda rival",
+  IRMANDADE_MILITAR = "Irmandade militar",
+  ORDEM_MAGOS = "Ordem de magos",
+  COMPANHIA_MERCANTIL = "Companhia mercantil",
+  CONSELHO_ANCIAOS = "Conselho de anciãos",
+  TRIBUNAL_CORRUPTO = "Tribunal corrupto",
+  COLEGIO_BARDOS = "Colégio de bardos",
+  REDE_ESPIONAGEM = "Rede de espionagem",
+  PACTO_DRUIDAS = "Pacto de druidas",
+}
+
+export enum ImminentDangerAntagonist {
+  HUMANOIDES_TRIBAIS = "Humanoides tribais/canibais",
+  ANIMAIS_SELVAGENS = "Animais selvagens",
+  BESTAS_PRE_HISTORICAS = "Bestas pré-históricas",
+  PLANTAS_GUARDIAS = "Plantas guardiãs",
+  LICANTROPOS = "Licantropos",
+  ENXAMES_INSETOS = "Enxames de insetos",
+  SAQUEADORES_FREQUENTES = "Saqueadores frequentes",
+  ELEMENTAIS = "Elementais",
+  CRIATURA_MITOLOGICA = "Criatura mitológica",
+  ANIMAIS_ATROZES = "Animais atrozes",
+  HORDA_MORTOS_VIVOS = "Horda de mortos-vivos",
+  BANDIDOS_ORGANIZADOS = "Bandidos organizados",
+  PREDADORES_NOTURNOS = "Predadores noturnos",
+  CRIATURAS_SUBTERRANEAS = "Criaturas subterrâneas",
+  INVASORES_PLANARES = "Invasores planares",
+  MONSTROS_AQUATICOS = "Monstros aquáticos",
+  FERAS_CORROMPIDAS = "Feras corrompidas",
+  ABERRACOES_ANTIGAS = "Aberrações antigas",
+  ESPIRITOS_VINGATIVOS = "Espíritos vingativos",
+}
+
+export enum SupernaturalEntityAntagonist {
+  VAMPIRO = "Vampiro",
+  SER_INCORPOREO = "Ser incorpóreo",
+  MORTO_VIVO_PODEROSO = "Morto-vivo poderoso",
+  CELESTIAL_DESCONTROLADO = "Celestial descontrolado",
+  FADA = "Fada",
+  DEMONIO_MENOR = "Demônio menor",
+  ANJO_CAIDO = "Anjo caído",
+  ESPECTRO_ANTIGO = "Espectro antigo",
+  SENHOR_SOMBRAS = "Senhor das sombras",
+  ARQUIFADA = "Arquifada",
+  ENTIDADE_COSMICA = "Entidade cósmica",
+  ESPIRITO_ELEMENTAL = "Espírito elemental",
+  ALMA_PERDIDA = "Alma perdida",
+  GUARDIAO_CORROMPIDO = "Guardião corrompido",
+}
+
+export enum AnomalyAntagonist {
+  MONSTRUOSIDADE = "Monstruosidade",
+  DEMONIO_DIABO = "Demônio ou diabo",
+  FENDA_PLANAR = "Fenda planar",
+  HIBRIDO_ANIMALESCO = "Híbrido ou Animalesco",
+  NEVOA_SOBRENATURAL = "Névoa sobrenatural",
+  INVASAO_ZUMBI = "Invasão zumbi/esqueleto",
+  LIMO = "Limo",
+  ANORMALIDADES_NATUREZA = "Anormalidades na natureza",
+  CRIATURA_ADORMECIDA = "Criatura poderosa adormecida",
+  CLIMATICA = "Climática",
+  ZONA_MAGIA_SELVAGEM = "Zona de magia selvagem",
+  DISTORCAO_TEMPORAL = "Distorção temporal",
+  MUTACAO_DESCONTROLADA = "Mutação descontrolada",
+  CORRUPCAO_ARCANA = "Corrupção arcana",
+  FISSURA_REALIDADE = "Fissura na realidade",
+  MANIFESTACAO_PSIQUICA = "Manifestação psíquica",
+}
+
+export enum DisasterAntagonist {
+  INUNDACAO = "Inundação",
+  TERREMOTO = "Terremoto",
+  NAUFRAGIO = "Naufrágio",
+  FEITICO_DESCONTROLADO = "Feitiço fora de controle",
+  EXPERIMENTO_ERRADO = "Experimento que deu errado",
+  CONSTRUCOES_DEPREDADAS = "Construções depredadas/desabamento",
+  INCENDIO = "Incêndio",
+  METEORO = "Meteoro",
+  NEVASCA_IMPETUOSA = "Nevasca impetuosa",
+  ACIDENTE_TRABALHO = "Acidente de trabalho",
+  DESLIZAMENTO_TERRA = "Deslizamento de terra",
+  TEMPESTADE_DEVASTADORA = "Tempestade devastadora",
+  EXPLOSAO_ARCANA = "Explosão arcana",
+  PRAGA_INSETOS = "Praga de insetos",
+  CONTAMINACAO_TOXICA = "Contaminação tóxica",
+  FALHA_PORTAL = "Falha em portal",
+  ACIDENTE_CRIATURAS = "Acidente com criaturas",
+  AVALANCHE = "Avalanche",
+}
+
+export enum CrisisAntagonist {
+  CONFLITO_POLITICO = "Conflito político",
+  DOENCA = "Doença",
+  ESCASSEZ_RECURSOS = "Escassez de recursos básicos",
+  PARASITA_PRAGA = "Parasita ou praga",
+  GUERRA_IMINENTE = "Guerra iminente/Disputa territorial",
+  REVOLUCAO_REVOLTA = "Revolução/revolta",
+  ECONOMICA = "Econômica",
+  DRAGAO = "Dragão",
+  QUEDA_FIGURA_IMPORTANTE = "Queda de uma figura importante",
+  CONFLITO_RELIGIOSO = "Conflito religioso",
+  CRISE_DIPLOMATICA = "Crise diplomática",
+  COLAPSO_INSTITUICOES = "Colapso de instituições",
+  SUCESSAO_CONTESTADA = "Sucessão contestada",
+  CORRUPCAO_GENERALIZADA = "Corrupção generalizada",
+  CISMA_SOCIAL = "Cisma social",
+  FUGA_MASSA = "Fuga em massa",
+  BOICOTE_COMERCIAL = "Boicote comercial",
+  CONSPIRACAO_REVELADA = "Conspiração revelada",
+  PERDA_CONFIANCA = "Perda de confiança",
+}
+
+export enum MysteryAntagonist {
+  CONSPIRACAO = "Conspiração",
+  COMPORTAMENTO_ANORMAL = "Comportamento/fenômeno anormal",
+  MORTES_MISTERIOSAS = "Mortes misteriosas",
+  ROUBOS_DESAPARECIMENTOS = "Roubos/Desaparecimentos",
+  MALDICAO_CASTIGO_DIVINO = "Maldição/castigo divino",
+  ATENTADO = "Atentado",
+  PROFECIA = "Profecia",
+  SURTOS_MAGIA = "Surtos de magia",
+  RITUAIS_SIMBOLOS = "Rituais e símbolos",
+  LENDA_URBANA = "Lenda urbana/local",
+  MEMORIAS_PERDIDAS = "Memórias perdidas",
+  IDENTIDADE_FALSA = "Identidade falsa",
+  MENSAGENS_CODIFICADAS = "Mensagens codificadas",
+  TESTEMUNHAS_CONFLITANTES = "Testemunhas conflitantes",
+  SEGREDO_FAMILIAR = "Segredo familiar",
+  ARTEFATO_PERDIDO = "Artefato perdido",
+  PRESSAGIO_SOMBRIO = "Presságio sombrio",
+  PASSADO_OCULTO = "Passado oculto",
+  CONEXAO_INESPERADA = "Conexão inesperada",
 }
 
 // Interface principal do antagonista
@@ -453,275 +616,112 @@ export interface Antagonist {
   specificType: string;
   name: string;
   description: string;
-
-  // Características de combate
-  combat: {
-    challengeRating: string;
-    estimatedXpValue: number;
-    primaryThreat: "Físico" | "Mágico" | "Mental" | "Social" | "Ambiental";
-    specialAbilities?: string[];
-  };
-
-  // Motivações e comportamento
-  motivation: {
-    primary: string;
-    secondary?: string;
-    relationToObjective: "Direto" | "Indireto" | "Acidental" | "Vingança";
-  };
-
-  // Táticas e estratégias
-  tactics: {
-    preferredApproach:
-      | "Confronto direto"
-      | "Emboscada"
-      | "Subterfúgio"
-      | "Negociação"
-      | "Fuga";
-    advantageConditions?: string[];
-    weaknesses?: string[];
-  };
-
-  // Recursos disponíveis
-  resources: {
-    followers?: number;
-    equipment?: string[];
-    territory?: string;
-    allies?: string[];
-  };
 }
 
 // ===== COMPLICAÇÕES =====
 
+// Categorias principais de complicações
 export enum ComplicationCategory {
-  TEMPO = "Temporal",
-  SOCIAL = "Social",
-  AMBIENTAL = "Ambiental",
-  MAGICA = "Mágica",
-  POLITICA = "Política",
-  MORAL = "Moral",
-  FINANCEIRA = "Financeira",
-  PESSOAL = "Pessoal",
-}
-
-export enum TemporalComplication {
-  PRAZO_APERTADO = "Prazo mais apertado que o esperado",
-  COMPETICAO = "Outro grupo com o mesmo objetivo",
-  JANELA_LIMITADA = "Janela de oportunidade muito específica",
-  EVENTOS_SIMULTANEOS = "Múltiplos eventos acontecendo ao mesmo tempo",
-}
-
-export enum SocialComplication {
-  TESTEMUNHAS = "Presença de testemunhas",
-  COBERTURA_NECESSARIA = "Necessidade de manter disfarce",
-  RELACOES_COMPLEXAS = "Relacionamentos complexos entre NPCs",
-  REPUTACAO_EM_RISCO = "Reputação da guilda em jogo",
-}
-
-export enum EnvironmentalComplication {
-  CLIMA_SEVERO = "Condições climáticas severas",
-  TERRENO_DIFICIL = "Terreno mais difícil que esperado",
-  RECURSOS_LIMITADOS = "Recursos limitados na região",
-  FAUNA_HOSTIL = "Fauna local hostil",
+  RECURSOS = "Recursos",
+  VITIMAS = "Vítimas",
+  ORGANIZACAO = "Organização",
+  MIRACULOSO = "Miraculoso",
+  AMBIENTE_HOSTIL = "Ambiente hostil",
+  INUSITADO = "Inusitado",
+  PROBLEMAS_DIPLOMATICOS = "Problemas diplomáticos",
+  PROTECAO = "Proteção",
+  CONTRA_TEMPO_AMISTOSO = "Contra-tempo amistoso",
+  ENCONTRO_HOSTIL = "Encontro hostil",
 }
 
 // Interface principal da complicação
 export interface Complication {
   category: ComplicationCategory;
-  specificType: string;
-  title: string;
+  specificDetail: string;
   description: string;
-
-  // Impacto na missão
-  impact: {
-    severity: "Menor" | "Moderado" | "Maior" | "Crítico";
-    affectedAspects: (
-      | "Tempo"
-      | "Recursos"
-      | "Stealth"
-      | "Combat"
-      | "Social"
-      | "Navigation"
-    )[];
-    experienceModifier: number;
-    difficultyIncrease: number;
-  };
-
-  // Possíveis soluções
-  solutions: {
-    direct: string[];
-    creative: string[];
-    avoidance?: string[];
-  };
-
-  // Revelação da complicação
-  revelation: {
-    timing:
-      | "Imediato"
-      | "Durante planejamento"
-      | "No meio da missão"
-      | "No clímax";
-    method: "Óbvio" | "Investigação" | "Descoberta acidental" | "Traição";
-  };
 }
 
-// ===== ALIADOS =====
+// ===== REVIRAVOLTAS =====
 
-export enum AllyCategory {
-  INFORMANTE = "Informante",
-  COMBATENTE = "Combatente",
-  ESPECIALISTA = "Especialista",
-  CONTATO_SOCIAL = "Contato Social",
-  GUIA = "Guia",
-  RECURSO = "Recurso",
-  PROTETOR = "Protetor",
+// Quem está envolvido na reviravolta
+export enum TwistWho {
+  CONTRATANTE = "O contratante",
+  ALIADO = "Um aliado",
+  COMPLICACAO = "A complicação",
+  OBJETIVO = "O objetivo",
+  VITIMA_INOCENTE = "A vítima/um inocente",
+  VELHO_CONHECIDO = "Um velho conhecido surge e...",
+  FUNCIONARIO_GUILDA = "Um funcionário da guilda",
+  ESPECTADOR_NEUTRO = "Um espectador aparentemente neutro",
+  INFORMANTE = "Um informante",
+  AUTORIDADE_LOCAL = "A autoridade local",
+  MERCADOR = "Um mercador envolvido",
+  GUARDA_PATRULHA = "O guarda que patrulha a área",
+  FONTE_PISTAS = "A pessoa que forneceu as pistas",
+  MEMBRO_FAMILIA_REAL = "Um membro da família real",
+  CURANDEIRO_SABIO = "O curandeiro/sábio consultado",
+  CRIANCA_INVISIVEL = "A criança que ninguém nota",
+  RIVAL_LONGA_DATA = "Um rival de longa data",
+  MORTO_DESAPARECIDO = "Um dos mortos/desaparecidos",
+  BENFEITOR_ANONIMO = "Um benfeitor anônimo",
+  TERRA_LOCAL = "A própria terra/local",
 }
 
-export enum AllyAvailability {
-  SEMPRE_DISPONIVEL = "Sempre disponível",
-  CONDICIONAL = "Disponível sob condições",
-  UMA_VEZ = "Apenas uma vez",
-  EMERGENCIA = "Apenas em emergências",
-  TEMPORAL = "Por tempo limitado",
+// O que realmente são
+export enum TwistWhat {
+  VERDADEIRO_INIMIGO = "É o verdadeiro inimigo",
+  PARENTE_PROXIMO = "É um parente próximo",
+  HEROI_LENDARIO = "É um herói lendário dado como morto",
+  NAO_E_O_QUE_PARECE = "Não é o que parece",
+  AUXILIA_ANTAGONISTA = "Auxilia o antagonista secretamente",
+  FANTASMA = "É um fantasma",
+  ESPIAO_INFILTRADO = "É um espião infiltrado",
+  CONTROLADO_POSSUIDO = "É controlado/possuído por outra entidade",
+  ILUSAO_DISFARCE = "É uma ilusão ou disfarce",
+  OUTRA_DIMENSAO = "É de outra dimensão/plano",
+  CLONE_IMPOSTOR = "É um clone ou impostor",
+  MAIS_PODEROSO = "É muito mais poderoso do que aparenta",
+  PERDEU_MEMORIA = "Perdeu a memória de quem realmente é",
+  METAMORFO = "É um metamorfo",
+  SENDO_CHANTAGEADO = "Está sendo chantageado",
+  CRIACAO_ARTIFICIAL = "É uma criação artificial",
+  VIAJANTE_TEMPORAL = "Vem do futuro ou passado",
+  DEUS_DISFARCADO = "É um deus disfarçado",
+  REENCARNACAO = "É a reencarnação de alguém importante",
+  MULTIPLAS_PESSOAS = "São múltiplas pessoas agindo como uma",
 }
 
-export enum AllyLoyalty {
-  TOTAL = "Lealdade total",
-  ALTA = "Alta lealdade",
-  MODERADA = "Lealdade moderada",
-  CONDICIONAL = "Lealdade condicional",
-  DUVIDOSA = "Lealdade duvidosa",
-  INTERESSADA = "Apenas por interesse",
+// Motivação ou circunstância especial
+export enum TwistBut {
+  PELAS_CRIANCAS = "Faz isso pelas crianças",
+  ANTAGONISTA_SEM_CULPA = "O antagonista não tem culpa",
+  ASSASSINADO_MISTERIOSAMENTE = "Ele é assassinado misteriosamente",
+  LIGADO_PROFECIA = "O objetivo está ligado a uma profecia",
+  PROTEGER_NATUREZA = "Faz isso para proteger a natureza",
+  OBJETIVO_EXIGE_SACRIFICIO = "O objetivo exige um sacrifício",
+  SALVAR_ALGUEM_QUERIDO = "Está tentando salvar alguém querido",
+  FORCADO_MALDICAO = "Foi forçado por uma maldição",
+  ACREDITA_FAZER_BEM = "Acredita estar fazendo o bem",
+  CUMPRINDO_PROMESSA = "Está cumprindo uma promessa antiga",
+  EVITAR_ALGO_PIOR = "É a única forma de evitar algo pior",
+  PROTEGENDO_SEGREDO = "Está protegendo um segredo terrível",
+  DIAS_DE_VIDA = "Tem apenas dias de vida",
+  MANIPULADO_SEM_SABER = "Está sendo manipulado sem saber",
+  SALVAR_ALMA = "Precisa salvar sua alma",
+  DESFAZER_ERRO_PASSADO = "Está tentando desfazer um erro do passado",
+  UNICO_QUE_PODE = "É o único que pode fazer isso",
+  HONRANDO_MEMORIA = "Está honrando a memória de alguém",
+  PROVAR_VALOR = "Precisa provar seu valor/inocência",
+  TEMPO_SE_ESGOTANDO = "O tempo está se esgotando",
 }
 
-// Interface principal do aliado
-export interface ContractAlly {
-  category: AllyCategory;
-  name: string;
+// Interface da reviravolta completa
+export interface Twist {
+  hasTwist: boolean;
+  who?: TwistWho;
+  what?: TwistWhat;
+  but?: TwistBut;
   description: string;
-
-  // Características pessoais
-  personal: {
-    race?: string;
-    profession?: string;
-    personality: string[];
-    motivation: string;
-  };
-
-  // Disponibilidade e lealdade
-  availability: {
-    type: AllyAvailability;
-    conditions?: string[];
-    limitations?: string[];
-    duration?: string;
-  };
-
-  loyalty: {
-    level: AllyLoyalty;
-    factors: string[];
-    breakingPoints?: string[];
-  };
-
-  // Capacidades e recursos
-  capabilities: {
-    primarySkills: string[];
-    secondarySkills?: string[];
-    equipment?: string[];
-    connections?: string[];
-    knowledgeAreas?: string[];
-  };
-
-  // Como e quando aparece
-  introduction: {
-    timing:
-      | "Início da missão"
-      | "Durante planejamento"
-      | "No meio da aventura"
-      | "Momento crítico";
-    method:
-      | "Enviado pela guilda"
-      | "Encontro casual"
-      | "Contato prévio"
-      | "Interesse próprio";
-    requirements?: string[];
-  };
-
-  // Custos ou obrigações
-  costs?: {
-    payment?: number;
-    favors?: string[];
-    futureObligations?: string[];
-    risks?: string[];
-  };
-}
-
-// ===== RECOMPENSAS ADICIONAIS =====
-
-export enum RewardCategory {
-  MONETARIA = "Monetária",
-  EQUIPAMENTO = "Equipamento",
-  INFORMACAO = "Informação",
-  SOCIAL = "Social",
-  MAGICA = "Mágica",
-  PROPRIEDADE = "Propriedade",
-  SERVICO = "Serviço",
-  CONHECIMENTO = "Conhecimento",
-}
-
-export enum MonetaryReward {
-  BONUS_OURO = "Bônus em ouro",
-  JOIAS = "Joias valiosas",
-  GEMAS = "Gemas preciosas",
-  OBRAS_ARTE = "Obras de arte",
-  ANTIGUIDADES = "Antiguidades valiosas",
-}
-
-export enum EquipmentReward {
-  ARMA_MAGICA = "Arma mágica",
-  ARMADURA_ESPECIAL = "Armadura especial",
-  ITEM_UTILITARIO = "Item utilitário mágico",
-  POCOES = "Poções raras",
-  PERGAMINHOS = "Pergaminhos mágicos",
-  FERRAMENTAS = "Ferramentas especializadas",
-}
-
-// Interface principal da recompensa adicional
-export interface ContractReward {
-  category: RewardCategory;
-  specificType: string;
-  name: string;
-  description: string;
-
-  // Valor e raridade
-  value: {
-    estimatedGoldValue: number;
-    rarity: "Comum" | "Incomum" | "Raro" | "Muito raro" | "Lendário" | "Único";
-    experienceValue?: number;
-  };
-
-  // Condições para obtenção
-  conditions: {
-    isAutomatic: boolean;
-    requirements?: string[];
-    performanceBased?: boolean;
-    secretive?: boolean;
-    optional?: boolean;
-  };
-
-  // Benefícios mecânicos
-  benefits?: {
-    statBonus?: string[];
-    specialAbilities?: string[];
-    ongoingEffects?: string[];
-    socialBenefits?: string[];
-  };
-
-  // Limitações ou custos
-  limitations?: {
-    temporaryEffect?: boolean;
-    maintenanceCost?: number;
-    curses?: string[];
-    restrictions?: string[];
-  };
 }
 
 // ===== SCHEMAS ZOD PARA VALIDAÇÃO =====
@@ -782,174 +782,20 @@ export const AntagonistSchema = z.object({
   specificType: z.string(),
   name: z.string(),
   description: z.string(),
-  combat: z.object({
-    challengeRating: z.string(),
-    estimatedXpValue: z.number(),
-    primaryThreat: z.enum([
-      "Físico",
-      "Mágico",
-      "Mental",
-      "Social",
-      "Ambiental",
-    ]),
-    specialAbilities: z.array(z.string()).optional(),
-  }),
-  motivation: z.object({
-    primary: z.string(),
-    secondary: z.string().optional(),
-    relationToObjective: z.enum([
-      "Direto",
-      "Indireto",
-      "Acidental",
-      "Vingança",
-    ]),
-  }),
-  tactics: z.object({
-    preferredApproach: z.enum([
-      "Confronto direto",
-      "Emboscada",
-      "Subterfúgio",
-      "Negociação",
-      "Fuga",
-    ]),
-    advantageConditions: z.array(z.string()).optional(),
-    weaknesses: z.array(z.string()).optional(),
-  }),
-  resources: z.object({
-    followers: z.number().optional(),
-    equipment: z.array(z.string()).optional(),
-    territory: z.string().optional(),
-    allies: z.array(z.string()).optional(),
-  }),
 });
 
 export const ComplicationSchema = z.object({
   category: z.nativeEnum(ComplicationCategory),
-  specificType: z.string(),
-  title: z.string(),
+  specificDetail: z.string(),
   description: z.string(),
-  impact: z.object({
-    severity: z.enum(["Menor", "Moderado", "Maior", "Crítico"]),
-    affectedAspects: z.array(
-      z.enum(["Tempo", "Recursos", "Stealth", "Combat", "Social", "Navigation"])
-    ),
-    experienceModifier: z.number(),
-    difficultyIncrease: z.number(),
-  }),
-  solutions: z.object({
-    direct: z.array(z.string()),
-    creative: z.array(z.string()),
-    avoidance: z.array(z.string()).optional(),
-  }),
-  revelation: z.object({
-    timing: z.enum([
-      "Imediato",
-      "Durante planejamento",
-      "No meio da missão",
-      "No clímax",
-    ]),
-    method: z.enum([
-      "Óbvio",
-      "Investigação",
-      "Descoberta acidental",
-      "Traição",
-    ]),
-  }),
 });
 
-export const ContractAllySchema = z.object({
-  category: z.nativeEnum(AllyCategory),
-  name: z.string(),
+export const TwistSchema = z.object({
+  hasTwist: z.boolean(),
+  who: z.nativeEnum(TwistWho).optional(),
+  what: z.nativeEnum(TwistWhat).optional(),
+  but: z.nativeEnum(TwistBut).optional(),
   description: z.string(),
-  personal: z.object({
-    race: z.string().optional(),
-    profession: z.string().optional(),
-    personality: z.array(z.string()),
-    motivation: z.string(),
-  }),
-  availability: z.object({
-    type: z.nativeEnum(AllyAvailability),
-    conditions: z.array(z.string()).optional(),
-    limitations: z.array(z.string()).optional(),
-    duration: z.string().optional(),
-  }),
-  loyalty: z.object({
-    level: z.nativeEnum(AllyLoyalty),
-    factors: z.array(z.string()),
-    breakingPoints: z.array(z.string()).optional(),
-  }),
-  capabilities: z.object({
-    primarySkills: z.array(z.string()),
-    secondarySkills: z.array(z.string()).optional(),
-    equipment: z.array(z.string()).optional(),
-    connections: z.array(z.string()).optional(),
-    knowledgeAreas: z.array(z.string()).optional(),
-  }),
-  introduction: z.object({
-    timing: z.enum([
-      "Início da missão",
-      "Durante planejamento",
-      "No meio da aventura",
-      "Momento crítico",
-    ]),
-    method: z.enum([
-      "Enviado pela guilda",
-      "Encontro casual",
-      "Contato prévio",
-      "Interesse próprio",
-    ]),
-    requirements: z.array(z.string()).optional(),
-  }),
-  costs: z
-    .object({
-      payment: z.number().optional(),
-      favors: z.array(z.string()).optional(),
-      futureObligations: z.array(z.string()).optional(),
-      risks: z.array(z.string()).optional(),
-    })
-    .optional(),
-});
-
-export const ContractRewardSchema = z.object({
-  category: z.nativeEnum(RewardCategory),
-  specificType: z.string(),
-  name: z.string(),
-  description: z.string(),
-  value: z.object({
-    estimatedGoldValue: z.number(),
-    rarity: z.enum([
-      "Comum",
-      "Incomum",
-      "Raro",
-      "Muito raro",
-      "Lendário",
-      "Único",
-    ]),
-    experienceValue: z.number().optional(),
-  }),
-  conditions: z.object({
-    isAutomatic: z.boolean(),
-    requirements: z.array(z.string()).optional(),
-    performanceBased: z.boolean().optional(),
-    secretive: z.boolean().optional(),
-    optional: z.boolean().optional(),
-  }),
-  benefits: z
-    .object({
-      statBonus: z.array(z.string()).optional(),
-      specialAbilities: z.array(z.string()).optional(),
-      ongoingEffects: z.array(z.string()).optional(),
-      socialBenefits: z.array(z.string()).optional(),
-    })
-    .optional(),
-  limitations: z
-    .object({
-      temporaryEffect: z.boolean().optional(),
-      maintenanceCost: z.number().optional(),
-      curses: z.array(z.string()).optional(),
-      restrictions: z.array(z.string()).optional(),
-    })
-    .optional(),
 });
 
 // ===== FUNÇÕES UTILITÁRIAS =====
@@ -983,94 +829,8 @@ export function validateComplication(data: unknown): Complication {
 }
 
 /**
- * Valida um aliado usando o schema Zod
+ * Valida uma reviravolta usando o schema Zod
  */
-export function validateContractAlly(data: unknown): ContractAlly {
-  return ContractAllySchema.parse(data);
-}
-
-/**
- * Valida uma recompensa adicional usando o schema Zod
- */
-export function validateContractReward(data: unknown): ContractReward {
-  return ContractRewardSchema.parse(data);
-}
-
-/**
- * Calcula modificador de experiência baseado na complexidade do antagonista
- */
-export function calculateAntagonistXpModifier(antagonist: Antagonist): number {
-  const crMap: Record<string, number> = {
-    "1/8": 25,
-    "1/4": 50,
-    "1/2": 100,
-    "1": 200,
-    "2": 450,
-    "3": 700,
-    "4": 1100,
-    "5": 1800,
-    "6": 2300,
-    "7": 2900,
-    "8": 3900,
-    "9": 5000,
-    "10": 5900,
-    "11": 7200,
-    "12": 8400,
-    "13": 10000,
-    "14": 11500,
-    "15": 13000,
-    "16": 15000,
-    "17": 18000,
-    "18": 20000,
-    "19": 22000,
-    "20": 25000,
-  };
-
-  return crMap[antagonist.combat.challengeRating] || 0;
-}
-
-/**
- * Calcula modificador de dificuldade baseado em complicações
- */
-export function calculateComplicationDifficultyModifier(
-  complications: Complication[]
-): number {
-  return complications.reduce((total, complication) => {
-    const severityMap = { Menor: 1, Moderado: 2, Maior: 3, Crítico: 5 };
-    return total + severityMap[complication.impact.severity];
-  }, 0);
-}
-
-/**
- * Verifica se um aliado está disponível baseado nas condições
- */
-export function isAllyAvailable(
-  ally: ContractAlly,
-  conditions: string[] = []
-): boolean {
-  if (ally.availability.type === AllyAvailability.SEMPRE_DISPONIVEL) {
-    return true;
-  }
-
-  if (ally.availability.type === AllyAvailability.CONDICIONAL) {
-    return (
-      ally.availability.conditions?.every((condition) =>
-        conditions.includes(condition)
-      ) ?? false
-    );
-  }
-
-  return false;
-}
-
-/**
- * Calcula valor total de recompensas adicionais
- */
-export function calculateAdditionalRewardsValue(
-  rewards: ContractReward[]
-): number {
-  return rewards.reduce(
-    (total, reward) => total + reward.value.estimatedGoldValue,
-    0
-  );
+export function validateTwist(data: unknown): Twist {
+  return TwistSchema.parse(data);
 }
