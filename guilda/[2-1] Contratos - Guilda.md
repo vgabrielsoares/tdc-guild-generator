@@ -382,7 +382,7 @@ Os contratantes podem optar por fazer um pagamento antecipado à guilda, garanti
 | 4-6   | Metade com a guilda, metade com o contratante              |
 | 7-9   | Metade com a guilda, metade, em bens, com o contratante    |
 | 10-12 | Em materiais, joias, bens ou serviços do contratante       |
-| 14-20 | Pagamento total na guilda em PO$                           |
+| 13-20 | Pagamento total na guilda em PO$                           |
 | 21+   | Pagamento total na guilda em PO$ e serviços do contratante |
 
 ## Conclusões Automáticas de Contratos
@@ -456,7 +456,7 @@ Contratos que permanecem na guilda sem serem aceitos por aventureiros não ficam
 | 3-5   | Todos foram devidamente resolvidos                                                                 |
 | 6-10  | Os de menor XP foram resolvidos                                                                    |
 | 11-12 | Contratos com as melhores Recompensas foram resolvidos                                             |
-| 13-14 | 1d6 contratos aleatórios são resolvidos                                                            |
+| 13-15 | 1d6 contratos aleatórios são resolvidos                                                            |
 | 16    | 1d4+2 contratos são assinados, porém não são resolvidos (Role a tabela Motivos para não resolução) |
 | 17-18 | 1d6+2 contratos são resolvidos                                                                     |
 | 19    | 2d6+2 contratos são resolvidos                                                                     |
