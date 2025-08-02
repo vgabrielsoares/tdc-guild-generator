@@ -319,19 +319,6 @@ export interface ContractObjective {
   category: ObjectiveCategory;
   specificObjective: string;
   description: string;
-  targetName?: string;
-  targetLocation?: string;
-  urgencyLevel: "Baixa" | "Média" | "Alta" | "Crítica";
-  isSecretMission: boolean;
-
-  // Especificações adicionais baseadas no tipo
-  specifications: {
-    minimumPartySize?: number;
-    requiredSkills?: string[];
-    forbiddenActions?: string[];
-    specialEquipment?: string[];
-    timeWindow?: string;
-  };
 }
 
 // ===== LOCALIDADES DO CONTRATO =====
@@ -384,34 +371,6 @@ export interface ContractLocation {
   specificLocation: string;
   name: string;
   description: string;
-
-  // Características da localidade
-  characteristics: {
-    dangerLevel: "Seguro" | "Baixo" | "Moderado" | "Alto" | "Extremo";
-    accessibility: "Fácil" | "Moderado" | "Difícil" | "Muito difícil";
-    population:
-      | "Desabitado"
-      | "Pouco habitado"
-      | "Moderado"
-      | "Povoado"
-      | "Densamente povoado";
-    civilizationLevel: "Primitivo" | "Rural" | "Civilizado" | "Avançado";
-  };
-
-  // Modificadores específicos da localidade
-  modifiers: {
-    experienceBonus: number;
-    rewardModifier: number;
-    difficultyIncrease: number;
-  };
-
-  // Informações de viagem
-  travel: {
-    distanceInHexes: number;
-    estimatedTravelTime: string;
-    transportRequired: boolean;
-    specialRequirements?: string[];
-  };
 }
 
 // ===== ANTAGONISTAS =====
@@ -732,23 +691,12 @@ export interface Twist {
 
 // ===== SCHEMAS ZOD PARA VALIDAÇÃO =====
 
-export const ObjectiveSpecificationsSchema = z.object({
-  minimumPartySize: z.number().optional(),
-  requiredSkills: z.array(z.string()).optional(),
-  forbiddenActions: z.array(z.string()).optional(),
-  specialEquipment: z.array(z.string()).optional(),
-  timeWindow: z.string().optional(),
-});
-
 export const ContractObjectiveSchema = z.object({
   category: z.nativeEnum(ObjectiveCategory),
   specificObjective: z.string(),
   description: z.string(),
   targetName: z.string().optional(),
   targetLocation: z.string().optional(),
-  urgencyLevel: z.enum(["Baixa", "Média", "Alta", "Crítica"]),
-  isSecretMission: z.boolean(),
-  specifications: ObjectiveSpecificationsSchema,
 });
 
 export const LocationCharacteristicsSchema = z.object({
