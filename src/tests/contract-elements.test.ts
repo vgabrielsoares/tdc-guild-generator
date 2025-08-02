@@ -13,7 +13,7 @@ import {
   // Enums de Antagonistas
   AntagonistCategory,
   HumanoidAntagonist,
-  BeastAntagonist,
+  ImminentDangerAntagonist,
 
   // Enums de Complicações
   ComplicationCategory,
@@ -39,7 +39,6 @@ import {
   validateContractReward,
 
   // Funções utilitárias
-  calculateAntagonistXpModifier,
   calculateComplicationDifficultyModifier,
   isAllyAvailable,
   calculateAdditionalRewardsValue,
@@ -206,62 +205,32 @@ describe("Contract Elements - Issue 4.2", () => {
   describe("Antagonist", () => {
     it("should validate a complete antagonist successfully", () => {
       const antagonist: Antagonist = {
-        category: AntagonistCategory.HUMANOIDE,
-        specificType: HumanoidAntagonist.BANDIDOS,
+        category: AntagonistCategory.HUMANOIDE_PODEROSO,
+        specificType: HumanoidAntagonist.MERCENARIO_ASSASSINO,
         name: "Gangue do Corvo Negro",
         description: "Um grupo de bandidos que assola as estradas comerciais",
-        combat: {
-          challengeRating: "3",
-          estimatedXpValue: 700,
-          primaryThreat: "Físico",
-          specialAbilities: ["Emboscada", "Tiro certeiro"],
-        },
-        motivation: {
-          primary: "Ganância",
-          secondary: "Vingança contra mercadores",
-          relationToObjective: "Direto",
-        },
-        tactics: {
-          preferredApproach: "Emboscada",
-          advantageConditions: ["Terreno familiar", "Superioridade numérica"],
-          weaknesses: ["Covardia quando em desvantagem", "Brigas internas"],
-        },
-        resources: {
-          followers: 8,
-          equipment: ["Arcos", "Cavalos", "Armaduras de couro"],
-          territory: "Floresta dos Sussurros",
-          allies: ["Contrabandistas locais"],
-        },
       };
 
       expect(() => validateAntagonist(antagonist)).not.toThrow();
-      expect(antagonist.category).toBe(AntagonistCategory.HUMANOIDE);
-      expect(antagonist.combat.challengeRating).toBe("3");
+      expect(antagonist.category).toBe(AntagonistCategory.HUMANOIDE_PODEROSO);
+      expect(antagonist.name).toBe("Gangue do Corvo Negro");
+      expect(antagonist.description).toContain("bandidos");
     });
 
     it("should calculate XP modifier correctly", () => {
       const antagonist: Antagonist = {
-        category: AntagonistCategory.BESTA,
-        specificType: BeastAntagonist.URSOS,
+        category: AntagonistCategory.PERIGO_IMINENTE,
+        specificType: ImminentDangerAntagonist.ANIMAIS_SELVAGENS,
         name: "Urso Pardo Territorial",
         description: "Um urso grande e agressivo",
-        combat: {
-          challengeRating: "2",
-          estimatedXpValue: 450,
-          primaryThreat: "Físico",
-        },
-        motivation: {
-          primary: "Território",
-          relationToObjective: "Indireto",
-        },
-        tactics: {
-          preferredApproach: "Confronto direto",
-        },
-        resources: {},
       };
 
-      const xpModifier = calculateAntagonistXpModifier(antagonist);
-      expect(xpModifier).toBe(450);
+      expect(antagonist.name).toBe("Urso Pardo Territorial");
+      expect(antagonist.category).toBe(AntagonistCategory.PERIGO_IMINENTE);
+      expect(antagonist.specificType).toBe(
+        ImminentDangerAntagonist.ANIMAIS_SELVAGENS
+      );
+      expect(antagonist.description).toContain("urso");
     });
   });
 
@@ -489,7 +458,8 @@ describe("Contract Elements - Issue 4.2", () => {
       // Teste de compilação - se este código compilar, os tipos estão corretos
       const objective: ObjectiveCategory = ObjectiveCategory.ESCOLTA;
       const location: LocationCategory = LocationCategory.URBANO;
-      const antagonist: AntagonistCategory = AntagonistCategory.HUMANOIDE;
+      const antagonist: AntagonistCategory =
+        AntagonistCategory.HUMANOIDE_PODEROSO;
       const complication: ComplicationCategory = ComplicationCategory.TEMPO;
       const ally: AllyCategory = AllyCategory.INFORMANTE;
       const reward: RewardCategory = RewardCategory.EQUIPAMENTO;
