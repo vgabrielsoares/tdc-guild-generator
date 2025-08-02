@@ -690,15 +690,6 @@ export class ContractGenerator {
       category: ObjectiveCategory.ELIMINACAO, // Usar enum padrão por enquanto
       specificObjective: specification.target,
       description: specification.description,
-      urgencyLevel: this.generateUrgencyLevel(),
-      isSecretMission: Math.random() < 0.1, // 10% chance de ser missão secreta
-      specifications: {
-        minimumPartySize: this.generateMinimumPartySize(),
-        requiredSkills: this.generateRequiredSkills(category),
-        forbiddenActions: this.generateForbiddenActions(),
-        specialEquipment: this.generateSpecialEquipment(category),
-        timeWindow: this.generateTimeWindow(),
-      },
     };
   }
 
@@ -847,212 +838,237 @@ export class ContractGenerator {
     return { target: "Cerimônia especial", description: "Participar ou proteger ritual importante" };
   }
 
-  // Métodos auxiliares para gerar características do objetivo
-  private static generateUrgencyLevel(): "Baixa" | "Média" | "Alta" | "Crítica" {
-    const roll = Math.random();
-    if (roll < 0.4) return "Baixa";
-    if (roll < 0.7) return "Média";
-    if (roll < 0.9) return "Alta";
-    return "Crítica";
-  }
-
-  private static generateMinimumPartySize(): number {
-    return Math.floor(Math.random() * 4) + 1; // 1-4 pessoas
-  }
-
-  private static generateRequiredSkills(category: string): string[] {
-    const skillsByCategory: Record<string, string[]> = {
-      "Atacar ou destruir": ["Combate", "Táticas"],
-      "Encontrar ou recuperar": ["Investigação", "Rastreamento"],
-      "Capturar": ["Combate não-letal", "Intimidação"],
-      "Proteger ou salvar": ["Vigilância", "Primeiros socorros"],
-      "Explorar ou descobrir": ["Sobrevivência", "Navegação"],
-      "Entregar ou receber": ["Viagem", "Diplomacia"],
-      "Investigar ou sabotar": ["Furtividade", "Investigação"],
-      "Serviços perigosos": ["Especialização específica"],
-      "Religioso": ["Conhecimento religioso"],
-    };
-    
-    return skillsByCategory[category] || ["Habilidades gerais"];
-  }
-
-  private static generateForbiddenActions(): string[] {
-    const forbidden = ["Sem mortes", "Discrição total", "Sem magia", "Sem violência"];
-    const count = Math.floor(Math.random() * 3);
-    return forbidden.slice(0, count);
-  }
-
-  private static generateSpecialEquipment(category: string): string[] {
-    const equipmentByCategory: Record<string, string[]> = {
-      "Atacar ou destruir": ["Armas especiais"],
-      "Encontrar ou recuperar": ["Equipamento de rastreamento"],
-      "Capturar": ["Redes", "Cordas"],
-      "Proteger ou salvar": ["Armaduras", "Escudos"],
-      "Explorar ou descobrir": ["Equipamento de exploração"],
-      "Entregar ou receber": ["Veículo"],
-      "Investigar ou sabotar": ["Ferramentas de espionagem"],
-      "Serviços perigosos": ["Equipamento especializado"],
-      "Religioso": ["Símbolos sagrados"],
-    };
-    
-    return equipmentByCategory[category] || [];
-  }
-
-  private static generateTimeWindow(): string {
-    const windows = ["Durante o dia", "Durante a noite", "Em lua nova", "Em festivais", "Em qualquer momento"];
-    return windows[Math.floor(Math.random() * windows.length)];
-  }
-
   /**
    * Gera localidade do contrato seguindo as regras do markdown
    */
   private static generateLocation(): ContractLocation {
-    // Rolar tipo de localidade (1d20)
+    // 1. Rolar localidade principal (1d20)
     const locationRoll = rollDice({ notation: "1d20" }).result;
     
-    let specificLocation: string;
-    let name: string;
-    let description: string;
+    let mainLocation: string;
     
-    if (locationRoll <= 5) {
-      const urban = this.generateUrbanLocation();
-      specificLocation = urban.type;
-      name = urban.name;
-      description = urban.description;
-    } else if (locationRoll <= 10) {
-      const rural = this.generateRuralLocation();
-      specificLocation = rural.type;
-      name = rural.name;
-      description = rural.description;
-    } else if (locationRoll <= 15) {
-      const wild = this.generateWildLocation();
-      specificLocation = wild.type;
-      name = wild.name;
-      description = wild.description;
+    if (locationRoll <= 4) {
+      mainLocation = "Cidade grande";
+    } else if (locationRoll <= 9) {
+      mainLocation = "Ruínas ou masmorras";
+    } else if (locationRoll <= 12) {
+      mainLocation = "Região selvagem";
+    } else if (locationRoll <= 14) {
+      mainLocation = "Lugar isolado";
+    } else if (locationRoll <= 17) {
+      mainLocation = "Zona rural";
+    } else if (locationRoll === 18) {
+      mainLocation = "Localidade exótica";
+    } else if (locationRoll === 19) {
+      mainLocation = "Profundezas";
     } else {
-      const underground = this.generateUndergroundLocation();
-      specificLocation = underground.type;
-      name = underground.name;
-      description = underground.description;
+      mainLocation = "Terras mórbidas";
     }
+
+    // 2. Gerar especificação baseada na localidade principal
+    const specification = this.generateLocationSpecification(mainLocation);
 
     return {
       category: LocationCategory.URBANO, // Usar enum padrão por enquanto
-      specificLocation,
-      name,
-      description,
-      characteristics: {
-        dangerLevel: this.generateDangerLevel(),
-        accessibility: this.generateAccessibility(),
-        population: this.generatePopulationLevel(),
-        civilizationLevel: this.generateCivilizationLevel(),
-      },
-      modifiers: {
-        experienceBonus: this.generateExperienceBonus(),
-        rewardModifier: this.generateRewardModifier(),
-        difficultyIncrease: this.generateDifficultyIncrease(),
-      },
-      travel: {
-        distanceInHexes: this.generateDistance(),
-        estimatedTravelTime: this.generateTravelTime(),
-        transportRequired: Math.random() < 0.3,
-        specialRequirements: this.generateSpecialRequirements(),
-      },
+      specificLocation: specification.specific,
+      name: specification.name,
+      description: `${mainLocation}: ${specification.specific}`,
     };
   }
 
-  private static generateUrbanLocation(): { type: string; name: string; description: string } {
-    const types = [
-      { type: "Taverna local", name: "A Candeia Dourada", description: "Uma taverna movimentada no centro da cidade" },
-      { type: "Mansão de nobre", name: "Solar dos Corvos", description: "Residência aristocrática nos altos da cidade" },
-      { type: "Distrito pobre", name: "Quarteirão da Lama", description: "Área carente com becos estreitos" },
-      { type: "Mercado", name: "Praça do Comércio", description: "Centro comercial com dezenas de bancas" },
-      { type: "Templo", name: "Catedral da Luz", description: "Grande templo dedicado às divindades locais" },
-    ];
-    return types[Math.floor(Math.random() * types.length)];
+  /**
+   * Gera especificação de localidade baseada no tipo principal
+   */
+  private static generateLocationSpecification(mainLocation: string): { specific: string; name: string } {
+    const specRoll = rollDice({ notation: "1d20" }).result;
+    
+    switch (mainLocation) {
+      case "Cidade grande":
+        return this.generateCidadeGrandeSpec(specRoll);
+      case "Ruínas ou masmorras":
+        return this.generateRuinasMasmorrasSpec(specRoll);
+      case "Região selvagem":
+        return this.generateRegiaoSelvagemSpec(specRoll);
+      case "Lugar isolado":
+        return this.generateLugarIsoladoSpec(specRoll);
+      case "Zona rural":
+        return this.generateZonaRuralSpec(specRoll);
+      case "Localidade exótica":
+        return this.generateLocalidadeExoticaSpec(specRoll);
+      case "Profundezas":
+        return this.generateProfundezasSpec(specRoll);
+      case "Terras mórbidas":
+        return this.generateTerrasMorbidasSpec(specRoll);
+      default:
+        return { specific: "Local indefinido", name: "Local Desconhecido" };
+    }
   }
 
-  private static generateRuralLocation(): { type: string; name: string; description: string } {
-    const types = [
-      { type: "Fazenda isolada", name: "Fazenda Pedraverde", description: "Propriedade rural distante do centro" },
-      { type: "Vila pequena", name: "Vilarejo do Riacho", description: "Pequena comunidade rural" },
-      { type: "Estrada comercial", name: "Rota dos Mercadores", description: "Estrada principal entre cidades" },
-      { type: "Ponte importante", name: "Ponte dos Dois Rios", description: "Travessia estratégica sobre o rio" },
-      { type: "Moinhos", name: "Moinhos do Vento Sul", description: "Complexo de moinhos na colina" },
-    ];
-    return types[Math.floor(Math.random() * types.length)];
+  // Métodos para gerar especificações por tipo de localidade (seguindo exatamente as tabelas do .md)
+  private static generateCidadeGrandeSpec(roll: number): { specific: string; name: string } {
+    if (roll === 1) return { specific: "Esgotos/subterrâneo da cidade", name: "Esgotos da Cidade" };
+    if (roll === 2) return { specific: "Na moradia do líder local", name: "Palácio do Governante" };
+    if (roll <= 4) return { specific: "Em um distrito específico", name: "Distrito da Cidade" };
+    if (roll === 5) return { specific: "Casarão nobre", name: "Mansão Nobre" };
+    if (roll === 6) return { specific: "Em uma das tavernas", name: "Taverna Local" };
+    if (roll === 7) return { specific: "Templo local", name: "Templo da Cidade" };
+    if (roll === 8) return { specific: "Local de recuperação de enfermos", name: "Hospital" };
+    if (roll === 9) return { specific: "Construção/local icônico", name: "Marco da Cidade" };
+    if (roll === 10) return { specific: "Centro de treinamento/estudos", name: "Academia" };
+    if (roll <= 12) return { specific: "Submundo urbano", name: "Área Criminosa" };
+    if (roll <= 14) return { specific: "Cemitério ou cripta", name: "Necrópole" };
+    if (roll === 15) return { specific: "Mercado ou praça central", name: "Praça Central" };
+    if (roll === 16) return { specific: "Quartel ou posto de guarda", name: "Quartel" };
+    if (roll === 17) return { specific: "Área portuária ou entrada da cidade", name: "Portões da Cidade" };
+    if (roll === 18) return { specific: "Armazém ou depósito", name: "Armazéns" };
+    if (roll === 19) return { specific: "Torre ou fortificação", name: "Torre de Guarda" };
+    return { specific: "Múltiplos locais na cidade", name: "Vários Locais" };
   }
 
-  private static generateWildLocation(): { type: string; name: string; description: string } {
-    const types = [
-      { type: "Floresta densa", name: "Mata do Eco Sombrio", description: "Floresta fechada com árvores centenárias" },
-      { type: "Montanhas", name: "Picos da Névoa", description: "Cadeia montanhosa de difícil acesso" },
-      { type: "Pântano", name: "Charco das Almas", description: "Área alagadiça perigosa e misteriosa" },
-      { type: "Deserto", name: "Areias Vermelhas", description: "Vasta extensão de dunas ardentes" },
-      { type: "Cavernas", name: "Gruta dos Cristais", description: "Sistema de cavernas naturais" },
-    ];
-    return types[Math.floor(Math.random() * types.length)];
+  private static generateRuinasMasmorrasSpec(roll: number): { specific: string; name: string } {
+    if (roll === 1) return { specific: "Complexo de cavernas", name: "Cavernas Antigas" };
+    if (roll === 2) return { specific: "Assentamento humanoide", name: "Ruínas de Vila" };
+    if (roll <= 4) return { specific: "Torre/fortaleza esquecida", name: "Torre Arruinada" };
+    if (roll === 5) return { specific: "Labirinto", name: "Labirinto Perdido" };
+    if (roll <= 7) return { specific: "Mina abandonada", name: "Minas Desertas" };
+    if (roll === 8) return { specific: "Calabouço arruinado", name: "Prisão Antiga" };
+    if (roll === 9) return { specific: "Tumba de um antigo Rei", name: "Sepulcro Real" };
+    if (roll === 10) return { specific: "Estrutura soterrada/inundada", name: "Estrutura Submersa" };
+    if (roll === 11) return { specific: "Ilha amaldiçoada", name: "Ilha Maldita" };
+    if (roll <= 14) return { specific: "Masmorra", name: "Masmorra Profunda" };
+    if (roll === 15) return { specific: "Encontradas em um distrito específico", name: "Ruínas Urbanas" };
+    if (roll <= 17) return { specific: "Templo em ruínas", name: "Templo Abandonado" };
+    if (roll === 18) return { specific: "Prisão ou cativeiro antigo", name: "Cárcere Antigo" };
+    if (roll === 19) return { specific: "Cidade subterrânea perdida", name: "Cidade Subterrânea" };
+    return { specific: "Múltiplas ruínas", name: "Complexo de Ruínas" };
   }
 
-  private static generateUndergroundLocation(): { type: string; name: string; description: string } {
-    const types = [
-      { type: "Esgotos", name: "Canais Subterrâneos", description: "Sistema de drenagem da cidade" },
-      { type: "Catacumbas", name: "Túmulos Ancestrais", description: "Cemitério subterrâneo antigo" },
-      { type: "Minas", name: "Poços de Ferro", description: "Minas abandonadas nas montanhas" },
-      { type: "Túneis", name: "Passagens Secretas", description: "Rede de túneis sob a cidade" },
-      { type: "Masmorra", name: "Prisões Esquecidas", description: "Calabouços em ruínas" },
-    ];
-    return types[Math.floor(Math.random() * types.length)];
+  private static generateRegiaoSelvagemSpec(roll: number): { specific: string; name: string } {
+    if (roll === 1) return { specific: "Floresta/bosque", name: "Floresta Densa" };
+    if (roll === 2) return { specific: "Deserto escaldante", name: "Deserto Árido" };
+    if (roll === 3) return { specific: "Pântano viscoso", name: "Pântano Perigoso" };
+    if (roll === 4) return { specific: "Complexo de cavernas", name: "Cavernas Selvagens" };
+    if (roll === 5) return { specific: "Tundra esquecida", name: "Tundra Gelada" };
+    if (roll === 6) return { specific: "Montanhas sinuosas", name: "Cordilheira" };
+    if (roll === 7) return { specific: "Savana/descampado/pradaria", name: "Planícies Abertas" };
+    if (roll === 8) return { specific: "Desfiladeiro/ravina mortal", name: "Desfiladeiro" };
+    if (roll === 9) return { specific: "Região vulcânica", name: "Terras Vulcânicas" };
+    if (roll === 10) return { specific: "Cânions profundos", name: "Cânions" };
+    if (roll === 11) return { specific: "Região costeira perigosa", name: "Costa Selvagem" };
+    if (roll === 12) return { specific: "Platô isolado", name: "Platô Remoto" };
+    if (roll === 13) return { specific: "Estepe gelada", name: "Estepe Congelada" };
+    if (roll === 14) return { specific: "Selva densa e hostil", name: "Selva Perigosa" };
+    if (roll === 15) return { specific: "Território de geysers e fontes termais", name: "Campos Geotérmicos" };
+    if (roll === 16) return { specific: "Planície alagada", name: "Terras Alagadas" };
+    if (roll === 17) return { specific: "Penhasco gélido", name: "Penhascos Gelados" };
+    if (roll === 18) return { specific: "Oásis oculto", name: "Oásis Secreto" };
+    if (roll === 19) return { specific: "Colinas traiçoeiras", name: "Colinas Perigosas" };
+    return { specific: "Múltiplas regiões selvagens", name: "Territórios Selvagens" };
   }
 
-  // Métodos auxiliares para características da localidade
-  private static generateDangerLevel(): "Seguro" | "Baixo" | "Moderado" | "Alto" | "Extremo" {
-    const levels: Array<"Seguro" | "Baixo" | "Moderado" | "Alto" | "Extremo"> = ["Seguro", "Baixo", "Moderado", "Alto", "Extremo"];
-    return levels[Math.floor(Math.random() * levels.length)];
+  private static generateLugarIsoladoSpec(roll: number): { specific: string; name: string } {
+    if (roll === 1) return { specific: "Região não mapeada ou inexplorada", name: "Terra Desconhecida" };
+    if (roll === 2) return { specific: "Monastério", name: "Monastério Isolado" };
+    if (roll === 3) return { specific: "Fortaleza distante", name: "Forte Remoto" };
+    if (roll === 4) return { specific: "Torre de um arcanista", name: "Torre do Mago" };
+    if (roll === 5) return { specific: "Floresta densa", name: "Mata Fechada" };
+    if (roll === 6) return { specific: "Covil de uma criatura rara", name: "Covil da Criatura" };
+    if (roll === 7) return { specific: "Ilha exótica", name: "Ilha Misteriosa" };
+    if (roll === 8) return { specific: "Posto avançado em zona de conflito", name: "Posto de Guerra" };
+    if (roll === 9) return { specific: "Engenhoca monumental", name: "Máquina Antiga" };
+    if (roll === 10) return { specific: "Masmorra inóspita", name: "Masmorra Perigosa" };
+    if (roll === 11) return { specific: "Vale oculto entre montanhas", name: "Vale Secreto" };
+    if (roll === 12) return { specific: "Caverna de difícil acesso", name: "Gruta Inacessível" };
+    if (roll === 13) return { specific: "Refúgio subterrâneo", name: "Abrigo Subterrâneo" };
+    if (roll === 14) return { specific: "Pico nevado isolado", name: "Pico Isolado" };
+    if (roll === 15) return { specific: "Penhasco ou abismo remoto", name: "Abismo Remoto" };
+    if (roll === 16) return { specific: "Minas desativadas", name: "Minas Abandonadas" };
+    if (roll === 17) return { specific: "Poço profundo no deserto", name: "Poço do Deserto" };
+    if (roll === 18) return { specific: "Vila eremita ou de exilados", name: "Vila dos Exilados" };
+    if (roll === 19) return { specific: "Santuário natural protegido", name: "Santuário Natural" };
+    return { specific: "Múltiplos locais isolados", name: "Locais Remotos" };
   }
 
-  private static generateAccessibility(): "Fácil" | "Moderado" | "Difícil" | "Muito difícil" {
-    const levels: Array<"Fácil" | "Moderado" | "Difícil" | "Muito difícil"> = ["Fácil", "Moderado", "Difícil", "Muito difícil"];
-    return levels[Math.floor(Math.random() * levels.length)];
+  private static generateZonaRuralSpec(roll: number): { specific: string; name: string } {
+    if (roll <= 2) return { specific: "Pequena aldeia", name: "Aldeia Rural" };
+    if (roll === 3) return { specific: "Vilarejo desprotegido", name: "Vila Indefesa" };
+    if (roll === 4) return { specific: "Grande plantação/vinhedo", name: "Plantação" };
+    if (roll === 5) return { specific: "Lugarejo", name: "Lugarejo Simples" };
+    if (roll === 6) return { specific: "Povoado humilde", name: "Povoado Pobre" };
+    if (roll === 7) return { specific: "Fazenda", name: "Fazenda Rural" };
+    if (roll === 8) return { specific: "Comunidade itinerante", name: "Acampamento Nômade" };
+    if (roll === 9) return { specific: "Celeiro/moinho/estábulo", name: "Instalação Agrícola" };
+    if (roll === 10) return { specific: "Criadouro/abatedouro", name: "Criação de Animais" };
+    if (roll === 11) return { specific: "Pousada isolada", name: "Estalagem Rural" };
+    if (roll === 12) return { specific: "Campo de cultivo", name: "Campos de Plantio" };
+    if (roll === 13) return { specific: "Mercado rural", name: "Feira Rural" };
+    if (roll === 14) return { specific: "Capela ou santuário na natureza", name: "Capela Rural" };
+    if (roll === 15) return { specific: "Escola ou posto em um campo", name: "Posto Rural" };
+    if (roll === 16) return { specific: "Oficina rural", name: "Oficina do Campo" };
+    if (roll === 17) return { specific: "Armazém de grãos", name: "Celeiro de Grãos" };
+    if (roll === 18) return { specific: "Área de pastagem", name: "Pastagens" };
+    return { specific: "Múltiplas áreas rurais", name: "Região Rural" };
   }
 
-  private static generatePopulationLevel(): "Desabitado" | "Pouco habitado" | "Moderado" | "Povoado" | "Densamente povoado" {
-    const levels: Array<"Desabitado" | "Pouco habitado" | "Moderado" | "Povoado" | "Densamente povoado"> = 
-      ["Desabitado", "Pouco habitado", "Moderado", "Povoado", "Densamente povoado"];
-    return levels[Math.floor(Math.random() * levels.length)];
+  private static generateLocalidadeExoticaSpec(roll: number): { specific: string; name: string } {
+    if (roll <= 2) return { specific: "Plano feérico", name: "Reino das Fadas" };
+    if (roll === 3) return { specific: "Dentro de um objeto pequeno", name: "Espaço Extradimensional" };
+    if (roll <= 6) return { specific: "Floresta mágica", name: "Floresta Encantada" };
+    if (roll === 7) return { specific: "Plano elemental", name: "Plano Elemental" };
+    if (roll === 8) return { specific: "Dentro de uma criatura", name: "Interior de Criatura" };
+    if (roll <= 10) return { specific: "Pirâmide/zigurate", name: "Pirâmide Antiga" };
+    if (roll === 11) return { specific: "Assentamento submarino", name: "Cidade Submarina" };
+    if (roll === 12) return { specific: "Plano astral", name: "Plano Astral" };
+    if (roll === 13) return { specific: "Abismo ou Inferno", name: "Planos Infernais" };
+    if (roll === 14) return { specific: "Umbra", name: "Plano Sombrio" };
+    if (roll === 15) return { specific: "Labirinto dimensional", name: "Labirinto Planar" };
+    if (roll === 16) return { specific: "Cidade voadora", name: "Cidade Flutuante" };
+    if (roll === 17) return { specific: "Ilha flutuante", name: "Ilha Voadora" };
+    if (roll === 18) return { specific: "Biblioteca infinita", name: "Biblioteca Eterna" };
+    if (roll === 19) return { specific: "Santuário cristalino", name: "Templo de Cristal" };
+    return { specific: "Múltiplas localidades exóticas", name: "Locais Mágicos" };
   }
 
-  private static generateCivilizationLevel(): "Primitivo" | "Rural" | "Civilizado" | "Avançado" {
-    const levels: Array<"Primitivo" | "Rural" | "Civilizado" | "Avançado"> = ["Primitivo", "Rural", "Civilizado", "Avançado"];
-    return levels[Math.floor(Math.random() * levels.length)];
+  private static generateProfundezasSpec(roll: number): { specific: string; name: string } {
+    if (roll === 1) return { specific: "Complexo de cavernas", name: "Cavernas Profundas" };
+    if (roll === 2) return { specific: "Despenhadeiro", name: "Abismo Rochoso" };
+    if (roll === 3) return { specific: "Ravina subterrânea", name: "Fenda Subterrânea" };
+    if (roll === 4) return { specific: "Fossa abissal", name: "Poço Abissal" };
+    if (roll <= 6) return { specific: "Tumba esquecida", name: "Sepulcro Antigo" };
+    if (roll <= 8) return { specific: "Cripta", name: "Cripta Subterrânea" };
+    if (roll <= 10) return { specific: "Assentamento de humanoides", name: "Cidade das Profundezas" };
+    if (roll === 11) return { specific: "Fenda submarina", name: "Abismo Submarino" };
+    if (roll === 12) return { specific: "Cemitério de monstruosidades", name: "Cemitério dos Monstros" };
+    if (roll === 13) return { specific: "Labirinto", name: "Labirinto Subterrâneo" };
+    if (roll <= 15) return { specific: "Mina abandonada", name: "Minas Profundas" };
+    if (roll === 16) return { specific: "Sistema de túneis", name: "Rede de Túneis" };
+    if (roll === 17) return { specific: "Gruta submersa", name: "Caverna Inundada" };
+    if (roll === 18) return { specific: "Câmaras secretas", name: "Câmaras Ocultas" };
+    if (roll === 19) return { specific: "Prisão subterrânea", name: "Calabouço Profundo" };
+    return { specific: "Múltiplas profundezas", name: "Complexo Subterrâneo" };
   }
 
-  private static generateExperienceBonus(): number {
-    return Math.floor(Math.random() * 21); // 0-20
-  }
-
-  private static generateRewardModifier(): number {
-    return Math.floor(Math.random() * 41) - 20; // -20 a +20
-  }
-
-  private static generateDifficultyIncrease(): number {
-    return Math.floor(Math.random() * 11); // 0-10
-  }
-
-  private static generateDistance(): number {
-    return Math.floor(Math.random() * 20) + 1; // 1-20 hexes
-  }
-
-  private static generateTravelTime(): string {
-    const times = ["1 dia", "2-3 dias", "1 semana", "2 semanas", "1 mês"];
-    return times[Math.floor(Math.random() * times.length)];
-  }
-
-  private static generateSpecialRequirements(): string[] {
-    const requirements = ["Guia local", "Equipamento especial", "Autorização", "Suprimentos extras"];
-    const count = Math.floor(Math.random() * 3);
-    return requirements.slice(0, count);
-  }
+  private static generateTerrasMorbidasSpec(roll: number): { specific: string; name: string } {
+    if (roll === 1) return { specific: "Cemitério esquecido", name: "Necrópole Abandonada" };
+    if (roll === 2) return { specific: "Catacumbas", name: "Catacumbas Antigas" };
+    if (roll === 3) return { specific: "Templo profanado", name: "Templo Corrompido" };
+    if (roll === 4) return { specific: "Campo de batalha devastado", name: "Campo de Guerra" };
+    if (roll === 5) return { specific: "Zona morta", name: "Terras Mortas" };
+    if (roll === 6) return { specific: "Vales rúnicos", name: "Vale das Runas" };
+    if (roll === 7) return { specific: "Assentamento próximo", name: "Vila Amaldiçoada" };
+    if (roll === 8) return { specific: "Ruína maldita", name: "Ruínas Malditas" };
+    if (roll === 9) return { specific: "Covil monstruoso", name: "Covil do Horror" };
+    if (roll === 10) return { specific: "Pântano sombrio", name: "Charco Sombrio" };
+    if (roll === 11) return { specific: "Terra amaldiçoada", name: "Solo Amaldiçoado" };
+    if (roll === 12) return { specific: "Floresta necrótica", name: "Mata Morta" };
+    if (roll === 13) return { specific: "Deserto de ossos", name: "Deserto Ósseo" };
+    if (roll === 14) return { specific: "Lago venenoso", name: "Lago Tóxico" };
+    if (roll === 15) return { specific: "Montanha assombrada", name: "Monte Assombrado" };
+    if (roll === 16) return { specific: "Cidade fantasma", name: "Cidade Espectral" };
+    if (roll === 17) return { specific: "Bosque corrompido", name: "Bosque Corrompido" };
+    if (roll <= 19) return { specific: "Floresta assombrada", name: "Floresta dos Mortos" };
+    return { specific: "Múltiplas terras mórbidas", name: "Região Amaldiçoada" };
+}
 
   /**
    * Gera pré-requisitos seguindo as tabelas do markdown
