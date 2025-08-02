@@ -1,9 +1,14 @@
 import type { TableEntry } from "@/types/tables";
-import { ContractResolution, FailureReason, PaymentType } from "@/types/contract";
+import { ContractResolution, FailureReason } from "@/types/contract";
 
-// ===== TABELAS DE MODIFICADORES DE CONTRATOS =====
-
-// Implementa modificadores avançados, resolução automática e ciclo de vida de contratos
+/**
+ * Tabelas de Modificadores de Contratos - Ciclo de Vida e Resolução Automática
+ *
+ * Este arquivo contém as funcionalidades específicas para:
+ * - Modificadores dinâmicos baseados em valor
+ * - Resolução automática de contratos
+ * - Ciclo de vida e gestão temporal
+ */
 
 // ===== DADOS POR RESULTADO DE VALOR E RECOMPENSA =====
 
@@ -43,62 +48,6 @@ export const PAYMENT_TYPE_DICE_BY_VALUE: Record<string, ValueBasedRoll> = {
   "101+": { diceNotation: "1d20", modifier: 7 },
 };
 
-// ===== TABELA DE PRÉ-REQUISITOS (1d20) =====
-
-// Tabela de pré-requisitos para contratos
-export const CONTRACT_PREREQUISITES_TABLE: TableEntry<string>[] = [
-  { min: 1, max: 5, result: "Nenhum" },
-  { min: 6, max: 6, result: "5 de renome" },
-  { min: 7, max: 7, result: "Um conjurador" },
-  { min: 8, max: 8, result: "Proficiência com um Instrumento de Habilidade" },
-  { min: 9, max: 9, result: "Perícia treinada que envolve Força" },
-  { min: 10, max: 10, result: "10 de renome" },
-  { min: 11, max: 11, result: "Proficiência com um Idioma" },
-  { min: 12, max: 12, result: "Perícia treinada que envolve Agilidade" },
-  { min: 13, max: 13, result: "Veículo de carga (como um cavalo ou uma carroça)" },
-  { min: 14, max: 14, result: "Perícia treinada que envolve Presença" },
-  { min: 15, max: 15, result: "15 de renome" },
-  { min: 16, max: 16, result: "Perícia treinada que envolve Mente" },
-  { min: 17, max: 17, result: "Um conjurador arcano e um divino" },
-  { min: 18, max: 18, result: "Perícia treinada que envolve Influência" },
-  { min: 19, max: 19, result: "Grupo de no mínimo 6 membros" },
-  { min: 20, max: 20, result: "Ter 50 de renome" },
-  { min: 21, max: 999, result: "Role duas vezes e use ambos" },
-];
-
-// ===== TABELA DE CLÁUSULAS ADICIONAIS (1d20) =====
-
-// Tabela de cláusulas adicionais para contratos
-export const CONTRACT_CLAUSES_TABLE: TableEntry<string>[] = [
-  { min: 1, max: 7, result: "Nenhuma" },
-  { min: 8, max: 8, result: "Nenhum inimigo deve ser morto" },
-  { min: 9, max: 9, result: "Uma criatura específica não pode ser ferida" },
-  { min: 10, max: 10, result: "Um troféu é exigido" },
-  { min: 11, max: 11, result: "O objetivo deve ser concluído sem ser detectado" },
-  { min: 12, max: 12, result: "Proibido o uso de magia" },
-  { min: 13, max: 13, result: "Outro grupo tem o mesmo contrato. Apenas o primeiro a completá-lo é agraciado com a recompensa" },
-  { min: 14, max: 14, result: "Exterminar a fonte do problema" },
-  { min: 15, max: 15, result: "Um supervisor deve ser protegido e acompanhar o contratado" },
-  { min: 16, max: 16, result: "Deve ser feito em um horário específico do dia (como manhã, tarde ou noite)" },
-  { min: 17, max: 17, result: "Um relatório completo deve ser escrito ao concluir o contrato" },
-  { min: 18, max: 18, result: "Todo tesouro conquistado é de posse do contratante" },
-  { min: 19, max: 19, result: "Deve se manter a própria identidade em segredo, e/ou estar sob disfarce" },
-  { min: 20, max: 20, result: "Sigilo absoluto" },
-  { min: 21, max: 999, result: "Role duas vezes e use ambos" },
-];
-
-// ===== TABELA DE TIPO DE PAGAMENTO (1d20) =====
-
-// Tabela para determinar como será feito o pagamento do contrato
-export const CONTRACT_PAYMENT_TYPE_TABLE: TableEntry<PaymentType>[] = [
-  { min: 1, max: 3, result: PaymentType.DIRETO_CONTRATANTE },
-  { min: 4, max: 6, result: PaymentType.METADE_GUILDA_METADE_CONTRATANTE },
-  { min: 7, max: 9, result: PaymentType.METADE_GUILDA_METADE_BENS },
-  { min: 10, max: 12, result: PaymentType.BENS_SERVICOS },
-  { min: 13, max: 20, result: PaymentType.TOTAL_GUILDA },
-  { min: 21, max: 999, result: PaymentType.TOTAL_GUILDA_MAIS_SERVICOS },
-];
-
 // ===== TEMPO DE RESOLUÇÃO AUTOMÁTICA =====
 
 // Tempo para resolução de contratos firmados
@@ -132,12 +81,13 @@ export const UNSIGNED_CONTRACT_RESOLUTION_TIME_TABLE: TableEntry<string>[] = [
 // ===== RESOLUÇÃO DE CONTRATOS FIRMADOS =====
 
 // Resultado da resolução de contratos firmados por outros aventureiros
-export const SIGNED_CONTRACT_RESOLUTION_TABLE: TableEntry<ContractResolution>[] = [
-  { min: 1, max: 12, result: ContractResolution.RESOLVIDO },
-  { min: 13, max: 16, result: ContractResolution.NAO_RESOLVIDO },
-  { min: 17, max: 18, result: ContractResolution.RESOLVIDO_COM_RESSALVAS },
-  { min: 19, max: 20, result: ContractResolution.AINDA_NAO_SE_SABE },
-];
+export const SIGNED_CONTRACT_RESOLUTION_TABLE: TableEntry<ContractResolution>[] =
+  [
+    { min: 1, max: 12, result: ContractResolution.RESOLVIDO },
+    { min: 13, max: 16, result: ContractResolution.NAO_RESOLVIDO },
+    { min: 17, max: 18, result: ContractResolution.RESOLVIDO_COM_RESSALVAS },
+    { min: 19, max: 20, result: ContractResolution.AINDA_NAO_SE_SABE },
+  ];
 
 // ===== RESOLUÇÃO DE CONTRATOS NÃO ASSINADOS =====
 
@@ -148,71 +98,82 @@ interface UnsignedResolutionResult {
 }
 
 // Resultado da resolução de contratos não assinados
-export const UNSIGNED_CONTRACT_RESOLUTION_TABLE: TableEntry<UnsignedResolutionResult>[] = [
-  { 
-    min: 1, max: 2, 
-    result: { 
-      description: "Nenhum foi assinado, todos continuam disponíveis",
-      action: "keep_all"
-    } 
-  },
-  { 
-    min: 3, max: 5, 
-    result: { 
-      description: "Todos foram devidamente resolvidos",
-      action: "resolve_all"
-    } 
-  },
-  { 
-    min: 6, max: 10, 
-    result: { 
-      description: "Os de menor XP foram resolvidos",
-      action: "resolve_lowest_xp"
-    } 
-  },
-  { 
-    min: 11, max: 12, 
-    result: { 
-      description: "Contratos com as melhores Recompensas foram resolvidos",
-      action: "resolve_highest_reward"
-    } 
-  },
-  { 
-    min: 13, max: 15, 
-    result: { 
-      description: "1d6 contratos aleatórios são resolvidos",
-      action: "resolve_random_1d6"
-    } 
-  },
-  { 
-    min: 16, max: 16, 
-    result: { 
-      description: "1d4+2 contratos são assinados, porém não são resolvidos",
-      action: "sign_but_not_resolve_1d4plus2"
-    } 
-  },
-  { 
-    min: 17, max: 18, 
-    result: { 
-      description: "1d6+2 contratos são resolvidos",
-      action: "resolve_1d6plus2"
-    } 
-  },
-  { 
-    min: 19, max: 19, 
-    result: { 
-      description: "2d6+2 contratos são resolvidos",
-      action: "resolve_2d6plus2"
-    } 
-  },
-  { 
-    min: 20, max: 20, 
-    result: { 
-      description: "Nenhum foi assinado, e há algum motivo estranho para isso",
-      action: "strange_reason"
-    } 
-  },
-];
+export const UNSIGNED_CONTRACT_RESOLUTION_TABLE: TableEntry<UnsignedResolutionResult>[] =
+  [
+    {
+      min: 1,
+      max: 2,
+      result: {
+        description: "Nenhum foi assinado, todos continuam disponíveis",
+        action: "keep_all",
+      },
+    },
+    {
+      min: 3,
+      max: 5,
+      result: {
+        description: "Todos foram devidamente resolvidos",
+        action: "resolve_all",
+      },
+    },
+    {
+      min: 6,
+      max: 10,
+      result: {
+        description: "Os de menor XP foram resolvidos",
+        action: "resolve_lowest_xp",
+      },
+    },
+    {
+      min: 11,
+      max: 12,
+      result: {
+        description: "Contratos com as melhores Recompensas foram resolvidos",
+        action: "resolve_highest_reward",
+      },
+    },
+    {
+      min: 13,
+      max: 15,
+      result: {
+        description: "1d6 contratos aleatórios são resolvidos",
+        action: "resolve_random_1d6",
+      },
+    },
+    {
+      min: 16,
+      max: 16,
+      result: {
+        description: "1d4+2 contratos são assinados, porém não são resolvidos",
+        action: "sign_but_not_resolve_1d4plus2",
+      },
+    },
+    {
+      min: 17,
+      max: 18,
+      result: {
+        description: "1d6+2 contratos são resolvidos",
+        action: "resolve_1d6plus2",
+      },
+    },
+    {
+      min: 19,
+      max: 19,
+      result: {
+        description: "2d6+2 contratos são resolvidos",
+        action: "resolve_2d6plus2",
+      },
+    },
+    {
+      min: 20,
+      max: 20,
+      result: {
+        description:
+          "Nenhum foi assinado, e há algum motivo estranho para isso",
+        action: "strange_reason",
+      },
+    },
+  ];
 
 // ===== MOTIVOS PARA NÃO RESOLUÇÃO =====
 
@@ -246,7 +207,7 @@ export const NEW_CONTRACTS_TIME_TABLE: TableEntry<string>[] = [
 // ===== CONSTANTES DE MODIFICADORES =====
 
 // Penalidade por quebra de contrato (10% da recompensa)
-export const CONTRACT_BREACH_PENALTY_PERCENTAGE = 0.1;
+export const CONTRACT_BREACH_PENALTY_RATE = 0.1;
 
 // Aumento de recompensa para contratos não resolvidos (+2)
 export const UNRESOLVED_CONTRACT_BONUS = 2;
@@ -296,14 +257,14 @@ export function getPaymentTypeDice(contractValue: number): ValueBasedRoll {
  * Calcula a penalidade por quebra de contrato
  */
 export function calculateBreachPenalty(rewardValue: number): number {
-  return Math.floor(rewardValue * CONTRACT_BREACH_PENALTY_PERCENTAGE);
+  return Math.floor(rewardValue * CONTRACT_BREACH_PENALTY_RATE);
 }
 
 /**
  * Calcula o bônus total por pré-requisitos e cláusulas
  */
 export function calculateRequirementClauseBonus(
-  prerequisiteCount: number, 
+  prerequisiteCount: number,
   clauseCount: number
 ): number {
   return (prerequisiteCount + clauseCount) * REQUIREMENT_CLAUSE_BONUS;
