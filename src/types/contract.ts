@@ -258,3 +258,819 @@ export function isContractExpired(contract: Contract): boolean {
 export function applyUnresolvedBonus(rewardValue: number): number {
   return rewardValue + 2;
 }
+
+// ===== OBJETIVOS DO CONTRATO =====
+
+// Categorias principais de objetivos
+export enum ObjectiveCategory {
+  ESCOLTA = "Escolta",
+  INVESTIGACAO = "Investigação",
+  RECUPERACAO = "Recuperação",
+  ELIMINACAO = "Eliminação",
+  EXPLORACAO = "Exploração",
+  NEGOCIACAO = "Negociação",
+  PROTECAO = "Proteção",
+  ENTREGA = "Entrega",
+  RESGATE = "Resgate",
+  INFILTRACAO = "Infiltração",
+}
+
+// Especificações detalhadas por tipo de objetivo
+export enum EscortObjective {
+  PESSOA_IMPORTANTE = "Escoltar pessoa importante",
+  CARAVANA_COMERCIAL = "Escoltar caravana comercial",
+  PRISIONEIRO = "Escoltar prisioneiro",
+  DIPLOMATA = "Escoltar diplomata",
+  REFUGIADOS = "Escoltar refugiados",
+}
+
+export enum InvestigationObjective {
+  CRIME_LOCAL = "Investigar crime local",
+  DESAPARECIMENTO = "Investigar desaparecimento",
+  FENOMENO_ESTRANHO = "Investigar fenômeno estranho",
+  ESPIONAGEM = "Investigar atividade suspeita",
+  CORRUPCAO = "Investigar corrupção",
+}
+
+export enum RecoveryObjective {
+  ITEM_ROUBADO = "Recuperar item roubado",
+  ARTEFATO_PERDIDO = "Recuperar artefato perdido",
+  DOCUMENTO_IMPORTANTE = "Recuperar documento importante",
+  TESOURO_ANCESTRAL = "Recuperar tesouro ancestral",
+  PROPRIEDADE = "Recuperar propriedade",
+}
+
+export enum EliminationObjective {
+  CRIATURA_PERIGOSA = "Eliminar criatura perigosa",
+  BANDIDOS = "Eliminar grupo de bandidos",
+  PRAGA_MONSTROS = "Eliminar praga de monstros",
+  LIDER_INIMIGO = "Eliminar líder inimigo",
+  AMEACA_MAGICA = "Eliminar ameaça mágica",
+}
+
+// Interface principal do objetivo
+export interface ContractObjective {
+  category: ObjectiveCategory;
+  specificObjective: string;
+  description: string;
+  targetName?: string;
+  targetLocation?: string;
+  urgencyLevel: "Baixa" | "Média" | "Alta" | "Crítica";
+  isSecretMission: boolean;
+
+  // Especificações adicionais baseadas no tipo
+  specifications: {
+    minimumPartySize?: number;
+    requiredSkills?: string[];
+    forbiddenActions?: string[];
+    specialEquipment?: string[];
+    timeWindow?: string;
+  };
+}
+
+// ===== LOCALIDADES DO CONTRATO =====
+
+export enum LocationCategory {
+  URBANO = "Urbano",
+  RURAL = "Rural",
+  SELVAGEM = "Selvagem",
+  SUBTERRANEO = "Subterrâneo",
+  AQUATICO = "Aquático",
+  AEREO = "Aéreo",
+  PLANAR = "Planar",
+  MAGICO = "Mágico",
+}
+
+export enum UrbanLocation {
+  TAVERNA = "Taverna local",
+  MANSAO_NOBRE = "Mansão de nobre",
+  DISTRITO_POBRE = "Distrito pobre",
+  MERCADO = "Área do mercado",
+  TEMPLO = "Templo ou igreja",
+  PALACIO = "Palácio governamental",
+  ESGOTOS = "Sistema de esgotos",
+  CEMITERIO = "Cemitério",
+}
+
+export enum RuralLocation {
+  FAZENDA_ISOLADA = "Fazenda isolada",
+  VILA_PEQUENA = "Vila pequena",
+  ESTRADA_COMERCIAL = "Estrada comercial",
+  PONTE_IMPORTANTE = "Ponte importante",
+  MOINHOS = "Área de moinhos",
+  CAMPOS_CULTIVO = "Campos de cultivo",
+  PASTAGENS = "Pastagens",
+}
+
+export enum WildLocation {
+  FLORESTA_DENSA = "Floresta densa",
+  MONTANHAS = "Região montanhosa",
+  PANTANO = "Pântano perigoso",
+  DESERTO = "Área desértica",
+  TUNDRA = "Tundra gelada",
+  CAVERNAS = "Sistema de cavernas",
+  RUINAS_ANTIGAS = "Ruínas antigas",
+}
+
+// Interface principal da localidade
+export interface ContractLocation {
+  category: LocationCategory;
+  specificLocation: string;
+  name: string;
+  description: string;
+
+  // Características da localidade
+  characteristics: {
+    dangerLevel: "Seguro" | "Baixo" | "Moderado" | "Alto" | "Extremo";
+    accessibility: "Fácil" | "Moderado" | "Difícil" | "Muito difícil";
+    population:
+      | "Desabitado"
+      | "Pouco habitado"
+      | "Moderado"
+      | "Povoado"
+      | "Densamente povoado";
+    civilizationLevel: "Primitivo" | "Rural" | "Civilizado" | "Avançado";
+  };
+
+  // Modificadores específicos da localidade
+  modifiers: {
+    experienceBonus: number;
+    rewardModifier: number;
+    difficultyIncrease: number;
+  };
+
+  // Informações de viagem
+  travel: {
+    distanceInHexes: number;
+    estimatedTravelTime: string;
+    transportRequired: boolean;
+    specialRequirements?: string[];
+  };
+}
+
+// ===== ANTAGONISTAS =====
+
+export enum AntagonistCategory {
+  HUMANOIDE = "Humanoide",
+  BESTA = "Besta",
+  MORTO_VIVO = "Morto-vivo",
+  ABERRACAO = "Aberração",
+  CELESTIAL = "Celestial",
+  CONSTRUTO = "Construto",
+  DRAGAO = "Dragão",
+  ELEMENTAL = "Elemental",
+  FEY = "Fey",
+  DEMONIO = "Demônio/Diabo",
+  GIGANTE = "Gigante",
+  PLANTA = "Planta",
+  ORGANIZACAO = "Organização",
+}
+
+export enum HumanoidAntagonist {
+  BANDIDOS = "Grupo de bandidos",
+  CULTISTAS = "Cultistas fanáticos",
+  MERCENARIOS = "Mercenários hostis",
+  NOBRES_CORRUPTOS = "Nobres corruptos",
+  PIRATAS = "Piratas ou corsários",
+  ESPIAS = "Rede de espionagem",
+  ASSASSINOS = "Guilda de assassinos",
+  REVOLUCIONARIOS = "Grupo revolucionário",
+}
+
+export enum BeastAntagonist {
+  LOBOS = "Alcateia de lobos",
+  URSOS = "Urso territorial",
+  ARANHAS_GIGANTES = "Aranhas gigantes",
+  SERPENTES = "Serpentes venenosas",
+  JAVALIS = "Javalis selvagens",
+  AVES_PREDADORAS = "Aves de rapina gigantes",
+  FELINOS = "Grandes felinos",
+}
+
+// Interface principal do antagonista
+export interface Antagonist {
+  category: AntagonistCategory;
+  specificType: string;
+  name: string;
+  description: string;
+
+  // Características de combate
+  combat: {
+    challengeRating: string;
+    estimatedXpValue: number;
+    primaryThreat: "Físico" | "Mágico" | "Mental" | "Social" | "Ambiental";
+    specialAbilities?: string[];
+  };
+
+  // Motivações e comportamento
+  motivation: {
+    primary: string;
+    secondary?: string;
+    relationToObjective: "Direto" | "Indireto" | "Acidental" | "Vingança";
+  };
+
+  // Táticas e estratégias
+  tactics: {
+    preferredApproach:
+      | "Confronto direto"
+      | "Emboscada"
+      | "Subterfúgio"
+      | "Negociação"
+      | "Fuga";
+    advantageConditions?: string[];
+    weaknesses?: string[];
+  };
+
+  // Recursos disponíveis
+  resources: {
+    followers?: number;
+    equipment?: string[];
+    territory?: string;
+    allies?: string[];
+  };
+}
+
+// ===== COMPLICAÇÕES =====
+
+export enum ComplicationCategory {
+  TEMPO = "Temporal",
+  SOCIAL = "Social",
+  AMBIENTAL = "Ambiental",
+  MAGICA = "Mágica",
+  POLITICA = "Política",
+  MORAL = "Moral",
+  FINANCEIRA = "Financeira",
+  PESSOAL = "Pessoal",
+}
+
+export enum TemporalComplication {
+  PRAZO_APERTADO = "Prazo mais apertado que o esperado",
+  COMPETICAO = "Outro grupo com o mesmo objetivo",
+  JANELA_LIMITADA = "Janela de oportunidade muito específica",
+  EVENTOS_SIMULTANEOS = "Múltiplos eventos acontecendo ao mesmo tempo",
+}
+
+export enum SocialComplication {
+  TESTEMUNHAS = "Presença de testemunhas",
+  COBERTURA_NECESSARIA = "Necessidade de manter disfarce",
+  RELACOES_COMPLEXAS = "Relacionamentos complexos entre NPCs",
+  REPUTACAO_EM_RISCO = "Reputação da guilda em jogo",
+}
+
+export enum EnvironmentalComplication {
+  CLIMA_SEVERO = "Condições climáticas severas",
+  TERRENO_DIFICIL = "Terreno mais difícil que esperado",
+  RECURSOS_LIMITADOS = "Recursos limitados na região",
+  FAUNA_HOSTIL = "Fauna local hostil",
+}
+
+// Interface principal da complicação
+export interface Complication {
+  category: ComplicationCategory;
+  specificType: string;
+  title: string;
+  description: string;
+
+  // Impacto na missão
+  impact: {
+    severity: "Menor" | "Moderado" | "Maior" | "Crítico";
+    affectedAspects: (
+      | "Tempo"
+      | "Recursos"
+      | "Stealth"
+      | "Combat"
+      | "Social"
+      | "Navigation"
+    )[];
+    experienceModifier: number;
+    difficultyIncrease: number;
+  };
+
+  // Possíveis soluções
+  solutions: {
+    direct: string[];
+    creative: string[];
+    avoidance?: string[];
+  };
+
+  // Revelação da complicação
+  revelation: {
+    timing:
+      | "Imediato"
+      | "Durante planejamento"
+      | "No meio da missão"
+      | "No clímax";
+    method: "Óbvio" | "Investigação" | "Descoberta acidental" | "Traição";
+  };
+}
+
+// ===== ALIADOS =====
+
+export enum AllyCategory {
+  INFORMANTE = "Informante",
+  COMBATENTE = "Combatente",
+  ESPECIALISTA = "Especialista",
+  CONTATO_SOCIAL = "Contato Social",
+  GUIA = "Guia",
+  RECURSO = "Recurso",
+  PROTETOR = "Protetor",
+}
+
+export enum AllyAvailability {
+  SEMPRE_DISPONIVEL = "Sempre disponível",
+  CONDICIONAL = "Disponível sob condições",
+  UMA_VEZ = "Apenas uma vez",
+  EMERGENCIA = "Apenas em emergências",
+  TEMPORAL = "Por tempo limitado",
+}
+
+export enum AllyLoyalty {
+  TOTAL = "Lealdade total",
+  ALTA = "Alta lealdade",
+  MODERADA = "Lealdade moderada",
+  CONDICIONAL = "Lealdade condicional",
+  DUVIDOSA = "Lealdade duvidosa",
+  INTERESSADA = "Apenas por interesse",
+}
+
+// Interface principal do aliado
+export interface ContractAlly {
+  category: AllyCategory;
+  name: string;
+  description: string;
+
+  // Características pessoais
+  personal: {
+    race?: string;
+    profession?: string;
+    personality: string[];
+    motivation: string;
+  };
+
+  // Disponibilidade e lealdade
+  availability: {
+    type: AllyAvailability;
+    conditions?: string[];
+    limitations?: string[];
+    duration?: string;
+  };
+
+  loyalty: {
+    level: AllyLoyalty;
+    factors: string[];
+    breakingPoints?: string[];
+  };
+
+  // Capacidades e recursos
+  capabilities: {
+    primarySkills: string[];
+    secondarySkills?: string[];
+    equipment?: string[];
+    connections?: string[];
+    knowledgeAreas?: string[];
+  };
+
+  // Como e quando aparece
+  introduction: {
+    timing:
+      | "Início da missão"
+      | "Durante planejamento"
+      | "No meio da aventura"
+      | "Momento crítico";
+    method:
+      | "Enviado pela guilda"
+      | "Encontro casual"
+      | "Contato prévio"
+      | "Interesse próprio";
+    requirements?: string[];
+  };
+
+  // Custos ou obrigações
+  costs?: {
+    payment?: number;
+    favors?: string[];
+    futureObligations?: string[];
+    risks?: string[];
+  };
+}
+
+// ===== RECOMPENSAS ADICIONAIS =====
+
+export enum RewardCategory {
+  MONETARIA = "Monetária",
+  EQUIPAMENTO = "Equipamento",
+  INFORMACAO = "Informação",
+  SOCIAL = "Social",
+  MAGICA = "Mágica",
+  PROPRIEDADE = "Propriedade",
+  SERVICO = "Serviço",
+  CONHECIMENTO = "Conhecimento",
+}
+
+export enum MonetaryReward {
+  BONUS_OURO = "Bônus em ouro",
+  JOIAS = "Joias valiosas",
+  GEMAS = "Gemas preciosas",
+  OBRAS_ARTE = "Obras de arte",
+  ANTIGUIDADES = "Antiguidades valiosas",
+}
+
+export enum EquipmentReward {
+  ARMA_MAGICA = "Arma mágica",
+  ARMADURA_ESPECIAL = "Armadura especial",
+  ITEM_UTILITARIO = "Item utilitário mágico",
+  POCOES = "Poções raras",
+  PERGAMINHOS = "Pergaminhos mágicos",
+  FERRAMENTAS = "Ferramentas especializadas",
+}
+
+// Interface principal da recompensa adicional
+export interface ContractReward {
+  category: RewardCategory;
+  specificType: string;
+  name: string;
+  description: string;
+
+  // Valor e raridade
+  value: {
+    estimatedGoldValue: number;
+    rarity: "Comum" | "Incomum" | "Raro" | "Muito raro" | "Lendário" | "Único";
+    experienceValue?: number;
+  };
+
+  // Condições para obtenção
+  conditions: {
+    isAutomatic: boolean;
+    requirements?: string[];
+    performanceBased?: boolean;
+    secretive?: boolean;
+    optional?: boolean;
+  };
+
+  // Benefícios mecânicos
+  benefits?: {
+    statBonus?: string[];
+    specialAbilities?: string[];
+    ongoingEffects?: string[];
+    socialBenefits?: string[];
+  };
+
+  // Limitações ou custos
+  limitations?: {
+    temporaryEffect?: boolean;
+    maintenanceCost?: number;
+    curses?: string[];
+    restrictions?: string[];
+  };
+}
+
+// ===== SCHEMAS ZOD PARA VALIDAÇÃO =====
+
+export const ObjectiveSpecificationsSchema = z.object({
+  minimumPartySize: z.number().optional(),
+  requiredSkills: z.array(z.string()).optional(),
+  forbiddenActions: z.array(z.string()).optional(),
+  specialEquipment: z.array(z.string()).optional(),
+  timeWindow: z.string().optional(),
+});
+
+export const ContractObjectiveSchema = z.object({
+  category: z.nativeEnum(ObjectiveCategory),
+  specificObjective: z.string(),
+  description: z.string(),
+  targetName: z.string().optional(),
+  targetLocation: z.string().optional(),
+  urgencyLevel: z.enum(["Baixa", "Média", "Alta", "Crítica"]),
+  isSecretMission: z.boolean(),
+  specifications: ObjectiveSpecificationsSchema,
+});
+
+export const LocationCharacteristicsSchema = z.object({
+  dangerLevel: z.enum(["Seguro", "Baixo", "Moderado", "Alto", "Extremo"]),
+  accessibility: z.enum(["Fácil", "Moderado", "Difícil", "Muito difícil"]),
+  population: z.enum([
+    "Desabitado",
+    "Pouco habitado",
+    "Moderado",
+    "Povoado",
+    "Densamente povoado",
+  ]),
+  civilizationLevel: z.enum(["Primitivo", "Rural", "Civilizado", "Avançado"]),
+});
+
+export const ContractLocationSchema = z.object({
+  category: z.nativeEnum(LocationCategory),
+  specificLocation: z.string(),
+  name: z.string(),
+  description: z.string(),
+  characteristics: LocationCharacteristicsSchema,
+  modifiers: z.object({
+    experienceBonus: z.number(),
+    rewardModifier: z.number(),
+    difficultyIncrease: z.number(),
+  }),
+  travel: z.object({
+    distanceInHexes: z.number(),
+    estimatedTravelTime: z.string(),
+    transportRequired: z.boolean(),
+    specialRequirements: z.array(z.string()).optional(),
+  }),
+});
+
+export const AntagonistSchema = z.object({
+  category: z.nativeEnum(AntagonistCategory),
+  specificType: z.string(),
+  name: z.string(),
+  description: z.string(),
+  combat: z.object({
+    challengeRating: z.string(),
+    estimatedXpValue: z.number(),
+    primaryThreat: z.enum([
+      "Físico",
+      "Mágico",
+      "Mental",
+      "Social",
+      "Ambiental",
+    ]),
+    specialAbilities: z.array(z.string()).optional(),
+  }),
+  motivation: z.object({
+    primary: z.string(),
+    secondary: z.string().optional(),
+    relationToObjective: z.enum([
+      "Direto",
+      "Indireto",
+      "Acidental",
+      "Vingança",
+    ]),
+  }),
+  tactics: z.object({
+    preferredApproach: z.enum([
+      "Confronto direto",
+      "Emboscada",
+      "Subterfúgio",
+      "Negociação",
+      "Fuga",
+    ]),
+    advantageConditions: z.array(z.string()).optional(),
+    weaknesses: z.array(z.string()).optional(),
+  }),
+  resources: z.object({
+    followers: z.number().optional(),
+    equipment: z.array(z.string()).optional(),
+    territory: z.string().optional(),
+    allies: z.array(z.string()).optional(),
+  }),
+});
+
+export const ComplicationSchema = z.object({
+  category: z.nativeEnum(ComplicationCategory),
+  specificType: z.string(),
+  title: z.string(),
+  description: z.string(),
+  impact: z.object({
+    severity: z.enum(["Menor", "Moderado", "Maior", "Crítico"]),
+    affectedAspects: z.array(
+      z.enum(["Tempo", "Recursos", "Stealth", "Combat", "Social", "Navigation"])
+    ),
+    experienceModifier: z.number(),
+    difficultyIncrease: z.number(),
+  }),
+  solutions: z.object({
+    direct: z.array(z.string()),
+    creative: z.array(z.string()),
+    avoidance: z.array(z.string()).optional(),
+  }),
+  revelation: z.object({
+    timing: z.enum([
+      "Imediato",
+      "Durante planejamento",
+      "No meio da missão",
+      "No clímax",
+    ]),
+    method: z.enum([
+      "Óbvio",
+      "Investigação",
+      "Descoberta acidental",
+      "Traição",
+    ]),
+  }),
+});
+
+export const ContractAllySchema = z.object({
+  category: z.nativeEnum(AllyCategory),
+  name: z.string(),
+  description: z.string(),
+  personal: z.object({
+    race: z.string().optional(),
+    profession: z.string().optional(),
+    personality: z.array(z.string()),
+    motivation: z.string(),
+  }),
+  availability: z.object({
+    type: z.nativeEnum(AllyAvailability),
+    conditions: z.array(z.string()).optional(),
+    limitations: z.array(z.string()).optional(),
+    duration: z.string().optional(),
+  }),
+  loyalty: z.object({
+    level: z.nativeEnum(AllyLoyalty),
+    factors: z.array(z.string()),
+    breakingPoints: z.array(z.string()).optional(),
+  }),
+  capabilities: z.object({
+    primarySkills: z.array(z.string()),
+    secondarySkills: z.array(z.string()).optional(),
+    equipment: z.array(z.string()).optional(),
+    connections: z.array(z.string()).optional(),
+    knowledgeAreas: z.array(z.string()).optional(),
+  }),
+  introduction: z.object({
+    timing: z.enum([
+      "Início da missão",
+      "Durante planejamento",
+      "No meio da aventura",
+      "Momento crítico",
+    ]),
+    method: z.enum([
+      "Enviado pela guilda",
+      "Encontro casual",
+      "Contato prévio",
+      "Interesse próprio",
+    ]),
+    requirements: z.array(z.string()).optional(),
+  }),
+  costs: z
+    .object({
+      payment: z.number().optional(),
+      favors: z.array(z.string()).optional(),
+      futureObligations: z.array(z.string()).optional(),
+      risks: z.array(z.string()).optional(),
+    })
+    .optional(),
+});
+
+export const ContractRewardSchema = z.object({
+  category: z.nativeEnum(RewardCategory),
+  specificType: z.string(),
+  name: z.string(),
+  description: z.string(),
+  value: z.object({
+    estimatedGoldValue: z.number(),
+    rarity: z.enum([
+      "Comum",
+      "Incomum",
+      "Raro",
+      "Muito raro",
+      "Lendário",
+      "Único",
+    ]),
+    experienceValue: z.number().optional(),
+  }),
+  conditions: z.object({
+    isAutomatic: z.boolean(),
+    requirements: z.array(z.string()).optional(),
+    performanceBased: z.boolean().optional(),
+    secretive: z.boolean().optional(),
+    optional: z.boolean().optional(),
+  }),
+  benefits: z
+    .object({
+      statBonus: z.array(z.string()).optional(),
+      specialAbilities: z.array(z.string()).optional(),
+      ongoingEffects: z.array(z.string()).optional(),
+      socialBenefits: z.array(z.string()).optional(),
+    })
+    .optional(),
+  limitations: z
+    .object({
+      temporaryEffect: z.boolean().optional(),
+      maintenanceCost: z.number().optional(),
+      curses: z.array(z.string()).optional(),
+      restrictions: z.array(z.string()).optional(),
+    })
+    .optional(),
+});
+
+// ===== FUNÇÕES UTILITÁRIAS =====
+
+/**
+ * Valida um objetivo de contrato usando o schema Zod
+ */
+export function validateContractObjective(data: unknown): ContractObjective {
+  return ContractObjectiveSchema.parse(data);
+}
+
+/**
+ * Valida uma localidade de contrato usando o schema Zod
+ */
+export function validateContractLocation(data: unknown): ContractLocation {
+  return ContractLocationSchema.parse(data);
+}
+
+/**
+ * Valida um antagonista usando o schema Zod
+ */
+export function validateAntagonist(data: unknown): Antagonist {
+  return AntagonistSchema.parse(data);
+}
+
+/**
+ * Valida uma complicação usando o schema Zod
+ */
+export function validateComplication(data: unknown): Complication {
+  return ComplicationSchema.parse(data);
+}
+
+/**
+ * Valida um aliado usando o schema Zod
+ */
+export function validateContractAlly(data: unknown): ContractAlly {
+  return ContractAllySchema.parse(data);
+}
+
+/**
+ * Valida uma recompensa adicional usando o schema Zod
+ */
+export function validateContractReward(data: unknown): ContractReward {
+  return ContractRewardSchema.parse(data);
+}
+
+/**
+ * Calcula modificador de experiência baseado na complexidade do antagonista
+ */
+export function calculateAntagonistXpModifier(antagonist: Antagonist): number {
+  const crMap: Record<string, number> = {
+    "1/8": 25,
+    "1/4": 50,
+    "1/2": 100,
+    "1": 200,
+    "2": 450,
+    "3": 700,
+    "4": 1100,
+    "5": 1800,
+    "6": 2300,
+    "7": 2900,
+    "8": 3900,
+    "9": 5000,
+    "10": 5900,
+    "11": 7200,
+    "12": 8400,
+    "13": 10000,
+    "14": 11500,
+    "15": 13000,
+    "16": 15000,
+    "17": 18000,
+    "18": 20000,
+    "19": 22000,
+    "20": 25000,
+  };
+
+  return crMap[antagonist.combat.challengeRating] || 0;
+}
+
+/**
+ * Calcula modificador de dificuldade baseado em complicações
+ */
+export function calculateComplicationDifficultyModifier(
+  complications: Complication[]
+): number {
+  return complications.reduce((total, complication) => {
+    const severityMap = { Menor: 1, Moderado: 2, Maior: 3, Crítico: 5 };
+    return total + severityMap[complication.impact.severity];
+  }, 0);
+}
+
+/**
+ * Verifica se um aliado está disponível baseado nas condições
+ */
+export function isAllyAvailable(
+  ally: ContractAlly,
+  conditions: string[] = []
+): boolean {
+  if (ally.availability.type === AllyAvailability.SEMPRE_DISPONIVEL) {
+    return true;
+  }
+
+  if (ally.availability.type === AllyAvailability.CONDICIONAL) {
+    return (
+      ally.availability.conditions?.every((condition) =>
+        conditions.includes(condition)
+      ) ?? false
+    );
+  }
+
+  return false;
+}
+
+/**
+ * Calcula valor total de recompensas adicionais
+ */
+export function calculateAdditionalRewardsValue(
+  rewards: ContractReward[]
+): number {
+  return rewards.reduce(
+    (total, reward) => total + reward.value.estimatedGoldValue,
+    0
+  );
+}
