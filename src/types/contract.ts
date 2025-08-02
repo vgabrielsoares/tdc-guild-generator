@@ -411,40 +411,203 @@ export interface ContractLocation {
 // ===== ANTAGONISTAS =====
 
 export enum AntagonistCategory {
-  HUMANOIDE = "Humanoide",
-  BESTA = "Besta",
-  MORTO_VIVO = "Morto-vivo",
-  ABERRACAO = "Aberração",
-  CELESTIAL = "Celestial",
-  CONSTRUTO = "Construto",
-  DRAGAO = "Dragão",
-  ELEMENTAL = "Elemental",
-  FEY = "Fey",
-  DEMONIO = "Demônio/Diabo",
-  GIGANTE = "Gigante",
-  PLANTA = "Planta",
+  HUMANOIDE_PODEROSO = "Humanoide poderoso",
+  ARTEFATO_MAGICO = "Artefato mágico",
   ORGANIZACAO = "Organização",
+  PERIGO_IMINENTE = "Perigo iminente",
+  ENTIDADE_SOBRENATURAL = "Entidade sobrenatural",
+  ANOMALIA = "Anomalia",
+  DESASTRE_ACIDENTE = "Desastre ou acidente",
+  CRISE = "Crise",
+  MISTERIO = "Mistério",
 }
 
 export enum HumanoidAntagonist {
-  BANDIDOS = "Grupo de bandidos",
-  CULTISTAS = "Cultistas fanáticos",
-  MERCENARIOS = "Mercenários hostis",
-  NOBRES_CORRUPTOS = "Nobres corruptos",
-  PIRATAS = "Piratas ou corsários",
-  ESPIAS = "Rede de espionagem",
-  ASSASSINOS = "Guilda de assassinos",
-  REVOLUCIONARIOS = "Grupo revolucionário",
+  MERCENARIO_ASSASSINO = "Mercenário/assassino",
+  CONJURADOR = "Conjurador",
+  NOBRE = "Nobre",
+  LIDER_IMPORTANTE = "Líder importante",
+  DUPLO = "Duplo",
+  ALQUIMISTA_PERTURBADO = "Alquimista perturbado",
+  RIVAL_CONTRATANTE = "Rival do contratante",
+  HEROI_AVENTUREIRO = "Herói/aventureiro",
+  FANATICO_RELIGIOSO = "Fanático religioso",
+  FUGITIVO = "Fugitivo",
+  COMERCIANTE_CORRUPTO = "Comerciante corrupto",
+  GENERAL_RENEGADO = "General renegado",
+  SACERDOTE_CAIDO = "Sacerdote caído",
+  ESPIAO_INFILTRADO = "Espião infiltrado",
+  ARTISTA_EXCENTRICO = "Artista excêntrico",
+  DIPLOMATA_TRAIDOR = "Diplomata traidor",
+  REVOLUCIONARIO_RADICAL = "Revolucionário radical",
+  MENTOR_DECAIDO = "Mentor decaído",
 }
 
-export enum BeastAntagonist {
-  LOBOS = "Alcateia de lobos",
-  URSOS = "Urso territorial",
-  ARANHAS_GIGANTES = "Aranhas gigantes",
-  SERPENTES = "Serpentes venenosas",
-  JAVALIS = "Javalis selvagens",
-  AVES_PREDADORAS = "Aves de rapina gigantes",
-  FELINOS = "Grandes felinos",
+export enum MagicalArtifactAntagonist {
+  CONSTRUCTO_DESCONTROLADO = "Constructo descontrolado",
+  RELIQUIA_DIVINA = "Relíquia divina",
+  ARTEFATO_ALIENIGENA = "Artefato alienígena",
+  JOIA_ALMA_PODEROSA = "Joia com a alma de um ser poderoso",
+  ARMADURA_ENFEITICADA = "Armadura enfeitiçada",
+  ARMA_SENCIENTE = "Arma senciente",
+  GRIMORIO_PROIBIDO = "Grimório proibido",
+  FOCO_ARCANO_CORROMPIDO = "Foco arcano danificado/corrompido",
+  PERGAMINHO_MILENAR = "Pergaminho milenar",
+  OBJETO_AMALDICOADO = "Objeto amaldiçoado",
+  PORTAL_INSTAVEL = "Portal instável",
+  CRISTAL_ENERGIA = "Cristal de energia",
+  ESPELHO_DIMENSIONAL = "Espelho dimensional",
+  AMULETO_CORRUPTOR = "Amuleto corruptor",
+  INSTRUMENTO_MUSICAL_MAGICO = "Instrumento musical mágico",
+  TOTEM_ANCESTRAL = "Totem ancestral",
+  ORBE_PODER = "Orbe de poder",
+  MAQUINA_ANTIGA = "Máquina antiga",
+  RECIPIENTE_ALMAS = "Recipiente de almas",
+}
+
+export enum OrganizationAntagonist {
+  GRUPO_AMEACADOR = "Grupo ameaçador",
+  FACCAO_CRIMINOSA = "Facção criminosa",
+  SEITA_CULTISTA = "Seita cultista",
+  ALTA_SOCIEDADE = "Alta sociedade",
+  CORTE_REAL_INIMIGA = "Corte real inimiga",
+  CLA_FAMILIA_PODEROSA = "Clã/família poderosa",
+  SOCIEDADE_SECRETA = "Sociedade secreta",
+  GRUPO_AVENTUREIROS = "Grupo de aventureiros",
+  REVOLUCIONARIOS = "Revolucionários",
+  SINDICATO = "Sindicato",
+  GUILDA_RIVAL = "Uma guilda rival",
+  IRMANDADE_MILITAR = "Irmandade militar",
+  ORDEM_MAGOS = "Ordem de magos",
+  COMPANHIA_MERCANTIL = "Companhia mercantil",
+  CONSELHO_ANCIAOS = "Conselho de anciãos",
+  TRIBUNAL_CORRUPTO = "Tribunal corrupto",
+  COLEGIO_BARDOS = "Colégio de bardos",
+  REDE_ESPIONAGEM = "Rede de espionagem",
+  PACTO_DRUIDAS = "Pacto de druidas",
+}
+
+export enum ImminentDangerAntagonist {
+  HUMANOIDES_TRIBAIS = "Humanoides tribais/canibais",
+  ANIMAIS_SELVAGENS = "Animais selvagens",
+  BESTAS_PRE_HISTORICAS = "Bestas pré-históricas",
+  PLANTAS_GUARDIAS = "Plantas guardiãs",
+  LICANTROPOS = "Licantropos",
+  ENXAMES_INSETOS = "Enxames de insetos",
+  SAQUEADORES_FREQUENTES = "Saqueadores frequentes",
+  ELEMENTAIS = "Elementais",
+  CRIATURA_MITOLOGICA = "Criatura mitológica",
+  ANIMAIS_ATROZES = "Animais atrozes",
+  HORDA_MORTOS_VIVOS = "Horda de mortos-vivos",
+  BANDIDOS_ORGANIZADOS = "Bandidos organizados",
+  PREDADORES_NOTURNOS = "Predadores noturnos",
+  CRIATURAS_SUBTERRANEAS = "Criaturas subterrâneas",
+  INVASORES_PLANARES = "Invasores planares",
+  MONSTROS_AQUATICOS = "Monstros aquáticos",
+  FERAS_CORROMPIDAS = "Feras corrompidas",
+  ABERRACOES_ANTIGAS = "Aberrações antigas",
+  ESPIRITOS_VINGATIVOS = "Espíritos vingativos",
+}
+
+export enum SupernaturalEntityAntagonist {
+  VAMPIRO = "Vampiro",
+  SER_INCORPOREO = "Ser incorpóreo",
+  MORTO_VIVO_PODEROSO = "Morto-vivo poderoso",
+  CELESTIAL_DESCONTROLADO = "Celestial descontrolado",
+  FADA = "Fada",
+  DEMONIO_MENOR = "Demônio menor",
+  ANJO_CAIDO = "Anjo caído",
+  ESPECTRO_ANTIGO = "Espectro antigo",
+  SENHOR_SOMBRAS = "Senhor das sombras",
+  ARQUIFADA = "Arquifada",
+  ENTIDADE_COSMICA = "Entidade cósmica",
+  ESPIRITO_ELEMENTAL = "Espírito elemental",
+  ALMA_PERDIDA = "Alma perdida",
+  GUARDIAO_CORROMPIDO = "Guardião corrompido",
+}
+
+export enum AnomalyAntagonist {
+  MONSTRUOSIDADE = "Monstruosidade",
+  DEMONIO_DIABO = "Demônio ou diabo",
+  FENDA_PLANAR = "Fenda planar",
+  HIBRIDO_ANIMALESCO = "Híbrido ou Animalesco",
+  NEVOA_SOBRENATURAL = "Névoa sobrenatural",
+  INVASAO_ZUMBI = "Invasão zumbi/esqueleto",
+  LIMO = "Limo",
+  ANORMALIDADES_NATUREZA = "Anormalidades na natureza",
+  CRIATURA_ADORMECIDA = "Criatura poderosa adormecida",
+  CLIMATICA = "Climática",
+  ZONA_MAGIA_SELVAGEM = "Zona de magia selvagem",
+  DISTORCAO_TEMPORAL = "Distorção temporal",
+  MUTACAO_DESCONTROLADA = "Mutação descontrolada",
+  CORRUPCAO_ARCANA = "Corrupção arcana",
+  FISSURA_REALIDADE = "Fissura na realidade",
+  MANIFESTACAO_PSIQUICA = "Manifestação psíquica",
+}
+
+export enum DisasterAntagonist {
+  INUNDACAO = "Inundação",
+  TERREMOTO = "Terremoto",
+  NAUFRAGIO = "Naufrágio",
+  FEITICO_DESCONTROLADO = "Feitiço fora de controle",
+  EXPERIMENTO_ERRADO = "Experimento que deu errado",
+  CONSTRUCOES_DEPREDADAS = "Construções depredadas/desabamento",
+  INCENDIO = "Incêndio",
+  METEORO = "Meteoro",
+  NEVASCA_IMPETUOSA = "Nevasca impetuosa",
+  ACIDENTE_TRABALHO = "Acidente de trabalho",
+  DESLIZAMENTO_TERRA = "Deslizamento de terra",
+  TEMPESTADE_DEVASTADORA = "Tempestade devastadora",
+  EXPLOSAO_ARCANA = "Explosão arcana",
+  PRAGA_INSETOS = "Praga de insetos",
+  CONTAMINACAO_TOXICA = "Contaminação tóxica",
+  FALHA_PORTAL = "Falha em portal",
+  ACIDENTE_CRIATURAS = "Acidente com criaturas",
+  AVALANCHE = "Avalanche",
+}
+
+export enum CrisisAntagonist {
+  CONFLITO_POLITICO = "Conflito político",
+  DOENCA = "Doença",
+  ESCASSEZ_RECURSOS = "Escassez de recursos básicos",
+  PARASITA_PRAGA = "Parasita ou praga",
+  GUERRA_IMINENTE = "Guerra iminente/Disputa territorial",
+  REVOLUCAO_REVOLTA = "Revolução/revolta",
+  ECONOMICA = "Econômica",
+  DRAGAO = "Dragão",
+  QUEDA_FIGURA_IMPORTANTE = "Queda de uma figura importante",
+  CONFLITO_RELIGIOSO = "Conflito religioso",
+  CRISE_DIPLOMATICA = "Crise diplomática",
+  COLAPSO_INSTITUICOES = "Colapso de instituições",
+  SUCESSAO_CONTESTADA = "Sucessão contestada",
+  CORRUPCAO_GENERALIZADA = "Corrupção generalizada",
+  CISMA_SOCIAL = "Cisma social",
+  FUGA_MASSA = "Fuga em massa",
+  BOICOTE_COMERCIAL = "Boicote comercial",
+  CONSPIRACAO_REVELADA = "Conspiração revelada",
+  PERDA_CONFIANCA = "Perda de confiança",
+}
+
+export enum MysteryAntagonist {
+  CONSPIRACAO = "Conspiração",
+  COMPORTAMENTO_ANORMAL = "Comportamento/fenômeno anormal",
+  MORTES_MISTERIOSAS = "Mortes misteriosas",
+  ROUBOS_DESAPARECIMENTOS = "Roubos/Desaparecimentos",
+  MALDICAO_CASTIGO_DIVINO = "Maldição/castigo divino",
+  ATENTADO = "Atentado",
+  PROFECIA = "Profecia",
+  SURTOS_MAGIA = "Surtos de magia",
+  RITUAIS_SIMBOLOS = "Rituais e símbolos",
+  LENDA_URBANA = "Lenda urbana/local",
+  MEMORIAS_PERDIDAS = "Memórias perdidas",
+  IDENTIDADE_FALSA = "Identidade falsa",
+  MENSAGENS_CODIFICADAS = "Mensagens codificadas",
+  TESTEMUNHAS_CONFLITANTES = "Testemunhas conflitantes",
+  SEGREDO_FAMILIAR = "Segredo familiar",
+  ARTEFATO_PERDIDO = "Artefato perdido",
+  PRESSAGIO_SOMBRIO = "Presságio sombrio",
+  PASSADO_OCULTO = "Passado oculto",
+  CONEXAO_INESPERADA = "Conexão inesperada",
 }
 
 // Interface principal do antagonista
@@ -453,41 +616,6 @@ export interface Antagonist {
   specificType: string;
   name: string;
   description: string;
-
-  // Características de combate
-  combat: {
-    challengeRating: string;
-    estimatedXpValue: number;
-    primaryThreat: "Físico" | "Mágico" | "Mental" | "Social" | "Ambiental";
-    specialAbilities?: string[];
-  };
-
-  // Motivações e comportamento
-  motivation: {
-    primary: string;
-    secondary?: string;
-    relationToObjective: "Direto" | "Indireto" | "Acidental" | "Vingança";
-  };
-
-  // Táticas e estratégias
-  tactics: {
-    preferredApproach:
-      | "Confronto direto"
-      | "Emboscada"
-      | "Subterfúgio"
-      | "Negociação"
-      | "Fuga";
-    advantageConditions?: string[];
-    weaknesses?: string[];
-  };
-
-  // Recursos disponíveis
-  resources: {
-    followers?: number;
-    equipment?: string[];
-    territory?: string;
-    allies?: string[];
-  };
 }
 
 // ===== COMPLICAÇÕES =====
@@ -782,45 +910,6 @@ export const AntagonistSchema = z.object({
   specificType: z.string(),
   name: z.string(),
   description: z.string(),
-  combat: z.object({
-    challengeRating: z.string(),
-    estimatedXpValue: z.number(),
-    primaryThreat: z.enum([
-      "Físico",
-      "Mágico",
-      "Mental",
-      "Social",
-      "Ambiental",
-    ]),
-    specialAbilities: z.array(z.string()).optional(),
-  }),
-  motivation: z.object({
-    primary: z.string(),
-    secondary: z.string().optional(),
-    relationToObjective: z.enum([
-      "Direto",
-      "Indireto",
-      "Acidental",
-      "Vingança",
-    ]),
-  }),
-  tactics: z.object({
-    preferredApproach: z.enum([
-      "Confronto direto",
-      "Emboscada",
-      "Subterfúgio",
-      "Negociação",
-      "Fuga",
-    ]),
-    advantageConditions: z.array(z.string()).optional(),
-    weaknesses: z.array(z.string()).optional(),
-  }),
-  resources: z.object({
-    followers: z.number().optional(),
-    equipment: z.array(z.string()).optional(),
-    territory: z.string().optional(),
-    allies: z.array(z.string()).optional(),
-  }),
 });
 
 export const ComplicationSchema = z.object({
@@ -994,39 +1083,6 @@ export function validateContractAlly(data: unknown): ContractAlly {
  */
 export function validateContractReward(data: unknown): ContractReward {
   return ContractRewardSchema.parse(data);
-}
-
-/**
- * Calcula modificador de experiência baseado na complexidade do antagonista
- */
-export function calculateAntagonistXpModifier(antagonist: Antagonist): number {
-  const crMap: Record<string, number> = {
-    "1/8": 25,
-    "1/4": 50,
-    "1/2": 100,
-    "1": 200,
-    "2": 450,
-    "3": 700,
-    "4": 1100,
-    "5": 1800,
-    "6": 2300,
-    "7": 2900,
-    "8": 3900,
-    "9": 5000,
-    "10": 5900,
-    "11": 7200,
-    "12": 8400,
-    "13": 10000,
-    "14": 11500,
-    "15": 13000,
-    "16": 15000,
-    "17": 18000,
-    "18": 20000,
-    "19": 22000,
-    "20": 25000,
-  };
-
-  return crMap[antagonist.combat.challengeRating] || 0;
 }
 
 /**
