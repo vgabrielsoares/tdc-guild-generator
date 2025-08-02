@@ -620,76 +620,108 @@ export interface Antagonist {
 
 // ===== COMPLICAÇÕES =====
 
+// Categorias principais de complicações
 export enum ComplicationCategory {
-  TEMPO = "Temporal",
-  SOCIAL = "Social",
-  AMBIENTAL = "Ambiental",
-  MAGICA = "Mágica",
-  POLITICA = "Política",
-  MORAL = "Moral",
-  FINANCEIRA = "Financeira",
-  PESSOAL = "Pessoal",
-}
-
-export enum TemporalComplication {
-  PRAZO_APERTADO = "Prazo mais apertado que o esperado",
-  COMPETICAO = "Outro grupo com o mesmo objetivo",
-  JANELA_LIMITADA = "Janela de oportunidade muito específica",
-  EVENTOS_SIMULTANEOS = "Múltiplos eventos acontecendo ao mesmo tempo",
-}
-
-export enum SocialComplication {
-  TESTEMUNHAS = "Presença de testemunhas",
-  COBERTURA_NECESSARIA = "Necessidade de manter disfarce",
-  RELACOES_COMPLEXAS = "Relacionamentos complexos entre NPCs",
-  REPUTACAO_EM_RISCO = "Reputação da guilda em jogo",
-}
-
-export enum EnvironmentalComplication {
-  CLIMA_SEVERO = "Condições climáticas severas",
-  TERRENO_DIFICIL = "Terreno mais difícil que esperado",
-  RECURSOS_LIMITADOS = "Recursos limitados na região",
-  FAUNA_HOSTIL = "Fauna local hostil",
+  RECURSOS = "Recursos",
+  VITIMAS = "Vítimas",
+  ORGANIZACAO = "Organização",
+  MIRACULOSO = "Miraculoso",
+  AMBIENTE_HOSTIL = "Ambiente hostil",
+  INUSITADO = "Inusitado",
+  PROBLEMAS_DIPLOMATICOS = "Problemas diplomáticos",
+  PROTECAO = "Proteção",
+  CONTRA_TEMPO_AMISTOSO = "Contra-tempo amistoso",
+  ENCONTRO_HOSTIL = "Encontro hostil",
 }
 
 // Interface principal da complicação
 export interface Complication {
   category: ComplicationCategory;
-  specificType: string;
-  title: string;
+  specificDetail: string;
   description: string;
+}
 
-  // Impacto na missão
-  impact: {
-    severity: "Menor" | "Moderado" | "Maior" | "Crítico";
-    affectedAspects: (
-      | "Tempo"
-      | "Recursos"
-      | "Stealth"
-      | "Combat"
-      | "Social"
-      | "Navigation"
-    )[];
-    experienceModifier: number;
-    difficultyIncrease: number;
-  };
+// ===== REVIRAVOLTAS =====
 
-  // Possíveis soluções
-  solutions: {
-    direct: string[];
-    creative: string[];
-    avoidance?: string[];
-  };
+// Quem está envolvido na reviravolta
+export enum TwistWho {
+  CONTRATANTE = "O contratante",
+  ALIADO = "Um aliado",
+  COMPLICACAO = "A complicação",
+  OBJETIVO = "O objetivo",
+  VITIMA_INOCENTE = "A vítima/um inocente",
+  VELHO_CONHECIDO = "Um velho conhecido surge e...",
+  FUNCIONARIO_GUILDA = "Um funcionário da guilda",
+  ESPECTADOR_NEUTRO = "Um espectador aparentemente neutro",
+  INFORMANTE = "Um informante",
+  AUTORIDADE_LOCAL = "A autoridade local",
+  MERCADOR = "Um mercador envolvido",
+  GUARDA_PATRULHA = "O guarda que patrulha a área",
+  FONTE_PISTAS = "A pessoa que forneceu as pistas",
+  MEMBRO_FAMILIA_REAL = "Um membro da família real",
+  CURANDEIRO_SABIO = "O curandeiro/sábio consultado",
+  CRIANCA_INVISIVEL = "A criança que ninguém nota",
+  RIVAL_LONGA_DATA = "Um rival de longa data",
+  MORTO_DESAPARECIDO = "Um dos mortos/desaparecidos",
+  BENFEITOR_ANONIMO = "Um benfeitor anônimo",
+  TERRA_LOCAL = "A própria terra/local",
+}
 
-  // Revelação da complicação
-  revelation: {
-    timing:
-      | "Imediato"
-      | "Durante planejamento"
-      | "No meio da missão"
-      | "No clímax";
-    method: "Óbvio" | "Investigação" | "Descoberta acidental" | "Traição";
-  };
+// O que realmente são
+export enum TwistWhat {
+  VERDADEIRO_INIMIGO = "É o verdadeiro inimigo",
+  PARENTE_PROXIMO = "É um parente próximo",
+  HEROI_LENDARIO = "É um herói lendário dado como morto",
+  NAO_E_O_QUE_PARECE = "Não é o que parece",
+  AUXILIA_ANTAGONISTA = "Auxilia o antagonista secretamente",
+  FANTASMA = "É um fantasma",
+  ESPIAO_INFILTRADO = "É um espião infiltrado",
+  CONTROLADO_POSSUIDO = "É controlado/possuído por outra entidade",
+  ILUSAO_DISFARCE = "É uma ilusão ou disfarce",
+  OUTRA_DIMENSAO = "É de outra dimensão/plano",
+  CLONE_IMPOSTOR = "É um clone ou impostor",
+  MAIS_PODEROSO = "É muito mais poderoso do que aparenta",
+  PERDEU_MEMORIA = "Perdeu a memória de quem realmente é",
+  METAMORFO = "É um metamorfo",
+  SENDO_CHANTAGEADO = "Está sendo chantageado",
+  CRIACAO_ARTIFICIAL = "É uma criação artificial",
+  VIAJANTE_TEMPORAL = "Vem do futuro ou passado",
+  DEUS_DISFARCADO = "É um deus disfarçado",
+  REENCARNACAO = "É a reencarnação de alguém importante",
+  MULTIPLAS_PESSOAS = "São múltiplas pessoas agindo como uma",
+}
+
+// Motivação ou circunstância especial
+export enum TwistBut {
+  PELAS_CRIANCAS = "Faz isso pelas crianças",
+  ANTAGONISTA_SEM_CULPA = "O antagonista não tem culpa",
+  ASSASSINADO_MISTERIOSAMENTE = "Ele é assassinado misteriosamente",
+  LIGADO_PROFECIA = "O objetivo está ligado a uma profecia",
+  PROTEGER_NATUREZA = "Faz isso para proteger a natureza",
+  OBJETIVO_EXIGE_SACRIFICIO = "O objetivo exige um sacrifício",
+  SALVAR_ALGUEM_QUERIDO = "Está tentando salvar alguém querido",
+  FORCADO_MALDICAO = "Foi forçado por uma maldição",
+  ACREDITA_FAZER_BEM = "Acredita estar fazendo o bem",
+  CUMPRINDO_PROMESSA = "Está cumprindo uma promessa antiga",
+  EVITAR_ALGO_PIOR = "É a única forma de evitar algo pior",
+  PROTEGENDO_SEGREDO = "Está protegendo um segredo terrível",
+  DIAS_DE_VIDA = "Tem apenas dias de vida",
+  MANIPULADO_SEM_SABER = "Está sendo manipulado sem saber",
+  SALVAR_ALMA = "Precisa salvar sua alma",
+  DESFAZER_ERRO_PASSADO = "Está tentando desfazer um erro do passado",
+  UNICO_QUE_PODE = "É o único que pode fazer isso",
+  HONRANDO_MEMORIA = "Está honrando a memória de alguém",
+  PROVAR_VALOR = "Precisa provar seu valor/inocência",
+  TEMPO_SE_ESGOTANDO = "O tempo está se esgotando",
+}
+
+// Interface da reviravolta completa
+export interface Twist {
+  hasTwist: boolean;
+  who?: TwistWho;
+  what?: TwistWhat;
+  but?: TwistBut;
+  description: string;
 }
 
 // ===== ALIADOS =====
@@ -914,36 +946,16 @@ export const AntagonistSchema = z.object({
 
 export const ComplicationSchema = z.object({
   category: z.nativeEnum(ComplicationCategory),
-  specificType: z.string(),
-  title: z.string(),
+  specificDetail: z.string(),
   description: z.string(),
-  impact: z.object({
-    severity: z.enum(["Menor", "Moderado", "Maior", "Crítico"]),
-    affectedAspects: z.array(
-      z.enum(["Tempo", "Recursos", "Stealth", "Combat", "Social", "Navigation"])
-    ),
-    experienceModifier: z.number(),
-    difficultyIncrease: z.number(),
-  }),
-  solutions: z.object({
-    direct: z.array(z.string()),
-    creative: z.array(z.string()),
-    avoidance: z.array(z.string()).optional(),
-  }),
-  revelation: z.object({
-    timing: z.enum([
-      "Imediato",
-      "Durante planejamento",
-      "No meio da missão",
-      "No clímax",
-    ]),
-    method: z.enum([
-      "Óbvio",
-      "Investigação",
-      "Descoberta acidental",
-      "Traição",
-    ]),
-  }),
+});
+
+export const TwistSchema = z.object({
+  hasTwist: z.boolean(),
+  who: z.nativeEnum(TwistWho).optional(),
+  what: z.nativeEnum(TwistWhat).optional(),
+  but: z.nativeEnum(TwistBut).optional(),
+  description: z.string(),
 });
 
 export const ContractAllySchema = z.object({
@@ -1072,61 +1084,8 @@ export function validateComplication(data: unknown): Complication {
 }
 
 /**
- * Valida um aliado usando o schema Zod
+ * Valida uma reviravolta usando o schema Zod
  */
-export function validateContractAlly(data: unknown): ContractAlly {
-  return ContractAllySchema.parse(data);
-}
-
-/**
- * Valida uma recompensa adicional usando o schema Zod
- */
-export function validateContractReward(data: unknown): ContractReward {
-  return ContractRewardSchema.parse(data);
-}
-
-/**
- * Calcula modificador de dificuldade baseado em complicações
- */
-export function calculateComplicationDifficultyModifier(
-  complications: Complication[]
-): number {
-  return complications.reduce((total, complication) => {
-    const severityMap = { Menor: 1, Moderado: 2, Maior: 3, Crítico: 5 };
-    return total + severityMap[complication.impact.severity];
-  }, 0);
-}
-
-/**
- * Verifica se um aliado está disponível baseado nas condições
- */
-export function isAllyAvailable(
-  ally: ContractAlly,
-  conditions: string[] = []
-): boolean {
-  if (ally.availability.type === AllyAvailability.SEMPRE_DISPONIVEL) {
-    return true;
-  }
-
-  if (ally.availability.type === AllyAvailability.CONDICIONAL) {
-    return (
-      ally.availability.conditions?.every((condition) =>
-        conditions.includes(condition)
-      ) ?? false
-    );
-  }
-
-  return false;
-}
-
-/**
- * Calcula valor total de recompensas adicionais
- */
-export function calculateAdditionalRewardsValue(
-  rewards: ContractReward[]
-): number {
-  return rewards.reduce(
-    (total, reward) => total + reward.value.estimatedGoldValue,
-    0
-  );
+export function validateTwist(data: unknown): Twist {
+  return TwistSchema.parse(data);
 }
