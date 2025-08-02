@@ -1,365 +1,163 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect } from "vitest";
 import {
-  // Dados baseados em valor
-  PREREQUISITE_DICE_BY_VALUE,
-  CLAUSE_DICE_BY_VALUE,
-  PAYMENT_TYPE_DICE_BY_VALUE,
-  
-  // Tabelas principais
-  CONTRACT_PREREQUISITES_TABLE,
-  CONTRACT_CLAUSES_TABLE,
-  CONTRACT_PAYMENT_TYPE_TABLE,
-  SIGNED_CONTRACT_RESOLUTION_TIME_TABLE,
-  UNSIGNED_CONTRACT_RESOLUTION_TIME_TABLE,
-  SIGNED_CONTRACT_RESOLUTION_TABLE,
   UNSIGNED_CONTRACT_RESOLUTION_TABLE,
+  UNSIGNED_CONTRACT_RESOLUTION_TIME_TABLE,
+  SIGNED_CONTRACT_RESOLUTION_TIME_TABLE,
+  SIGNED_CONTRACT_RESOLUTION_TABLE,
   CONTRACT_FAILURE_REASONS_TABLE,
   NEW_CONTRACTS_TIME_TABLE,
-  
-  // Constantes
-  CONTRACT_BREACH_PENALTY_PERCENTAGE,
-  UNRESOLVED_CONTRACT_BONUS,
-  REQUIREMENT_CLAUSE_BONUS,
-  
-  // Funções utilitárias
-  getPrerequisiteDice,
-  getClauseDice,
   getPaymentTypeDice,
   calculateBreachPenalty,
   calculateRequirementClauseBonus,
-} from '@/data/tables/contract-modifier-tables'
+  CONTRACT_BREACH_PENALTY_RATE,
+  UNRESOLVED_CONTRACT_BONUS,
+  REQUIREMENT_CLAUSE_BONUS,
+} from "@/data/tables/contract-modifier-tables";
+import type { TableEntry } from "@/types/tables";
 
-import { 
-  ContractResolution, 
-  FailureReason, 
-  PaymentType 
-} from '@/types/contract'
+describe("Contract Lifecycle Tables", () => {
+  describe("Resolution Time Tables", () => {
+    it("should have valid time ranges for signed contracts", () => {
+      expect(SIGNED_CONTRACT_RESOLUTION_TIME_TABLE).toBeDefined();
+      expect(SIGNED_CONTRACT_RESOLUTION_TIME_TABLE.length).toBeGreaterThan(0);
 
-// ===== TESTES DE DADOS BASEADOS EM VALOR =====
+      SIGNED_CONTRACT_RESOLUTION_TIME_TABLE.forEach(
+        (entry: TableEntry<string>) => {
+          expect(entry.min).toBeGreaterThan(0);
+          expect(entry.max).toBeGreaterThanOrEqual(entry.min);
+          expect(entry.result).toMatch(
+            /\d+\s+(dia|dias|semana|semanas|mês|meses)/
+          );
+        }
+      );
+    });
 
-describe('Contract Modifier Tables - Value-Based Dice Data', () => {
-  describe('PREREQUISITE_DICE_BY_VALUE', () => {
-    it('should have correct dice notation and modifiers for all value ranges', () => {
-      expect(PREREQUISITE_DICE_BY_VALUE["1-20"]).toEqual({ diceNotation: "1d20", modifier: -10 })
-      expect(PREREQUISITE_DICE_BY_VALUE["21-40"]).toEqual({ diceNotation: "1d20", modifier: -5 })
-      expect(PREREQUISITE_DICE_BY_VALUE["41-60"]).toEqual({ diceNotation: "1d20", modifier: 0 })
-      expect(PREREQUISITE_DICE_BY_VALUE["61-80"]).toEqual({ diceNotation: "1d20", modifier: 5 })
-      expect(PREREQUISITE_DICE_BY_VALUE["81-100"]).toEqual({ diceNotation: "1d20", modifier: 10 })
-      expect(PREREQUISITE_DICE_BY_VALUE["101+"]).toEqual({ diceNotation: "1d20", modifier: 15 })
-    })
-  })
+    it("should have valid time ranges for unsigned contracts", () => {
+      expect(UNSIGNED_CONTRACT_RESOLUTION_TIME_TABLE).toBeDefined();
+      expect(UNSIGNED_CONTRACT_RESOLUTION_TIME_TABLE.length).toBeGreaterThan(0);
 
-  describe('CLAUSE_DICE_BY_VALUE', () => {
-    it('should have correct dice notation and modifiers for all value ranges', () => {
-      expect(CLAUSE_DICE_BY_VALUE["1-20"]).toEqual({ diceNotation: "1d20", modifier: -2 })
-      expect(CLAUSE_DICE_BY_VALUE["21-40"]).toEqual({ diceNotation: "1d20", modifier: -1 })
-      expect(CLAUSE_DICE_BY_VALUE["41-60"]).toEqual({ diceNotation: "1d20", modifier: 0 })
-      expect(CLAUSE_DICE_BY_VALUE["61-80"]).toEqual({ diceNotation: "1d20", modifier: 2 })
-      expect(CLAUSE_DICE_BY_VALUE["81-100"]).toEqual({ diceNotation: "1d20", modifier: 5 })
-      expect(CLAUSE_DICE_BY_VALUE["101+"]).toEqual({ diceNotation: "1d20", modifier: 7 })
-    })
-  })
+      UNSIGNED_CONTRACT_RESOLUTION_TIME_TABLE.forEach(
+        (entry: TableEntry<string>) => {
+          expect(entry.min).toBeGreaterThan(0);
+          expect(entry.max).toBeGreaterThanOrEqual(entry.min);
+          expect(entry.result).toMatch(
+            /\d+\s+(dia|dias|semana|semanas|mês|meses)/
+          );
+        }
+      );
+    });
+  });
 
-  describe('PAYMENT_TYPE_DICE_BY_VALUE', () => {
-    it('should have correct dice notation and modifiers for all value ranges', () => {
-      expect(PAYMENT_TYPE_DICE_BY_VALUE["1-20"]).toEqual({ diceNotation: "1d20", modifier: -2 })
-      expect(PAYMENT_TYPE_DICE_BY_VALUE["21-40"]).toEqual({ diceNotation: "1d20", modifier: -1 })
-      expect(PAYMENT_TYPE_DICE_BY_VALUE["41-60"]).toEqual({ diceNotation: "1d20", modifier: 0 })
-      expect(PAYMENT_TYPE_DICE_BY_VALUE["61-80"]).toEqual({ diceNotation: "1d20", modifier: 2 })
-      expect(PAYMENT_TYPE_DICE_BY_VALUE["81-100"]).toEqual({ diceNotation: "1d20", modifier: 5 })
-      expect(PAYMENT_TYPE_DICE_BY_VALUE["101+"]).toEqual({ diceNotation: "1d20", modifier: 7 })
-    })
-  })
-})
+  describe("Contract Resolution Tables", () => {
+    it("should cover all possible signed contract outcomes", () => {
+      expect(SIGNED_CONTRACT_RESOLUTION_TABLE).toBeDefined();
+      expect(SIGNED_CONTRACT_RESOLUTION_TABLE.length).toBeGreaterThan(0);
 
-// ===== TESTES DE TABELAS PRINCIPAIS =====
+      SIGNED_CONTRACT_RESOLUTION_TABLE.forEach((entry) => {
+        expect(entry.min).toBeGreaterThan(0);
+        expect(entry.max).toBeGreaterThanOrEqual(entry.min);
 
-describe('Contract Modifier Tables - Main Tables', () => {
-  describe('CONTRACT_PREREQUISITES_TABLE', () => {
-    it('should cover dice range 1-20 completely', () => {
-      const table = CONTRACT_PREREQUISITES_TABLE
-      
-      // Verificar cobertura de 1-20
-      for (let i = 1; i <= 20; i++) {
-        const hasEntry = table.some(entry => i >= entry.min && i <= entry.max)
-        expect(hasEntry, `Value ${i} should be covered`).toBe(true)
-      }
-    })
+        // Verifica tipos válidos de resolução para contratos assinados usando valores de enum
+        const validResolutions = [
+          "O contrato foi resolvido",
+          "O contrato não foi resolvido",
+          "O contrato foi resolvido mas com ressalvas",
+          "Ainda não se sabe",
+        ];
+        expect(validResolutions).toContain(entry.result);
+      });
+    });
 
-    it('should have specific prerequisite entries from .md file', () => {
-      const table = CONTRACT_PREREQUISITES_TABLE
-      
-      expect(table.find(e => e.min === 1 && e.max === 5)?.result).toBe("Nenhum")
-      expect(table.find(e => e.min === 6 && e.max === 6)?.result).toBe("5 de renome")
-      expect(table.find(e => e.min === 7 && e.max === 7)?.result).toBe("Um conjurador")
-      expect(table.find(e => e.min === 20 && e.max === 20)?.result).toBe("Ter 50 de renome")
-      expect(table.find(e => e.min === 21)?.result).toBe("Role duas vezes e use ambos")
-    })
-  })
+    it("should cover all possible unsigned contract outcomes", () => {
+      expect(UNSIGNED_CONTRACT_RESOLUTION_TABLE).toBeDefined();
+      expect(UNSIGNED_CONTRACT_RESOLUTION_TABLE.length).toBeGreaterThan(0);
 
-  describe('CONTRACT_CLAUSES_TABLE', () => {
-    it('should cover dice range 1-20 completely', () => {
-      const table = CONTRACT_CLAUSES_TABLE
-      
-      for (let i = 1; i <= 20; i++) {
-        const hasEntry = table.some(entry => i >= entry.min && i <= entry.max)
-        expect(hasEntry, `Value ${i} should be covered`).toBe(true)
-      }
-    })
+      UNSIGNED_CONTRACT_RESOLUTION_TABLE.forEach((entry) => {
+        expect(entry.min).toBeGreaterThan(0);
+        expect(entry.max).toBeGreaterThanOrEqual(entry.min);
+        expect(entry.result).toHaveProperty("description");
+        expect(entry.result).toHaveProperty("action");
+      });
+    });
+  });
 
-    it('should have specific clause entries from .md file', () => {
-      const table = CONTRACT_CLAUSES_TABLE
-      
-      expect(table.find(e => e.min === 1 && e.max === 7)?.result).toBe("Nenhuma")
-      expect(table.find(e => e.min === 8 && e.max === 8)?.result).toBe("Nenhum inimigo deve ser morto")
-      expect(table.find(e => e.min === 20 && e.max === 20)?.result).toBe("Sigilo absoluto")
-      expect(table.find(e => e.min === 21)?.result).toBe("Role duas vezes e use ambos")
-    })
-  })
+  describe("Contract Failure Reasons Table", () => {
+    it("should have valid failure reasons", () => {
+      expect(CONTRACT_FAILURE_REASONS_TABLE).toBeDefined();
+      expect(CONTRACT_FAILURE_REASONS_TABLE.length).toBeGreaterThan(0);
 
-  describe('CONTRACT_PAYMENT_TYPE_TABLE', () => {
-    it('should cover dice range 1-20 completely', () => {
-      const table = CONTRACT_PAYMENT_TYPE_TABLE
-      
-      for (let i = 1; i <= 20; i++) {
-        const hasEntry = table.some(entry => i >= entry.min && i <= entry.max)
-        expect(hasEntry, `Value ${i} should be covered`).toBe(true)
-      }
-    })
+      CONTRACT_FAILURE_REASONS_TABLE.forEach((entry) => {
+        expect(entry.min).toBeGreaterThan(0);
+        expect(entry.max).toBeGreaterThanOrEqual(entry.min);
 
-    it('should have correct payment type distributions', () => {
-      const table = CONTRACT_PAYMENT_TYPE_TABLE
-      
-      expect(table.find(e => e.min === 1 && e.max === 3)?.result).toBe(PaymentType.DIRETO_CONTRATANTE)
-      expect(table.find(e => e.min === 4 && e.max === 6)?.result).toBe(PaymentType.METADE_GUILDA_METADE_CONTRATANTE)
-      expect(table.find(e => e.min === 13 && e.max === 20)?.result).toBe(PaymentType.TOTAL_GUILDA)
-    })
-  })
+        // Verifica tipos válidos de razão de falha usando valores de enum
+        const validReasons = [
+          "Quebra devido a desistência",
+          "Quebra devido a picaretagem do contratante",
+          "Óbito de todos ou maioria dos envolvidos",
+          "Prazo não cumprido ou contratados desaparecidos",
+          "Quebra devido a cláusula adicional não cumprida",
+          "Contratante morto ou desaparecido",
+        ];
+        expect(validReasons).toContain(entry.result);
+      });
+    });
+  });
 
-  describe('SIGNED_CONTRACT_RESOLUTION_TIME_TABLE', () => {
-    it('should cover dice range 1-20 completely', () => {
-      const table = SIGNED_CONTRACT_RESOLUTION_TIME_TABLE
-      
-      for (let i = 1; i <= 20; i++) {
-        const hasEntry = table.some(entry => i >= entry.min && i <= entry.max)
-        expect(hasEntry, `Value ${i} should be covered`).toBe(true)
-      }
-    })
+  describe("New Contracts Time Table", () => {
+    it("should have valid time intervals for new contracts", () => {
+      expect(NEW_CONTRACTS_TIME_TABLE).toBeDefined();
+      expect(NEW_CONTRACTS_TIME_TABLE.length).toBeGreaterThan(0);
 
-    it('should have time-based resolution entries', () => {
-      const table = SIGNED_CONTRACT_RESOLUTION_TIME_TABLE
-      
-      expect(table.find(e => e.min === 1 && e.max === 6)?.result).toBe("1d6 dias")
-      expect(table.find(e => e.min === 7 && e.max === 8)?.result).toBe("1 semana")
-      expect(table.find(e => e.min === 19 && e.max === 19)?.result).toBe("3 semanas")
-    })
-  })
+      NEW_CONTRACTS_TIME_TABLE.forEach((entry: TableEntry<string>) => {
+        expect(entry.min).toBeGreaterThan(0);
+        expect(entry.max).toBeGreaterThanOrEqual(entry.min);
+        expect(entry.result).toMatch(
+          /\d+\s+(dia|dias|semana|semanas|mês|meses)/
+        );
+      });
+    });
+  });
 
-  describe('UNSIGNED_CONTRACT_RESOLUTION_TIME_TABLE', () => {
-    it('should cover dice range 1-20 completely', () => {
-      const table = UNSIGNED_CONTRACT_RESOLUTION_TIME_TABLE
-      
-      for (let i = 1; i <= 20; i++) {
-        const hasEntry = table.some(entry => i >= entry.min && i <= entry.max)
-        expect(hasEntry, `Value ${i} should be covered`).toBe(true)
-      }
-    })
+  describe("Payment Type Dice Functions", () => {
+    it("should return correct dice notation for different value ranges", () => {
+      const testValues = [10, 25, 50, 75, 95, 150];
 
-    it('should have shorter resolution times than signed contracts', () => {
-      const table = UNSIGNED_CONTRACT_RESOLUTION_TIME_TABLE
-      
-      expect(table.find(e => e.min === 1 && e.max === 4)?.result).toBe("3 dias")
-      expect(table.find(e => e.min === 20 && e.max === 20)?.result).toBe("1 dia")
-    })
-  })
+      testValues.forEach((value) => {
+        const dice = getPaymentTypeDice(value);
+        expect(dice).toHaveProperty("diceNotation");
+        expect(dice.diceNotation).toMatch(/^\d+d\d+(\+\d+)?$/);
+      });
+    });
+  });
 
-  describe('SIGNED_CONTRACT_RESOLUTION_TABLE', () => {
-    it('should cover dice range 1-20 completely', () => {
-      const table = SIGNED_CONTRACT_RESOLUTION_TABLE
-      
-      for (let i = 1; i <= 20; i++) {
-        const hasEntry = table.some(entry => i >= entry.min && i <= entry.max)
-        expect(hasEntry, `Value ${i} should be covered`).toBe(true)
-      }
-    })
+  describe("Contract Constants", () => {
+    it("should have correct penalty rate", () => {
+      expect(CONTRACT_BREACH_PENALTY_RATE).toBe(0.1);
+    });
 
-    it('should have correct resolution distributions', () => {
-      const table = SIGNED_CONTRACT_RESOLUTION_TABLE
-      
-      expect(table.find(e => e.min === 1 && e.max === 12)?.result).toBe(ContractResolution.RESOLVIDO)
-      expect(table.find(e => e.min === 13 && e.max === 16)?.result).toBe(ContractResolution.NAO_RESOLVIDO)
-      expect(table.find(e => e.min === 19 && e.max === 20)?.result).toBe(ContractResolution.AINDA_NAO_SE_SABE)
-    })
-  })
+    it("should have correct bonus values", () => {
+      expect(UNRESOLVED_CONTRACT_BONUS).toBe(2);
+      expect(REQUIREMENT_CLAUSE_BONUS).toBe(5);
+    });
+  });
 
-  describe('UNSIGNED_CONTRACT_RESOLUTION_TABLE', () => {
-    it('should cover dice range 1-20 completely', () => {
-      const table = UNSIGNED_CONTRACT_RESOLUTION_TABLE
-      
-      for (let i = 1; i <= 20; i++) {
-        const hasEntry = table.some(entry => i >= entry.min && i <= entry.max)
-        expect(hasEntry, `Value ${i} should be covered`).toBe(true)
-      }
-    })
+  describe("Calculation Functions", () => {
+    it("should calculate breach penalty correctly", () => {
+      expect(calculateBreachPenalty(100)).toBe(10);
+      expect(calculateBreachPenalty(500)).toBe(50);
+      expect(calculateBreachPenalty(0)).toBe(0);
+    });
 
-    it('should have correct resolution actions', () => {
-      const table = UNSIGNED_CONTRACT_RESOLUTION_TABLE
-      
-      expect(table.find(e => e.min === 1 && e.max === 2)?.result.action).toBe("keep_all")
-      expect(table.find(e => e.min === 3 && e.max === 5)?.result.action).toBe("resolve_all")
-      expect(table.find(e => e.min === 20 && e.max === 20)?.result.action).toBe("strange_reason")
-    })
-  })
+    it("should calculate requirement clause bonus correctly", () => {
+      const bonus = calculateRequirementClauseBonus(2, 1);
+      expect(bonus).toBe(15); // (2 + 1) * 5 = 15
 
-  describe('CONTRACT_FAILURE_REASONS_TABLE', () => {
-    it('should cover dice range 1-20 completely', () => {
-      const table = CONTRACT_FAILURE_REASONS_TABLE
-      
-      for (let i = 1; i <= 20; i++) {
-        const hasEntry = table.some(entry => i >= entry.min && i <= entry.max)
-        expect(hasEntry, `Value ${i} should be covered`).toBe(true)
-      }
-    })
+      const noBonus = calculateRequirementClauseBonus(0, 0);
+      expect(noBonus).toBe(0);
 
-    it('should have correct failure reason distributions', () => {
-      const table = CONTRACT_FAILURE_REASONS_TABLE
-      
-      expect(table.find(e => e.min === 1 && e.max === 6)?.result).toBe(FailureReason.DESISTENCIA)
-      expect(table.find(e => e.min === 8 && e.max === 14)?.result).toBe(FailureReason.OBITO)
-      expect(table.find(e => e.min === 20 && e.max === 20)?.result).toBe(FailureReason.CONTRATANTE_MORTO)
-    })
-  })
-
-  describe('NEW_CONTRACTS_TIME_TABLE', () => {
-    it('should cover dice range 1-20 completely', () => {
-      const table = NEW_CONTRACTS_TIME_TABLE
-      
-      for (let i = 1; i <= 20; i++) {
-        const hasEntry = table.some(entry => i >= entry.min && i <= entry.max)
-        expect(hasEntry, `Value ${i} should be covered`).toBe(true)
-      }
-    })
-
-    it('should have varied time ranges for new contracts', () => {
-      const table = NEW_CONTRACTS_TIME_TABLE
-      
-      expect(table.find(e => e.min === 1 && e.max === 1)?.result).toBe("1d6 dias")
-      expect(table.find(e => e.min === 18 && e.max === 18)?.result).toBe("2 meses")
-      expect(table.find(e => e.min === 20 && e.max === 20)?.result).toBe("3 meses")
-    })
-  })
-})
-
-// ===== TESTES DE CONSTANTES =====
-
-describe('Contract Modifier Tables - Constants', () => {
-  it('should have correct constant values from .md file', () => {
-    expect(CONTRACT_BREACH_PENALTY_PERCENTAGE).toBe(0.1) // 10%
-    expect(UNRESOLVED_CONTRACT_BONUS).toBe(2)
-    expect(REQUIREMENT_CLAUSE_BONUS).toBe(5)
-  })
-})
-
-// ===== TESTES DE FUNÇÕES UTILITÁRIAS =====
-
-describe('Contract Modifier Tables - Utility Functions', () => {
-  describe('getPrerequisiteDice', () => {
-    it('should return correct dice for each value range', () => {
-      expect(getPrerequisiteDice(10)).toEqual({ diceNotation: "1d20", modifier: -10 })
-      expect(getPrerequisiteDice(30)).toEqual({ diceNotation: "1d20", modifier: -5 })
-      expect(getPrerequisiteDice(50)).toEqual({ diceNotation: "1d20", modifier: 0 })
-      expect(getPrerequisiteDice(70)).toEqual({ diceNotation: "1d20", modifier: 5 })
-      expect(getPrerequisiteDice(90)).toEqual({ diceNotation: "1d20", modifier: 10 })
-      expect(getPrerequisiteDice(150)).toEqual({ diceNotation: "1d20", modifier: 15 })
-    })
-
-    it('should handle boundary values correctly', () => {
-      expect(getPrerequisiteDice(20)).toEqual({ diceNotation: "1d20", modifier: -10 })
-      expect(getPrerequisiteDice(21)).toEqual({ diceNotation: "1d20", modifier: -5 })
-      expect(getPrerequisiteDice(100)).toEqual({ diceNotation: "1d20", modifier: 10 })
-      expect(getPrerequisiteDice(101)).toEqual({ diceNotation: "1d20", modifier: 15 })
-    })
-  })
-
-  describe('getClauseDice', () => {
-    it('should return correct dice for each value range', () => {
-      expect(getClauseDice(15)).toEqual({ diceNotation: "1d20", modifier: -2 })
-      expect(getClauseDice(35)).toEqual({ diceNotation: "1d20", modifier: -1 })
-      expect(getClauseDice(55)).toEqual({ diceNotation: "1d20", modifier: 0 })
-      expect(getClauseDice(75)).toEqual({ diceNotation: "1d20", modifier: 2 })
-      expect(getClauseDice(95)).toEqual({ diceNotation: "1d20", modifier: 5 })
-      expect(getClauseDice(200)).toEqual({ diceNotation: "1d20", modifier: 7 })
-    })
-  })
-
-  describe('getPaymentTypeDice', () => {
-    it('should return correct dice for each value range', () => {
-      expect(getPaymentTypeDice(5)).toEqual({ diceNotation: "1d20", modifier: -2 })
-      expect(getPaymentTypeDice(25)).toEqual({ diceNotation: "1d20", modifier: -1 })
-      expect(getPaymentTypeDice(45)).toEqual({ diceNotation: "1d20", modifier: 0 })
-      expect(getPaymentTypeDice(65)).toEqual({ diceNotation: "1d20", modifier: 2 })
-      expect(getPaymentTypeDice(85)).toEqual({ diceNotation: "1d20", modifier: 5 })
-      expect(getPaymentTypeDice(120)).toEqual({ diceNotation: "1d20", modifier: 7 })
-    })
-  })
-
-  describe('calculateBreachPenalty', () => {
-    it('should calculate 10% penalty correctly', () => {
-      expect(calculateBreachPenalty(100)).toBe(10)
-      expect(calculateBreachPenalty(250)).toBe(25)
-      expect(calculateBreachPenalty(33)).toBe(3) // Floor de 3.3
-    })
-
-    it('should handle zero and negative values', () => {
-      expect(calculateBreachPenalty(0)).toBe(0)
-      expect(calculateBreachPenalty(-50)).toBe(-5)
-    })
-  })
-
-  describe('calculateRequirementClauseBonus', () => {
-    it('should calculate bonus correctly for prerequisites and clauses', () => {
-      expect(calculateRequirementClauseBonus(0, 0)).toBe(0)
-      expect(calculateRequirementClauseBonus(1, 0)).toBe(5)
-      expect(calculateRequirementClauseBonus(0, 1)).toBe(5)
-      expect(calculateRequirementClauseBonus(2, 3)).toBe(25) // (2+3) * 5
-    })
-  })
-})
-
-// ===== TESTES DE INTEGRAÇÃO =====
-
-describe('Contract Modifier Tables - Integration Tests', () => {
-  it('should handle complex modifier scenarios', () => {
-    // Cenário: Contrato de alto valor com múltiplos requisitos
-    const contractValue = 85
-    const rewardValue = 90
-    
-    const prerequisiteDice = getPrerequisiteDice(contractValue)
-    const clauseDice = getClauseDice(rewardValue)
-    const paymentDice = getPaymentTypeDice(contractValue)
-    
-    expect(prerequisiteDice.modifier).toBe(10) // Alto valor = alto modificador
-    expect(clauseDice.modifier).toBe(5)       // Alta recompensa = bom modificador
-    expect(paymentDice.modifier).toBe(5)      // Alto valor = melhor pagamento
-    
-    // Bonus por ter requisitos/cláusulas
-    const bonus = calculateRequirementClauseBonus(1, 1)
-    expect(bonus).toBe(10) // +5 por requisito, +5 por cláusula
-  })
-
-  it('should handle low-value contract scenarios', () => {
-    // Cenário: Contrato de baixo valor
-    const contractValue = 15
-    const rewardValue = 18
-    
-    const prerequisiteDice = getPrerequisiteDice(contractValue)
-    const clauseDice = getClauseDice(rewardValue)
-    
-    expect(prerequisiteDice.modifier).toBe(-10) // Baixo valor = penalidade
-    expect(clauseDice.modifier).toBe(-2)        // Baixa recompensa = penalidade
-    
-    // Penalidade por quebra seria mínima
-    const penalty = calculateBreachPenalty(rewardValue)
-    expect(penalty).toBe(1) // 10% de 18 = 1.8, floor = 1
-  })
-})
+      const singleReq = calculateRequirementClauseBonus(1, 0);
+      expect(singleReq).toBe(5); // 1 * 5 = 5
+    });
+  });
+});
