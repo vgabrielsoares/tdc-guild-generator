@@ -680,12 +680,62 @@ export enum TwistBut {
   TEMPO_SE_ESGOTANDO = "O tempo está se esgotando",
 }
 
+// Primeira tabela "E..." - Complicações adicionais da reviravolta
+export enum TwistAndFirst {
+  TODOS_MORTOS = "Todos já estão mortos",
+  CONTRATADO_VILAO = "O contratado é o verdadeiro vilão",
+  NOVO_ANTAGONISTA = "Um novo antagonista surge em paralelo",
+  INFORMACOES_FALSAS = "As informações fornecidas são falsas",
+  ANTAGONISTA_PARENTE = "O antagonista é um parente próximo",
+  OUTRO_GRUPO_CUMPRE = "Outro grupo cumpre o objetivo",
+  OBJETIVO_INEXISTENTE = "O objetivo nunca existiu realmente",
+  CONSPIRACAO_MAIOR = "Há uma conspiração maior por trás",
+  LOCAL_AMALDICOADO = "O local está amaldiçoado",
+  TESTE_CARATER = "Tudo é um teste de caráter",
+  TEMPO_LOOP = "O tempo está em loop",
+  MULTIPLAS_REALIDADES = "Existem múltiplas versões da realidade",
+  CONTRATO_DISTRACAO = "O contrato é uma distração para outro plano",
+  ALGUEM_OBSERVA = "Alguém está observando e julgando",
+  OBJETIVO_DIFERENTE = "O verdadeiro objetivo é completamente diferente",
+  TRAIDOR_GRUPO = "Há um traidor no grupo",
+  PROBLEMA_SE_RESOLVE = "O problema se resolve sozinho",
+  RITUAL_MAIOR = "Tudo faz parte de um ritual maior",
+  ANTAGONISTA_CERTO = "O antagonista está certo",
+  CONSEQUENCIAS_IRREVERSIVEIS = "As consequências são irreversíveis",
+}
+
+// Segunda tabela "E..." - Complicações extremas da reviravolta
+export enum TwistAndSecond {
+  CUMPLICIDADE_VITIMAS = "Há cumplicidade da(s) vítima(s) com o vilão",
+  TUDO_UM_JOGO = "Era tudo parte de um jogo",
+  AFETA_OUTRO_PLANO = "Cumprir o objetivo afeta negativamente outro plano",
+  DOIS_ANTAGONISTAS = "O contratado está sendo manipulado por dois antagonistas",
+  TUDO_SONHO = "Tudo não passa de um sonho",
+  VINGANCA_PLANEJADA = "Tudo foi uma vingança friamente planejada",
+  ILUSAO_COLETIVA = "O problema era uma ilusão coletiva",
+  VERSAO_ALTERNATIVA = "Existe uma versão alternativa dos eventos",
+  REESCREVENDO_HISTORIA = "Alguém está reescrevendo a história",
+  CONFLITO_CICLICO = "O conflito é cíclico e se repete eternamente",
+  PECAS_JOGO_MAIOR = "Todos os envolvidos são peças de um jogo maior",
+  SOLUCAO_CRIA_PROBLEMA = "A solução cria um problema ainda maior",
+  NADA_PODE_DESFAZER = "Nada do que aconteceu pode ser desfeito",
+  PODER_NAS_CRIANCAS = "O verdadeiro poder está nas mãos de uma criança",
+  MORTE_NAO_PERMANENTE = "A morte não é permanente neste caso",
+  OBSERVADORES_DIMENSIONAIS = "Há observadores de outras dimensões",
+  LOCAL_CONSCIENTE = "O local tem sua própria consciência",
+  TEMPO_DIFERENTE = "O tempo flui diferente para cada pessoa",
+  MEMORIAS_ALTERADAS = "As memórias de todos estão sendo alteradas",
+  REALIDADE_DESFAZENDO = "A realidade está se desfazendo lentamente",
+}
+
 // Interface da reviravolta completa
 export interface Twist {
   hasTwist: boolean;
   who?: TwistWho;
   what?: TwistWhat;
   but?: TwistBut;
+  andFirst?: TwistAndFirst;
+  andSecond?: TwistAndSecond;
   description: string;
 }
 
@@ -805,7 +855,7 @@ export interface UnusualContractor {
   description: string;
   motivations?: string[];
   quirks?: string[];
-  themeKeywords?: ThemeKeyword[];
+  themeKeywords: ThemeKeyword[];
 }
 
 // ===== SCHEMAS ZOD PARA VALIDAÇÃO =====
@@ -868,6 +918,8 @@ export const TwistSchema = z.object({
   who: z.nativeEnum(TwistWho).optional(),
   what: z.nativeEnum(TwistWhat).optional(),
   but: z.nativeEnum(TwistBut).optional(),
+  andFirst: z.nativeEnum(TwistAndFirst).optional(),
+  andSecond: z.nativeEnum(TwistAndSecond).optional(),
   description: z.string(),
 });
 
@@ -907,7 +959,7 @@ export const UnusualContractorSchema = z.object({
   description: z.string(),
   motivations: z.array(z.string()).optional(),
   quirks: z.array(z.string()).optional(),
-  themeKeywords: z.array(ThemeKeywordSchema).optional(),
+  themeKeywords: z.array(ThemeKeywordSchema),
 });
 
 // ===== FUNÇÕES UTILITÁRIAS =====
