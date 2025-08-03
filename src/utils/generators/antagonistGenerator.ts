@@ -33,8 +33,16 @@ export class AntagonistGenerator {
    * Gera múltiplos antagonistas quando o resultado indica "Role duas vezes"
    */
   private static generateMultipleAntagonists(): Antagonist {
-    const firstType = rollOnTable(ANTAGONIST_TYPES_TABLE).result;
-    const secondType = rollOnTable(ANTAGONIST_TYPES_TABLE).result;
+    // Rola até obter tipos válidos (não "Role duas vezes")
+    let firstType = rollOnTable(ANTAGONIST_TYPES_TABLE).result;
+    while (shouldRollTwice(firstType)) {
+      firstType = rollOnTable(ANTAGONIST_TYPES_TABLE).result;
+    }
+
+    let secondType = rollOnTable(ANTAGONIST_TYPES_TABLE).result;
+    while (shouldRollTwice(secondType)) {
+      secondType = rollOnTable(ANTAGONIST_TYPES_TABLE).result;
+    }
 
     const firstAntagonist = this.generateSingleAntagonist(firstType);
     const secondAntagonist = this.generateSingleAntagonist(secondType);
@@ -66,8 +74,16 @@ export class AntagonistGenerator {
 
     // Se der "Role duas vezes" na tabela de detalhes, combina dois resultados
     if (shouldRollTwice(specificType)) {
-      const firstDetail = rollOnTable(detailTable).result;
-      const secondDetail = rollOnTable(detailTable).result;
+      let firstDetail = rollOnTable(detailTable).result;
+      while (shouldRollTwice(firstDetail)) {
+        firstDetail = rollOnTable(detailTable).result;
+      }
+
+      let secondDetail = rollOnTable(detailTable).result;
+      while (shouldRollTwice(secondDetail)) {
+        secondDetail = rollOnTable(detailTable).result;
+      }
+
       specificType = `${firstDetail} e ${secondDetail}`;
     }
 
