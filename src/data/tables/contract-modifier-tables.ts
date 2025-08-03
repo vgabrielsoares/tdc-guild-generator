@@ -91,15 +91,11 @@ export const SIGNED_CONTRACT_RESOLUTION_TABLE: TableEntry<ContractResolution>[] 
 
 // ===== RESOLUÇÃO DE CONTRATOS NÃO ASSINADOS =====
 
-// Interface para resultado de resolução de contratos não assinados
-interface UnsignedResolutionResult {
+// Resultado da resolução de contratos não assinados
+export const UNSIGNED_CONTRACT_RESOLUTION_TABLE: TableEntry<{
   description: string;
   action: string;
-}
-
-// Resultado da resolução de contratos não assinados
-export const UNSIGNED_CONTRACT_RESOLUTION_TABLE: TableEntry<UnsignedResolutionResult>[] =
-  [
+}>[] = [
     {
       min: 1,
       max: 2,
@@ -198,10 +194,9 @@ export const NEW_CONTRACTS_TIME_TABLE: TableEntry<string>[] = [
   { min: 9, max: 13, result: "1d6+2 semanas" },
   { min: 14, max: 14, result: "1 mês" },
   { min: 15, max: 16, result: "2d6+3 semanas" },
-  { min: 17, max: 17, result: "1d20+10 dias" },
-  { min: 18, max: 18, result: "2 meses" },
-  { min: 19, max: 19, result: "2d6+6 semanas" },
-  { min: 20, max: 20, result: "3 meses" },
+  { min: 17, max: 18, result: "2 meses" },
+  { min: 19, max: 19, result: "1d4 meses" },
+  { min: 20, max: 20, result: "1d4+1 meses" },
 ];
 
 // ===== CONSTANTES DE MODIFICADORES =====
