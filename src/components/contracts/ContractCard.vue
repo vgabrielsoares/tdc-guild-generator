@@ -1,19 +1,210 @@
 <template>
-  <div class="contract-card p-4 bg-gray-700 rounded border border-gray-600">
-    <div class="text-center">
-      <h4 class="text-lg font-semibold text-amber-400 mb-2 flex items-center justify-center gap-2">
-        <font-awesome-icon :icon="['fas', 'scroll']" class="text-amber-400" />
-        Card de Contrato
-      </h4>
-      <p class="text-gray-300">
-        Componente será implementado na Issue 4.5
+  <div
+    class="contract-card bg-gray-800 border border-gray-600 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 hover:border-amber-400/50"
+    :class="[
+      { 'opacity-60': isExpired || isUnavailable },
+      { 'border-amber-400/30': isHighValue },
+      { 'border-red-400/30': isDangerous }
+    ]"
+  >
+    <!-- Header com status e tipo de contratante -->
+    <div class="p-4 border-b border-gray-700">
+      <div class="flex items-start justify-between">
+        <div class="flex items-center gap-2">
+          <font-awesome-icon
+            :icon="contractorIcon"
+            class="text-amber-400"
+          />
+          <h3 class="text-lg font-semibold text-amber-400">
+            {{ contract.title || `Contrato ${contract.id.slice(0, 6)}` }}
+          </h3>
+        </div>
+        <ContractStatus :status="contract.status" size="sm" />
+      </div>
+      
+      <p class="text-sm text-gray-400 mt-1">
+        {{ contractorTypeLabel }} - {{ contract.contractorName || 'Nome não especificado' }}
       </p>
+    </div>
+
+    <!-- Conteúdo principal -->
+    <div class="p-4 space-y-3">
+      <!-- Objetivo -->
+      <div v-if="contract.objective">
+        <p class="text-sm font-medium text-gray-300">
+          {{ contract.objective.category }}
+        </p>
+        <p class="text-sm text-gray-400 line-clamp-2">
+          {{ contract.objective.description }}
+        </p>
+      </div>
+
+      <!-- Localização -->
+      <div v-if="contract.location" class="flex items-center gap-2 text-sm text-gray-400">
+        <font-awesome-icon :icon="['fas', 'map-marker-alt']" class="text-amber-400" />
+        <span>{{ contract.location.name }}</span>
+        <span v-if="contract.location.description" class="text-xs">
+          ({{ contract.location.description }})
+        </span>
+      </div>
+
+      <!-- Valores e prazo -->
+      <div class="flex items-center justify-between">
+        <ContractValue
+          :value="contract.value"
+          :difficulty="contract.difficulty"
+          size="sm"
+        />
+        
+        <div v-if="contract.deadline.type !== 'Sem prazo'" class="text-right">
+          <p class="text-sm font-medium text-gray-300">
+            {{ contract.deadline.value }}
+          </p>
+          <p class="text-xs text-gray-500">
+            {{ contract.deadline.isFlexible ? 'Flexível' : 'Rígido' }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer com ações -->
+    <div class="p-4 pt-0">
+      <div class="flex gap-2">
+        <button
+          v-if="canAccept"
+          @click="$emit('accept', contract)"
+          class="flex-1 bg-green-600 hover:bg-green-700 text-white text-sm py-2 px-3 rounded transition-colors"
+        >
+          Aceitar
+        </button>
+        
+        <button
+          v-if="canComplete"
+          @click="$emit('complete', contract)"
+          class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 px-3 rounded transition-colors"
+        >
+          Concluir
+        </button>
+        
+        <button
+          @click="$emit('view-details', contract)"
+          class="flex-1 bg-gray-600 hover:bg-gray-700 text-white text-sm py-2 px-3 rounded transition-colors"
+        >
+          Detalhes
+        </button>
+        
+        <button
+          v-if="canAbandon"
+          @click="$emit('abandon', contract)"
+          class="bg-red-600 hover:bg-red-700 text-white text-sm py-2 px-3 rounded transition-colors"
+        >
+          <font-awesome-icon :icon="['fas', 'times']" />
+        </button>
+      </div>
+    </div>
+
+    <!-- Indicador de contrato perigoso -->
+    <div
+      v-if="isDangerous"
+      class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full shadow-lg"
+    >
+      {{ contract.difficulty }}
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-// ContractCard component
-// Will be implemented in Issue 4.5
-console.log('[CONTRACT CARD] ContractCard component loaded')
+import { computed } from 'vue';
+import type { Contract } from '@/types/contract';
+import { ContractStatus as Status, ContractorType, ContractDifficulty } from '@/types/contract';
+import ContractStatus from './ContractStatus.vue';
+import ContractValue from './ContractValue.vue';
+
+interface Props {
+  contract: Contract;
+  showActions?: boolean;
+}
+
+interface Emits {
+  accept: [contract: Contract];
+  complete: [contract: Contract];
+  abandon: [contract: Contract];
+  'view-details': [contract: Contract];
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  showActions: true
+});
+
+defineEmits<Emits>();
+
+// ===== COMPUTED =====
+
+const contractorIcon = computed(() => {
+  switch (props.contract.contractorType) {
+    case ContractorType.POVO:
+      return ['fas', 'users'];
+    case ContractorType.GOVERNO:
+      return ['fas', 'crown'];
+    case ContractorType.INSTITUICAO:
+      return ['fas', 'building'];
+    default:
+      return ['fas', 'question'];
+  }
+});
+
+const contractorTypeLabel = computed(() => {
+  return props.contract.contractorType;
+});
+
+const isExpired = computed(() => {
+  return props.contract.status === Status.EXPIRADO;
+});
+
+const isUnavailable = computed(() => {
+  return [
+    Status.CONCLUIDO,
+    Status.FALHOU,
+    Status.ANULADO,
+    Status.RESOLVIDO_POR_OUTROS
+  ].includes(props.contract.status);
+});
+
+const isHighValue = computed(() => {
+  return props.contract.value.finalGoldReward >= 100; // 1000+ pontos = 100+ PO$
+});
+
+const isDangerous = computed(() => {
+  return [ContractDifficulty.DIFICIL, ContractDifficulty.MORTAL].includes(
+    props.contract.difficulty
+  );
+});
+
+const canAccept = computed(() => {
+  return props.showActions && props.contract.status === Status.DISPONIVEL;
+});
+
+const canComplete = computed(() => {
+  return props.showActions && [
+    Status.ACEITO,
+    Status.EM_ANDAMENTO
+  ].includes(props.contract.status);
+});
+
+const canAbandon = computed(() => {
+  return props.showActions && [
+    Status.ACEITO,
+    Status.EM_ANDAMENTO
+  ].includes(props.contract.status);
+});
 </script>
+
+<style scoped>
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+</style>
