@@ -166,17 +166,21 @@ export function rollUnsignedContractResolution(): {
   if (result && typeof result === 'object' && 'action' in result) {
     response.type = mapActionToResult(result.action);
     
-    // Calcular count se necessário
-    if (result.action.includes("1d6")) {
-      if (result.action.includes("1d6+2")) {
-        response.count = rollDice({ notation: "1d6+2" }).result;
-      } else {
+    // Calcular count se necessário baseado na ação
+    switch (result.action) {
+      case "resolve_random_1d6":
         response.count = rollDice({ notation: "1d6" }).result;
-      }
-    } else if (result.action.includes("1d4+2")) {
-      response.count = rollDice({ notation: "1d4+2" }).result;
-    } else if (result.action.includes("2d6+2")) {
-      response.count = rollDice({ notation: "2d6+2" }).result;
+        break;
+      case "resolve_1d6plus2":
+        response.count = rollDice({ notation: "1d6+2" }).result;
+        break;
+      case "resolve_2d6plus2":
+        response.count = rollDice({ notation: "2d6+2" }).result;
+        break;
+      case "sign_but_not_resolve_1d4plus2":
+        response.count = rollDice({ notation: "1d4+2" }).result;
+        break;
+      // Para outras ações que não precisam de count, não definir
     }
   } else if (typeof result === 'string') {
     // Se é uma string direta, mapear diretamente
