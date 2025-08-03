@@ -267,58 +267,44 @@ export function applyUnresolvedBonus(rewardValue: number): number {
 
 // ===== OBJETIVOS DO CONTRATO =====
 
+// ===== OBJETIVOS DOS CONTRATOS =====
+
 // Categorias principais de objetivos
 export enum ObjectiveCategory {
-  ESCOLTA = "Escolta",
-  INVESTIGACAO = "Investigação",
-  RECUPERACAO = "Recuperação",
-  ELIMINACAO = "Eliminação",
-  EXPLORACAO = "Exploração",
-  NEGOCIACAO = "Negociação",
-  PROTECAO = "Proteção",
-  ENTREGA = "Entrega",
-  RESGATE = "Resgate",
-  INFILTRACAO = "Infiltração",
+  ATACAR_DESTRUIR = "Atacar/Destruir",
+  ENCONTRAR_RECUPERAR = "Encontrar/Recuperar",
+  CAPTURAR = "Capturar",
+  PROTEGER_SALVAR = "Proteger/Salvar",
+  EXPLORAR_DESCOBRIR = "Explorar/Descobrir",
+  ENTREGAR_RECEBER = "Entregar/Receber",
+  INVESTIGAR_SABOTAR = "Investigar/Sabotar",
+  SERVICOS_PERIGOSOS = "Serviços perigosos",
+  RELIGIOSO = "Religioso",
 }
 
-// Especificações detalhadas por tipo de objetivo
-export enum EscortObjective {
-  PESSOA_IMPORTANTE = "Escoltar pessoa importante",
-  CARAVANA_COMERCIAL = "Escoltar caravana comercial",
-  PRISIONEIRO = "Escoltar prisioneiro",
-  DIPLOMATA = "Escoltar diplomata",
-  REFUGIADOS = "Escoltar refugiados",
+// Tipos de locais para especificações (conforme tabela "Tipo de Local")
+export enum LocationType {
+  MUNDANO = "Mundano",
+  MAGICO = "Mágico",
+  SAGRADO = "Sagrado",
+  PROFANO = "Profano",
+  ESTRANHO = "Estranho",
 }
 
-export enum InvestigationObjective {
-  CRIME_LOCAL = "Investigar crime local",
-  DESAPARECIMENTO = "Investigar desaparecimento",
-  FENOMENO_ESTRANHO = "Investigar fenômeno estranho",
-  ESPIONAGEM = "Investigar atividade suspeita",
-  CORRUPCAO = "Investigar corrupção",
-}
-
-export enum RecoveryObjective {
-  ITEM_ROUBADO = "Recuperar item roubado",
-  ARTEFATO_PERDIDO = "Recuperar artefato perdido",
-  DOCUMENTO_IMPORTANTE = "Recuperar documento importante",
-  TESOURO_ANCESTRAL = "Recuperar tesouro ancestral",
-  PROPRIEDADE = "Recuperar propriedade",
-}
-
-export enum EliminationObjective {
-  CRIATURA_PERIGOSA = "Eliminar criatura perigosa",
-  BANDIDOS = "Eliminar grupo de bandidos",
-  PRAGA_MONSTROS = "Eliminar praga de monstros",
-  LIDER_INIMIGO = "Eliminar líder inimigo",
-  AMEACA_MAGICA = "Eliminar ameaça mágica",
-}
-
-// Interface principal do objetivo
+// Interface para objetivo principal do contrato
 export interface ContractObjective {
   category: ObjectiveCategory;
-  specificObjective: string;
   description: string;
+  specificObjective: string;
+  targetName?: string;
+  targetLocation?: string;
+}
+
+// Interface para especificações detalhadas por objetivo
+export interface ObjectiveSpecification {
+  target: string;
+  description: string;
+  rollTwice?: boolean;
 }
 
 // ===== LOCALIDADES DO CONTRATO =====
