@@ -65,6 +65,17 @@ export enum FailureReason {
   CONTRATANTE_MORTO = "Contratante morto ou desaparecido",
 }
 
+// Resultados de resolução automática de contratos não assinados
+export enum UnsignedResolutionResult {
+  TODOS_CONTINUAM = "Nenhum foi assinado, todos continuam disponíveis",
+  TODOS_RESOLVIDOS = "Todos foram devidamente resolvidos",
+  MENORES_XP_RESOLVIDOS = "Os de menor XP foram resolvidos",
+  MELHORES_RECOMPENSAS_RESOLVIDOS = "Contratos com as melhores Recompensas foram resolvidos",
+  ALEATORIOS_RESOLVIDOS = "contratos aleatórios são resolvidos",
+  ASSINADOS_NAO_RESOLVIDOS = "contratos são assinados, porém não são resolvidos",
+  MOTIVO_ESTRANHO = "Nenhum foi assinado, e há algum motivo estranho para isso",
+}
+
 // ===== INTERFACES PARA VALOR E RECOMPENSA =====
 
 // Interface para controlar valores e recompensas do contrato
@@ -267,58 +278,44 @@ export function applyUnresolvedBonus(rewardValue: number): number {
 
 // ===== OBJETIVOS DO CONTRATO =====
 
+// ===== OBJETIVOS DOS CONTRATOS =====
+
 // Categorias principais de objetivos
 export enum ObjectiveCategory {
-  ESCOLTA = "Escolta",
-  INVESTIGACAO = "Investigação",
-  RECUPERACAO = "Recuperação",
-  ELIMINACAO = "Eliminação",
-  EXPLORACAO = "Exploração",
-  NEGOCIACAO = "Negociação",
-  PROTECAO = "Proteção",
-  ENTREGA = "Entrega",
-  RESGATE = "Resgate",
-  INFILTRACAO = "Infiltração",
+  ATACAR_DESTRUIR = "Atacar/Destruir",
+  ENCONTRAR_RECUPERAR = "Encontrar/Recuperar",
+  CAPTURAR = "Capturar",
+  PROTEGER_SALVAR = "Proteger/Salvar",
+  EXPLORAR_DESCOBRIR = "Explorar/Descobrir",
+  ENTREGAR_RECEBER = "Entregar/Receber",
+  INVESTIGAR_SABOTAR = "Investigar/Sabotar",
+  SERVICOS_PERIGOSOS = "Serviços perigosos",
+  RELIGIOSO = "Religioso",
 }
 
-// Especificações detalhadas por tipo de objetivo
-export enum EscortObjective {
-  PESSOA_IMPORTANTE = "Escoltar pessoa importante",
-  CARAVANA_COMERCIAL = "Escoltar caravana comercial",
-  PRISIONEIRO = "Escoltar prisioneiro",
-  DIPLOMATA = "Escoltar diplomata",
-  REFUGIADOS = "Escoltar refugiados",
+// Tipos de locais para especificações (conforme tabela "Tipo de Local")
+export enum LocationType {
+  MUNDANO = "Mundano",
+  MAGICO = "Mágico",
+  SAGRADO = "Sagrado",
+  PROFANO = "Profano",
+  ESTRANHO = "Estranho",
 }
 
-export enum InvestigationObjective {
-  CRIME_LOCAL = "Investigar crime local",
-  DESAPARECIMENTO = "Investigar desaparecimento",
-  FENOMENO_ESTRANHO = "Investigar fenômeno estranho",
-  ESPIONAGEM = "Investigar atividade suspeita",
-  CORRUPCAO = "Investigar corrupção",
-}
-
-export enum RecoveryObjective {
-  ITEM_ROUBADO = "Recuperar item roubado",
-  ARTEFATO_PERDIDO = "Recuperar artefato perdido",
-  DOCUMENTO_IMPORTANTE = "Recuperar documento importante",
-  TESOURO_ANCESTRAL = "Recuperar tesouro ancestral",
-  PROPRIEDADE = "Recuperar propriedade",
-}
-
-export enum EliminationObjective {
-  CRIATURA_PERIGOSA = "Eliminar criatura perigosa",
-  BANDIDOS = "Eliminar grupo de bandidos",
-  PRAGA_MONSTROS = "Eliminar praga de monstros",
-  LIDER_INIMIGO = "Eliminar líder inimigo",
-  AMEACA_MAGICA = "Eliminar ameaça mágica",
-}
-
-// Interface principal do objetivo
+// Interface para objetivo principal do contrato
 export interface ContractObjective {
   category: ObjectiveCategory;
-  specificObjective: string;
   description: string;
+  specificObjective: string;
+  targetName?: string;
+  targetLocation?: string;
+}
+
+// Interface para especificações detalhadas por objetivo
+export interface ObjectiveSpecification {
+  target: string;
+  description: string;
+  rollTwice?: boolean;
 }
 
 // ===== LOCALIDADES DO CONTRATO =====
@@ -680,12 +677,62 @@ export enum TwistBut {
   TEMPO_SE_ESGOTANDO = "O tempo está se esgotando",
 }
 
+// Primeira tabela "E..." - Complicações adicionais da reviravolta
+export enum TwistAndFirst {
+  TODOS_MORTOS = "Todos já estão mortos",
+  CONTRATADO_VILAO = "O contratado é o verdadeiro vilão",
+  NOVO_ANTAGONISTA = "Um novo antagonista surge em paralelo",
+  INFORMACOES_FALSAS = "As informações fornecidas são falsas",
+  ANTAGONISTA_PARENTE = "O antagonista é um parente próximo",
+  OUTRO_GRUPO_CUMPRE = "Outro grupo cumpre o objetivo",
+  OBJETIVO_INEXISTENTE = "O objetivo nunca existiu realmente",
+  CONSPIRACAO_MAIOR = "Há uma conspiração maior por trás",
+  LOCAL_AMALDICOADO = "O local está amaldiçoado",
+  TESTE_CARATER = "Tudo é um teste de caráter",
+  TEMPO_LOOP = "O tempo está em loop",
+  MULTIPLAS_REALIDADES = "Existem múltiplas versões da realidade",
+  CONTRATO_DISTRACAO = "O contrato é uma distração para outro plano",
+  ALGUEM_OBSERVA = "Alguém está observando e julgando",
+  OBJETIVO_DIFERENTE = "O verdadeiro objetivo é completamente diferente",
+  TRAIDOR_GRUPO = "Há um traidor no grupo",
+  PROBLEMA_SE_RESOLVE = "O problema se resolve sozinho",
+  RITUAL_MAIOR = "Tudo faz parte de um ritual maior",
+  ANTAGONISTA_CERTO = "O antagonista está certo",
+  CONSEQUENCIAS_IRREVERSIVEIS = "As consequências são irreversíveis",
+}
+
+// Segunda tabela "E..." - Complicações extremas da reviravolta
+export enum TwistAndSecond {
+  CUMPLICIDADE_VITIMAS = "Há cumplicidade da(s) vítima(s) com o vilão",
+  TUDO_UM_JOGO = "Era tudo parte de um jogo",
+  AFETA_OUTRO_PLANO = "Cumprir o objetivo afeta negativamente outro plano",
+  DOIS_ANTAGONISTAS = "O contratado está sendo manipulado por dois antagonistas",
+  TUDO_SONHO = "Tudo não passa de um sonho",
+  VINGANCA_PLANEJADA = "Tudo foi uma vingança friamente planejada",
+  ILUSAO_COLETIVA = "O problema era uma ilusão coletiva",
+  VERSAO_ALTERNATIVA = "Existe uma versão alternativa dos eventos",
+  REESCREVENDO_HISTORIA = "Alguém está reescrevendo a história",
+  CONFLITO_CICLICO = "O conflito é cíclico e se repete eternamente",
+  PECAS_JOGO_MAIOR = "Todos os envolvidos são peças de um jogo maior",
+  SOLUCAO_CRIA_PROBLEMA = "A solução cria um problema ainda maior",
+  NADA_PODE_DESFAZER = "Nada do que aconteceu pode ser desfeito",
+  PODER_NAS_CRIANCAS = "O verdadeiro poder está nas mãos de uma criança",
+  MORTE_NAO_PERMANENTE = "A morte não é permanente neste caso",
+  OBSERVADORES_DIMENSIONAIS = "Há observadores de outras dimensões",
+  LOCAL_CONSCIENTE = "O local tem sua própria consciência",
+  TEMPO_DIFERENTE = "O tempo flui diferente para cada pessoa",
+  MEMORIAS_ALTERADAS = "As memórias de todos estão sendo alteradas",
+  REALIDADE_DESFAZENDO = "A realidade está se desfazendo lentamente",
+}
+
 // Interface da reviravolta completa
 export interface Twist {
   hasTwist: boolean;
   who?: TwistWho;
   what?: TwistWhat;
   but?: TwistBut;
+  andFirst?: TwistAndFirst;
+  andSecond?: TwistAndSecond;
   description: string;
 }
 
@@ -805,7 +852,7 @@ export interface UnusualContractor {
   description: string;
   motivations?: string[];
   quirks?: string[];
-  themeKeywords?: ThemeKeyword[];
+  themeKeywords: ThemeKeyword[];
 }
 
 // ===== SCHEMAS ZOD PARA VALIDAÇÃO =====
@@ -868,6 +915,8 @@ export const TwistSchema = z.object({
   who: z.nativeEnum(TwistWho).optional(),
   what: z.nativeEnum(TwistWhat).optional(),
   but: z.nativeEnum(TwistBut).optional(),
+  andFirst: z.nativeEnum(TwistAndFirst).optional(),
+  andSecond: z.nativeEnum(TwistAndSecond).optional(),
   description: z.string(),
 });
 
@@ -907,7 +956,7 @@ export const UnusualContractorSchema = z.object({
   description: z.string(),
   motivations: z.array(z.string()).optional(),
   quirks: z.array(z.string()).optional(),
-  themeKeywords: z.array(ThemeKeywordSchema).optional(),
+  themeKeywords: z.array(ThemeKeywordSchema),
 });
 
 // ===== FUNÇÕES UTILITÁRIAS =====

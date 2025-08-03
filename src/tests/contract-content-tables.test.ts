@@ -25,15 +25,17 @@ import {
   DANGEROUS_SERVICES_SPECIFICATIONS,
   RELIGIOUS_SPECIFICATIONS,
   LOCATION_TYPE_TABLE,
-  ObjectiveCategory,
   GovernmentContractorType,
-  LocationType,
   applyContractorRelationModifiers,
   getObjectiveSpecificationTable,
   shouldRollTwiceForObjective,
   shouldRollTwiceForSpecification,
 } from "@/data/tables/contract-content-tables";
-import { ContractorType } from "@/types/contract";
+import {
+  ContractorType,
+  ObjectiveCategory,
+  LocationType,
+} from "@/types/contract";
 
 describe("Contract Content Tables - Issue 4.6", () => {
   // =============================================
@@ -72,7 +74,7 @@ describe("Contract Content Tables - Issue 4.6", () => {
       // Verificar alguns entries específicos
       const arcanist = GOVERNMENT_CONTRACTOR_TABLE.find(
         (entry) =>
-          entry.result.type === GovernmentContractorType.ARCANIST_DIPLOMAT
+          entry.result.type === GovernmentContractorType.ARCANISTA_DIPLOMATA
       );
       expect(arcanist).toMatchObject({
         min: 1,
@@ -81,7 +83,7 @@ describe("Contract Content Tables - Issue 4.6", () => {
       });
 
       const localLeader = GOVERNMENT_CONTRACTOR_TABLE.find(
-        (entry) => entry.result.type === GovernmentContractorType.LOCAL_LEADER
+        (entry) => entry.result.type === GovernmentContractorType.LIDER_LOCAL
       );
       expect(localLeader).toMatchObject({
         min: 20,
@@ -95,7 +97,7 @@ describe("Contract Content Tables - Issue 4.6", () => {
 
       // Verificar distribuição conforme arquivo .md
       const attackDestroy = MAIN_OBJECTIVE_TABLE.find(
-        (entry) => entry.result.category === ObjectiveCategory.ATTACK_DESTROY
+        (entry) => entry.result.category === ObjectiveCategory.ATACAR_DESTRUIR
       );
       expect(attackDestroy).toMatchObject({
         min: 1,
@@ -105,7 +107,7 @@ describe("Contract Content Tables - Issue 4.6", () => {
 
       const dangerous = MAIN_OBJECTIVE_TABLE.find(
         (entry) =>
-          entry.result.category === ObjectiveCategory.DANGEROUS_SERVICES
+          entry.result.category === ObjectiveCategory.SERVICOS_PERIGOSOS
       );
       expect(dangerous).toMatchObject({
         min: 15,
@@ -205,38 +207,38 @@ describe("Contract Content Tables - Issue 4.6", () => {
   describe("Objectives and Specifications", () => {
     it("should return correct specification table for each objective category", () => {
       expect(
-        getObjectiveSpecificationTable(ObjectiveCategory.ATTACK_DESTROY)
+        getObjectiveSpecificationTable(ObjectiveCategory.ATACAR_DESTRUIR)
       ).toBe(ATTACK_DESTROY_SPECIFICATIONS);
 
       expect(
-        getObjectiveSpecificationTable(ObjectiveCategory.FIND_RECOVER)
+        getObjectiveSpecificationTable(ObjectiveCategory.ENCONTRAR_RECUPERAR)
       ).toBe(FIND_RECOVER_SPECIFICATIONS);
 
-      expect(getObjectiveSpecificationTable(ObjectiveCategory.CAPTURE)).toBe(
+      expect(getObjectiveSpecificationTable(ObjectiveCategory.CAPTURAR)).toBe(
         CAPTURE_SPECIFICATIONS
       );
 
       expect(
-        getObjectiveSpecificationTable(ObjectiveCategory.PROTECT_SAVE)
+        getObjectiveSpecificationTable(ObjectiveCategory.PROTEGER_SALVAR)
       ).toBe(PROTECT_SAVE_SPECIFICATIONS);
 
       expect(
-        getObjectiveSpecificationTable(ObjectiveCategory.EXPLORE_DISCOVER)
+        getObjectiveSpecificationTable(ObjectiveCategory.EXPLORAR_DESCOBRIR)
       ).toBe(EXPLORE_DISCOVER_SPECIFICATIONS);
 
       expect(
-        getObjectiveSpecificationTable(ObjectiveCategory.DELIVER_RECEIVE)
+        getObjectiveSpecificationTable(ObjectiveCategory.ENTREGAR_RECEBER)
       ).toBe(DELIVER_RECEIVE_SPECIFICATIONS);
 
       expect(
-        getObjectiveSpecificationTable(ObjectiveCategory.INVESTIGATE_SABOTAGE)
+        getObjectiveSpecificationTable(ObjectiveCategory.INVESTIGAR_SABOTAR)
       ).toBe(INVESTIGATE_SABOTAGE_SPECIFICATIONS);
 
       expect(
-        getObjectiveSpecificationTable(ObjectiveCategory.DANGEROUS_SERVICES)
+        getObjectiveSpecificationTable(ObjectiveCategory.SERVICOS_PERIGOSOS)
       ).toBe(DANGEROUS_SERVICES_SPECIFICATIONS);
 
-      expect(getObjectiveSpecificationTable(ObjectiveCategory.RELIGIOUS)).toBe(
+      expect(getObjectiveSpecificationTable(ObjectiveCategory.RELIGIOSO)).toBe(
         RELIGIOUS_SPECIFICATIONS
       );
     });
@@ -249,15 +251,15 @@ describe("Contract Content Tables - Issue 4.6", () => {
 
     it("should detect roll twice for main objectives correctly", () => {
       const rollTwiceObjective = {
-        category: ObjectiveCategory.ATTACK_DESTROY,
+        category: ObjectiveCategory.ATACAR_DESTRUIR,
         name: "Role duas vezes e use ambos",
         description: "Multiple objectives",
       };
 
       const normalObjective = {
-        category: ObjectiveCategory.ATTACK_DESTROY,
+        category: ObjectiveCategory.ATACAR_DESTRUIR,
         name: "Atacar ou destruir",
-        description: "Normal objective",
+        description: "Eliminar, destruir ou atacar um alvo específico",
       };
 
       expect(shouldRollTwiceForObjective(rollTwiceObjective)).toBe(true);
@@ -350,7 +352,7 @@ describe("Contract Content Tables - Issue 4.6", () => {
       expect(LOCATION_TYPE_TABLE).toHaveLength(5);
 
       const mundane = LOCATION_TYPE_TABLE.find(
-        (entry) => entry.result.type === LocationType.MUNDANE
+        (entry) => entry.result.type === LocationType.MUNDANO
       );
       expect(mundane).toMatchObject({
         min: 1,
@@ -359,7 +361,7 @@ describe("Contract Content Tables - Issue 4.6", () => {
       });
 
       const strange = LOCATION_TYPE_TABLE.find(
-        (entry) => entry.result.type === LocationType.STRANGE
+        (entry) => entry.result.type === LocationType.ESTRANHO
       );
       expect(strange).toMatchObject({
         min: 17,
@@ -422,13 +424,14 @@ describe("Contract Content Tables - Issue 4.6", () => {
     it("should have proper government contractor distribution", () => {
       // Verificar distribuição de poder nos contratantes do governo
       const nobles = GOVERNMENT_CONTRACTOR_TABLE.filter(
-        (entry) => entry.result.type === GovernmentContractorType.POWERFUL_NOBLE
+        (entry) => entry.result.type === GovernmentContractorType.NOBRE_PODEROSO
       );
       expect(nobles).toHaveLength(1);
       expect(nobles[0].max - nobles[0].min + 1).toBe(5); // 6-10, 5 slots
 
       const family = GOVERNMENT_CONTRACTOR_TABLE.filter(
-        (entry) => entry.result.type === GovernmentContractorType.RULING_FAMILY
+        (entry) =>
+          entry.result.type === GovernmentContractorType.FAMILIA_GOVERNANTE
       );
       expect(family).toHaveLength(1);
       expect(family[0].max - family[0].min + 1).toBe(5); // 11-15, 5 slots
@@ -451,9 +454,11 @@ describe("Contract Content Tables - Issue 4.6", () => {
       expect(uniqueCategories.size).toBe(9);
 
       // Verificar categorias específicas importantes
-      expect(uniqueCategories.has(ObjectiveCategory.ATTACK_DESTROY)).toBe(true);
-      expect(uniqueCategories.has(ObjectiveCategory.RELIGIOUS)).toBe(true);
-      expect(uniqueCategories.has(ObjectiveCategory.DANGEROUS_SERVICES)).toBe(
+      expect(uniqueCategories.has(ObjectiveCategory.ATACAR_DESTRUIR)).toBe(
+        true
+      );
+      expect(uniqueCategories.has(ObjectiveCategory.RELIGIOSO)).toBe(true);
+      expect(uniqueCategories.has(ObjectiveCategory.SERVICOS_PERIGOSOS)).toBe(
         true
       );
     });

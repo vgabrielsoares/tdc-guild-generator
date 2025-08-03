@@ -9,44 +9,26 @@
  */
 
 import type { TableEntry } from "@/types/tables";
-import { ContractorType } from "@/types/contract";
+import {
+  ContractorType,
+  ObjectiveCategory,
+  LocationType,
+} from "@/types/contract";
 
 // ====================================
-// TIPOS E ENUMS
+// TIPOS E ENUMS ESPECÍFICOS
 // ====================================
 
 // Tipos específicos de contratantes do governo
 export enum GovernmentContractorType {
-  ARCANIST_DIPLOMAT = "arcanist_diplomat",
-  IMPORTANT_CLERGY = "important_clergy",
-  POWERFUL_NOBLE = "powerful_noble",
-  RULING_FAMILY = "ruling_family",
-  BUREAUCRATIC_AGENT = "bureaucratic_agent",
-  HIGH_RANKING_MILITARY = "high_ranking_military",
-  OTHER_SETTLEMENT_GOVERNMENT = "other_settlement_government",
-  LOCAL_LEADER = "local_leader",
-}
-
-// Categorias principais de objetivos
-export enum ObjectiveCategory {
-  ATTACK_DESTROY = "attack_destroy",
-  FIND_RECOVER = "find_recover",
-  CAPTURE = "capture",
-  PROTECT_SAVE = "protect_save",
-  EXPLORE_DISCOVER = "explore_discover",
-  DELIVER_RECEIVE = "deliver_receive",
-  INVESTIGATE_SABOTAGE = "investigate_sabotage",
-  DANGEROUS_SERVICES = "dangerous_services",
-  RELIGIOUS = "religious",
-}
-
-// Tipos de locais para especificações
-export enum LocationType {
-  MUNDANE = "mundane",
-  MAGICAL = "magical",
-  SACRED = "sacred",
-  PROFANE = "profane",
-  STRANGE = "strange",
+  ARCANISTA_DIPLOMATA = "arcanista_diplomata",
+  CLERO_IMPORTANTE = "clero_importante",
+  NOBRE_PODEROSO = "nobre_poderoso",
+  FAMILIA_GOVERNANTE = "familia_governante",
+  AGENTE_BUROCRATICO = "agente_burocratico",
+  MILITAR_ALTO_ESCALAO = "militar_alto_escalao",
+  GOVERNO_OUTRO_ASSENTAMENTO = "governo_outro_assentamento",
+  LIDER_LOCAL = "lider_local",
 }
 
 // ====================================
@@ -190,7 +172,7 @@ export const GOVERNMENT_CONTRACTOR_TABLE: TableEntry<GovernmentContractorEntry>[
       min: 1,
       max: 2,
       result: {
-        type: GovernmentContractorType.ARCANIST_DIPLOMAT,
+        type: GovernmentContractorType.ARCANISTA_DIPLOMATA,
         name: "Arcanista diplomata",
         description:
           "Mago ou arcanista especializado em relações diplomáticas e assuntos mágicos do governo",
@@ -201,8 +183,8 @@ export const GOVERNMENT_CONTRACTOR_TABLE: TableEntry<GovernmentContractorEntry>[
       min: 3,
       max: 5,
       result: {
-        type: GovernmentContractorType.IMPORTANT_CLERGY,
-        name: "Membro importante do clero",
+        type: GovernmentContractorType.CLERO_IMPORTANTE,
+        name: "Clérigo importante",
         description:
           "Alto clérigo com influência significativa no governo local",
       },
@@ -212,19 +194,19 @@ export const GOVERNMENT_CONTRACTOR_TABLE: TableEntry<GovernmentContractorEntry>[
       min: 6,
       max: 10,
       result: {
-        type: GovernmentContractorType.POWERFUL_NOBLE,
+        type: GovernmentContractorType.NOBRE_PODEROSO,
         name: "Nobre poderoso",
         description:
           "Membro da nobreza com considerável poder político e econômico",
       },
     },
-    // 11-15: Círculo familiar dos governantes
+    // 11-15: Família governante
     {
       min: 11,
       max: 15,
       result: {
-        type: GovernmentContractorType.RULING_FAMILY,
-        name: "Círculo familiar dos governantes",
+        type: GovernmentContractorType.FAMILIA_GOVERNANTE,
+        name: "Família governante",
         description:
           "Familiares próximos ou conselheiros diretos dos líderes do governo",
       },
@@ -234,7 +216,7 @@ export const GOVERNMENT_CONTRACTOR_TABLE: TableEntry<GovernmentContractorEntry>[
       min: 16,
       max: 16,
       result: {
-        type: GovernmentContractorType.BUREAUCRATIC_AGENT,
+        type: GovernmentContractorType.AGENTE_BUROCRATICO,
         name: "Agente burocrático",
         description:
           "Funcionário do governo como cobrador de impostos, juiz, advogado ou similar",
@@ -245,19 +227,19 @@ export const GOVERNMENT_CONTRACTOR_TABLE: TableEntry<GovernmentContractorEntry>[
       min: 17,
       max: 17,
       result: {
-        type: GovernmentContractorType.HIGH_RANKING_MILITARY,
+        type: GovernmentContractorType.MILITAR_ALTO_ESCALAO,
         name: "Militar de alto escalão",
         description:
           "Oficial militar de alta patente com autoridade para contratar aventureiros",
       },
     },
-    // 18-19: Membro do governo de outro assentamento
+    // 18-19: Governo de outro assentamento
     {
       min: 18,
       max: 19,
       result: {
-        type: GovernmentContractorType.OTHER_SETTLEMENT_GOVERNMENT,
-        name: "Membro do governo de outro assentamento",
+        type: GovernmentContractorType.GOVERNO_OUTRO_ASSENTAMENTO,
+        name: "Governo de outro assentamento",
         description:
           "Representante governamental de outro assentamento em missão diplomática ou oficial",
       },
@@ -267,7 +249,7 @@ export const GOVERNMENT_CONTRACTOR_TABLE: TableEntry<GovernmentContractorEntry>[
       min: 20,
       max: 20,
       result: {
-        type: GovernmentContractorType.LOCAL_LEADER,
+        type: GovernmentContractorType.LIDER_LOCAL,
         name: "Líder local",
         description:
           "O próprio líder do assentamento ou seu representante direto",
@@ -290,7 +272,7 @@ export const MAIN_OBJECTIVE_TABLE: TableEntry<ObjectiveEntry>[] = [
     min: 1,
     max: 2,
     result: {
-      category: ObjectiveCategory.ATTACK_DESTROY,
+      category: ObjectiveCategory.ATACAR_DESTRUIR,
       name: "Atacar ou destruir",
       description: "Eliminar, destruir ou atacar um alvo específico",
     },
@@ -300,7 +282,7 @@ export const MAIN_OBJECTIVE_TABLE: TableEntry<ObjectiveEntry>[] = [
     min: 3,
     max: 5,
     result: {
-      category: ObjectiveCategory.FIND_RECOVER,
+      category: ObjectiveCategory.ENCONTRAR_RECUPERAR,
       name: "Encontrar ou recuperar",
       description: "Localizar e recuperar algo perdido, roubado ou escondido",
     },
@@ -310,7 +292,7 @@ export const MAIN_OBJECTIVE_TABLE: TableEntry<ObjectiveEntry>[] = [
     min: 6,
     max: 7,
     result: {
-      category: ObjectiveCategory.CAPTURE,
+      category: ObjectiveCategory.CAPTURAR,
       name: "Capturar",
       description:
         "Capturar vivo um alvo específico ou tomar controle de um local",
@@ -321,7 +303,7 @@ export const MAIN_OBJECTIVE_TABLE: TableEntry<ObjectiveEntry>[] = [
     min: 8,
     max: 9,
     result: {
-      category: ObjectiveCategory.PROTECT_SAVE,
+      category: ObjectiveCategory.PROTEGER_SALVAR,
       name: "Proteger ou salvar",
       description:
         "Defender ou resgatar pessoas, objetos ou locais importantes",
@@ -332,7 +314,7 @@ export const MAIN_OBJECTIVE_TABLE: TableEntry<ObjectiveEntry>[] = [
     min: 10,
     max: 11,
     result: {
-      category: ObjectiveCategory.EXPLORE_DISCOVER,
+      category: ObjectiveCategory.EXPLORAR_DESCOBRIR,
       name: "Explorar ou descobrir",
       description:
         "Explorar novos territórios ou descobrir informações importantes",
@@ -343,7 +325,7 @@ export const MAIN_OBJECTIVE_TABLE: TableEntry<ObjectiveEntry>[] = [
     min: 12,
     max: 13,
     result: {
-      category: ObjectiveCategory.DELIVER_RECEIVE,
+      category: ObjectiveCategory.ENTREGAR_RECEBER,
       name: "Entregar ou receber",
       description: "Transportar e entregar algo valioso ou importante",
     },
@@ -353,7 +335,7 @@ export const MAIN_OBJECTIVE_TABLE: TableEntry<ObjectiveEntry>[] = [
     min: 14,
     max: 14,
     result: {
-      category: ObjectiveCategory.INVESTIGATE_SABOTAGE,
+      category: ObjectiveCategory.INVESTIGAR_SABOTAR,
       name: "Investigar ou sabotar",
       description: "Investigar mistérios ou sabotar operações inimigas",
     },
@@ -363,7 +345,7 @@ export const MAIN_OBJECTIVE_TABLE: TableEntry<ObjectiveEntry>[] = [
     min: 15,
     max: 18,
     result: {
-      category: ObjectiveCategory.DANGEROUS_SERVICES,
+      category: ObjectiveCategory.SERVICOS_PERIGOSOS,
       name: "Serviços perigosos",
       description:
         "Realizar tarefas específicas que envolvem perigo considerável",
@@ -374,7 +356,7 @@ export const MAIN_OBJECTIVE_TABLE: TableEntry<ObjectiveEntry>[] = [
     min: 19,
     max: 19,
     result: {
-      category: ObjectiveCategory.RELIGIOUS,
+      category: ObjectiveCategory.RELIGIOSO,
       name: "Religioso",
       description: "Cumprir uma missão de natureza religiosa ou espiritual",
     },
@@ -384,7 +366,7 @@ export const MAIN_OBJECTIVE_TABLE: TableEntry<ObjectiveEntry>[] = [
     min: 20,
     max: 20,
     result: {
-      category: ObjectiveCategory.ATTACK_DESTROY, // TODO: Placeholder - deve ser tratado na lógica
+      category: ObjectiveCategory.ATACAR_DESTRUIR, // TODO: Placeholder - deve ser tratado na lógica
       name: "Role duas vezes e use ambos",
       description:
         "O contrato possui dois objetivos principais que devem ser cumpridos",
@@ -1503,29 +1485,29 @@ export const LOCATION_TYPE_TABLE: TableEntry<{
     min: 1,
     max: 10,
     result: {
-      type: LocationType.MUNDANE,
+      type: LocationType.MUNDANO,
       description: "Local ou território mundano",
     },
   },
   {
     min: 11,
     max: 12,
-    result: { type: LocationType.MAGICAL, description: "Local mágico" },
+    result: { type: LocationType.MAGICO, description: "Local mágico" },
   },
   {
     min: 13,
     max: 14,
-    result: { type: LocationType.SACRED, description: "Local sagrado" },
+    result: { type: LocationType.SAGRADO, description: "Local sagrado" },
   },
   {
     min: 15,
     max: 16,
-    result: { type: LocationType.PROFANE, description: "Local profano" },
+    result: { type: LocationType.PROFANO, description: "Local profano" },
   },
   {
     min: 17,
     max: 20,
-    result: { type: LocationType.STRANGE, description: "Local estranho" },
+    result: { type: LocationType.ESTRANHO, description: "Local estranho" },
   },
 ];
 
@@ -1566,23 +1548,23 @@ export function getObjectiveSpecificationTable(
   category: ObjectiveCategory
 ): TableEntry<ObjectiveSpecificationEntry>[] {
   switch (category) {
-    case ObjectiveCategory.ATTACK_DESTROY:
+    case ObjectiveCategory.ATACAR_DESTRUIR:
       return ATTACK_DESTROY_SPECIFICATIONS;
-    case ObjectiveCategory.FIND_RECOVER:
+    case ObjectiveCategory.ENCONTRAR_RECUPERAR:
       return FIND_RECOVER_SPECIFICATIONS;
-    case ObjectiveCategory.CAPTURE:
+    case ObjectiveCategory.CAPTURAR:
       return CAPTURE_SPECIFICATIONS;
-    case ObjectiveCategory.PROTECT_SAVE:
+    case ObjectiveCategory.PROTEGER_SALVAR:
       return PROTECT_SAVE_SPECIFICATIONS;
-    case ObjectiveCategory.EXPLORE_DISCOVER:
+    case ObjectiveCategory.EXPLORAR_DESCOBRIR:
       return EXPLORE_DISCOVER_SPECIFICATIONS;
-    case ObjectiveCategory.DELIVER_RECEIVE:
+    case ObjectiveCategory.ENTREGAR_RECEBER:
       return DELIVER_RECEIVE_SPECIFICATIONS;
-    case ObjectiveCategory.INVESTIGATE_SABOTAGE:
+    case ObjectiveCategory.INVESTIGAR_SABOTAR:
       return INVESTIGATE_SABOTAGE_SPECIFICATIONS;
-    case ObjectiveCategory.DANGEROUS_SERVICES:
+    case ObjectiveCategory.SERVICOS_PERIGOSOS:
       return DANGEROUS_SERVICES_SPECIFICATIONS;
-    case ObjectiveCategory.RELIGIOUS:
+    case ObjectiveCategory.RELIGIOSO:
       return RELIGIOUS_SPECIFICATIONS;
     default:
       throw new Error(`Categoria de objetivo não reconhecida: ${category}`);
