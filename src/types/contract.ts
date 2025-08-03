@@ -65,6 +65,17 @@ export enum FailureReason {
   CONTRATANTE_MORTO = "Contratante morto ou desaparecido",
 }
 
+// Resultados de resolução automática de contratos não assinados
+export enum UnsignedResolutionResult {
+  TODOS_CONTINUAM = "Nenhum foi assinado, todos continuam disponíveis",
+  TODOS_RESOLVIDOS = "Todos foram devidamente resolvidos",
+  MENORES_XP_RESOLVIDOS = "Os de menor XP foram resolvidos",
+  MELHORES_RECOMPENSAS_RESOLVIDOS = "Contratos com as melhores Recompensas foram resolvidos",
+  ALEATORIOS_RESOLVIDOS = "contratos aleatórios são resolvidos",
+  ASSINADOS_NAO_RESOLVIDOS = "contratos são assinados, porém não são resolvidos",
+  MOTIVO_ESTRANHO = "Nenhum foi assinado, e há algum motivo estranho para isso",
+}
+
 // ===== INTERFACES PARA VALOR E RECOMPENSA =====
 
 // Interface para controlar valores e recompensas do contrato
