@@ -470,6 +470,16 @@ export const CREATIVITY_KEYWORD_TABLES: TableEntry<string>[][] = [
   CREATIVITY_KEYWORDS_SET6_TABLE,
 ];
 
+/**
+ * Array com todas as tabelas temáticas para compatibilidade com código existente
+ */
+export const ALL_THEME_TABLES = Object.values(THEME_KEYWORD_TABLES);
+
+/**
+ * Array com todas as tabelas de palavras-chave para contratantes (alias para CREATIVITY_KEYWORD_TABLES)
+ */
+export const ALL_CONTRACTOR_KEYWORD_TABLES = CREATIVITY_KEYWORD_TABLES;
+
 // ===== FUNÇÕES DE ACESSO ÀS TABELAS =====
 
 /**
