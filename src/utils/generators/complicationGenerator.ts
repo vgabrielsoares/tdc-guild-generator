@@ -17,6 +17,10 @@ import {
   TWIST_WHAT_TABLE,
   TWIST_BUT_TABLE,
 } from "@/data/tables/contract-complications-tables";
+import {
+  TWIST_AND_FIRST_TABLE,
+  TWIST_AND_SECOND_TABLE,
+} from "@/data/tables/contract-twist-tables";
 
 /**
  * Gera uma complicação aleatória
@@ -82,10 +86,9 @@ export function generateComplication(): Complication {
 /**
  * Gera uma reviravolta conforme especificado no arquivo base
  *
- * Processo:
- * 1. Rola 1d20 para chance (apenas 19-20 resulta em reviravolta)
- * 2. Se houver reviravolta, rola os três elementos: "Quem?", "Na verdade...", "Mas..."
- * 3. Constrói descrição narrativa da reviravolta
+ * Implementa o sistema de reviravoltas incluindo:
+ * - Chance de reviravolta (1d20, apenas 19-20 = Sim)
+ * - Elementos obrigatórios: "Quem?", "Na verdade...", "Mas...", "E..." (primeira e segunda tabela)
  *
  * @returns Reviravolta gerada ou indicação de que não há reviravolta
  */
@@ -122,14 +125,29 @@ export function generateTwist(): Twist {
   const what = whatResult.result;
   const but = butResult.result;
 
-  // 3. Criar descrição narrativa conforme especificação
-  const description = `REVIRAVOLTA: ${who} ${what.toLowerCase()}, mas ${but.toLowerCase()}.`;
+  // 3. Gerar elementos "E..."
+  const andFirstResult = rollOnTable({
+    table: TWIST_AND_FIRST_TABLE,
+    context: "E... (primeira tabela)",
+  });
+  const andFirst = andFirstResult.result;
+
+  const andSecondResult = rollOnTable({
+    table: TWIST_AND_SECOND_TABLE,
+    context: "E... (segunda tabela)",
+  });
+  const andSecond = andSecondResult.result;
+
+  // 4. Montar descrição completa com todos os elementos
+  const description = `REVIRAVOLTA: ${who} ${what.toLowerCase()}, mas ${but.toLowerCase()}. E ${andFirst.toLowerCase()}. E ${andSecond.toLowerCase()}.`;
 
   return {
     hasTwist: true,
     who,
     what,
     but,
+    andFirst,
+    andSecond,
     description,
   };
 }
