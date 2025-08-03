@@ -689,6 +689,125 @@ export interface Twist {
   description: string;
 }
 
+// ===== ALIADOS =====
+
+// Tipos de aliados que podem surgir durante contratos
+export enum AllyCategory {
+  ARTEFATO = "Artefato",
+  CRIATURA_PODEROSA = "Criatura poderosa",
+  INESPERADO = "Inesperado",
+  AJUDA_SOBRENATURAL = "Ajuda sobrenatural",
+  CIVIS_ORDINARIOS = "Civis ordinários",
+  NATUREZA = "Natureza",
+  ORGANIZACAO = "Organização",
+  REFUGIO = "Refúgio",
+  AVENTUREIROS = "Aventureiros",
+  MONSTRUOSIDADE_AMIGAVEL = "Monstruosidade amigável",
+}
+
+// Quando/Como os aliados aparecem
+export enum AllyTiming {
+  CORRENDO_PERIGO = "Correndo perigo",
+  JEITO_CONSTRANGEDOR = "De um jeito constrangedor",
+  MANEIRA_COMUM = "De maneira comum e pacata",
+  PEDINDO_AJUDA_DESCANSO = "Pedindo ajuda durante um descanso",
+  AINDA_ASSENTAMENTO = "Ainda no assentamento",
+  LIDANDO_COMPLICACAO = "Já estará lidando com a complicação",
+  UM_D4_DIAS_APOS = "1d4 dias após o começo do contrato",
+  DOIS_D4_DIAS_APOS = "2d4 dias após o começo do contrato",
+  MAGICAMENTE_INVOCADO = "Magicamente invocado",
+  PARA_SALVAR_DIA = "Para salvar o dia",
+}
+
+// Interface principal do aliado
+export interface Ally {
+  category: AllyCategory;
+  specificType: string;
+  name: string;
+  description: string;
+  timing: AllyTiming;
+  powerLevel?: number; // Para aventureiros (NA 0-30)
+  characteristics?: string[]; // Para monstruosidades amigáveis
+}
+
+// ===== RECOMPENSAS ADICIONAIS =====
+
+// Categorias de recompensas adicionais
+export enum RewardCategory {
+  RIQUEZAS = "Riquezas",
+  ARTEFATOS_MAGICOS = "Artefatos mágicos",
+  PODER = "Poder",
+  CONHECIMENTO = "Conhecimento",
+  INFLUENCIA_RENOME = "Influência e renome",
+  GLORIA = "Glória",
+  MORAL = "Moral",
+  PAGAMENTO_DIFERENCIADO = "Pagamento diferenciado",
+  RECOMPENSA_BIZARRA = "Recompensa bizarra",
+  APARENCIAS_ENGANAM = "Aparências enganam",
+}
+
+// Interface principal da recompensa adicional
+export interface AdditionalReward {
+  category: RewardCategory;
+  specificReward: string;
+  description: string;
+  value?: number; // Valor estimado quando aplicável
+  isPositive: boolean; // False para "Aparências enganam"
+}
+
+// ===== CONSEQUÊNCIAS SEVERAS =====
+
+// Categorias de consequências por falha
+export enum SevereConsequenceCategory {
+  MALDICAO = "Maldição",
+  GUERRA = "Guerra",
+  CALAMIDADE_NATURAL = "Calamidade natural",
+  PRAGA = "Praga",
+  EVENTOS_SOBRENATURAIS = "Eventos sobrenaturais",
+  FOME_SECA = "Fome/Seca",
+  CRISE_ECONOMICA = "Crise econômica",
+  PERSEGUICAO = "Perseguição",
+  MORTE_IMPORTANTES = "Morte de importantes",
+}
+
+// Interface para consequências severas
+export interface SevereConsequence {
+  category: SevereConsequenceCategory;
+  specificConsequence: string;
+  description: string;
+  affectsContractors: string; // O que acontece com os contratados
+  additionalEffect?: string; // Efeito adicional da segunda tabela "E..."
+}
+
+// ===== PALAVRAS-CHAVE TEMÁTICAS =====
+
+// Conjuntos de palavras-chave para criatividade
+export enum ThemeKeywordSet {
+  MACABRO = "Primeira Tabela Temática",
+  GUERRA = "Segunda Tabela Temática",
+  FANTASIA = "Terceira Tabela Temática",
+  STEAMPUNK = "Quarta Tabela Temática",
+  MASMORRAS = "Quinta Tabela Temática",
+  POLITICA = "Sexta Tabela Temática",
+}
+
+// Interface para palavra-chave temática
+export interface ThemeKeyword {
+  set: ThemeKeywordSet;
+  keyword: string;
+}
+
+// ===== CONTRATANTES INUSITADOS =====
+
+// Interface para contratante inusitado
+export interface UnusualContractor {
+  isUnusual: boolean;
+  description: string;
+  motivations?: string[];
+  quirks?: string[];
+  themeKeywords?: ThemeKeyword[];
+}
+
 // ===== SCHEMAS ZOD PARA VALIDAÇÃO =====
 
 export const ContractObjectiveSchema = z.object({
@@ -752,6 +871,45 @@ export const TwistSchema = z.object({
   description: z.string(),
 });
 
+export const ThemeKeywordSchema = z.object({
+  set: z.nativeEnum(ThemeKeywordSet),
+  keyword: z.string(),
+});
+
+export const AllySchema = z.object({
+  category: z.nativeEnum(AllyCategory),
+  specificType: z.string(),
+  name: z.string(),
+  description: z.string(),
+  timing: z.nativeEnum(AllyTiming),
+  powerLevel: z.number().min(0).max(30).optional(),
+  characteristics: z.array(z.string()).optional(),
+});
+
+export const AdditionalRewardSchema = z.object({
+  category: z.nativeEnum(RewardCategory),
+  specificReward: z.string(),
+  description: z.string(),
+  value: z.number().optional(),
+  isPositive: z.boolean(),
+});
+
+export const SevereConsequenceSchema = z.object({
+  category: z.nativeEnum(SevereConsequenceCategory),
+  specificConsequence: z.string(),
+  description: z.string(),
+  affectsContractors: z.string(),
+  additionalEffect: z.string().optional(),
+});
+
+export const UnusualContractorSchema = z.object({
+  isUnusual: z.boolean(),
+  description: z.string(),
+  motivations: z.array(z.string()).optional(),
+  quirks: z.array(z.string()).optional(),
+  themeKeywords: z.array(ThemeKeywordSchema).optional(),
+});
+
 // ===== FUNÇÕES UTILITÁRIAS =====
 
 /**
@@ -787,4 +945,39 @@ export function validateComplication(data: unknown): Complication {
  */
 export function validateTwist(data: unknown): Twist {
   return TwistSchema.parse(data);
+}
+
+/**
+ * Valida um aliado usando o schema Zod
+ */
+export function validateAlly(data: unknown): Ally {
+  return AllySchema.parse(data);
+}
+
+/**
+ * Valida uma recompensa adicional usando o schema Zod
+ */
+export function validateAdditionalReward(data: unknown): AdditionalReward {
+  return AdditionalRewardSchema.parse(data);
+}
+
+/**
+ * Valida uma consequência severa usando o schema Zod
+ */
+export function validateSevereConsequence(data: unknown): SevereConsequence {
+  return SevereConsequenceSchema.parse(data);
+}
+
+/**
+ * Valida uma palavra-chave temática usando o schema Zod
+ */
+export function validateThemeKeyword(data: unknown): ThemeKeyword {
+  return ThemeKeywordSchema.parse(data);
+}
+
+/**
+ * Valida um contratante inusitado usando o schema Zod
+ */
+export function validateUnusualContractor(data: unknown): UnusualContractor {
+  return UnusualContractorSchema.parse(data);
 }
