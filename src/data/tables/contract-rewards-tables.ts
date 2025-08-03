@@ -1,8 +1,8 @@
 /**
  * Tabelas de Aliados e Recompensas para Contratos
- * 
+ *
  * Seções: "Aparição de Aliados" e "Recompensas e Incentivos"
- * 
+ *
  * Estas tabelas implementam:
  * - Sistema de aparição de aliados (chance e tipos)
  * - Quando/como os aliados surgem
@@ -662,9 +662,25 @@ export function rollForAdditionalRewards(): boolean {
   return false;
 }
 
+// ===== FUNÇÕES DE ACESSO ÀS TABELAS =====
+
+/**
+ * Retorna todas as entradas da tabela de aliados
+ */
+export function getAlliesTable() {
+  return ALLY_TYPES_TABLE;
+}
+
+/**
+ * Retorna todas as entradas da tabela de recompensas adicionais
+ */
+export function getAdditionalRewardsTable() {
+  return REWARD_TYPES_TABLE;
+}
+
 /**
  * Nota: Tabela "Pagamento diferenciado" não oferece recompensa extra.
  * Apenas o valor básico do contrato, porém pago de forma diferente.
  */
-export const PAYMENT_DIFERENTIATED_NOTE = 
+export const PAYMENT_DIFERENTIATED_NOTE =
   "Em 'pagamento diferenciado' não há recompensa extra. Apenas a recompensa pelo próprio contrato, porém o contratante não pagará com ouro, e sim com alguma coisa que tenha o mesmo valor ou o mais próximo disso.";
