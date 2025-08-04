@@ -1,15 +1,16 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import type { Contract } from "../types/contract";
-import { 
-  ContractStatus, 
-  ContractResolution, 
-  FailureReason, 
-  PaymentType, 
+import {
+  ContractStatus,
+  ContractResolution,
+  FailureReason,
+  PaymentType,
   DeadlineType,
   LocationCategory,
   ContractDifficulty,
   ContractorType,
-  UnsignedResolutionResult
+  UnsignedResolutionResult,
+  AntagonistCategory,
 } from "../types/contract";
 import {
   rollSignedContractResolutionTime,
@@ -41,8 +42,10 @@ const createMockContract = (overrides: Partial<Contract> = {}): Contract => ({
     finalGoldReward: 3,
     modifiers: {
       distance: 0,
-      populationRelation: 0,
-      governmentRelation: 0,
+      populationRelationValue: 0,
+      populationRelationReward: 0,
+      governmentRelationValue: 0,
+      governmentRelationReward: 0,
       staffPreparation: 0,
       difficultyMultiplier: {
         experienceMultiplier: 1,
@@ -64,6 +67,16 @@ const createMockContract = (overrides: Partial<Contract> = {}): Contract => ({
     isFlexible: false,
     isArbitrary: false,
   },
+  prerequisites: [],
+  clauses: [],
+  antagonist: {
+    category: AntagonistCategory.HUMANOIDE_PODEROSO,
+    specificType: "Nobre",
+    name: "Nobre Corrupto",
+    description: "Um membro da nobreza local",
+  },
+  complications: [],
+  twists: [],
   createdAt: new Date(),
   expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 dias
   generationData: {
@@ -98,7 +111,7 @@ describe("Contract Lifecycle - Sistema Unificado", () => {
       const resolution = rollSignedContractResolution();
       expect(resolution).toBeDefined();
       expect(Object.values(ContractResolution)).toContain(resolution.result);
-      
+
       if (resolution.result === ContractResolution.NAO_RESOLVIDO) {
         expect(resolution.reason).toBeDefined();
         expect(Object.values(FailureReason)).toContain(resolution.reason);
@@ -108,11 +121,15 @@ describe("Contract Lifecycle - Sistema Unificado", () => {
     it("deve rolar resolução para contratos não assinados", () => {
       const resolution = rollUnsignedContractResolution();
       expect(resolution).toBeDefined();
-      expect(Object.values(UnsignedResolutionResult)).toContain(resolution.type);
-      
+      expect(Object.values(UnsignedResolutionResult)).toContain(
+        resolution.type
+      );
+
       // Verificar se count está presente quando esperado
-      if (resolution.type === UnsignedResolutionResult.ALEATORIOS_RESOLVIDOS ||
-          resolution.type === UnsignedResolutionResult.ASSINADOS_NAO_RESOLVIDOS) {
+      if (
+        resolution.type === UnsignedResolutionResult.ALEATORIOS_RESOLVIDOS ||
+        resolution.type === UnsignedResolutionResult.ASSINADOS_NAO_RESOLVIDOS
+      ) {
         expect(resolution.count).toBeGreaterThan(0);
       }
     });
@@ -123,20 +140,20 @@ describe("Contract Lifecycle - Sistema Unificado", () => {
 
     beforeEach(() => {
       contracts = [
-        createMockContract({ 
-          id: "1", 
+        createMockContract({
+          id: "1",
           status: ContractStatus.ACEITO,
-          title: "Contrato Aceito" 
+          title: "Contrato Aceito",
         }),
-        createMockContract({ 
-          id: "2", 
+        createMockContract({
+          id: "2",
           status: ContractStatus.EM_ANDAMENTO,
-          title: "Contrato Em Andamento" 
+          title: "Contrato Em Andamento",
         }),
-        createMockContract({ 
-          id: "3", 
+        createMockContract({
+          id: "3",
           status: ContractStatus.DISPONIVEL,
-          title: "Contrato Disponível" 
+          title: "Contrato Disponível",
         }),
       ];
     });
@@ -144,16 +161,17 @@ describe("Contract Lifecycle - Sistema Unificado", () => {
     it("deve aplicar resolução a contratos assinados", () => {
       const result = applySignedContractResolution(contracts);
       expect(result).toHaveLength(contracts.length);
-      
+
       // Verificar se contratos assinados foram afetados
-      const signedContracts = result.filter(c => 
-        c.id === "1" || c.id === "2"
+      const signedContracts = result.filter(
+        (c) => c.id === "1" || c.id === "2"
       );
-      
+
       // Pelo menos um deve ter mudado de status (pode ser probabilístico)
-      const anyChanged = signedContracts.some(c => 
-        c.status !== ContractStatus.ACEITO && 
-        c.status !== ContractStatus.EM_ANDAMENTO
+      const anyChanged = signedContracts.some(
+        (c) =>
+          c.status !== ContractStatus.ACEITO &&
+          c.status !== ContractStatus.EM_ANDAMENTO
       );
       expect(anyChanged || signedContracts.length > 0).toBe(true);
     });
@@ -161,7 +179,7 @@ describe("Contract Lifecycle - Sistema Unificado", () => {
     it("deve aplicar resolução a contratos não assinados", () => {
       const result = applyUnsignedContractResolution(contracts);
       expect(result).toHaveLength(contracts.length);
-      
+
       // Resultado deve ser determinístico baseado na rolagem
       expect(result).toBeDefined();
     });
@@ -177,7 +195,7 @@ describe("Contract Lifecycle - Sistema Unificado", () => {
 
       const contracts = [expiredContract];
       const result = markExpiredContracts(contracts);
-      
+
       expect(result[0].status).toBe(ContractStatus.EXPIRADO);
     });
 
@@ -190,7 +208,7 @@ describe("Contract Lifecycle - Sistema Unificado", () => {
 
       const contracts = [expiredInProgress];
       const result = processContractDeadlines(contracts);
-      
+
       expect(result[0].status).toBe(ContractStatus.FALHOU);
     });
 
@@ -203,7 +221,7 @@ describe("Contract Lifecycle - Sistema Unificado", () => {
       ];
 
       const stats = getContractResolutionStats(testContracts);
-      
+
       expect(stats.total).toBe(4);
       expect(stats.resolved).toBe(1);
       expect(stats.failed).toBe(1);
@@ -221,8 +239,10 @@ describe("Contract Lifecycle - Sistema Unificado", () => {
           finalGoldReward: 3,
           modifiers: {
             distance: 0,
-            populationRelation: 0,
-            governmentRelation: 0,
+            populationRelationValue: 0,
+            populationRelationReward: 0,
+            governmentRelationValue: 0,
+            governmentRelationReward: 0,
             staffPreparation: 0,
             difficultyMultiplier: {
               experienceMultiplier: 1,
@@ -230,11 +250,11 @@ describe("Contract Lifecycle - Sistema Unificado", () => {
             },
             requirementsAndClauses: 0,
           },
-        }
+        },
       });
 
       const result = applyUnresolvedBonus(contract);
-      
+
       expect(result.value.rewardValue).toBe(32); // 30 + 2
       expect(result.value.finalGoldReward).toBe(3.2); // (30 + 2) * 0.1
     });
@@ -249,7 +269,7 @@ describe("Contract Lifecycle - Sistema Unificado", () => {
 
     it("deve inicializar tempos de resolução", () => {
       manager.initializeResolutionTimes();
-      
+
       const nextActions = manager.getNextActions();
       expect(nextActions.daysUntilResolution).toBeGreaterThanOrEqual(0);
       expect(nextActions.daysUntilNewContracts).toBeGreaterThanOrEqual(0);
@@ -258,7 +278,7 @@ describe("Contract Lifecycle - Sistema Unificado", () => {
     it("deve exportar e importar estado", () => {
       manager.initializeResolutionTimes();
       const state = manager.exportState();
-      
+
       expect(state.resolutionTimes).toBeDefined();
       expect(state.nextNewContractsTime).toBeDefined();
       expect(state.lastResolutionDate).toBeDefined();
@@ -266,7 +286,7 @@ describe("Contract Lifecycle - Sistema Unificado", () => {
 
       const newManager = new ContractLifecycleManager();
       newManager.importState(state);
-      
+
       const newState = newManager.exportState();
       expect(newState.resolutionTimes).toEqual(state.resolutionTimes);
       expect(newState.nextNewContractsTime).toEqual(state.nextNewContractsTime);
@@ -284,10 +304,10 @@ describe("Contract Lifecycle - Sistema Unificado", () => {
 
     it("deve marcar novos contratos como gerados", () => {
       manager.initializeResolutionTimes();
-      
+
       manager.markNewContractsGenerated();
       const stateAfter = manager.exportState();
-      
+
       // O tempo pode ter mudado
       expect(stateAfter.lastNewContractsDate).toBeDefined();
       expect(stateAfter.nextNewContractsTime).toBeGreaterThan(0);
@@ -298,18 +318,24 @@ describe("Contract Lifecycle - Sistema Unificado", () => {
     it("deve usar constantes das tabelas de modificadores", () => {
       const contract = createMockContract();
       const bonusApplied = applyUnresolvedBonus(contract);
-      
+
       // Verifica se está usando UNRESOLVED_CONTRACT_BONUS da tabela
-      expect(bonusApplied.value.rewardValue).toBe(contract.value.rewardValue + 2);
+      expect(bonusApplied.value.rewardValue).toBe(
+        contract.value.rewardValue + 2
+      );
     });
 
     it("deve processar resoluções usando tabelas importadas", () => {
       // Teste para verificar se as funções de rolagem estão usando as tabelas corretas
       const signedResolution = rollSignedContractResolution();
-      expect(Object.values(ContractResolution)).toContain(signedResolution.result);
+      expect(Object.values(ContractResolution)).toContain(
+        signedResolution.result
+      );
 
       const unsignedResolution = rollUnsignedContractResolution();
-      expect(Object.values(UnsignedResolutionResult)).toContain(unsignedResolution.type);
+      expect(Object.values(UnsignedResolutionResult)).toContain(
+        unsignedResolution.type
+      );
     });
   });
 });

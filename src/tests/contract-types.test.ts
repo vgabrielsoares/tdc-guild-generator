@@ -8,6 +8,7 @@ import {
   DeadlineType,
   ContractResolution,
   FailureReason,
+  AntagonistCategory,
   validateContract,
   calculateFinalGoldReward,
   calculateBreachPenalty,
@@ -107,8 +108,10 @@ describe("Contract Types - Issue 4.1", () => {
         finalGoldReward: 10,
         modifiers: {
           distance: 0,
-          populationRelation: 0,
-          governmentRelation: 0,
+          populationRelationValue: 0,
+          populationRelationReward: 0,
+          governmentRelationValue: 0,
+          governmentRelationReward: 0,
           staffPreparation: 0,
           difficultyMultiplier: {
             experienceMultiplier: 1,
@@ -123,6 +126,16 @@ describe("Contract Types - Issue 4.1", () => {
         isArbitrary: false,
       },
       paymentType: PaymentType.TOTAL_GUILDA,
+      prerequisites: [],
+      clauses: [],
+      antagonist: {
+        category: AntagonistCategory.HUMANOIDE_PODEROSO,
+        specificType: "Nobre",
+        name: "Nobre Corrupto",
+        description: "Um membro da nobreza local",
+      },
+      complications: [],
+      twists: [],
       createdAt: new Date(),
       generationData: {
         baseRoll: 50,
@@ -178,36 +191,36 @@ describe("Contract Types - Issue 4.1", () => {
     it("should enforce population relation modifier range (-20 to +5)", () => {
       const contract = createValidContract();
 
-      // Baseado na tabela "Relação com a População Local"
-      contract.value.modifiers.populationRelation = -20; // Péssima
+      // Baseado na tabela "Relação com a População Local" (tabelas mapeadas)
+      contract.value.modifiers.populationRelationValue = -10; // Ruim (valor mínimo)
       expect(() => validateContract(contract)).not.toThrow();
 
-      contract.value.modifiers.populationRelation = 5; // Excelente
+      contract.value.modifiers.populationRelationValue = 5; // Péssima (valor máximo)
       expect(() => validateContract(contract)).not.toThrow();
 
       // Fora do range
-      contract.value.modifiers.populationRelation = -25;
+      contract.value.modifiers.populationRelationValue = -15;
       expect(() => validateContract(contract)).toThrow();
 
-      contract.value.modifiers.populationRelation = 10;
+      contract.value.modifiers.populationRelationValue = 10;
       expect(() => validateContract(contract)).toThrow();
     });
 
-    it("should enforce government relation modifier range (-25 to +10)", () => {
+    it("should enforce government relation modifier range (-25 to +5)", () => {
       const contract = createValidContract();
 
-      // Baseado na tabela "Relação com o Governo Local"
-      contract.value.modifiers.governmentRelation = -25; // Péssima
+      // Baseado na tabela "Relação com o Governo Local" (tabelas mapeadas)
+      contract.value.modifiers.governmentRelationValue = -25; // Péssima (valor mínimo)
       expect(() => validateContract(contract)).not.toThrow();
 
-      contract.value.modifiers.governmentRelation = 10; // Excelente
+      contract.value.modifiers.governmentRelationValue = 5; // Muito boa/Excelente (valor máximo)
       expect(() => validateContract(contract)).not.toThrow();
 
       // Fora do range
-      contract.value.modifiers.governmentRelation = -30;
+      contract.value.modifiers.governmentRelationValue = -30;
       expect(() => validateContract(contract)).toThrow();
 
-      contract.value.modifiers.governmentRelation = 15;
+      contract.value.modifiers.governmentRelationValue = 10;
       expect(() => validateContract(contract)).toThrow();
     });
   });
@@ -228,8 +241,10 @@ describe("Contract Types - Issue 4.1", () => {
           finalGoldReward: 10,
           modifiers: {
             distance: 0,
-            populationRelation: 0,
-            governmentRelation: 0,
+            populationRelationValue: 0,
+            populationRelationReward: 0,
+            governmentRelationValue: 0,
+            governmentRelationReward: 0,
             staffPreparation: 0,
             difficultyMultiplier: {
               experienceMultiplier: 1,
@@ -245,6 +260,16 @@ describe("Contract Types - Issue 4.1", () => {
           isArbitrary: true,
         },
         paymentType: PaymentType.TOTAL_GUILDA,
+        prerequisites: [],
+        clauses: [],
+        antagonist: {
+          category: AntagonistCategory.HUMANOIDE_PODEROSO,
+          specificType: "Nobre",
+          name: "Nobre Corrupto",
+          description: "Um membro da nobreza local",
+        },
+        complications: [],
+        twists: [],
         createdAt: new Date(),
         expiresAt: new Date(Date.now() - 86400000), // 1 dia atrás
         generationData: {
