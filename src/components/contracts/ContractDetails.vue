@@ -53,48 +53,116 @@
             <div class="p-6 overflow-y-auto max-h-[calc(90vh-180px)]">
               <div class="space-y-6">
                 
-                <!-- Descrição e Objetivo -->
-                <section class="space-y-4">
-                  <div v-if="contract.description">
-                    <h4 class="text-lg font-semibold text-amber-400 mb-2">Descrição</h4>
-                    <p class="text-gray-300 leading-relaxed">{{ contract.description }}</p>
-                  </div>
+                <!-- Descrição -->
+                <section v-if="contract.description">
+                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Descrição</h4>
+                  <div class="text-gray-300 leading-relaxed whitespace-pre-line" v-html="formatMarkdown(contract.description)"></div>
+                </section>
 
-                  <div v-if="contract.objective">
-                    <h4 class="text-lg font-semibold text-amber-400 mb-2">Objetivo</h4>
-                    <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
-                      <div class="flex items-center gap-2 mb-2">
-                        <font-awesome-icon :icon="['fas', 'bullseye']" class="text-amber-400" />
-                        <span class="font-medium text-white">{{ contract.objective.category }}</span>
+                <!-- 1. Objetivo -->
+                <section v-if="contract.objective">
+                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Objetivo</h4>
+                  <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
+                    <div class="flex items-center gap-2 mb-2">
+                      <font-awesome-icon :icon="['fas', 'bullseye']" class="text-amber-400" />
+                      <span class="font-medium text-white">{{ contract.objective.category }}</span>
+                    </div>
+                    <p class="text-gray-300 mb-2">{{ contract.objective.description }}</p>
+                    
+                    <!-- Especificação do objetivo -->
+                    <div v-if="contract.objective.specificObjective" class="mt-3 p-3 bg-gray-800 rounded border border-gray-500">
+                      <div class="text-sm text-gray-400 mb-1">
+                        <strong>Especificação:</strong>
                       </div>
-                      <p class="text-gray-300">{{ contract.objective.description }}</p>
-                      <div v-if="contract.objective.targetName" class="mt-2 text-sm text-gray-400">
-                        <strong>Alvo:</strong> {{ contract.objective.targetName }}
-                      </div>
+                      <p class="text-gray-200">{{ contract.objective.specificObjective }}</p>
+                    </div>
+                    
+                    <!-- Informações extras do objetivo -->
+                    <div v-if="contract.objective.targetName" class="mt-2 text-sm text-gray-400">
+                      <strong>Alvo:</strong> {{ contract.objective.targetName }}
                     </div>
                   </div>
                 </section>
 
-                <!-- Localização -->
+                <!-- 2. Localidade -->
                 <section v-if="contract.location">
-                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Localização</h4>
+                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Localidade</h4>
                   <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
                     <div class="flex items-center gap-2 mb-2">
                       <font-awesome-icon :icon="['fas', 'map-marker-alt']" class="text-amber-400" />
                       <span class="font-medium text-white">{{ contract.location.name }}</span>
                     </div>
-                    <div v-if="contract.location.description" class="text-gray-300">
+                    
+                    <!-- Descrição da localidade -->
+                    <div v-if="contract.location.description" class="text-gray-300 mb-2">
                       {{ contract.location.description }}
                     </div>
-                    <div v-if="contract.location.category" class="mt-2 text-sm text-gray-400">
-                      <strong>Tipo:</strong> {{ contract.location.category }}
+                    
+                    <!-- Categoria da localidade -->
+                    <div v-if="contract.location.category" class="mb-2">
+                      <span class="text-sm text-gray-400">
+                        <strong>Categoria:</strong>
+                      </span>
+                      <span class="text-sm text-blue-300 bg-blue-800/50 px-2 py-1 rounded ml-2">
+                        {{ contract.location.category }}
+                      </span>
+                    </div>
+                    
+                    <!-- Local específico -->
+                    <div v-if="contract.location.specificLocation" class="mt-3 p-3 bg-gray-800 rounded border border-gray-500">
+                      <div class="text-sm text-gray-400 mb-1">
+                        <strong>Local Específico:</strong>
+                      </div>
+                      <p class="text-gray-200">{{ contract.location.specificLocation }}</p>
                     </div>
                   </div>
                 </section>
 
-                <!-- Valores e Recompensas -->
+                <!-- 3. Antagonista -->
                 <section>
-                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Valores e Recompensas</h4>
+                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Antagonista</h4>
+                  <div class="bg-red-900/20 rounded-lg p-4 border border-red-500/30">
+                    <div class="flex items-center gap-2 mb-2">
+                      <font-awesome-icon :icon="['fas', 'user-times']" class="text-red-400" />
+                      <span class="font-medium text-white">{{ contract.antagonist.name }}</span>
+                      <span class="text-sm text-red-300 bg-red-800/50 px-2 py-1 rounded">
+                        {{ contract.antagonist.category }}
+                      </span>
+                    </div>
+                    <p class="text-gray-300 text-sm mb-2">{{ contract.antagonist.description }}</p>
+                    <div class="text-xs text-red-200">
+                      <strong>Tipo Específico:</strong> {{ contract.antagonist.specificType }}
+                    </div>
+                  </div>
+                </section>
+
+                <!-- 4. Complicações -->
+                <section v-if="contract.complications?.length">
+                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Complicações</h4>
+                  <div class="space-y-3">
+                    <div 
+                      v-for="complication in contract.complications" 
+                      :key="complication.category"
+                      class="bg-orange-900/20 rounded-lg p-4 border border-orange-500/30"
+                    >
+                      <div class="flex items-center gap-2 mb-2">
+                        <font-awesome-icon :icon="['fas', 'exclamation-circle']" class="text-orange-400" />
+                        <span class="font-medium text-white">{{ complication.category }}</span>
+                      </div>
+                      <p class="text-gray-300 text-sm mb-1">{{ complication.description }}</p>
+                      <div class="text-xs text-orange-200">
+                        <strong>Detalhe:</strong> {{ complication.specificDetail }}
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- 5. Aliados (Placeholder - Não implementado ainda) -->
+                <!-- TODO: Implementar seção de aliados -->
+
+                <!-- 6. Recompensas e Incentivos -->
+                <section>
+                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Recompensas e Incentivos</h4>
                   <ContractValue
                     :value="contract.value"
                     :difficulty="contract.difficulty"
@@ -119,16 +187,16 @@
                               {{ formatModifier(contract.value.modifiers.distance) }}
                             </span>
                           </div>
-                          <div v-if="contract.value.modifiers.populationRelation !== 0" class="flex justify-between">
+                          <div v-if="contract.value.modifiers.populationRelationValue !== 0" class="flex justify-between">
                             <span class="text-gray-400">Relação População:</span>
-                            <span :class="getModifierClass(contract.value.modifiers.populationRelation)">
-                              {{ formatModifier(contract.value.modifiers.populationRelation) }}
+                            <span :class="getModifierClass(contract.value.modifiers.populationRelationValue)">
+                              {{ formatModifier(contract.value.modifiers.populationRelationValue) }}
                             </span>
                           </div>
-                          <div v-if="contract.value.modifiers.governmentRelation !== 0" class="flex justify-between">
+                          <div v-if="contract.value.modifiers.governmentRelationValue !== 0" class="flex justify-between">
                             <span class="text-gray-400">Relação Governo:</span>
-                            <span :class="getModifierClass(contract.value.modifiers.governmentRelation)">
-                              {{ formatModifier(contract.value.modifiers.governmentRelation) }}
+                            <span :class="getModifierClass(contract.value.modifiers.governmentRelationValue)">
+                              {{ formatModifier(contract.value.modifiers.governmentRelationValue) }}
                             </span>
                           </div>
                         </div>
@@ -159,49 +227,108 @@
                       </div>
                     </div>
                   </div>
-                </section>
 
-                <!-- Prazo e Pagamento -->
-                <section>
-                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Prazo e Pagamento</h4>
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
-                      <h5 class="font-medium text-white mb-2 flex items-center gap-2">
-                        <font-awesome-icon :icon="['fas', 'clock']" class="text-amber-400" />
-                        Prazo
-                      </h5>
-                      <div class="space-y-1 text-sm">
-                        <div class="flex justify-between">
-                          <span class="text-gray-400">Tipo:</span>
-                          <span class="text-white">{{ contract.deadline.type }}</span>
+                  <!-- Prazo e Pagamento -->
+                  <div class="mt-4">
+                    <h5 class="font-medium text-white mb-2">Prazo e Pagamento</h5>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
+                        <h6 class="font-medium text-white mb-2 flex items-center gap-2">
+                          <font-awesome-icon :icon="['fas', 'clock']" class="text-amber-400" />
+                          Prazo
+                        </h6>
+                        <div class="space-y-1 text-sm">
+                          <div class="flex justify-between">
+                            <span class="text-gray-400">Tipo:</span>
+                            <span class="text-white">{{ contract.deadline.type }}</span>
+                          </div>
+                          <div v-if="contract.deadline.value" class="flex justify-between">
+                            <span class="text-gray-400">Tempo:</span>
+                            <span class="text-white">{{ contract.deadline.value }}</span>
+                          </div>
+                          <div class="flex justify-between">
+                            <span class="text-gray-400">Flexibilidade:</span>
+                            <span :class="contract.deadline.isFlexible ? 'text-green-400' : 'text-orange-400'">
+                              {{ contract.deadline.isFlexible ? 'Flexível' : 'Rígido' }}
+                            </span>
+                          </div>
+                          <div class="flex justify-between">
+                            <span class="text-gray-400">Arbitrário:</span>
+                            <span :class="contract.deadline.isArbitrary ? 'text-yellow-400' : 'text-blue-400'">
+                              {{ contract.deadline.isArbitrary ? 'Sim' : 'Não' }}
+                            </span>
+                          </div>
                         </div>
-                        <div v-if="contract.deadline.value" class="flex justify-between">
-                          <span class="text-gray-400">Tempo:</span>
-                          <span class="text-white">{{ contract.deadline.value }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                          <span class="text-gray-400">Flexibilidade:</span>
-                          <span :class="contract.deadline.isFlexible ? 'text-green-400' : 'text-orange-400'">
-                            {{ contract.deadline.isFlexible ? 'Flexível' : 'Rígido' }}
-                          </span>
-                        </div>
-                        <div class="flex justify-between">
-                          <span class="text-gray-400">Arbitrário:</span>
-                          <span :class="contract.deadline.isArbitrary ? 'text-yellow-400' : 'text-blue-400'">
-                            {{ contract.deadline.isArbitrary ? 'Sim' : 'Não' }}
-                          </span>
+                      </div>
+
+                      <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
+                        <h6 class="font-medium text-white mb-2 flex items-center gap-2">
+                          <font-awesome-icon :icon="['fas', 'coins']" class="text-amber-400" />
+                          Pagamento
+                        </h6>
+                        <div class="text-sm">
+                          <div class="text-gray-300">{{ getPaymentTypeDescription(contract.paymentType) }}</div>
                         </div>
                       </div>
                     </div>
+                  </div>
+                </section>
 
-                    <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
-                      <h5 class="font-medium text-white mb-2 flex items-center gap-2">
-                        <font-awesome-icon :icon="['fas', 'coins']" class="text-amber-400" />
-                        Pagamento
-                      </h5>
-                      <div class="text-sm">
-                        <div class="text-gray-300">{{ getPaymentTypeDescription(contract.paymentType) }}</div>
+                <!-- 7. Reviravoltas -->
+                <section v-if="contract.twists?.length">
+                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Reviravoltas</h4>
+                  <div class="space-y-3">
+                    <div 
+                      v-for="twist in contract.twists" 
+                      :key="twist.description"
+                      class="bg-purple-900/20 rounded-lg p-4 border border-purple-500/30"
+                    >
+                      <div class="flex items-center gap-2 mb-2">
+                        <font-awesome-icon :icon="['fas', 'surprise']" class="text-purple-400" />
+                        <span class="font-medium text-white">Reviravolta</span>
+                        <span v-if="twist.who" class="text-sm text-purple-300 bg-purple-800/50 px-2 py-1 rounded">
+                          {{ twist.who }}
+                        </span>
                       </div>
+                      <p class="text-gray-300 text-sm mb-1">{{ twist.description }}</p>
+                      <div v-if="twist.what" class="text-xs text-purple-200">
+                        <strong>Revelação:</strong> {{ twist.what }}
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- 8. Consequências Severas (Placeholder - Não implementado ainda) -->
+                <!-- TODO: Implementar seção de consequências severas -->
+
+                <!-- Pré-requisitos e Cláusulas -->
+                <section v-if="contract.prerequisites?.length || contract.clauses?.length">
+                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Requisitos e Condições</h4>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div v-if="contract.prerequisites?.length" class="bg-gray-700 rounded-lg p-4 border border-gray-600">
+                      <h5 class="font-medium text-white mb-2 flex items-center gap-2">
+                        <font-awesome-icon :icon="['fas', 'exclamation-triangle']" class="text-yellow-400" />
+                        Pré-requisitos
+                      </h5>
+                      <ul class="text-sm text-gray-300 space-y-1">
+                        <li v-for="prerequisite in contract.prerequisites" :key="prerequisite" class="flex items-start gap-2">
+                          <span class="text-yellow-400 mt-0.5">•</span>
+                          <span>{{ prerequisite }}</span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div v-if="contract.clauses?.length" class="bg-gray-700 rounded-lg p-4 border border-gray-600">
+                      <h5 class="font-medium text-white mb-2 flex items-center gap-2">
+                        <font-awesome-icon :icon="['fas', 'scroll']" class="text-blue-400" />
+                        Cláusulas Especiais
+                      </h5>
+                      <ul class="text-sm text-gray-300 space-y-1">
+                        <li v-for="clause in contract.clauses" :key="clause" class="flex items-start gap-2">
+                          <span class="text-blue-400 mt-0.5">•</span>
+                          <span>{{ clause }}</span>
+                        </li>
+                      </ul>
                     </div>
                   </div>
                 </section>
@@ -416,6 +543,16 @@ function formatDate(date: Date): string {
     hour: '2-digit',
     minute: '2-digit'
   }).format(date);
+}
+
+function formatMarkdown(text: string): string {
+  if (!text) return '';
+  
+  return text
+    // Converter **texto** para <strong>texto</strong>
+    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-amber-300">$1</strong>')
+    // Preservar quebras de linha
+    .replace(/\n/g, '<br>');
 }
 </script>
 
