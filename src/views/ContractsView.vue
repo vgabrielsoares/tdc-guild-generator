@@ -192,7 +192,7 @@ const guildStore = useGuildStore();
 
 // ===== STATE =====
 const currentPage = ref(1);
-const pageSize = ref(10);
+const pageSize = ref(5);
 const toastMessage = ref<string>('');
 
 // Modal de detalhes
@@ -328,27 +328,45 @@ function handleAbandonContractFromDetails(contract: Contract) {
 }
 
 // Métodos para geração de contratos
-async function handleRegenerateContracts() {
+async function handleGenerateContracts() {
   try {
     if (!guild.value) {
-      showToast('É necessário ter uma guilda para gerar contratos');
+      showToast('É necessário ter uma guilda ativa para gerar contratos');
       return;
     }
     
-    // Limpar contratos existentes
-    contractsStore.clearContracts();
+    // Gerar novos contratos usando a guilda atual
+    await contractsStore.generateContracts();
+    currentPage.value = 1; // Reset para primeira página
+    showToast(`Novos contratos gerados para a guilda "${guild.value.name}"!`);
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+    showToast(`Erro ao gerar contratos: ${errorMessage}`);
+  }
+}
+
+async function handleRegenerateContracts() {
+  try {
+    if (!guild.value) {
+      showToast('É necessário ter uma guilda ativa para regenerar contratos');
+      return;
+    }
+    
+    // Confirmar se há contratos para limpar
+    if (contracts.value.length > 0) {
+      // Limpar contratos existentes
+      contractsStore.clearContracts();
+      showToast('Contratos anteriores removidos.');
+    }
     
     // Gerar novos contratos
     await contractsStore.generateContracts();
     currentPage.value = 1; // Reset para primeira página
-    showToast('Contratos regenerados com sucesso!');
+    showToast(`Contratos regenerados para a guilda "${guild.value.name}"!`);
   } catch (error) {
-    showToast('Erro ao regenerar contratos');
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+    showToast(`Erro ao regenerar contratos: ${errorMessage}`);
   }
-}
-
-async function handleGenerateContracts() {
-  await handleRegenerateContracts();
 }
 
 // Métodos para filtros
@@ -399,7 +417,12 @@ onMounted(async () => {
   // Carregar dados do store
   await contractsStore.initializeStore();
   
+  // Se não há guilda ativa, limpar contratos órfãos
   if (!guild.value) {
+    if (contracts.value.length > 0) {
+      contractsStore.clearContractsForNewGuild();
+      showToast('Contratos removidos - nenhuma guilda ativa.');
+    }
     return;
   }
   
