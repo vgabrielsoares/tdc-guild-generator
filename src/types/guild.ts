@@ -187,8 +187,20 @@ export const GuildSchema = z.object({
   visitors: GuildVisitorsSchema,
   resources: GuildResourcesSchema,
   settlementType: SettlementTypeSchema,
-  createdAt: z.date(),
-  updatedAt: z.date().optional(),
+  createdAt: z.union([
+    z.date(),
+    z.string().transform((str) => new Date(str)),
+    z.number().transform((num) => new Date(num))
+  ]).refine((date) => !isNaN(date.getTime()), {
+    message: "Invalid date"
+  }),
+  updatedAt: z.union([
+    z.date(),
+    z.string().transform((str) => new Date(str)),
+    z.number().transform((num) => new Date(num))
+  ]).refine((date) => !isNaN(date.getTime()), {
+    message: "Invalid date"
+  }).optional(),
   locked: z.boolean().optional().default(false),
 });
 
