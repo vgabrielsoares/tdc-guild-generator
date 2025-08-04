@@ -115,7 +115,7 @@
       <!-- Filtros Avançados -->
       <ContractFilters
         v-if="contracts.length > 0"
-        :contracts="[...contracts]"
+        :contracts="contracts as Contract[]"
         :filters="currentFilters"
         @update-status="handleFilterUpdate('status', $event)"
         @update-difficulty="handleFilterUpdate('difficulty', $event)"
@@ -129,7 +129,7 @@
 
       <!-- Lista de Contratos -->
       <ContractList
-        :contracts="[...filteredContracts]"
+        :contracts="filteredContracts as Contract[]"
         :is-loading="isLoading"
         :show-actions="true"
         :show-filters="false"

@@ -82,17 +82,17 @@
           </span>
         </div>
         
-        <div v-if="value.modifiers.populationRelation !== 0" class="tooltip-item">
+        <div v-if="value.modifiers.populationRelationValue !== 0" class="tooltip-item">
           <span class="tooltip-label">Relação População:</span>
-          <span :class="getModifierClass(value.modifiers.populationRelation)">
-            {{ formatModifier(value.modifiers.populationRelation) }}
+          <span :class="getModifierClass(value.modifiers.populationRelationValue)">
+            {{ formatModifier(value.modifiers.populationRelationValue) }}
           </span>
         </div>
         
-        <div v-if="value.modifiers.governmentRelation !== 0" class="tooltip-item">
+        <div v-if="value.modifiers.governmentRelationValue !== 0" class="tooltip-item">
           <span class="tooltip-label">Relação Governo:</span>
-          <span :class="getModifierClass(value.modifiers.governmentRelation)">
-            {{ formatModifier(value.modifiers.governmentRelation) }}
+          <span :class="getModifierClass(value.modifiers.governmentRelationValue)">
+            {{ formatModifier(value.modifiers.governmentRelationValue) }}
           </span>
         </div>
         
@@ -230,8 +230,8 @@ const difficultyTextClasses = computed(() => {
 const hasModifiers = computed(() => {
   const mods = props.value.modifiers;
   return mods.distance !== 0 ||
-         mods.populationRelation !== 0 ||
-         mods.governmentRelation !== 0 ||
+         mods.populationRelationValue !== 0 ||
+         mods.governmentRelationValue !== 0 ||
          mods.staffPreparation !== 0 ||
          mods.requirementsAndClauses > 0;
 });
@@ -244,8 +244,8 @@ const hasDifficultyMultipliers = computed(() => {
 const totalModifierDisplay = computed(() => {
   const mods = props.value.modifiers;
   const total = mods.distance + 
-                mods.populationRelation + 
-                mods.governmentRelation + 
+                mods.populationRelationValue + 
+                mods.governmentRelationValue + 
                 mods.staffPreparation + 
                 mods.requirementsAndClauses;
   
@@ -255,8 +255,8 @@ const totalModifierDisplay = computed(() => {
 const modifierClasses = computed(() => {
   const mods = props.value.modifiers;
   const total = mods.distance + 
-                mods.populationRelation + 
-                mods.governmentRelation + 
+                mods.populationRelationValue + 
+                mods.governmentRelationValue + 
                 mods.staffPreparation + 
                 mods.requirementsAndClauses;
   
