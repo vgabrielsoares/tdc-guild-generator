@@ -65,7 +65,7 @@
                   <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
                     <div class="flex items-center gap-2 mb-2">
                       <font-awesome-icon :icon="['fas', 'bullseye']" class="text-amber-400" />
-                      <span class="font-medium text-white">{{ contract.objective.category }}</span>
+                      <span class="font-medium text-white">{{ getCategoryDisplayName(contract.objective.category) }}</span>
                     </div>
                     <p class="text-gray-300 mb-2">{{ contract.objective.description }}</p>
                     
@@ -75,11 +75,6 @@
                         <strong>Especificação:</strong>
                       </div>
                       <p class="text-gray-200">{{ contract.objective.specificObjective }}</p>
-                    </div>
-                    
-                    <!-- Informações extras do objetivo -->
-                    <div v-if="contract.objective.targetName" class="mt-2 text-sm text-gray-400">
-                      <strong>Alvo:</strong> {{ contract.objective.targetName }}
                     </div>
                   </div>
                 </section>
@@ -93,27 +88,48 @@
                       <span class="font-medium text-white">{{ contract.location.name }}</span>
                     </div>
                     
-                    <!-- Descrição da localidade -->
-                    <div v-if="contract.location.description" class="text-gray-300 mb-2">
-                      {{ contract.location.description }}
-                    </div>
-                    
-                    <!-- Categoria da localidade -->
-                    <div v-if="contract.location.category" class="mb-2">
-                      <span class="text-sm text-gray-400">
-                        <strong>Categoria:</strong>
-                      </span>
-                      <span class="text-sm text-blue-300 bg-blue-800/50 px-2 py-1 rounded ml-2">
-                        {{ contract.location.category }}
-                      </span>
-                    </div>
-                    
-                    <!-- Local específico -->
-                    <div v-if="contract.location.specificLocation" class="mt-3 p-3 bg-gray-800 rounded border border-gray-500">
+                    <!-- Especificação da localidade -->
+                    <div v-if="contract.location.specification" class="mt-3 p-3 bg-gray-800 rounded border border-gray-500">
                       <div class="text-sm text-gray-400 mb-1">
-                        <strong>Local Específico:</strong>
+                        <strong>Localização específica:</strong>
                       </div>
-                      <p class="text-gray-200">{{ contract.location.specificLocation }}</p>
+                      <p class="text-gray-200 mb-1">{{ contract.location.specification.location }}</p>
+                      <div v-if="contract.location.specification.description !== contract.location.specification.location" class="text-sm text-gray-300">
+                        → {{ contract.location.specification.description }}
+                      </div>
+                    </div>
+
+                    <!-- Distrito específico -->
+                    <div v-if="contract.location.district" class="mt-3 p-3 bg-gray-800 rounded border border-gray-500">
+                      <div class="text-sm text-gray-400 mb-1">
+                        <strong>Distrito:</strong>
+                      </div>
+                      <p class="text-gray-200">
+                        {{ contract.location.district.primary.name }}
+                        <span v-if="contract.location.district.secondary"> e {{ contract.location.district.secondary.name }}</span>
+                      </p>
+                    </div>
+
+                    <!-- Importância do local -->
+                    <div v-if="contract.location.importance && contract.location.importance.type !== 'nenhuma'" class="mt-3 p-3 bg-gray-800 rounded border border-gray-500">
+                      <div class="text-sm text-gray-400 mb-1">
+                        <strong>Importância:</strong>
+                      </div>
+                      <p class="text-gray-200 mb-1">{{ contract.location.importance.name }}</p>
+                      <div v-if="contract.location.importance.description !== contract.location.importance.name" class="text-sm text-gray-300">
+                        → {{ contract.location.importance.description }}
+                      </div>
+                    </div>
+
+                    <!-- Peculiaridade do local -->
+                    <div v-if="contract.location.peculiarity && contract.location.peculiarity.type !== 'nenhuma'" class="mt-3 p-3 bg-gray-800 rounded border border-gray-500">
+                      <div class="text-sm text-gray-400 mb-1">
+                        <strong>Peculiaridade:</strong>
+                      </div>
+                      <p class="text-gray-200 mb-1">{{ contract.location.peculiarity.name }}</p>
+                      <div v-if="contract.location.peculiarity.description !== contract.location.peculiarity.name" class="text-sm text-gray-300">
+                        → {{ contract.location.peculiarity.description }}
+                      </div>
                     </div>
                   </div>
                 </section>
@@ -124,15 +140,12 @@
                   <div class="bg-red-900/20 rounded-lg p-4 border border-red-500/30">
                     <div class="flex items-center gap-2 mb-2">
                       <font-awesome-icon :icon="['fas', 'user-times']" class="text-red-400" />
-                      <span class="font-medium text-white">{{ contract.antagonist.name }}</span>
+                      <span class="font-medium text-white">{{ contract.antagonist.specificType }}</span>
                       <span class="text-sm text-red-300 bg-red-800/50 px-2 py-1 rounded">
-                        {{ contract.antagonist.category }}
+                        {{ getCategoryDisplayName(contract.antagonist.category) }}
                       </span>
                     </div>
-                    <p class="text-gray-300 text-sm mb-2">{{ contract.antagonist.description }}</p>
-                    <div class="text-xs text-red-200">
-                      <strong>Tipo Específico:</strong> {{ contract.antagonist.specificType }}
-                    </div>
+                    <p class="text-gray-300 text-sm">{{ contract.antagonist.description }}</p>
                   </div>
                 </section>
 
@@ -147,12 +160,12 @@
                     >
                       <div class="flex items-center gap-2 mb-2">
                         <font-awesome-icon :icon="['fas', 'exclamation-circle']" class="text-orange-400" />
-                        <span class="font-medium text-white">{{ complication.category }}</span>
+                        <span class="font-medium text-white">{{ complication.specificDetail }}</span>
+                        <span class="text-sm text-orange-300 bg-orange-800/50 px-2 py-1 rounded">
+                          {{ getCategoryDisplayName(complication.category) }}
+                        </span>
                       </div>
-                      <p class="text-gray-300 text-sm mb-1">{{ complication.description }}</p>
-                      <div class="text-xs text-orange-200">
-                        <strong>Detalhe:</strong> {{ complication.specificDetail }}
-                      </div>
+                      <p class="text-gray-300 text-sm">{{ complication.description }}</p>
                     </div>
                   </div>
                 </section>
@@ -518,6 +531,40 @@ function getPaymentTypeDescription(paymentType: PaymentType): string {
     default:
       return 'Tipo de pagamento não especificado';
   }
+}
+
+function getCategoryDisplayName(category: string): string {
+  const categoryMap: Record<string, string> = {
+    'ATACAR_DESTRUIR': 'Atacar/Destruir',
+    'ENCONTRAR_RECUPERAR': 'Encontrar/Recuperar', 
+    'CAPTURAR': 'Capturar',
+    'PROTEGER_SALVAR': 'Proteger/Salvar',
+    'EXPLORAR_DESCOBRIR': 'Explorar/Descobrir',
+    'ENTREGAR_RECEBER': 'Entregar/Receber',
+    'INVESTIGAR_SABOTAR': 'Investigar/Sabotar',
+    'SERVICOS_PERIGOSOS': 'Serviços Perigosos',
+    'RELIGIOSO': 'Religioso',
+    'HUMANOIDE_PODEROSO': 'Humanoide Poderoso',
+    'ARTEFATO_MAGICO': 'Artefato Mágico',
+    'ORGANIZACAO': 'Organização',
+    'PERIGO_IMINENTE': 'Perigo Iminente',
+    'ENTIDADE_SOBRENATURAL': 'Entidade Sobrenatural',
+    'ANOMALIA': 'Anomalia',
+    'DESASTRE_ACIDENTE': 'Desastre/Acidente',
+    'CRISE': 'Crise',
+    'MISTERIO': 'Mistério',
+    'RECURSOS': 'Recursos',
+    'VITIMAS': 'Vítimas',
+    'MIRACULOSO': 'Miraculoso',
+    'AMBIENTE_HOSTIL': 'Ambiente Hostil',
+    'INUSITADO': 'Inusitado',
+    'PROBLEMAS_DIPLOMATICOS': 'Problemas Diplomáticos',
+    'PROTECAO': 'Proteção',
+    'CONTRA_TEMPO_AMISTOSO': 'Contra-tempo Amistoso',
+    'ENCONTRO_HOSTIL': 'Encontro Hostil'
+  };
+  
+  return categoryMap[category] || category;
 }
 
 function getDifficultyDescription(difficulty: ContractDifficulty): string {
