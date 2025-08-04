@@ -6,42 +6,144 @@
         Contratos da Guilda
       </h1>
       <p class="text-lg text-gray-300 mb-8">
-        Explore contratos disponíveis com valores dinâmicos e modificadores baseados na estrutura da guilda.
+        Gerencie contratos da sede da guilda atual
       </p>
     </div>
 
-    <!-- Filtros Avançados -->
-    <ContractFilters
-      :contracts="[...contracts]"
-      :filters="currentFilters"
-      @update-status="handleFilterUpdate('status', $event)"
-      @update-difficulty="handleFilterUpdate('difficulty', $event)"
-      @update-contractor="handleFilterUpdate('contractor', $event)"
-      @update-search="handleFilterUpdate('searchText', $event)"
-      @update-min-value="handleFilterUpdate('minValue', $event)"
-      @update-max-value="handleFilterUpdate('maxValue', $event)"
-      @update-deadline="handleFilterUpdate('hasDeadline', $event)"
-      @clear-filters="handleClearFilters"
-    />
+    <!-- Info da Guilda Atual -->
+    <div v-if="guild" class="bg-gradient-to-r from-amber-900/20 to-yellow-900/20 border border-amber-600/50 rounded-lg p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-xl font-semibold text-amber-400 flex items-center">
+          <font-awesome-icon icon="crown" class="mr-2" />
+          {{ guild.name }}
+        </h3>
+        <span class="text-sm px-3 py-1 bg-amber-600 text-amber-100 rounded-full">
+          {{ guild.settlementType }}
+        </span>
+      </div>
+      
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+        <div class="flex flex-col">
+          <span class="text-gray-400 uppercase tracking-wide text-xs">Sede</span>
+          <span class="text-white font-medium">{{ guild.structure.size }}</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-gray-400 uppercase tracking-wide text-xs">Recursos</span>
+          <span class="text-white font-medium">{{ guild.resources.level }}</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-gray-400 uppercase tracking-wide text-xs">Rel. Governo</span>
+          <span class="text-white font-medium">{{ guild.relations.government }}</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-gray-400 uppercase tracking-wide text-xs">Rel. População</span>
+          <span class="text-white font-medium">{{ guild.relations.population }}</span>
+        </div>
+      </div>
 
-    <!-- Componente principal de contratos -->
-    <ContractList
-      :contracts="[...filteredContracts]"
-      :is-loading="isLoading"
-      :show-actions="true"
-      :show-filters="false"
-      :can-generate="!isLoading"
-      :active-status-filter="null"
-      :current-page="currentPage"
-      :page-size="pageSize"
-      @accept="handleAcceptContract"
-      @complete="handleCompleteContract"
-      @abandon="handleAbandonContract"
-      @view-details="handleViewContractDetails"
-      @regenerate="handleRegenerateContracts"
-      @generate="handleGenerateContracts"
-      @page-change="handlePageChange"
-    />
+      <div class="mt-4 pt-4 border-t border-amber-600/30">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-amber-200">
+            <font-awesome-icon icon="map-marker-alt" class="mr-2" />
+            Sede localizada em: <span class="font-medium">{{ guild.settlementType }}</span>
+          </span>
+          <span class="text-xs text-gray-400">
+            Criada em: {{ formatDate(guild.createdAt) }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Aviso quando não há guilda -->
+    <div v-else class="bg-red-900/20 border border-red-600/50 rounded-lg p-8 text-center">
+      <font-awesome-icon icon="exclamation-triangle" class="text-red-400 text-4xl mb-4" />
+      <h2 class="text-xl font-semibold text-red-400 mb-2">Nenhuma Guilda Encontrada</h2>
+      <p class="text-gray-300 mb-6">
+        Para gerar contratos, você precisa primeiro ter uma guilda ativa. 
+        Acesse a página de Guildas para gerar uma nova sede.
+      </p>
+      <router-link 
+        to="/guild" 
+        class="inline-flex items-center px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-lg transition-colors"
+      >
+        <font-awesome-icon icon="plus" class="mr-2" />
+        Gerar Nova Guilda
+      </router-link>
+    </div>
+
+    <!-- Contratos (só mostra se há guilda) -->
+    <template v-if="guild">
+      <!-- Botão de Gerar Contratos -->
+      <div class="bg-gray-800 border border-gray-700 rounded-lg p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="text-lg font-semibold text-white mb-2">Contratos Disponíveis</h3>
+            <p class="text-sm text-gray-400">
+              Total de {{ contracts.length }} contratos para esta sede da guilda
+            </p>
+          </div>
+          <div class="flex gap-3">
+            <button
+              @click="handleGenerateContracts"
+              :disabled="isLoading"
+              class="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white font-medium rounded-lg transition-colors flex items-center"
+            >
+              <font-awesome-icon 
+                :icon="isLoading ? 'spinner' : 'plus'" 
+                :class="{ 'animate-spin': isLoading }" 
+                class="mr-2" 
+              />
+              {{ isLoading ? 'Gerando...' : contracts.length > 0 ? 'Gerar Novos' : 'Gerar Contratos' }}
+            </button>
+            <button
+              v-if="contracts.length > 0"
+              @click="handleRegenerateContracts"
+              :disabled="isLoading"
+              class="px-4 py-2 bg-amber-600 hover:bg-amber-700 disabled:bg-gray-600 text-white font-medium rounded-lg transition-colors flex items-center"
+            >
+              <font-awesome-icon 
+                :icon="isLoading ? 'spinner' : 'refresh'" 
+                :class="{ 'animate-spin': isLoading }" 
+                class="mr-2" 
+              />
+              Regenerar Todos
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtros Avançados -->
+      <ContractFilters
+        v-if="contracts.length > 0"
+        :contracts="[...contracts]"
+        :filters="currentFilters"
+        @update-status="handleFilterUpdate('status', $event)"
+        @update-difficulty="handleFilterUpdate('difficulty', $event)"
+        @update-contractor="handleFilterUpdate('contractor', $event)"
+        @update-search="handleFilterUpdate('searchText', $event)"
+        @update-min-value="handleFilterUpdate('minValue', $event)"
+        @update-max-value="handleFilterUpdate('maxValue', $event)"
+        @update-deadline="handleFilterUpdate('hasDeadline', $event)"
+        @clear-filters="handleClearFilters"
+      />
+
+      <!-- Lista de Contratos -->
+      <ContractList
+        :contracts="[...filteredContracts]"
+        :is-loading="isLoading"
+        :show-actions="true"
+        :show-filters="false"
+        :can-generate="false"
+        :active-status-filter="null"
+        :current-page="currentPage"
+        :page-size="pageSize"
+        @accept="handleAcceptContract"
+        @complete="handleCompleteContract"
+        @abandon="handleAbandonContract"
+        @view-details="handleViewContractDetails"
+        @page-change="handlePageChange"
+      />
+    </template>
 
     <!-- Modal de Detalhes do Contrato -->
     <ContractDetails
@@ -53,25 +155,6 @@
       @complete="handleCompleteContractFromDetails"
       @abandon="handleAbandonContractFromDetails"
     />
-
-    <!-- Debug/Info sobre a guilda atual -->
-    <div v-if="guild" class="bg-gray-800 border border-gray-700 rounded-lg p-4 text-sm">
-      <h3 class="text-amber-400 font-semibold mb-2">Info da Guilda Atual</h3>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-gray-300">
-        <div>
-          <span class="text-gray-500">Sede:</span> {{ guild.structure.size }}
-        </div>
-        <div>
-          <span class="text-gray-500">Recursos:</span> {{ guild.resources.level }}
-        </div>
-        <div>
-          <span class="text-gray-500">Governo:</span> {{ guild.relations.government }}
-        </div>
-        <div>
-          <span class="text-gray-500">População:</span> {{ guild.relations.population }}
-        </div>
-      </div>
-    </div>
 
     <!-- Toast para feedback -->
     <div
@@ -300,21 +383,26 @@ function showToast(message: string) {
   }, 3000);
 }
 
+// Utility para formatação de data
+function formatDate(date: Date): string {
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  }).format(date);
+}
+
 // ===== LIFECYCLE =====
 onMounted(async () => {
   // Carregar dados do store
   await contractsStore.initializeStore();
   
-  // Se não há guilda, gerar uma
   if (!guild.value) {
-    showToast('Gerando guilda para começar...');
-    const { SettlementType } = await import('@/types/guild');
-    await guildStore.generateQuickGuildAction(SettlementType.POVOADO, 'Guilda Padrão');
+    return;
   }
   
-  // Se não há contratos, gerar alguns
-  if (contracts.value.length === 0 && guild.value) {
-    await handleGenerateContracts();
-  }
+  // Se há guilda mas não há contratos, o usuário pode gerar clicando no botão
 });
 </script>
