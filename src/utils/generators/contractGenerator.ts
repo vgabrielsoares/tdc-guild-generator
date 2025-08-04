@@ -1326,7 +1326,7 @@ export class ContractGenerator {
     category: ComplicationCategory,
     specificDetail: string
   ): string {
-    const baseDescriptions: Record<ComplicationCategory, string> = {
+    const categoryDescriptions: Record<ComplicationCategory, string> = {
       [ComplicationCategory.RECURSOS]:
         "Uma complicação relacionada a recursos disponíveis afeta a missão",
       [ComplicationCategory.VITIMAS]:
@@ -1350,8 +1350,8 @@ export class ContractGenerator {
     };
 
     const baseDescription =
-      baseDescriptions[category] || "Uma complicação afeta a missão";
-    return `${baseDescription}: ${specificDetail}.`;
+      categoryDescriptions[category] || "Uma complicação afeta a missão";
+    return `${baseDescription}: ${specificDetail}`;
   }
 
   /**
@@ -1447,14 +1447,19 @@ export class ContractGenerator {
 
     const sections: string[] = [];
 
-    // 1. Objetivo
+    // 1. Contratante
+    sections.push(
+      `**Contratante:** ${contractor.name}\n→ ${contractor.description}`
+    );
+
+    // 2. Objetivo
     let objectiveText = `**Objetivo:** ${objective.description}`;
     if (objective.specificObjective) {
       objectiveText += `\nDetalhes: ${objective.specificObjective}`;
     }
     sections.push(objectiveText);
 
-    // 2. Localidade com todas as informações organizadas
+    // 3. Localidade com todas as informações organizadas
     let locationText = `**Local:** ${location.name}`;
 
     if (location.specification) {
@@ -1489,14 +1494,9 @@ export class ContractGenerator {
 
     sections.push(locationText);
 
-    // 3. Contratante
-    sections.push(
-      `**Contratante:** ${contractor.name}\n→ ${contractor.description}`
-    );
-
     // 4. Antagonista
     sections.push(
-      `**Antagonista:** ${antagonist.name}\n→ ${antagonist.description}`
+      `**Antagonista:** ${antagonist.specificType}\n→ ${antagonist.description}`
     );
 
     // 5. Complicações
