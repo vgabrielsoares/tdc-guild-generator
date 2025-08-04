@@ -9,6 +9,7 @@ import {
 } from "@/utils/generators/guild-generator";
 import { createGuild, isGuild } from "@/types/guild";
 import { generateRandomGuildName } from "@/data/guild-names";
+import { useStorage } from "@/composables/useStorage";
 
 // Interface para opções de geração
 export interface GenerateGuildOptions {
@@ -27,17 +28,112 @@ export interface GuildHistoryFilters {
   readonly createdBefore?: Date;
 }
 
+// Interface para o estado do storage
+interface GuildStorageState {
+  currentGuild: Guild | null;
+  guildHistory: Guild[];
+  lastConfig: GenerateGuildOptions | null;
+}
+
 /**
  * Store da guilda com funcionalidades completas de CRUD e geração
  */
 export const useGuildStore = defineStore("guild", () => {
   // Estado reativo
-  const currentGuild = ref<Guild | null>(null);
-  const guildHistory = ref<Guild[]>([]);
   const isGenerating = ref(false);
   const lastGenerationResult = ref<GuildGenerationResult | null>(null);
-  const lastConfig = ref<GenerateGuildOptions | null>(null);
   const error = ref<string | null>(null);
+
+  // Storage resiliente
+  const storage = useStorage<GuildStorageState>("guild-store", {
+    currentGuild: null,
+    guildHistory: [],
+    lastConfig: null,
+  });
+
+  // Refs computados a partir do storage com validação
+  const currentGuild = computed({
+    get: () => {
+      const guild = storage.data.value.currentGuild;
+      if (!guild) return null;
+
+      // Validar e corrigir a data se necessário
+      if (guild.createdAt && !(guild.createdAt instanceof Date)) {
+        try {
+          const correctedGuild = {
+            ...guild,
+            createdAt: new Date(guild.createdAt),
+          };
+          // Atualizar o storage com a guilda corrigida
+          storage.data.value.currentGuild = correctedGuild;
+          return correctedGuild;
+        } catch {
+          const correctedGuild = {
+            ...guild,
+            createdAt: new Date(),
+          };
+          storage.data.value.currentGuild = correctedGuild;
+          return correctedGuild;
+        }
+      }
+
+      return guild;
+    },
+    set: (value) => {
+      storage.data.value.currentGuild = value;
+    },
+  });
+
+  const guildHistory = computed({
+    get: () => {
+      // Filtrar e corrigir guildas com datas inválidas
+      const validGuilds = storage.data.value.guildHistory
+        .map((guild) => {
+          try {
+            // Verificar se a guilda é válida
+            if (!guild || !guild.id || !guild.name) return null;
+
+            // Corrigir data se necessário
+            if (guild.createdAt && !(guild.createdAt instanceof Date)) {
+              return {
+                ...guild,
+                createdAt: new Date(guild.createdAt),
+              };
+            }
+
+            // Verificar se a data é válida
+            if (!guild.createdAt || isNaN(guild.createdAt.getTime())) {
+              return {
+                ...guild,
+                createdAt: new Date(),
+              };
+            }
+
+            return guild;
+          } catch {
+            return null; // Remove guildas que causam erro
+          }
+        })
+        .filter((guild): guild is Guild => guild !== null);
+
+      // Atualizar o storage se houve correções
+      if (validGuilds.length !== storage.data.value.guildHistory.length) {
+        storage.data.value.guildHistory = validGuilds;
+      }
+
+      return validGuilds;
+    },
+    set: (value) => {
+      storage.data.value.guildHistory = value;
+    },
+  });
+
+  const lastConfig = computed({
+    get: () => storage.data.value.lastConfig,
+    set: (value) => {
+      storage.data.value.lastConfig = value;
+    },
+  });
 
   // Getters computados
   const hasCurrentGuild = computed(() => currentGuild.value !== null);
@@ -119,8 +215,6 @@ export const useGuildStore = defineStore("guild", () => {
         addToHistory(guild);
       }
 
-      await saveToStorage();
-
       return guild;
     } catch (err) {
       const errorMessage =
@@ -178,7 +272,6 @@ export const useGuildStore = defineStore("guild", () => {
       guildHistory.value[historyIndex] = regeneratedGuild;
     }
 
-    await saveToStorage();
     return regeneratedGuild;
   }
 
@@ -233,8 +326,6 @@ export const useGuildStore = defineStore("guild", () => {
     if (historyIndex !== -1) {
       guildHistory.value[historyIndex] = regeneratedGuild;
     }
-
-    await saveToStorage();
   }
 
   // Regenerar apenas as relações
@@ -287,8 +378,6 @@ export const useGuildStore = defineStore("guild", () => {
     if (historyIndex !== -1) {
       guildHistory.value[historyIndex] = regeneratedGuild;
     }
-
-    await saveToStorage();
   }
 
   // Regenerar apenas os frequentadores
@@ -331,8 +420,6 @@ export const useGuildStore = defineStore("guild", () => {
     if (historyIndex !== -1) {
       guildHistory.value[historyIndex] = regeneratedGuild;
     }
-
-    await saveToStorage();
   }
 
   // CRUD do histórico
@@ -374,17 +461,12 @@ export const useGuildStore = defineStore("guild", () => {
     guildHistory.value = guildHistory.value.filter((g) => g.id !== guildId);
 
     const removed = guildHistory.value.length < initialLength;
-    if (removed) {
-      saveToStorage();
-    }
-
     return removed;
   }
 
   function clearHistory(): void {
     // Manter apenas as guildas bloqueadas
     guildHistory.value = guildHistory.value.filter((g) => g.locked);
-    saveToStorage();
   }
 
   function toggleGuildLock(guildId: string): boolean {
@@ -402,7 +484,6 @@ export const useGuildStore = defineStore("guild", () => {
       currentGuild.value = newGuild;
     }
 
-    saveToStorage();
     return true;
   }
 
@@ -469,7 +550,6 @@ export const useGuildStore = defineStore("guild", () => {
       ];
     }
 
-    saveToStorage();
     return true;
   }
 
@@ -538,7 +618,6 @@ export const useGuildStore = defineStore("guild", () => {
 
         currentGuild.value = guildData as Guild;
         addToHistory(guildData as Guild);
-        await saveToStorage();
 
         return true;
       }
@@ -553,59 +632,6 @@ export const useGuildStore = defineStore("guild", () => {
 
   function clearError(): void {
     error.value = null;
-  }
-
-  // Persistência
-  async function saveToStorage(): Promise<void> {
-    try {
-      const state = {
-        currentGuild: currentGuild.value,
-        guildHistory: guildHistory.value,
-        lastGenerated: lastGenerated.value,
-      };
-
-      localStorage.setItem(
-        "generator-guild-store",
-        JSON.stringify(state, dateReplacer)
-      );
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.warn("Failed to save guild state to storage:", err);
-
-      if (err instanceof Error) {
-        if (err.name === "QuotaExceededError") {
-          error.value =
-            "Espaço de armazenamento insuficiente. Considere limpar o histórico de guildas.";
-        } else {
-          error.value =
-            "Falha ao salvar dados. Suas alterações podem ser perdidas.";
-        }
-      }
-    }
-  }
-
-  async function loadFromStorage(): Promise<void> {
-    try {
-      const stored = localStorage.getItem("generator-guild-store");
-      if (!stored) return;
-
-      const state = JSON.parse(stored, dateReviver);
-
-      if (state.currentGuild && isGuild(state.currentGuild)) {
-        currentGuild.value = state.currentGuild;
-      }
-
-      if (Array.isArray(state.guildHistory)) {
-        guildHistory.value = state.guildHistory.filter(isGuild);
-      }
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        "Failed to load guild state from storage, cleaning up:",
-        err
-      );
-      localStorage.removeItem("generator-guild-store");
-    }
   }
 
   // Utilitários
@@ -623,7 +649,7 @@ export const useGuildStore = defineStore("guild", () => {
     }
   }
 
-  // Serialização de datas para localStorage
+  // Serialização de datas para exports
   function dateReplacer(_key: string, value: unknown): unknown {
     if (value instanceof Date) {
       return { __type: "Date", value: value.toISOString() };
@@ -644,9 +670,6 @@ export const useGuildStore = defineStore("guild", () => {
     }
     return value;
   }
-
-  // Inicialização
-  loadFromStorage();
 
   // Retornar API pública do store
   return {
@@ -682,8 +705,6 @@ export const useGuildStore = defineStore("guild", () => {
     updateGuildName,
     clearCurrentGuild,
     clearError,
-    saveToStorage,
-    loadFromStorage,
     exportCurrentGuild,
     exportHistory,
     importGuild,
