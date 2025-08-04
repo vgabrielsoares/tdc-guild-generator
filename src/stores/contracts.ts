@@ -214,6 +214,15 @@ export const useContractsStore = defineStore("contracts", () => {
   };
 
   /**
+   * Limpa contratos quando a guilda muda
+   */
+  const clearContractsForNewGuild = () => {
+    contracts.value = [];
+    lastUpdate.value = null;
+    saveToStorage();
+  };
+
+  /**
    * Salva o estado atual no storage
    */
   const saveToStorage = () => {
@@ -592,6 +601,7 @@ export const useContractsStore = defineStore("contracts", () => {
     addContract,
     removeContract,
     clearContracts,
+    clearContractsForNewGuild,
     getContractById,
 
     // ===== ACTIONS - Filtros =====

@@ -2,9 +2,9 @@
  * Teste completo para o Gerador Base de Contratos
  *
  * Este arquivo testa as funcionalidades implementadas
- * 
+ *
  * Issue 4.11: Gerador Base de Contratos
- * 
+ *
  * Funcionalidades testadas:
  * - Geração de quantidade baseada na sede
  * - Cálculo de valores base (1d100)
@@ -21,7 +21,12 @@ import {
   ContractGenerator,
   type ContractGenerationConfig,
 } from "@/utils/generators/contractGenerator";
-import { ContractStatus, ContractorType, PaymentType, ContractDifficulty } from "@/types/contract";
+import {
+  ContractStatus,
+  ContractorType,
+  PaymentType,
+  ContractDifficulty,
+} from "@/types/contract";
 import type { Guild } from "@/types/guild";
 import type { Contract } from "@/types/contract";
 import {
@@ -105,8 +110,12 @@ describe("ContractGenerator - Issue 4.11 - Implementação Completa", () => {
       expect(contract.value.modifiers).toBeDefined();
       expect(contract.value.modifiers.distance).toBeDefined();
       expect(contract.value.modifiers.difficultyMultiplier).toBeDefined();
-      expect(contract.value.modifiers.difficultyMultiplier.experienceMultiplier).toBeGreaterThan(0);
-      expect(contract.value.modifiers.difficultyMultiplier.rewardMultiplier).toBeGreaterThan(0);
+      expect(
+        contract.value.modifiers.difficultyMultiplier.experienceMultiplier
+      ).toBeGreaterThan(0);
+      expect(
+        contract.value.modifiers.difficultyMultiplier.rewardMultiplier
+      ).toBeGreaterThan(0);
     });
 
     it("deve rolar 1d100 sem modificadores para valor base conforme regras", () => {
@@ -123,7 +132,8 @@ describe("ContractGenerator - Issue 4.11 - Implementação Completa", () => {
     it("deve calcular PO$ final como recompensa * 0.1", () => {
       const contract = ContractGenerator.generateBaseContract(config);
 
-      const expectedGold = Math.round(contract.value.rewardValue * 0.1 * 100) / 100;
+      const expectedGold =
+        Math.round(contract.value.rewardValue * 0.1 * 100) / 100;
       expect(contract.value.finalGoldReward).toBe(expectedGold);
     });
 
@@ -151,10 +161,18 @@ describe("ContractGenerator - Issue 4.11 - Implementação Completa", () => {
 
       // Para uma guilda com relação BOA com governo e MUITO_BOA com população
       // os modificadores devem estar nos ranges esperados
-      expect(contract.value.modifiers.populationRelation).toBeGreaterThanOrEqual(-20);
-      expect(contract.value.modifiers.populationRelation).toBeLessThanOrEqual(5);
-      expect(contract.value.modifiers.governmentRelation).toBeGreaterThanOrEqual(-25);
-      expect(contract.value.modifiers.governmentRelation).toBeLessThanOrEqual(10);
+      expect(
+        contract.value.modifiers.populationRelationValue
+      ).toBeGreaterThanOrEqual(-20);
+      expect(
+        contract.value.modifiers.populationRelationValue
+      ).toBeLessThanOrEqual(5);
+      expect(
+        contract.value.modifiers.governmentRelationValue
+      ).toBeGreaterThanOrEqual(-25);
+      expect(
+        contract.value.modifiers.governmentRelationValue
+      ).toBeLessThanOrEqual(10);
     });
 
     it("deve garantir que experienceValue e rewardValue sejam separados", () => {
@@ -306,9 +324,13 @@ describe("ContractGenerator - Issue 4.11 - Implementação Completa", () => {
 
       // Deve ter aplicado redução (2d6 conforme tabela)
       expect(quantity.frequentatorsReduction).toBeGreaterThanOrEqual(0);
-      expect(quantity.details.appliedModifiers.some(mod => 
-        mod.includes("Redução por frequentadores") || mod.includes("frequentadores")
-      )).toBe(true);
+      expect(
+        quantity.details.appliedModifiers.some(
+          (mod) =>
+            mod.includes("Redução por frequentadores") ||
+            mod.includes("frequentadores")
+        )
+      ).toBe(true);
     });
 
     it("deve não aplicar redução para 'Vazia'", () => {
@@ -324,9 +346,11 @@ describe("ContractGenerator - Issue 4.11 - Implementação Completa", () => {
 
       // Não deve ter redução para guilda vazia
       expect(quantity.frequentatorsReduction).toBe(0);
-      expect(quantity.details.appliedModifiers.some(mod => 
-        mod.includes("sem redução")
-      )).toBe(true);
+      expect(
+        quantity.details.appliedModifiers.some((mod) =>
+          mod.includes("sem redução")
+        )
+      ).toBe(true);
     });
 
     it("deve aplicar redução para 'Abarrotada' (3d6)", () => {
@@ -389,8 +413,12 @@ describe("ContractGenerator - Issue 4.11 - Implementação Completa", () => {
       });
 
       // Verificar que modificadores negativos foram aplicados
-      expect(contract.value.modifiers.populationRelation).toBeLessThanOrEqual(0);
-      expect(contract.value.modifiers.governmentRelation).toBeLessThanOrEqual(0);
+      expect(
+        contract.value.modifiers.populationRelationValue
+      ).toBeLessThanOrEqual(0);
+      expect(
+        contract.value.modifiers.governmentRelationValue
+      ).toBeLessThanOrEqual(0);
     });
   });
 
