@@ -98,14 +98,16 @@ export interface ContractValue {
 
 // Interface para todos os modificadores que afetam valores
 export interface ContractModifiers {
-  // Modificador por distância (-20 a +20)
+  // Modificador por distância (aplicado a ambos valor e recompensa)
   distance: number;
 
-  // Modificador por relação com população (-20 a +5)
-  populationRelation: number;
+  // Modificadores por relação com população (separados para valor e recompensa)
+  populationRelationValue: number;
+  populationRelationReward: number;
 
-  // Modificador por relação com governo (-25 a +10)
-  governmentRelation: number;
+  // Modificadores por relação com governo (separados para valor e recompensa)
+  governmentRelationValue: number;
+  governmentRelationReward: number;
 
   // Modificador por funcionários experientes/despreparados
   staffPreparation: number;
@@ -154,6 +156,19 @@ export interface Contract {
   // Tipo de pagamento
   paymentType: PaymentType;
 
+  // Pré-requisitos e cláusulas
+  prerequisites: string[];
+  clauses: string[];
+
+  // Antagonistas
+  antagonist: Antagonist;
+
+  // Complicações
+  complications: Complication[];
+
+  // Reviravoltas
+  twists: Twist[];
+
   // Datas importantes
   createdAt: Date;
   expiresAt?: Date;
@@ -165,14 +180,19 @@ export interface Contract {
     distanceRoll?: number;
     difficultyRoll?: number;
     settlementType?: string; // Tipo de assentamento onde foi gerado
+    prerequisiteRolls?: number[];
+    clauseRolls?: number[];
+    antagonistRoll?: number;
   };
 }
 
 // Schema para modificadores de contratos
 export const ContractModifiersSchema = z.object({
   distance: z.number().int().min(-20).max(20),
-  populationRelation: z.number().int().min(-20).max(5),
-  governmentRelation: z.number().int().min(-25).max(10),
+  populationRelationValue: z.number().int().min(-10).max(5),
+  populationRelationReward: z.number().int().min(-20).max(5),
+  governmentRelationValue: z.number().int().min(-25).max(5),
+  governmentRelationReward: z.number().int().min(-25).max(10),
   staffPreparation: z.number().int().min(-2).max(2),
   difficultyMultiplier: z.object({
     experienceMultiplier: z.number().positive(),
@@ -204,6 +224,9 @@ export const GenerationDataSchema = z.object({
   distanceRoll: z.number().int().min(1).max(20).optional(),
   difficultyRoll: z.number().int().min(1).max(20).optional(),
   settlementType: z.string().optional(),
+  prerequisiteRolls: z.array(z.number().int()).optional(),
+  clauseRolls: z.array(z.number().int()).optional(),
+  antagonistRoll: z.number().int().optional(),
 });
 
 // Schema principal do contrato
@@ -220,6 +243,11 @@ export const ContractSchema = z.object({
   value: ContractValueSchema,
   deadline: DeadlineSchema,
   paymentType: z.nativeEnum(PaymentType),
+  prerequisites: z.array(z.string()),
+  clauses: z.array(z.string()),
+  antagonist: z.lazy(() => AntagonistSchema),
+  complications: z.array(z.lazy(() => ComplicationSchema)),
+  twists: z.array(z.lazy(() => TwistSchema)),
   createdAt: z.date(),
   expiresAt: z.date().optional(),
   completedAt: z.date().optional(),
@@ -368,6 +396,32 @@ export interface ContractLocation {
   specificLocation: string;
   name: string;
   description: string;
+  importance?: {
+    type: string;
+    name: string;
+    description: string;
+  };
+  peculiarity?: {
+    type: string;
+    name: string;
+    description: string;
+  };
+  specification?: {
+    location: string;
+    description: string;
+  } | null;
+  district?: {
+    primary: {
+      type: string;
+      name: string;
+      description: string;
+    };
+    secondary?: {
+      type: string;
+      name: string;
+      description: string;
+    };
+  } | null;
 }
 
 // ===== ANTAGONISTAS =====
