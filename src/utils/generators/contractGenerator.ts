@@ -8,17 +8,51 @@ import {
   CONTRACT_DIFFICULTY_TABLE,
   CONTRACT_DISTANCE_TABLE,
   STAFF_CONDITION_MODIFIERS,
+  STAFF_PREPARATION_ROLL_MODIFIERS,
   POPULATION_RELATION_MODIFIERS,
   GOVERNMENT_RELATION_MODIFIERS,
-  STAFF_PREPARATION_ROLL_MODIFIERS,
   calculateExtendedValue,
 } from "../../data/tables/contract-base-tables";
+
+import {
+  CONTRACT_PREREQUISITES_TABLE,
+  CONTRACT_CLAUSES_TABLE,
+  CONTRACT_PAYMENT_TYPE_TABLE,
+  getPrerequisiteDiceModifier,
+  getClauseDiceModifier,
+  getPaymentDiceModifier,
+} from "../../data/tables/contract-requirements-tables";
+
 import {
   MAIN_OBJECTIVE_TABLE,
   getObjectiveSpecificationTable,
   shouldRollTwiceForObjective,
   shouldRollTwiceForSpecification,
 } from "../../data/tables/contract-content-tables";
+
+import {
+  ANTAGONIST_TYPES_TABLE,
+  ANTAGONIST_DETAIL_TABLE_MAP,
+  mapAntagonistTypeToCategory,
+  shouldRollTwice,
+} from "../../data/tables/contract-antagonist-tables";
+
+import {
+  COMPLICATION_TYPES_TABLE,
+  COMPLICATION_DETAIL_TABLES,
+} from "../../data/tables/contract-complications-tables";
+
+import {
+  MAIN_LOCATION_TABLE,
+  LOCATION_IMPORTANCE_TABLE,
+  LOCATION_PECULIARITY_TABLE,
+  DISTRITO_ESPECIFICO_TABLE,
+  getLocationSpecificationTable,
+  shouldRollTwiceForLocation,
+  requiresDistrictRoll,
+  mapLocationToCategory,
+} from "../../data/tables/contract-location-tables";
+
 import {
   ContractStatus,
   ContractDifficulty,
@@ -26,7 +60,10 @@ import {
   DeadlineType,
   PaymentType,
   ObjectiveCategory,
-  LocationCategory,
+  AntagonistCategory,
+  ComplicationCategory,
+  TwistWho,
+  TwistWhat,
 } from "../../types/contract";
 import type {
   Contract,
@@ -34,6 +71,9 @@ import type {
   ContractModifiers,
   ContractObjective,
   ContractLocation,
+  Antagonist,
+  Complication,
+  Twist,
 } from "../../types/contract";
 import type { Guild } from "../../types/guild";
 import { VisitorLevel, RelationLevel } from "../../types/guild";
@@ -129,25 +169,67 @@ export class ContractGenerator {
     );
 
     // 11. Gerar cláusulas especiais
-    const clauses = this.generateClauses();
+    const clauses = this.generateClauses(valueResult.rewardValue);
 
-    // 12. Gerar tipo de pagamento
-    const paymentType = this.generatePaymentType();
+    // 12. Aplicar bônus por pré-requisitos e cláusulas
+    const totalBonuses = (prerequisites.length + clauses.length) * 5;
+    const finalValueResult = {
+      ...valueResult,
+      rewardValue: valueResult.rewardValue + totalBonuses,
+      finalGoldReward:
+        Math.round((valueResult.rewardValue + totalBonuses) * 0.1 * 100) / 100,
+      modifiers: {
+        ...valueResult.modifiers,
+        requirementsAndClauses: totalBonuses,
+      },
+    };
 
-    // 13. Estrutura básica do contrato
+    // 13. Gerar tipo de pagamento
+    const paymentType = this.generatePaymentType(finalValueResult.rewardValue);
+
+    // 13. Gerar antagonista
+    const antagonist = this.generateAntagonist();
+
+    // 14. Gerar complicações
+    const complications = this.generateComplications();
+
+    // 15. Gerar reviravoltas
+    const twists = this.generateTwists();
+
+    // 16. Gerar descrição completa do contrato
+    const fullDescription = this.generateFullContractDescription({
+      objective,
+      location,
+      contractor,
+      antagonist,
+      complications,
+      twists,
+      prerequisites,
+      clauses,
+      finalValueResult,
+      deadline,
+      paymentType,
+    });
+
+    // 17. Estrutura básica do contrato
     const contract: Contract = {
       id: this.generateId(),
       title: `Contrato #${Math.floor(Math.random() * 10000)
         .toString()
         .padStart(4, "0")}`,
-      description: `${objective.description} | Local: ${location.description} | Contratante: ${contractor.description}${prerequisites.length > 0 ? ` | Pré-requisitos: ${prerequisites.join(", ")}` : ""}${clauses.length > 0 ? ` | Cláusulas: ${clauses.join(", ")}` : ""}`,
+      description: fullDescription,
       status: ContractStatus.DISPONIVEL,
       difficulty,
       contractorType: contractor.type,
       contractorName: contractor.name,
       objective,
       location,
-      value: valueResult,
+      prerequisites,
+      clauses,
+      antagonist,
+      complications,
+      twists,
+      value: finalValueResult,
       deadline,
       paymentType,
       generationData: {
@@ -333,12 +415,12 @@ export class ContractGenerator {
     rewardValue += modifiers.distance;
 
     // 5. Aplicar modificadores de relação com população
-    experienceValue += modifiers.populationRelation;
-    rewardValue += modifiers.populationRelation;
+    experienceValue += modifiers.populationRelationValue;
+    rewardValue += modifiers.populationRelationReward;
 
     // 6. Aplicar modificadores de relação com governo
-    experienceValue += modifiers.governmentRelation;
-    rewardValue += modifiers.governmentRelation;
+    experienceValue += modifiers.governmentRelationValue;
+    rewardValue += modifiers.governmentRelationReward;
 
     // 7. Aplicar modificadores de funcionários (já aplicados na rolagem)
     // staffPreparation é aplicado à rolagem d100, não ao valor final
@@ -373,8 +455,10 @@ export class ContractGenerator {
   private static calculateModifiers(guild: Guild): ContractModifiers {
     const modifiers: ContractModifiers = {
       distance: 0,
-      populationRelation: 0,
-      governmentRelation: 0,
+      populationRelationValue: 0,
+      populationRelationReward: 0,
+      governmentRelationValue: 0,
+      governmentRelationReward: 0,
       staffPreparation: 0,
       difficultyMultiplier: {
         experienceMultiplier: 1,
@@ -396,19 +480,21 @@ export class ContractGenerator {
     const populationRelation = this.mapRelationLevelToString(
       guild.relations.population
     );
-    const populationMods = POPULATION_RELATION_MODIFIERS[populationRelation];
-    if (populationMods) {
-      modifiers.populationRelation = populationMods.rewardModifier; // Usar rewardModifier conforme regras
-    }
+    const populationMods = POPULATION_RELATION_MODIFIERS[
+      populationRelation
+    ] || { valueModifier: 0, rewardModifier: 0 };
+    modifiers.populationRelationValue = populationMods.valueModifier;
+    modifiers.populationRelationReward = populationMods.rewardModifier;
 
     // 3. Aplicar modificadores por relação com governo
     const governmentRelation = this.mapRelationLevelToString(
       guild.relations.government
     );
-    const governmentMods = GOVERNMENT_RELATION_MODIFIERS[governmentRelation];
-    if (governmentMods) {
-      modifiers.governmentRelation = governmentMods.rewardModifier; // Usar rewardModifier conforme regras
-    }
+    const governmentMods = GOVERNMENT_RELATION_MODIFIERS[
+      governmentRelation
+    ] || { valueModifier: 0, rewardModifier: 0 };
+    modifiers.governmentRelationValue = governmentMods.valueModifier;
+    modifiers.governmentRelationReward = governmentMods.rewardModifier;
 
     // 4. Modificadores de funcionários (aplicados à rolagem d100, não ao valor final)
     const staffDescription = guild.staff.employees || "";
@@ -695,7 +781,7 @@ export class ContractGenerator {
   }
 
   /**
-   * Gera objetivo principal e especificações seguindo as tabelas do markdown
+   * Gera objetivo principal e especificações
    */
   private static generateObjective(): ContractObjective {
     // 1. Rolar objetivo principal (1d20)
@@ -802,138 +888,711 @@ export class ContractGenerator {
    * Gera localidade do contrato seguindo as regras do markdown
    */
   private static generateLocation(): ContractLocation {
-    // Implementação usando as tabelas de localidades já implementadas
-    // Por ora, usar implementação simplificada
-    const locationRoll = rollDice({ notation: "1d20" }).result;
+    // 1. Determinar localidade principal
+    const mainLocationResult = rollOnTable(MAIN_LOCATION_TABLE);
+    const mainLocationData = mainLocationResult.result;
 
-    let mainLocation: string;
+    // 2. Gerar importância do local
+    const importanceResult = rollOnTable(LOCATION_IMPORTANCE_TABLE);
+    const importance = {
+      type: importanceResult.result.type,
+      name: importanceResult.result.name,
+      description: importanceResult.result.description,
+    };
 
-    if (locationRoll <= 4) {
-      mainLocation = "Cidade grande";
-    } else if (locationRoll <= 9) {
-      mainLocation = "Ruínas ou masmorras";
-    } else if (locationRoll <= 12) {
-      mainLocation = "Região selvagem";
-    } else if (locationRoll <= 14) {
-      mainLocation = "Lugar isolado";
-    } else if (locationRoll <= 17) {
-      mainLocation = "Zona rural";
-    } else if (locationRoll === 18) {
-      mainLocation = "Localidade exótica";
-    } else if (locationRoll === 19) {
-      mainLocation = "Profundezas";
+    // 3. Gerar peculiaridade do local
+    const peculiarityResult = rollOnTable(LOCATION_PECULIARITY_TABLE);
+    const peculiarity = {
+      type: peculiarityResult.result.type,
+      name: peculiarityResult.result.name,
+      description: peculiarityResult.result.description,
+    };
+
+    // 4. Gerar especificação da localidade específica
+    const specificationTable = getLocationSpecificationTable(
+      mainLocationData.category
+    );
+    const specificationResult = rollOnTable(specificationTable);
+
+    // Tratar casos de "role duas vezes"
+    const specifications: Array<{ location: string; description: string }> = [];
+
+    if (shouldRollTwiceForLocation(specificationResult.result)) {
+      // Rolar duas vezes e usar ambos
+      const firstSpec = rollOnTable(specificationTable);
+      const secondSpec = rollOnTable(specificationTable);
+      specifications.push(
+        {
+          location: firstSpec.result.location,
+          description: firstSpec.result.description,
+        },
+        {
+          location: secondSpec.result.location,
+          description: secondSpec.result.description,
+        }
+      );
     } else {
-      mainLocation = "Terras mórbidas";
+      specifications.push({
+        location: specificationResult.result.location,
+        description: specificationResult.result.description,
+      });
+    }
+
+    // 5. Verificar se precisa rolar distrito específico
+    let districtInfo = null;
+    if (specifications.some((spec) => requiresDistrictRoll(spec))) {
+      const districtResult = rollOnTable(DISTRITO_ESPECIFICO_TABLE);
+      if (shouldRollTwiceForLocation(districtResult.result)) {
+        const firstDistrict = rollOnTable(DISTRITO_ESPECIFICO_TABLE);
+        const secondDistrict = rollOnTable(DISTRITO_ESPECIFICO_TABLE);
+        districtInfo = {
+          primary: {
+            type: firstDistrict.result.type,
+            name: firstDistrict.result.name,
+            description: firstDistrict.result.description,
+          },
+          secondary: {
+            type: secondDistrict.result.type,
+            name: secondDistrict.result.name,
+            description: secondDistrict.result.description,
+          },
+        };
+      } else {
+        districtInfo = {
+          primary: {
+            type: districtResult.result.type,
+            name: districtResult.result.name,
+            description: districtResult.result.description,
+          },
+        };
+      }
+    }
+
+    // 6. Mapear categoria corretamente
+    const category = mapLocationToCategory(mainLocationData.category);
+
+    // 7. Montar especificação consolidada
+    const specification =
+      specifications.length === 1
+        ? specifications[0]
+        : {
+            location: specifications.map((s) => s.location).join(" e "),
+            description: specifications.map((s) => s.description).join("; "),
+          };
+
+    // 8. Montar descrição completa e organizada
+    let description = mainLocationData.description;
+
+    if (specification) {
+      description += `\nLocalização específica: ${specification.location}`;
+      if (specification.description !== specification.location) {
+        description += ` - ${specification.description}`;
+      }
+    }
+
+    if (districtInfo) {
+      description += `\nDistrito: ${districtInfo.primary.name}`;
+      if (districtInfo.secondary) {
+        description += ` e ${districtInfo.secondary.name}`;
+      }
+    }
+
+    if (importance.type !== "nenhuma") {
+      description += `\nImportância: ${importance.name}`;
+      if (importance.description !== importance.name) {
+        description += ` - ${importance.description}`;
+      }
+    }
+
+    if (peculiarity.type !== "nenhuma") {
+      description += `\nPeculiaridade: ${peculiarity.name}`;
+      if (peculiarity.description !== peculiarity.name) {
+        description += ` - ${peculiarity.description}`;
+      }
     }
 
     return {
-      category: LocationCategory.URBANO, // Usar enum padrão por enquanto
-      specificLocation: mainLocation,
-      name: mainLocation,
-      description: `Contrato localizado em: ${mainLocation}`,
+      category,
+      specificLocation: mainLocationData.name,
+      name: mainLocationData.name,
+      description,
+      importance,
+      peculiarity,
+      specification,
+      district: districtInfo,
     };
   }
 
   /**
-   * Gera pré-requisitos seguindo as tabelas do markdown
+   * Gera pré-requisitos
    */
   private static generatePrerequisites(contractValue: number): string[] {
     const prerequisites: string[] = [];
 
-    // Determinar se deve ter pré-requisitos baseado no valor
-    if (contractValue < 200) {
-      return prerequisites; // Contratos simples não têm pré-requisitos
+    // 1. Determinar modificador baseado no valor do contrato usando função da tabela
+    const modifier = getPrerequisiteDiceModifier(contractValue);
+
+    // 2. Rolar na tabela de pré-requisitos (1d20 + modificador)
+    const baseRoll = rollDice({ notation: "1d20" }).result;
+    const prerequisiteRoll = baseRoll + modifier;
+
+    // 3. Verificar se deve rolar duas vezes (21+)
+    if (prerequisiteRoll >= 21) {
+      // Role duas vezes na tabela - gerar dois pré-requisitos separados
+      const firstPrereq = this.generateSinglePrerequisite();
+      const secondPrereq = this.generateSinglePrerequisite();
+      if (firstPrereq) prerequisites.push(firstPrereq);
+      if (secondPrereq && secondPrereq !== firstPrereq)
+        prerequisites.push(secondPrereq);
+      return prerequisites;
     }
 
-    // Rolar na tabela de pré-requisitos (1d20)
-    const prereqRoll = rollDice({ notation: "1d20" }).result;
+    // 4. Buscar na tabela usando rollOnTable
+    const prerequisiteEntry = CONTRACT_PREREQUISITES_TABLE.find(
+      (entry) => prerequisiteRoll >= entry.min && prerequisiteRoll <= entry.max
+    );
 
-    if (prereqRoll <= 5) {
-      prerequisites.push("Nenhum pré-requisito específico");
-    } else if (prereqRoll <= 8) {
-      prerequisites.push("Renome mínimo de 5 pontos");
-    } else if (prereqRoll <= 10) {
-      prerequisites.push("Pelo menos um conjurador no grupo");
-    } else if (prereqRoll <= 12) {
-      prerequisites.push("Habilidade específica requerida");
-    } else if (prereqRoll <= 14) {
-      prerequisites.push("Proficiência com ferramentas específicas");
-    } else if (prereqRoll <= 16) {
-      prerequisites.push("Veículo ou montaria necessária");
-    } else if (prereqRoll <= 18) {
-      prerequisites.push("Grupo de pelo menos 3 pessoas");
-    } else {
-      prerequisites.push("Múltiplos pré-requisitos");
-      // Rolar novamente para pré-requisitos adicionais
-      const additional = this.generatePrerequisites(contractValue / 2);
-      prerequisites.push(...additional.slice(0, 2));
+    if (
+      prerequisiteEntry &&
+      prerequisiteEntry.result.description !== "Nenhum"
+    ) {
+      prerequisites.push(prerequisiteEntry.result.description);
     }
 
     return prerequisites;
   }
 
   /**
-   * Gera cláusulas especiais seguindo as tabelas do markdown
+   * Gera um único pré-requisito (para casos de "role duas vezes")
    */
-  private static generateClauses(): string[] {
-    const clauses: string[] = [];
+  private static generateSinglePrerequisite(): string | null {
+    // Rolar evitando recursão infinita (1d20 sem modificadores para casos individuais)
+    const prerequisiteRoll = rollDice({ notation: "1d20" }).result;
 
-    // 20% de chance de ter cláusula especial
-    if (Math.random() > 0.8) {
-      return clauses; // Sem cláusulas especiais
+    // Buscar na tabela
+    const prerequisiteEntry = CONTRACT_PREREQUISITES_TABLE.find(
+      (entry) => prerequisiteRoll >= entry.min && prerequisiteRoll <= entry.max
+    );
+
+    if (
+      prerequisiteEntry &&
+      prerequisiteEntry.result.description !== "Nenhum"
+    ) {
+      return prerequisiteEntry.result.description;
     }
 
-    // Rolar na tabela de cláusulas (1d20)
-    const clauseRoll = rollDice({ notation: "1d20" }).result;
+    return null;
+  }
 
-    if (clauseRoll <= 2) {
-      clauses.push("Proibido matar qualquer criatura");
-    } else if (clauseRoll <= 4) {
-      clauses.push("Proteger criatura específica durante a missão");
-    } else if (clauseRoll <= 6) {
-      clauses.push("Troféu ou prova necessária");
-    } else if (clauseRoll <= 8) {
-      clauses.push("Missão deve ser completada em total discrição");
-    } else if (clauseRoll <= 10) {
-      clauses.push("Proibido o uso de magia");
-    } else if (clauseRoll <= 12) {
-      clauses.push("Competição com outros grupos");
-    } else if (clauseRoll <= 14) {
-      clauses.push("Exterminar completamente a fonte do problema");
-    } else if (clauseRoll <= 16) {
-      clauses.push("Supervisor acompanhará o grupo");
-    } else if (clauseRoll === 17) {
-      clauses.push("Restrição de tempo específica");
-    } else if (clauseRoll === 18) {
-      clauses.push("Relatório detalhado obrigatório");
-    } else if (clauseRoll === 19) {
-      clauses.push("Todo tesouro conquistado é de posse do contratante");
-    } else {
-      clauses.push("Identidade secreta obrigatória");
+  /**
+   * Gera cláusulas especiais
+   */
+  private static generateClauses(rewardValue: number): string[] {
+    const clauses: string[] = [];
+
+    // 1. Determinar modificador baseado no valor da recompensa usando função da tabela
+    const modifier = getClauseDiceModifier(rewardValue);
+
+    // 2. Rolar na tabela de cláusulas (1d20 + modificador)
+    const baseRoll = rollDice({ notation: "1d20" }).result;
+    const clauseRoll = baseRoll + modifier;
+
+    // 3. Verificar se deve rolar duas vezes (21+)
+    if (clauseRoll >= 21) {
+      // Role duas vezes na tabela - gerar duas cláusulas separadas
+      const firstClause = this.generateSingleClause();
+      const secondClause = this.generateSingleClause();
+      if (firstClause) clauses.push(firstClause);
+      if (secondClause && secondClause !== firstClause)
+        clauses.push(secondClause);
+      return clauses;
+    }
+
+    // 4. Buscar na tabela usando a rolagem
+    const clauseEntry = CONTRACT_CLAUSES_TABLE.find(
+      (entry) => clauseRoll >= entry.min && clauseRoll <= entry.max
+    );
+
+    if (clauseEntry && clauseEntry.result.description !== "Nenhuma") {
+      clauses.push(clauseEntry.result.description);
     }
 
     return clauses;
   }
 
   /**
-   * Gera tipo de pagamento seguindo as tabelas do markdown
+   * Gera uma única cláusula (para casos de "role duas vezes")
    */
-  private static generatePaymentType(): PaymentType {
-    // Rolar na tabela de tipo de pagamento (1d20)
-    const paymentRoll = rollDice({ notation: "1d20" }).result;
+  private static generateSingleClause(): string | null {
+    // Rolar evitando recursão infinita (1d20 sem modificadores para casos individuais)
+    const clauseRoll = rollDice({ notation: "1d20" }).result;
 
-    if (paymentRoll <= 3) {
-      return PaymentType.DIRETO_CONTRATANTE;
-    } else if (paymentRoll <= 6) {
-      return PaymentType.METADE_GUILDA_METADE_CONTRATANTE;
-    } else if (paymentRoll <= 9) {
-      return PaymentType.METADE_GUILDA_METADE_BENS;
-    } else if (paymentRoll <= 11) {
-      return PaymentType.BENS_SERVICOS;
-    } else if (paymentRoll <= 18) {
-      return PaymentType.TOTAL_GUILDA;
+    // Buscar na tabela
+    const clauseEntry = CONTRACT_CLAUSES_TABLE.find(
+      (entry) => clauseRoll >= entry.min && clauseRoll <= entry.max
+    );
+
+    if (clauseEntry && clauseEntry.result.description !== "Nenhuma") {
+      return clauseEntry.result.description;
+    }
+
+    return null;
+  }
+
+  /**
+   * Gera tipo de pagamento
+   */
+  private static generatePaymentType(contractValue: number): PaymentType {
+    // 1. Determinar modificador baseado no valor/recompensa do contrato usando função da tabela
+    const modifier = getPaymentDiceModifier(contractValue);
+
+    // 2. Rolar na tabela de tipo de pagamento (1d20 + modificador)
+    const baseRoll = rollDice({ notation: "1d20" }).result;
+    const paymentRoll = baseRoll + modifier;
+
+    // 3. Buscar na tabela usando a rolagem
+    const paymentEntry = CONTRACT_PAYMENT_TYPE_TABLE.find(
+      (entry) => paymentRoll >= entry.min && paymentRoll <= entry.max
+    );
+
+    if (paymentEntry) {
+      // Converter do enum da tabela para o enum do contract
+      switch (paymentEntry.result.type) {
+        case "direct_from_contractor":
+          return PaymentType.DIRETO_CONTRATANTE;
+        case "half_guild_half_contractor":
+          return PaymentType.METADE_GUILDA_METADE_CONTRATANTE;
+        case "half_guild_half_goods":
+          return PaymentType.METADE_GUILDA_METADE_BENS;
+        case "goods_and_services":
+          return PaymentType.BENS_SERVICOS;
+        case "full_guild_payment":
+          return PaymentType.TOTAL_GUILDA;
+        case "full_guild_plus_services":
+          return PaymentType.TOTAL_GUILDA_MAIS_SERVICOS;
+        default:
+          return PaymentType.TOTAL_GUILDA;
+      }
+    }
+
+    // Fallback para valor padrão
+    return PaymentType.TOTAL_GUILDA;
+  }
+
+  /**
+   * Gera antagonista
+   */
+  private static generateAntagonist(): Antagonist {
+    // Rolar na tabela principal de tipos de antagonistas (1d20)
+    const antagonistTypeResult = rollOnTable(ANTAGONIST_TYPES_TABLE);
+
+    let antagonistTypes: string[] = [];
+
+    // Verificar se deve rolar duas vezes
+    if (shouldRollTwice(antagonistTypeResult.result)) {
+      // Rolar duas vezes e usar ambos
+      const firstRoll = rollOnTable(ANTAGONIST_TYPES_TABLE);
+      const secondRoll = rollOnTable(ANTAGONIST_TYPES_TABLE);
+      antagonistTypes = [firstRoll.result, secondRoll.result];
     } else {
-      return PaymentType.TOTAL_GUILDA_MAIS_SERVICOS;
+      antagonistTypes = [antagonistTypeResult.result];
+    }
+
+    // Para simplicidade, usar apenas o primeiro tipo se houver múltiplos
+    const primaryType = antagonistTypes[0];
+
+    // Obter a tabela de detalhamento para este tipo
+    const detailTable = ANTAGONIST_DETAIL_TABLE_MAP[primaryType];
+    if (!detailTable) {
+      // Fallback para humanoide poderoso se a tabela não existir
+      return this.generateFallbackAntagonist();
+    }
+
+    // Rolar na tabela de detalhamento
+    const specificResult = rollOnTable(detailTable);
+
+    let specificTypes: string[] = [];
+
+    // Verificar se deve rolar duas vezes na tabela específica
+    if (shouldRollTwice(specificResult.result)) {
+      // Rolar duas vezes na tabela específica
+      const firstSpecific = rollOnTable(detailTable);
+      const secondSpecific = rollOnTable(detailTable);
+      specificTypes = [firstSpecific.result, secondSpecific.result];
+    } else {
+      specificTypes = [specificResult.result];
+    }
+
+    // Usar o primeiro tipo específico para criar o antagonista
+    const specificType = specificTypes[0];
+    const category = mapAntagonistTypeToCategory(primaryType);
+
+    return {
+      category,
+      specificType,
+      name: specificType,
+      description: this.generateAntagonistDescription(category, specificType),
+    };
+  }
+
+  /**
+   * Gera um antagonista fallback caso não encontre a tabela
+   */
+  private static generateFallbackAntagonist(): Antagonist {
+    return {
+      category: AntagonistCategory.HUMANOIDE_PODEROSO,
+      specificType: "Nobre",
+      name: "Nobre Corrupto",
+      description:
+        "Um membro da nobreza local tem interesse em impedir esta missão.",
+    };
+  }
+
+  /**
+   * Gera descrição para o antagonista baseado no tipo
+   */
+  private static generateAntagonistDescription(
+    category: AntagonistCategory,
+    specificType: string
+  ): string {
+    const descriptions: Record<AntagonistCategory, string> = {
+      [AntagonistCategory.HUMANOIDE_PODEROSO]: `Um ${specificType.toLowerCase()} poderoso que se opõe diretamente aos objetivos da missão.`,
+      [AntagonistCategory.ARTEFATO_MAGICO]: `Um ${specificType.toLowerCase()} que está causando problemas na região e precisa ser lidado.`,
+      [AntagonistCategory.ORGANIZACAO]: `Uma ${specificType.toLowerCase()} que tem interesses conflitantes com a missão.`,
+      [AntagonistCategory.PERIGO_IMINENTE]: `${specificType} representam uma ameaça direta que deve ser enfrentada.`,
+      [AntagonistCategory.ENTIDADE_SOBRENATURAL]: `Um ${specificType.toLowerCase()} sobrenatural está interferindo na missão.`,
+      [AntagonistCategory.ANOMALIA]: `Uma ${specificType.toLowerCase()} está causando distúrbios na área.`,
+      [AntagonistCategory.DESASTRE_ACIDENTE]: `Um ${specificType.toLowerCase()} complica drasticamente a execução da missão.`,
+      [AntagonistCategory.CRISE]: `Uma ${specificType.toLowerCase()} está em andamento e afeta diretamente o contrato.`,
+      [AntagonistCategory.MISTERIO]: `Um ${specificType.toLowerCase()} envolve a missão e precisa ser desvendado.`,
+    };
+
+    return (
+      descriptions[category] ||
+      `Um antagonista do tipo ${specificType} está envolvido na missão.`
+    );
+  }
+
+  /**
+   * Gera complicações
+   */
+  private static generateComplications(): Complication[] {
+    const complications: Complication[] = [];
+
+    // Rolar na tabela de tipos de complicações (1d20)
+    const complicationTypeResult = rollOnTable(COMPLICATION_TYPES_TABLE);
+    const category = complicationTypeResult.result;
+
+    // Gerar descrição baseada na categoria
+    const specificDetail = this.generateComplicationDetail(category);
+    const description = this.generateComplicationDescription(
+      category,
+      specificDetail
+    );
+
+    complications.push({
+      category,
+      specificDetail,
+      description,
+    });
+
+    return complications;
+  }
+
+  /**
+   * Gera detalhe específico para uma complicação
+   */
+  private static generateComplicationDetail(
+    category: ComplicationCategory
+  ): string {
+    // Usar as tabelas de detalhamento implementadas
+    const detailTable = COMPLICATION_DETAIL_TABLES[category];
+
+    if (!detailTable) {
+      return "Complicação geral";
+    }
+
+    // Rolar na tabela de detalhes específicos (1d20)
+    const detailResult = rollOnTable(detailTable);
+    const details: string[] = [];
+
+    // Verificar se deve rolar duas vezes
+    if (detailResult.result === "Role duas vezes e use ambos") {
+      // Gerar dois detalhes separados
+      const firstDetail = this.generateSingleComplicationDetail(category);
+      const secondDetail = this.generateSingleComplicationDetail(category);
+
+      if (firstDetail) details.push(firstDetail);
+      if (secondDetail) details.push(secondDetail);
+
+      return details.length > 0 ? details.join(" e ") : "Complicação geral";
+    }
+
+    return detailResult.result;
+  }
+
+  /**
+   * Gera um único detalhe de complicação (para casos de "role duas vezes")
+   */
+  private static generateSingleComplicationDetail(
+    category: ComplicationCategory
+  ): string | null {
+    const detailTable = COMPLICATION_DETAIL_TABLES[category];
+
+    if (!detailTable) {
+      return null;
+    }
+
+    let detailResult;
+    do {
+      detailResult = rollOnTable(detailTable);
+    } while (detailResult.result === "Role duas vezes e use ambos");
+
+    return detailResult.result;
+  }
+
+  /**
+   * Gera descrição para uma complicação
+   */
+  private static generateComplicationDescription(
+    category: ComplicationCategory,
+    specificDetail: string
+  ): string {
+    const baseDescriptions: Record<ComplicationCategory, string> = {
+      [ComplicationCategory.RECURSOS]:
+        "Uma complicação relacionada a recursos disponíveis afeta a missão",
+      [ComplicationCategory.VITIMAS]:
+        "Há vítimas ou pessoas inocentes envolvidas que precisam ser protegidas",
+      [ComplicationCategory.ORGANIZACAO]:
+        "Problemas organizacionais complicam a execução da missão",
+      [ComplicationCategory.MIRACULOSO]:
+        "Um evento miraculoso ou sobrenatural afeta a situação",
+      [ComplicationCategory.AMBIENTE_HOSTIL]:
+        "O ambiente se torna hostil e perigoso para a execução da missão",
+      [ComplicationCategory.INUSITADO]:
+        "Uma situação inusitada e inesperada surge durante a missão",
+      [ComplicationCategory.PROBLEMAS_DIPLOMATICOS]:
+        "Problemas diplomáticos complicam as negociações",
+      [ComplicationCategory.PROTECAO]:
+        "Algum tipo de proteção inesperada interfere na missão",
+      [ComplicationCategory.CONTRA_TEMPO_AMISTOSO]:
+        "Um contra-tempo aparentemente amistoso causa problemas",
+      [ComplicationCategory.ENCONTRO_HOSTIL]:
+        "Um encontro hostil inesperado complica a situação",
+    };
+
+    const baseDescription =
+      baseDescriptions[category] || "Uma complicação afeta a missão";
+    return `${baseDescription}: ${specificDetail}.`;
+  }
+
+  /**
+   * Gera reviravoltas
+   * 10% de chance de reviravolta (19-20 no d20)
+   */
+  private static generateTwists(): Twist[] {
+    const twists: Twist[] = [];
+
+    // Rolar 1d20 para verificar se há reviravolta (19-20 = sim)
+    const twistRoll = rollDice({ notation: "1d20" }).result;
+
+    // Conforme tabela: 1-18 = Não, 19-20 = Sim
+    if (twistRoll < 19) {
+      return twists;
+    }
+
+    // Gerar elementos da reviravolta
+    const who = this.generateTwistWho();
+    const what = this.generateTwistWhat();
+    const description = this.generateTwistDescription(who, what);
+
+    twists.push({
+      hasTwist: true,
+      who,
+      what,
+      description,
+    });
+
+    return twists;
+  }
+
+  /**
+   * Gera "quem" está envolvido na reviravolta
+   */
+  private static generateTwistWho(): TwistWho {
+    const whoOptions = Object.values(TwistWho);
+    return whoOptions[Math.floor(Math.random() * whoOptions.length)];
+  }
+
+  /**
+   * Gera "o que" acontece na reviravolta
+   */
+  private static generateTwistWhat(): TwistWhat {
+    const whatOptions = Object.values(TwistWhat);
+    return whatOptions[Math.floor(Math.random() * whatOptions.length)];
+  }
+
+  /**
+   * Gera descrição da reviravolta
+   */
+  private static generateTwistDescription(
+    who: TwistWho,
+    what: TwistWhat
+  ): string {
+    return `Reviravolta: ${who} ${what.toLowerCase()}.`;
+  }
+
+  /**
+   * Gera descrição completa do contrato englobando todos os elementos
+   */
+  private static generateFullContractDescription(params: {
+    objective: ContractObjective;
+    location: ContractLocation;
+    contractor: { type: ContractorType; name: string; description: string };
+    antagonist: Antagonist;
+    complications: Complication[];
+    twists: Twist[];
+    prerequisites: string[];
+    clauses: string[];
+    finalValueResult: ContractValue;
+    deadline: {
+      type: DeadlineType;
+      value?: string;
+      isFlexible: boolean;
+      isArbitrary: boolean;
+    };
+    paymentType: PaymentType;
+  }): string {
+    const {
+      objective,
+      location,
+      contractor,
+      antagonist,
+      complications,
+      twists,
+      prerequisites,
+      clauses,
+      finalValueResult,
+      deadline,
+      paymentType,
+    } = params;
+
+    const sections: string[] = [];
+
+    // 1. Objetivo
+    let objectiveText = `**Objetivo:** ${objective.description}`;
+    if (objective.specificObjective) {
+      objectiveText += `\nDetalhes: ${objective.specificObjective}`;
+    }
+    sections.push(objectiveText);
+
+    // 2. Localidade com todas as informações organizadas
+    let locationText = `**Local:** ${location.name}`;
+
+    if (location.specification) {
+      locationText += `\nLocalização específica: ${location.specification.location}`;
+      if (
+        location.specification.description !== location.specification.location
+      ) {
+        locationText += `\n→ ${location.specification.description}`;
+      }
+    }
+
+    if (location.district) {
+      locationText += `\nDistrito: ${location.district.primary.name}`;
+      if (location.district.secondary) {
+        locationText += ` e ${location.district.secondary.name}`;
+      }
+    }
+
+    if (location.importance && location.importance.type !== "nenhuma") {
+      locationText += `\nImportância: ${location.importance.name}`;
+      if (location.importance.description !== location.importance.name) {
+        locationText += `\n→ ${location.importance.description}`;
+      }
+    }
+
+    if (location.peculiarity && location.peculiarity.type !== "nenhuma") {
+      locationText += `\nPeculiaridade: ${location.peculiarity.name}`;
+      if (location.peculiarity.description !== location.peculiarity.name) {
+        locationText += `\n→ ${location.peculiarity.description}`;
+      }
+    }
+
+    sections.push(locationText);
+
+    // 3. Contratante
+    sections.push(
+      `**Contratante:** ${contractor.name}\n→ ${contractor.description}`
+    );
+
+    // 4. Antagonista
+    sections.push(
+      `**Antagonista:** ${antagonist.name}\n→ ${antagonist.description}`
+    );
+
+    // 5. Complicações
+    if (complications.length > 0) {
+      const complicationTexts = complications
+        .map((c) => `• ${c.description}`)
+        .join("\n");
+      sections.push(`**Complicações:**\n${complicationTexts}`);
+    }
+
+    // 6. Reviravoltas (se houver)
+    if (twists.length > 0) {
+      const twistTexts = twists.map((t) => `• ${t.description}`).join("\n");
+      sections.push(`**Reviravoltas:**\n${twistTexts}`);
+    }
+
+    // 7. Recompensa e incentivos
+    sections.push(
+      `**Recompensa:** ${finalValueResult.finalGoldReward} moedas de ouro`
+    );
+
+    // 8. Prazo
+    if (deadline.type !== DeadlineType.SEM_PRAZO) {
+      sections.push(`**Prazo:** ${deadline.value}`);
+    }
+
+    // 9. Pré-requisitos (se houver)
+    if (prerequisites.length > 0) {
+      const prerequisiteTexts = prerequisites.map((p) => `• ${p}`).join("\n");
+      sections.push(`**Pré-requisitos:**\n${prerequisiteTexts}`);
+    }
+
+    // 10. Cláusulas (se houver)
+    if (clauses.length > 0) {
+      const clauseTexts = clauses.map((c) => `• ${c}`).join("\n");
+      sections.push(`**Cláusulas:**\n${clauseTexts}`);
+    }
+
+    // 11. Tipo de pagamento
+    const paymentText = this.getPaymentTypeDescription(paymentType);
+    sections.push(`**Forma de pagamento:** ${paymentText}`);
+
+    return sections.join("\n");
+  }
+
+  /**
+   * Converte PaymentType em descrição legível
+   */
+  private static getPaymentTypeDescription(paymentType: PaymentType): string {
+    switch (paymentType) {
+      case PaymentType.DIRETO_CONTRATANTE:
+        return "Pagamento direto com contratante";
+      case PaymentType.METADE_GUILDA_METADE_CONTRATANTE:
+        return "Metade com a guilda, metade com o contratante";
+      case PaymentType.METADE_GUILDA_METADE_BENS:
+        return "Metade com a guilda, metade em bens com o contratante";
+      case PaymentType.BENS_SERVICOS:
+        return "Em materiais, joias, bens ou serviços do contratante";
+      case PaymentType.TOTAL_GUILDA:
+        return "Pagamento total na guilda";
+      case PaymentType.TOTAL_GUILDA_MAIS_SERVICOS:
+        return "Pagamento total na guilda + serviços do contratante";
+      default:
+        return "Pagamento a definir";
     }
   }
 }
