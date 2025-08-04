@@ -6,10 +6,10 @@
       sizeClasses
     ]"
   >
-    <font-awesome-icon
+    <component
       v-if="showIcon"
-      :icon="statusIcon"
-      :class="['mr-1', iconClasses]"
+      :is="statusIcon"
+      :class="['w-3 h-3 mr-1', iconClasses]"
     />
     {{ statusLabel }}
   </span>
@@ -18,6 +18,17 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { ContractStatus } from '@/types/contract';
+import {
+  ClockIcon,
+  HandRaisedIcon,
+  ArrowPathIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  NoSymbolIcon,
+  UserIcon,
+  ExclamationTriangleIcon,
+  QuestionMarkCircleIcon
+} from '@heroicons/vue/24/outline';
 
 interface Props {
   status: ContractStatus;
@@ -35,25 +46,25 @@ const props = withDefaults(defineProps<Props>(), {
 const statusIcon = computed(() => {
   switch (props.status) {
     case ContractStatus.DISPONIVEL:
-      return ['fas', 'clock'];
+      return ClockIcon;
     case ContractStatus.ACEITO:
-      return ['fas', 'handshake'];
+      return HandRaisedIcon;
     case ContractStatus.EM_ANDAMENTO:
-      return ['fas', 'spinner'];
+      return ArrowPathIcon;
     case ContractStatus.CONCLUIDO:
-      return ['fas', 'check-circle'];
+      return CheckCircleIcon;
     case ContractStatus.FALHOU:
-      return ['fas', 'times-circle'];
+      return XCircleIcon;
     case ContractStatus.EXPIRADO:
-      return ['fas', 'hourglass-end'];
+      return ClockIcon;
     case ContractStatus.ANULADO:
-      return ['fas', 'ban'];
+      return NoSymbolIcon;
     case ContractStatus.RESOLVIDO_POR_OUTROS:
-      return ['fas', 'user-check'];
+      return UserIcon;
     case ContractStatus.QUEBRADO:
-      return ['fas', 'exclamation-triangle'];
+      return ExclamationTriangleIcon;
     default:
-      return ['fas', 'question-circle'];
+      return QuestionMarkCircleIcon;
   }
 });
 

@@ -2,7 +2,7 @@
   <div class="contract-filters bg-gray-800 rounded-lg border border-gray-700 p-4 space-y-4">
     <div class="flex items-center justify-between">
       <h3 class="text-lg font-semibold text-amber-400 flex items-center gap-2">
-        <font-awesome-icon :icon="['fas', 'filter']" />
+        <FunnelIcon class="w-5 h-5" />
         Filtros Avançados
       </h3>
       <button
@@ -102,16 +102,15 @@
             placeholder="Buscar por título, descrição, objetivo ou contratante..."
             class="filter-input pl-10"
           />
-          <font-awesome-icon
-            :icon="['fas', 'search']"
-            class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+          <MagnifyingGlassIcon
+            class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
           />
           <button
             v-if="filters.searchText"
             @click="clearSearchFilter"
             class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
           >
-            <font-awesome-icon :icon="['fas', 'times']" />
+            <XMarkIcon class="w-4 h-4" />
           </button>
         </div>
       </div>
@@ -150,7 +149,7 @@
           @click="applyQuickFilter('available')"
           :class="quickFilterClasses('available')"
         >
-          <font-awesome-icon :icon="['fas', 'clock']" class="mr-1" />
+          <ClockIcon class="w-4 h-4 mr-1" />
           Disponíveis ({{ availableCount }})
         </button>
         
@@ -158,7 +157,7 @@
           @click="applyQuickFilter('accepted')"
           :class="quickFilterClasses('accepted')"
         >
-          <font-awesome-icon :icon="['fas', 'handshake']" class="mr-1" />
+          <HandRaisedIcon class="w-4 h-4 mr-1" />
           Aceitos ({{ acceptedCount }})
         </button>
         
@@ -166,7 +165,7 @@
           @click="applyQuickFilter('high-reward')"
           :class="quickFilterClasses('high-reward')"
         >
-          <font-awesome-icon :icon="['fas', 'coins']" class="mr-1" />
+          <CurrencyDollarIcon class="w-4 h-4 mr-1" />
           Alta Recompensa ({{ highRewardCount }})
         </button>
         
@@ -174,7 +173,7 @@
           @click="applyQuickFilter('dangerous')"
           :class="quickFilterClasses('dangerous')"
         >
-          <font-awesome-icon :icon="['fas', 'skull']" class="mr-1" />
+          <XCircleIcon class="w-4 h-4 mr-1" />
           Perigosos ({{ dangerousCount }})
         </button>
         
@@ -182,7 +181,7 @@
           @click="applyQuickFilter('no-deadline')"
           :class="quickFilterClasses('no-deadline')"
         >
-          <font-awesome-icon :icon="['fas', 'infinity']" class="mr-1" />
+          <XCircleIcon class="w-4 h-4 mr-1" />
           Sem Prazo ({{ contractsWithoutDeadline }})
         </button>
       </div>
@@ -202,7 +201,7 @@
             @click="removeFilter(activeFilter.key)"
             class="text-amber-300 hover:text-white"
           >
-            <font-awesome-icon :icon="['fas', 'times']" class="text-xs" />
+            <XMarkIcon class="w-3 h-3" />
           </button>
         </span>
       </div>
@@ -215,6 +214,15 @@
 import { computed } from 'vue';
 import type { Contract } from '@/types/contract';
 import { ContractStatus, ContractDifficulty, ContractorType, DeadlineType } from '@/types/contract';
+import {
+  FunnelIcon,
+  MagnifyingGlassIcon,
+  XMarkIcon,
+  ClockIcon,
+  HandRaisedIcon,
+  CurrencyDollarIcon,
+  XCircleIcon
+} from '@heroicons/vue/24/outline';
 
 interface ContractFilters {
   status: string;

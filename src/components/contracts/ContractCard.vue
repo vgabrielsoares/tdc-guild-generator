@@ -11,9 +11,9 @@
     <div class="p-4 border-b border-gray-700">
       <div class="flex items-start justify-between">
         <div class="flex items-center gap-2">
-          <font-awesome-icon
-            :icon="contractorIcon"
-            class="text-amber-400"
+          <component
+            :is="contractorIcon"
+            class="w-5 h-5 text-amber-400"
           />
           <h3 class="text-lg font-semibold text-amber-400">
             {{ contract.title || `Contrato ${contract.id.slice(0, 6)}` }}
@@ -41,7 +41,7 @@
 
       <!-- Localização -->
       <div v-if="contract.location" class="flex items-center gap-2 text-sm text-gray-400">
-        <font-awesome-icon :icon="['fas', 'map-marker-alt']" class="text-amber-400" />
+        <MapPinIcon class="w-4 h-4 text-amber-400" />
         <span>{{ contract.location.name }}</span>
         <span v-if="contract.location.description" class="text-xs">
           ({{ contract.location.description }})
@@ -98,7 +98,7 @@
           @click="$emit('abandon', contract)"
           class="bg-red-600 hover:bg-red-700 text-white text-sm py-2 px-3 rounded transition-colors"
         >
-          <font-awesome-icon :icon="['fas', 'times']" />
+          <XMarkIcon class="w-4 h-4" />
         </button>
       </div>
     </div>
@@ -119,6 +119,13 @@ import type { Contract } from '@/types/contract';
 import { ContractStatus as Status, ContractorType, ContractDifficulty } from '@/types/contract';
 import ContractStatus from './ContractStatus.vue';
 import ContractValue from './ContractValue.vue';
+import { 
+  UsersIcon, 
+  BuildingOfficeIcon, 
+  QuestionMarkCircleIcon,
+  MapPinIcon,
+  XMarkIcon
+} from '@heroicons/vue/24/outline';
 
 interface Props {
   contract: Contract;
@@ -143,13 +150,13 @@ defineEmits<Emits>();
 const contractorIcon = computed(() => {
   switch (props.contract.contractorType) {
     case ContractorType.POVO:
-      return ['fas', 'users'];
+      return UsersIcon;
     case ContractorType.GOVERNO:
-      return ['fas', 'crown'];
+      return BuildingOfficeIcon;
     case ContractorType.INSTITUICAO:
-      return ['fas', 'building'];
+      return BuildingOfficeIcon;
     default:
-      return ['fas', 'question'];
+      return QuestionMarkCircleIcon;
   }
 });
 

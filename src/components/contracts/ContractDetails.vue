@@ -25,9 +25,9 @@
             <!-- Header -->
             <div class="flex items-center justify-between p-6 border-b border-gray-600">
               <div class="flex items-center gap-3">
-                <font-awesome-icon
-                  :icon="contractorIcon"
-                  class="text-amber-400 text-xl"
+                <component
+                  :is="contractorIcon"
+                  class="w-6 h-6 text-amber-400"
                 />
                 <div>
                   <h3 class="text-xl font-semibold text-amber-400">
@@ -44,7 +44,7 @@
                   @click="closeModal"
                   class="text-gray-400 hover:text-white transition-colors duration-200 p-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <font-awesome-icon :icon="['fas', 'times']" class="text-lg" />
+                  <XMarkIcon class="w-5 h-5" />
                 </button>
               </div>
             </div>
@@ -64,7 +64,7 @@
                   <h4 class="text-lg font-semibold text-amber-400 mb-2">Objetivo</h4>
                   <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
                     <div class="flex items-center gap-2 mb-2">
-                      <font-awesome-icon :icon="['fas', 'bullseye']" class="text-amber-400" />
+                      <XCircleIcon class="w-5 h-5 text-amber-400" />
                       <span class="font-medium text-white">{{ getCategoryDisplayName(contract.objective.category) }}</span>
                     </div>
                     <p class="text-gray-300 mb-2">{{ contract.objective.description }}</p>
@@ -84,7 +84,7 @@
                   <h4 class="text-lg font-semibold text-amber-400 mb-2">Localidade</h4>
                   <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
                     <div class="flex items-center gap-2 mb-2">
-                      <font-awesome-icon :icon="['fas', 'map-marker-alt']" class="text-amber-400" />
+                      <MapPinIcon class="w-5 h-5 text-amber-400" />
                       <span class="font-medium text-white">{{ contract.location.name }}</span>
                     </div>
                     
@@ -139,7 +139,7 @@
                   <h4 class="text-lg font-semibold text-amber-400 mb-2">Antagonista</h4>
                   <div class="bg-red-900/20 rounded-lg p-4 border border-red-500/30">
                     <div class="flex items-center gap-2 mb-2">
-                      <font-awesome-icon :icon="['fas', 'user-times']" class="text-red-400" />
+                      <UserMinusIcon class="w-5 h-5 text-red-400" />
                       <span class="font-medium text-white">{{ contract.antagonist.specificType }}</span>
                       <span class="text-sm text-red-300 bg-red-800/50 px-2 py-1 rounded">
                         {{ getCategoryDisplayName(contract.antagonist.category) }}
@@ -159,7 +159,7 @@
                       class="bg-orange-900/20 rounded-lg p-4 border border-orange-500/30"
                     >
                       <div class="flex items-center gap-2 mb-2">
-                        <font-awesome-icon :icon="['fas', 'exclamation-circle']" class="text-orange-400" />
+                        <ExclamationCircleIcon class="w-5 h-5 text-orange-400" />
                         <span class="font-medium text-white">{{ complication.specificDetail }}</span>
                         <span class="text-sm text-orange-300 bg-orange-800/50 px-2 py-1 rounded">
                           {{ getCategoryDisplayName(complication.category) }}
@@ -172,6 +172,30 @@
 
                 <!-- 5. Aliados (Placeholder - Não implementado ainda) -->
                 <!-- TODO: Implementar seção de aliados -->
+
+                <!-- 7. Reviravoltas -->
+                <section v-if="contract.twists?.length">
+                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Reviravoltas</h4>
+                  <div class="space-y-3">
+                    <div 
+                      v-for="twist in contract.twists" 
+                      :key="twist.description"
+                      class="bg-purple-900/20 rounded-lg p-4 border border-purple-500/30"
+                    >
+                      <div class="flex items-center gap-2 mb-2">
+                        <FaceSmileIcon class="w-5 h-5 text-purple-400" />
+                        <span class="font-medium text-white">Reviravolta</span>
+                        <span v-if="twist.who" class="text-sm text-purple-300 bg-purple-800/50 px-2 py-1 rounded">
+                          {{ twist.who }}
+                        </span>
+                      </div>
+                      <p class="text-gray-300 text-sm mb-1">{{ twist.description }}</p>
+                      <div v-if="twist.what" class="text-xs text-purple-200">
+                        <strong>Revelação:</strong> {{ twist.what }}
+                      </div>
+                    </div>
+                  </div>
+                </section>
 
                 <!-- 6. Recompensas e Incentivos -->
                 <section>
@@ -247,7 +271,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
                         <h6 class="font-medium text-white mb-2 flex items-center gap-2">
-                          <font-awesome-icon :icon="['fas', 'clock']" class="text-amber-400" />
+                          <ClockIcon class="w-5 h-5 text-amber-400" />
                           Prazo
                         </h6>
                         <div class="space-y-1 text-sm">
@@ -276,7 +300,7 @@
 
                       <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
                         <h6 class="font-medium text-white mb-2 flex items-center gap-2">
-                          <font-awesome-icon :icon="['fas', 'coins']" class="text-amber-400" />
+                          <CurrencyDollarIcon class="w-5 h-5 text-amber-400" />
                           Pagamento
                         </h6>
                         <div class="text-sm">
@@ -287,29 +311,6 @@
                   </div>
                 </section>
 
-                <!-- 7. Reviravoltas -->
-                <section v-if="contract.twists?.length">
-                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Reviravoltas</h4>
-                  <div class="space-y-3">
-                    <div 
-                      v-for="twist in contract.twists" 
-                      :key="twist.description"
-                      class="bg-purple-900/20 rounded-lg p-4 border border-purple-500/30"
-                    >
-                      <div class="flex items-center gap-2 mb-2">
-                        <font-awesome-icon :icon="['fas', 'surprise']" class="text-purple-400" />
-                        <span class="font-medium text-white">Reviravolta</span>
-                        <span v-if="twist.who" class="text-sm text-purple-300 bg-purple-800/50 px-2 py-1 rounded">
-                          {{ twist.who }}
-                        </span>
-                      </div>
-                      <p class="text-gray-300 text-sm mb-1">{{ twist.description }}</p>
-                      <div v-if="twist.what" class="text-xs text-purple-200">
-                        <strong>Revelação:</strong> {{ twist.what }}
-                      </div>
-                    </div>
-                  </div>
-                </section>
 
                 <!-- 8. Consequências Severas (Placeholder - Não implementado ainda) -->
                 <!-- TODO: Implementar seção de consequências severas -->
@@ -320,7 +321,7 @@
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div v-if="contract.prerequisites?.length" class="bg-gray-700 rounded-lg p-4 border border-gray-600">
                       <h5 class="font-medium text-white mb-2 flex items-center gap-2">
-                        <font-awesome-icon :icon="['fas', 'exclamation-triangle']" class="text-yellow-400" />
+                        <ExclamationTriangleIcon class="w-5 h-5 text-yellow-400" />
                         Pré-requisitos
                       </h5>
                       <ul class="text-sm text-gray-300 space-y-1">
@@ -333,7 +334,7 @@
 
                     <div v-if="contract.clauses?.length" class="bg-gray-700 rounded-lg p-4 border border-gray-600">
                       <h5 class="font-medium text-white mb-2 flex items-center gap-2">
-                        <font-awesome-icon :icon="['fas', 'scroll']" class="text-blue-400" />
+                        <DocumentTextIcon class="w-5 h-5 text-blue-400" />
                         Cláusulas Especiais
                       </h5>
                       <ul class="text-sm text-gray-300 space-y-1">
@@ -371,7 +372,7 @@
             <!-- Footer com ações -->
             <div class="flex items-center justify-between p-6 border-t border-gray-600 bg-gray-750">
               <div class="flex items-center gap-2 text-sm text-gray-400">
-                <font-awesome-icon :icon="['fas', 'info-circle']" />
+                <InformationCircleIcon class="w-4 h-4" />
                 <span>{{ getDifficultyDescription(contract.difficulty) }}</span>
               </div>
               
@@ -421,6 +422,24 @@ import type { Contract } from '@/types/contract';
 import { ContractorType, ContractDifficulty, PaymentType } from '@/types/contract';
 import ContractStatus from './ContractStatus.vue';
 import ContractValue from './ContractValue.vue';
+import {
+  UsersIcon,
+  BuildingOfficeIcon,
+  QuestionMarkCircleIcon,
+  XMarkIcon,
+  MapPinIcon,
+  UserMinusIcon,
+  ExclamationCircleIcon,
+  ClockIcon,
+  CurrencyDollarIcon,
+  FaceSmileIcon,
+  ExclamationTriangleIcon,
+  DocumentTextIcon,
+  InformationCircleIcon
+} from '@heroicons/vue/24/outline';
+import {
+  XCircleIcon
+} from '@heroicons/vue/24/solid';
 
 interface Props {
   isOpen: boolean;
@@ -444,17 +463,17 @@ const emit = defineEmits<Emits>();
 // ===== COMPUTED =====
 
 const contractorIcon = computed(() => {
-  if (!props.contract) return ['fas', 'question'];
+  if (!props.contract) return QuestionMarkCircleIcon;
   
   switch (props.contract.contractorType) {
     case ContractorType.POVO:
-      return ['fas', 'users'];
+      return UsersIcon;
     case ContractorType.GOVERNO:
-      return ['fas', 'crown'];
+      return BuildingOfficeIcon;
     case ContractorType.INSTITUICAO:
-      return ['fas', 'building'];
+      return BuildingOfficeIcon;
     default:
-      return ['fas', 'question'];
+      return QuestionMarkCircleIcon;
   }
 });
 
