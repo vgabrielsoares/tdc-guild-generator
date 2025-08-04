@@ -77,6 +77,7 @@ import type {
 } from "../../types/contract";
 import type { Guild } from "../../types/guild";
 import { VisitorLevel, RelationLevel } from "../../types/guild";
+import { GOVERNMENT_CONTRACTOR_TABLE } from "../../data/tables/contract-content-tables";
 
 /**
  * Configuração para geração de contratos
@@ -710,59 +711,26 @@ export class ContractGenerator {
   }
 
   /**
-   * Gera contratante específico do governo conforme tabela do markdown
+   * Gera contratante específico do governo
    */
   private static generateGovernmentContractor(): {
     name: string;
     description: string;
   } {
-    const governmentRoll = rollDice({ notation: "1d20" }).result;
-
-    if (governmentRoll <= 2) {
+    const roll = rollDice({ notation: "1d20" }).result;
+    const entry = GOVERNMENT_CONTRACTOR_TABLE.find(
+      (e) => roll >= e.min && roll <= e.max
+    );
+    if (!entry) {
       return {
-        name: "Arcanista Diplomata",
-        description:
-          "Um mago experiente que representa os interesses arcanos do governo",
-      };
-    } else if (governmentRoll <= 5) {
-      return {
-        name: "Membro Importante do Clero",
-        description: "Um alto sacerdote com influência política significativa",
-      };
-    } else if (governmentRoll <= 10) {
-      return {
-        name: "Nobre Poderoso",
-        description:
-          "Um aristocrata com considerável poder político e econômico",
-      };
-    } else if (governmentRoll <= 15) {
-      return {
-        name: "Círculo Familiar dos Governantes",
-        description:
-          "Um membro da família real ou do círculo íntimo dos líderes",
-      };
-    } else if (governmentRoll === 16) {
-      return {
-        name: "Agente Burocrático",
-        description:
-          "Um funcionário público de alto escalão (juiz, cobrador de impostos, advogado)",
-      };
-    } else if (governmentRoll === 17) {
-      return {
-        name: "Militar de Alto Escalão",
-        description: "Um general ou comandante das forças armadas locais",
-      };
-    } else if (governmentRoll <= 19) {
-      return {
-        name: "Membro do Governo de Outro Assentamento",
-        description: "Representante diplomático de outra cidade ou região",
-      };
-    } else {
-      return {
-        name: "Líder Local",
-        description: "O próprio governante ou seu representante direto",
+        name: "Funcionário desconhecido",
+        description: "Contratante do governo não identificado"
       };
     }
+    return {
+      name: entry.result.name,
+      description: entry.result.description
+    };
   }
 
   /**

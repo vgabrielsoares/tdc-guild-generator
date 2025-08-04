@@ -184,7 +184,7 @@ export const GOVERNMENT_CONTRACTOR_TABLE: TableEntry<GovernmentContractorEntry>[
       max: 5,
       result: {
         type: GovernmentContractorType.CLERO_IMPORTANTE,
-        name: "Clérigo importante",
+        name: "Membro importante do clero",
         description:
           "Alto clérigo com influência significativa no governo local",
       },
@@ -200,13 +200,13 @@ export const GOVERNMENT_CONTRACTOR_TABLE: TableEntry<GovernmentContractorEntry>[
           "Membro da nobreza com considerável poder político e econômico",
       },
     },
-    // 11-15: Família governante
+    // 11-15: Círculo familiar dos governantes
     {
       min: 11,
       max: 15,
       result: {
         type: GovernmentContractorType.FAMILIA_GOVERNANTE,
-        name: "Família governante",
+        name: "Círculo familiar dos governantes",
         description:
           "Familiares próximos ou conselheiros diretos dos líderes do governo",
       },
@@ -233,13 +233,13 @@ export const GOVERNMENT_CONTRACTOR_TABLE: TableEntry<GovernmentContractorEntry>[
           "Oficial militar de alta patente com autoridade para contratar aventureiros",
       },
     },
-    // 18-19: Governo de outro assentamento
+    // 18-19: Membro do governo de outro assentamento
     {
       min: 18,
       max: 19,
       result: {
         type: GovernmentContractorType.GOVERNO_OUTRO_ASSENTAMENTO,
-        name: "Governo de outro assentamento",
+        name: "Membro do governo de outro assentamento",
         description:
           "Representante governamental de outro assentamento em missão diplomática ou oficial",
       },
