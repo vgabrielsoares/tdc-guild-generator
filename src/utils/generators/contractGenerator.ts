@@ -1616,12 +1616,17 @@ export class ContractGenerator {
       sections.push(`**Reviravoltas:**\n${twistTexts}`);
     }
 
-    // 8. Recompensa principal
+    // 8. Valor em XP
+    sections.push(
+      `**Experiência:** ${finalValueResult.experienceValue} XP`
+    );
+
+    // 9. Recompensa principal
     sections.push(
       `**Recompensa:** ${finalValueResult.finalGoldReward} moedas de ouro`
     );
 
-    // 9. Recompensas e incentivos (se houver)
+    // 10. Recompensas e incentivos (se houver)
     if (additionalRewards.length > 0) {
       const rewardTexts = additionalRewards
         .map((reward) => {
@@ -1632,7 +1637,7 @@ export class ContractGenerator {
       sections.push(`**Recompensas e Incentivos:**\n${rewardTexts}`);
     }
 
-    // 10. Consequências severas (se houver)
+    // 11. Consequências severas (se houver)
     if (severeConsequences.length > 0) {
       const consequenceTexts = severeConsequences
         .map(
@@ -1643,24 +1648,24 @@ export class ContractGenerator {
       sections.push(`**Consequências por falha:**\n${consequenceTexts}`);
     }
 
-    // 11. Prazo
+    // 12. Prazo
     if (deadline.type !== DeadlineType.SEM_PRAZO) {
       sections.push(`**Prazo:** ${deadline.value}`);
     }
 
-    // 12. Pré-requisitos (se houver)
+    // 13. Pré-requisitos (se houver)
     if (prerequisites.length > 0) {
       const prerequisiteTexts = prerequisites.map((p) => `• ${p}`).join("\n");
       sections.push(`**Pré-requisitos:**\n${prerequisiteTexts}`);
     }
 
-    // 13. Cláusulas (se houver)
+    // 14. Cláusulas (se houver)
     if (clauses.length > 0) {
       const clauseTexts = clauses.map((c) => `• ${c}`).join("\n");
       sections.push(`**Cláusulas:**\n${clauseTexts}`);
     }
 
-    // 14. Tipo de pagamento
+    // 15. Tipo de pagamento
     const paymentText = this.getPaymentTypeDescription(paymentType);
     sections.push(`**Forma de pagamento:** ${paymentText}`);
 
