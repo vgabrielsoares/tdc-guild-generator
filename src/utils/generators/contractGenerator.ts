@@ -186,7 +186,8 @@ export class ContractGenerator {
     const valueCalculationResult = this.calculateContractValue(
       baseRoll,
       guild,
-      difficultyEntry
+      difficultyEntry,
+      distanceRoll
     );
     const { contractValue, prerequisites, clauses } = valueCalculationResult;
 
@@ -429,7 +430,8 @@ export class ContractGenerator {
       difficulty: ContractDifficulty;
       experienceMultiplier: number;
       rewardMultiplier: number;
-    }>
+    }>,
+    distanceRoll?: number
   ): {
     contractValue: ContractValue;
     prerequisites: string[];
@@ -447,7 +449,7 @@ export class ContractGenerator {
     }
 
     // 2. Calcular todos os modificadores que afetam a rolagem
-    const rollModifiers = this.calculateRollModifiers(guild);
+    const rollModifiers = this.calculateRollModifiers(guild, distanceRoll);
 
     // 3. Gerar pré-requisitos e cláusulas baseados no valor base preliminar
     // Isso nos permite calcular o bônus que será aplicado à rolagem
@@ -542,7 +544,7 @@ export class ContractGenerator {
   /**
    * Calcula modificadores que afetam a rolagem d100
    */
-  private static calculateRollModifiers(guild: Guild): {
+  private static calculateRollModifiers(guild: Guild, distanceRoll?: number): {
     experienceModifier: number;
     rewardModifier: number;
     distance: number;
@@ -556,9 +558,9 @@ export class ContractGenerator {
     let rewardModifier = 0;
 
     // 1. Modificadores de distância (afetam tanto valor quanto recompensa)
-    const distanceRoll = rollDice({ notation: "1d20" }).result;
+    const finalDistanceRoll = distanceRoll || rollDice({ notation: "1d20" }).result;
     const distanceEntry = CONTRACT_DISTANCE_TABLE.find(
-      (entry) => distanceRoll >= entry.min && distanceRoll <= entry.max
+      (entry) => finalDistanceRoll >= entry.min && finalDistanceRoll <= entry.max
     );
     const distanceModifier = distanceEntry?.result.valueModifier || 0;
     experienceModifier += distanceModifier;
