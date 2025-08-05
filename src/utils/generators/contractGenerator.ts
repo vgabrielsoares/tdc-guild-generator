@@ -1,5 +1,6 @@
 import { rollDice } from "../dice";
 import { rollOnTable } from "../tableRoller";
+import type { TableEntry } from "@/types/tables";
 import {
   CONTRACT_DICE_BY_SIZE,
   CONTRACT_VALUE_TABLE,
@@ -170,87 +171,59 @@ export class ContractGenerator {
     // 1. Rolar valor base (1d100)
     const baseRoll = rollDice({ notation: "1d100" }).result;
 
-    // 2. Aplicar modificador de funcionários à rolagem se necessário
-    let adjustedRoll = baseRoll;
-    const staffDescription = guild.staff.employees || "";
-    if (staffDescription.toLowerCase().includes("experientes")) {
-      adjustedRoll += STAFF_PREPARATION_ROLL_MODIFIERS["experientes"] || 2;
-    } else if (staffDescription.toLowerCase().includes("despreparados")) {
-      adjustedRoll += STAFF_PREPARATION_ROLL_MODIFIERS["despreparados"] || -2;
-    }
-
-    // Garantir que o roll ajustado esteja dentro dos limites da tabela
-    adjustedRoll = Math.max(1, Math.min(100, adjustedRoll));
-
-    // 3. Calcular valor usando a rolagem ajustada
-    const valueResult = this.calculateContractValue(adjustedRoll, guild);
-
-    // 4. Gerar rolagens adicionais para dados de geração
+    // 2. Gerar rolagens adicionais para dados de geração
     const distanceRoll = rollDice({ notation: "1d20" }).result;
     const difficultyRoll = rollDice({ notation: "1d20" }).result;
 
-    // 5. Gerar deadline usando a tabela
-    const deadline = this.generateDeadline();
-
-    // 6. Determinar dificuldade baseada na rolagem
+    // 3. Determinar dificuldade baseada na rolagem
     const difficultyEntry = CONTRACT_DIFFICULTY_TABLE.find(
       (entry) => difficultyRoll >= entry.min && difficultyRoll <= entry.max
     );
     const difficulty =
       difficultyEntry?.result.difficulty || ContractDifficulty.MEDIO;
 
-    // 7. Gerar contratante seguindo as regras do markdown
+    // 4. Calcular valor aplicando todos os modificadores, incluindo dificuldade
+    const valueCalculationResult = this.calculateContractValue(
+      baseRoll,
+      guild,
+      difficultyEntry
+    );
+    const { contractValue, prerequisites, clauses } = valueCalculationResult;
+
+    // 5. Gerar deadline usando a tabela
+    const deadline = this.generateDeadline();
+
+    // 6. Gerar contratante seguindo as regras do markdown
     const contractor = this.generateContractor(guild);
 
-    // 8. Gerar objetivo conforme tabela do markdown
+    // 7. Gerar objetivo conforme tabela do markdown
     const objective = this.generateObjective();
 
-    // 9. Gerar localidade conforme tabela do markdown
+    // 8. Gerar localidade conforme tabela do markdown
     const location = this.generateLocation();
 
-    // 10. Gerar pré-requisitos baseados no valor
-    const prerequisites = this.generatePrerequisites(
-      valueResult.experienceValue
-    );
+    // 9. Gerar tipo de pagamento
+    const paymentType = this.generatePaymentType(contractValue.rewardValue);
 
-    // 11. Gerar cláusulas especiais
-    const clauses = this.generateClauses(valueResult.rewardValue);
-
-    // 12. Aplicar bônus por pré-requisitos e cláusulas
-    const totalBonuses = (prerequisites.length + clauses.length) * 5;
-    const finalValueResult = {
-      ...valueResult,
-      rewardValue: valueResult.rewardValue + totalBonuses,
-      finalGoldReward:
-        Math.round((valueResult.rewardValue + totalBonuses) * 0.1 * 100) / 100,
-      modifiers: {
-        ...valueResult.modifiers,
-        requirementsAndClauses: totalBonuses,
-      },
-    };
-
-    // 13. Gerar tipo de pagamento
-    const paymentType = this.generatePaymentType(finalValueResult.rewardValue);
-
-    // 13. Gerar antagonista
+    // 10. Gerar antagonista
     const antagonist = this.generateAntagonist();
 
-    // 14. Gerar complicações
+    // 11. Gerar complicações
     const complications = this.generateComplications();
 
-    // 15. Gerar reviravoltas
+    // 12. Gerar reviravoltas
     const twists = this.generateTwists();
 
-    // 16. Gerar aliados
+    // 13. Gerar aliados
     const allies = this.generateAllies();
 
-    // 17. Gerar consequências severas (para quando o contrato falha)
+    // 14. Gerar consequências severas (para quando o contrato falha)
     const severeConsequences = this.generateSevereConsequences();
 
-    // 18. Gerar recompensas adicionais
+    // 15. Gerar recompensas adicionais
     const additionalRewards = this.generateAdditionalRewards();
 
-    // 19. Gerar descrição completa do contrato
+    // 16. Gerar descrição completa do contrato
     const fullDescription = this.generateFullContractDescription({
       objective,
       location,
@@ -263,12 +236,12 @@ export class ContractGenerator {
       additionalRewards,
       prerequisites,
       clauses,
-      finalValueResult,
+      finalValueResult: contractValue,
       deadline,
       paymentType,
     });
 
-    // 19. Estrutura básica do contrato
+    // 17. Estrutura básica do contrato
     const contract: Contract = {
       id: this.generateId(),
       title: `Contrato #${Math.floor(Math.random() * 10000)
@@ -289,7 +262,7 @@ export class ContractGenerator {
       allies,
       severeConsequences,
       additionalRewards: additionalRewards || [],
-      value: finalValueResult,
+      value: contractValue,
       deadline,
       paymentType,
       generationData: {
@@ -443,144 +416,221 @@ export class ContractGenerator {
   /**
    * Calcula o valor do contrato
    * 1. Rola 1d100 para valor base na tabela
-   * 2. Aplica modificadores de distância
-   * 3. Aplica modificadores de relações
-   * 4. Aplica modificadores de funcionários
-   * 5. Aplica multiplicadores de dificuldade
+   * 2. Calcula modificadores que afetam a rolagem
+   * 3. Gera pré-requisitos e cláusulas baseados no valor preliminar
+   * 4. Aplica modificadores à rolagem
+   * 5. Consulta a tabela novamente com as rolagens modificadas
+   * 6. Aplica multiplicadores de dificuldade
    */
   private static calculateContractValue(
     baseRoll: number,
-    guild: Guild
-  ): ContractValue {
+    guild: Guild,
+    difficultyEntry?: TableEntry<{
+      difficulty: ContractDifficulty;
+      experienceMultiplier: number;
+      rewardMultiplier: number;
+    }>
+  ): {
+    contractValue: ContractValue;
+    prerequisites: string[];
+    clauses: string[];
+  } {
     // 1. Obter valor base da tabela usando a rolagem 1d100
-    const tableEntry = CONTRACT_VALUE_TABLE.find(
+    const baseTableEntry = CONTRACT_VALUE_TABLE.find(
       (entry) => baseRoll >= entry.min && baseRoll <= entry.max
     );
-    let baseValue = tableEntry?.result || 75;
+    let baseValue = baseTableEntry?.result || 75;
 
     // Tratar caso especial 101+ (valor anterior * 1.1)
     if (baseRoll > 100) {
       baseValue = calculateExtendedValue(baseRoll, baseValue);
     }
 
-    // 2. Calcular modificadores
-    const modifiers = this.calculateModifiers(guild);
+    // 2. Calcular todos os modificadores que afetam a rolagem
+    const rollModifiers = this.calculateRollModifiers(guild);
 
-    // 3. Separar valores de experiência e recompensa (começam iguais)
-    let experienceValue = baseValue;
-    let rewardValue = baseValue;
+    // 3. Gerar pré-requisitos e cláusulas baseados no valor base preliminar
+    // Isso nos permite calcular o bônus que será aplicado à rolagem
+    const preliminaryExperienceValue = baseValue;
+    const preliminaryRewardValue = baseValue;
 
-    // 4. Aplicar modificadores de distância
-    experienceValue += modifiers.distance;
-    rewardValue += modifiers.distance;
+    const prerequisites = this.generatePrerequisites(
+      preliminaryExperienceValue
+    );
+    const clauses = this.generateClauses(preliminaryRewardValue);
 
-    // 5. Aplicar modificadores de relação com população
-    experienceValue += modifiers.populationRelationValue;
-    rewardValue += modifiers.populationRelationReward;
+    // 4. Calcular bônus de pré-requisitos e cláusulas (+5 por item na rolagem)
+    const requirementsBonusToRoll = (prerequisites.length + clauses.length) * 5;
 
-    // 6. Aplicar modificadores de relação com governo
-    experienceValue += modifiers.governmentRelationValue;
-    rewardValue += modifiers.governmentRelationReward;
+    // 5. Aplicar modificadores às rolagens separadas para XP e Recompensa
+    // Incluindo bônus de pré-requisitos e cláusulas
+    const experienceRoll = Math.max(
+      1,
+      Math.min(100, baseRoll + rollModifiers.experienceModifier)
+    );
+    const rewardRoll = Math.max(
+      1,
+      Math.min(
+        100,
+        baseRoll + rollModifiers.rewardModifier + requirementsBonusToRoll
+      )
+    );
 
-    // 7. Aplicar modificadores de funcionários (já aplicados na rolagem)
-    // staffPreparation é aplicado à rolagem d100, não ao valor final
+    // 6. Consultar a tabela novamente com as rolagens modificadas
+    const experienceTableEntry = CONTRACT_VALUE_TABLE.find(
+      (entry) => experienceRoll >= entry.min && experienceRoll <= entry.max
+    );
+    let experienceValue = experienceTableEntry?.result || 75;
 
-    // 8. Aplicar multiplicadores de dificuldade
+    const rewardTableEntry = CONTRACT_VALUE_TABLE.find(
+      (entry) => rewardRoll >= entry.min && rewardRoll <= entry.max
+    );
+    let rewardValue = rewardTableEntry?.result || 75;
+
+    // Tratar casos especiais 101+ para ambas as rolagens
+    if (experienceRoll > 100) {
+      experienceValue = calculateExtendedValue(experienceRoll, experienceValue);
+    }
+    if (rewardRoll > 100) {
+      rewardValue = calculateExtendedValue(rewardRoll, rewardValue);
+    }
+
+    // 7. Aplicar multiplicadores de dificuldade
+    const difficultyMultipliers =
+      this.calculateDifficultyMultipliers(difficultyEntry);
     experienceValue = Math.floor(
-      experienceValue * modifiers.difficultyMultiplier.experienceMultiplier
+      experienceValue * difficultyMultipliers.experienceMultiplier
     );
     rewardValue = Math.floor(
-      rewardValue * modifiers.difficultyMultiplier.rewardMultiplier
+      rewardValue * difficultyMultipliers.rewardMultiplier
     );
 
-    // 9. Garantir valores mínimos
+    // 8. Garantir valores mínimos
     experienceValue = Math.max(1, experienceValue);
     rewardValue = Math.max(1, rewardValue);
 
-    // 10. Calcular PO$ final (recompensa * 0.1)
-    const finalGoldReward = Math.round(rewardValue * 0.1 * 100) / 100;
+    // 9. Calcular PO$ final (recompensa * 0.1)
+    const finalGoldReward = Math.round(rewardValue * 10) / 100;
 
-    return {
+    // 10. Construir objeto de modificadores para referência
+    const modifiers: ContractModifiers = {
+      distance: rollModifiers.distance,
+      populationRelationValue: rollModifiers.populationRelationValue,
+      populationRelationReward: rollModifiers.populationRelationReward,
+      governmentRelationValue: rollModifiers.governmentRelationValue,
+      governmentRelationReward: rollModifiers.governmentRelationReward,
+      staffPreparation: rollModifiers.staffPreparation,
+      difficultyMultiplier: difficultyMultipliers,
+      requirementsAndClauses: requirementsBonusToRoll,
+    };
+
+    const contractValue: ContractValue = {
       baseValue, // Valor original da tabela
       experienceValue, // Valor para estruturar o contrato (orçamento XP)
       rewardValue, // Valor da recompensa em pontos
       finalGoldReward, // Valor final em PO$
       modifiers,
     };
+
+    return {
+      contractValue,
+      prerequisites,
+      clauses,
+    };
   }
 
   /**
-   * Calcula modificadores baseados na guilda seguindo as regras do markdown
+   * Calcula modificadores que afetam a rolagem d100
    */
-  private static calculateModifiers(guild: Guild): ContractModifiers {
-    const modifiers: ContractModifiers = {
-      distance: 0,
-      populationRelationValue: 0,
-      populationRelationReward: 0,
-      governmentRelationValue: 0,
-      governmentRelationReward: 0,
-      staffPreparation: 0,
-      difficultyMultiplier: {
-        experienceMultiplier: 1,
-        rewardMultiplier: 1,
-      },
-      requirementsAndClauses: 0,
-    };
+  private static calculateRollModifiers(guild: Guild): {
+    experienceModifier: number;
+    rewardModifier: number;
+    distance: number;
+    populationRelationValue: number;
+    populationRelationReward: number;
+    governmentRelationValue: number;
+    governmentRelationReward: number;
+    staffPreparation: number;
+  } {
+    let experienceModifier = 0;
+    let rewardModifier = 0;
 
-    // 1. Rolar distância (1d20) e aplicar modificadores
+    // 1. Modificadores de distância (afetam tanto valor quanto recompensa)
     const distanceRoll = rollDice({ notation: "1d20" }).result;
     const distanceEntry = CONTRACT_DISTANCE_TABLE.find(
       (entry) => distanceRoll >= entry.min && distanceRoll <= entry.max
     );
-    if (distanceEntry) {
-      modifiers.distance = distanceEntry.result.valueModifier;
-    }
+    const distanceModifier = distanceEntry?.result.valueModifier || 0;
+    experienceModifier += distanceModifier;
+    rewardModifier += distanceModifier;
 
-    // 2. Aplicar modificadores por relação com população
+    // 2. Modificadores por relação com população
     const populationRelation = this.mapRelationLevelToString(
       guild.relations.population
     );
     const populationMods = POPULATION_RELATION_MODIFIERS[
       populationRelation
-    ] || { valueModifier: 0, rewardModifier: 0 };
-    modifiers.populationRelationValue = populationMods.valueModifier;
-    modifiers.populationRelationReward = populationMods.rewardModifier;
+    ] || {
+      valueModifier: 0,
+      rewardModifier: 0,
+    };
+    experienceModifier += populationMods.valueModifier;
+    rewardModifier += populationMods.rewardModifier;
 
-    // 3. Aplicar modificadores por relação com governo
+    // 3. Modificadores por relação com governo
     const governmentRelation = this.mapRelationLevelToString(
       guild.relations.government
     );
     const governmentMods = GOVERNMENT_RELATION_MODIFIERS[
       governmentRelation
-    ] || { valueModifier: 0, rewardModifier: 0 };
-    modifiers.governmentRelationValue = governmentMods.valueModifier;
-    modifiers.governmentRelationReward = governmentMods.rewardModifier;
+    ] || {
+      valueModifier: 0,
+      rewardModifier: 0,
+    };
+    experienceModifier += governmentMods.valueModifier;
+    rewardModifier += governmentMods.rewardModifier;
 
-    // 4. Modificadores de funcionários (aplicados à rolagem d100, não ao valor final)
+    // 4. Modificadores de funcionários (aplicados apenas à rolagem de recompensa)
+    let staffPreparation = 0;
     const staffDescription = guild.staff.employees || "";
     if (staffDescription.toLowerCase().includes("experientes")) {
-      modifiers.staffPreparation =
-        STAFF_PREPARATION_ROLL_MODIFIERS["experientes"] || 2;
+      staffPreparation = STAFF_PREPARATION_ROLL_MODIFIERS["experientes"] || 2;
     } else if (staffDescription.toLowerCase().includes("despreparados")) {
-      modifiers.staffPreparation =
+      staffPreparation =
         STAFF_PREPARATION_ROLL_MODIFIERS["despreparados"] || -2;
     }
+    rewardModifier += staffPreparation; // Funcionários afetam apenas a recompensa
 
-    // 5. Rolar dificuldade (1d20) e aplicar multiplicadores
-    const difficultyRoll = rollDice({ notation: "1d20" }).result;
-    const difficultyEntry = CONTRACT_DIFFICULTY_TABLE.find(
-      (entry) => difficultyRoll >= entry.min && difficultyRoll <= entry.max
-    );
-    if (difficultyEntry) {
-      modifiers.difficultyMultiplier = {
-        experienceMultiplier: difficultyEntry.result.experienceMultiplier,
-        rewardMultiplier: difficultyEntry.result.rewardMultiplier,
-      };
-    }
-
-    return modifiers;
+    return {
+      experienceModifier,
+      rewardModifier,
+      distance: distanceModifier,
+      populationRelationValue: populationMods.valueModifier,
+      populationRelationReward: populationMods.rewardModifier,
+      governmentRelationValue: governmentMods.valueModifier,
+      governmentRelationReward: governmentMods.rewardModifier,
+      staffPreparation,
+    };
   }
 
+  /**
+   * Calcula multiplicadores de dificuldade
+   */
+  private static calculateDifficultyMultipliers(
+    difficultyEntry?: TableEntry<{
+      difficulty: ContractDifficulty;
+      experienceMultiplier: number;
+      rewardMultiplier: number;
+    }>
+  ): {
+    experienceMultiplier: number;
+    rewardMultiplier: number;
+  } {
+    return {
+      experienceMultiplier: difficultyEntry?.result.experienceMultiplier || 1,
+      rewardMultiplier: difficultyEntry?.result.rewardMultiplier || 1,
+    };
+  }
   /**
    * Mapeia RelationLevel enum para strings das tabelas
    */
@@ -629,8 +679,6 @@ export class ContractGenerator {
       return {
         type: DeadlineType.SEM_PRAZO,
         value: "Sem prazo",
-        isFlexible: true,
-        isArbitrary: true,
       };
     }
 
@@ -657,10 +705,6 @@ export class ContractGenerator {
       type = DeadlineType.DIAS;
     } else if (finalValue.includes("semana")) {
       type = DeadlineType.SEMANAS;
-    } else if (result.isArbitrary) {
-      type = DeadlineType.ARBITRARIO;
-    } else if (result.hasOpportunityWindow) {
-      type = DeadlineType.JANELA_OPORTUNIDADE;
     } else {
       type = DeadlineType.SEM_PRAZO;
     }
@@ -668,8 +712,6 @@ export class ContractGenerator {
     return {
       type,
       value: finalValue,
-      isFlexible: result.isFlexible,
-      isArbitrary: result.isArbitrary,
     };
   }
 
@@ -1488,8 +1530,6 @@ export class ContractGenerator {
     deadline: {
       type: DeadlineType;
       value?: string;
-      isFlexible: boolean;
-      isArbitrary: boolean;
     };
     paymentType: PaymentType;
   }): string {
@@ -1514,21 +1554,17 @@ export class ContractGenerator {
 
     // 1. Contratante
     sections.push(
-      `**Contratante:** ${contractor.name}\n→ ${contractor.description}`
+      `**Contratante:** ${contractor.name} (${contractor.description})`
     );
 
     // 2. Objetivo
-    let objectiveText = `**Objetivo:** ${objective.description}`;
-    if (objective.specificObjective) {
-      objectiveText += `\nDetalhes: ${objective.specificObjective}`;
-    }
+    const objectiveText = `**Objetivo:** ${objective.description} (${objective.specificObjective})`;
     sections.push(objectiveText);
 
     // 3. Localidade com todas as informações organizadas
-    let locationText = `**Local:** ${location.name}`;
+    let locationText = `**Local:** ${location.name} (${location.specification?.location})`;
 
     if (location.specification) {
-      locationText += `\nLocalização específica: ${location.specification.location}`;
       if (
         location.specification.description !== location.specification.location
       ) {
@@ -1561,15 +1597,15 @@ export class ContractGenerator {
 
     // 4. Antagonista
     sections.push(
-      `**Antagonista:** ${antagonist.specificType}\n→ ${antagonist.description}`
+      `**Antagonista:** ${antagonist.specificType}: ${antagonist.description}`
     );
 
     // 5. Complicações
     if (complications.length > 0) {
       const complicationTexts = complications
-        .map((c) => `• ${c.description}`)
+        .map((c) => `${c.description}`)
         .join("\n");
-      sections.push(`**Complicações:**\n${complicationTexts}`);
+      sections.push(`**Complicações:** ${complicationTexts}`);
     }
 
     // 6. Aliados (se houver)
@@ -1588,12 +1624,15 @@ export class ContractGenerator {
       sections.push(`**Reviravoltas:**\n${twistTexts}`);
     }
 
-    // 8. Recompensa principal
+    // 8. Valor em XP
+    sections.push(`**Experiência:** ${finalValueResult.experienceValue} XP`);
+
+    // 9. Recompensa principal
     sections.push(
       `**Recompensa:** ${finalValueResult.finalGoldReward} moedas de ouro`
     );
 
-    // 9. Recompensas e incentivos (se houver)
+    // 10. Recompensas e incentivos (se houver)
     if (additionalRewards.length > 0) {
       const rewardTexts = additionalRewards
         .map((reward) => {
@@ -1604,7 +1643,7 @@ export class ContractGenerator {
       sections.push(`**Recompensas e Incentivos:**\n${rewardTexts}`);
     }
 
-    // 10. Consequências severas (se houver)
+    // 11. Consequências severas (se houver)
     if (severeConsequences.length > 0) {
       const consequenceTexts = severeConsequences
         .map(
@@ -1615,24 +1654,24 @@ export class ContractGenerator {
       sections.push(`**Consequências por falha:**\n${consequenceTexts}`);
     }
 
-    // 11. Prazo
+    // 12. Prazo
     if (deadline.type !== DeadlineType.SEM_PRAZO) {
       sections.push(`**Prazo:** ${deadline.value}`);
     }
 
-    // 12. Pré-requisitos (se houver)
+    // 13. Pré-requisitos (se houver)
     if (prerequisites.length > 0) {
       const prerequisiteTexts = prerequisites.map((p) => `• ${p}`).join("\n");
       sections.push(`**Pré-requisitos:**\n${prerequisiteTexts}`);
     }
 
-    // 13. Cláusulas (se houver)
+    // 14. Cláusulas (se houver)
     if (clauses.length > 0) {
       const clauseTexts = clauses.map((c) => `• ${c}`).join("\n");
       sections.push(`**Cláusulas:**\n${clauseTexts}`);
     }
 
-    // 14. Tipo de pagamento
+    // 15. Tipo de pagamento
     const paymentText = this.getPaymentTypeDescription(paymentType);
     sections.push(`**Forma de pagamento:** ${paymentText}`);
 

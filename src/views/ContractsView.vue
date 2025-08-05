@@ -24,20 +24,20 @@
       
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
         <div class="flex flex-col">
-          <span class="text-gray-400 uppercase tracking-wide text-xs">Sede</span>
-          <span class="text-white font-medium">{{ guild.structure.size }}</span>
+          <span class="text-gray-400 uppercase tracking-wide text-lg">Sede</span>
+          <span class="text-white font-medium text-base">{{ guild.structure.size }}</span>
         </div>
         <div class="flex flex-col">
-          <span class="text-gray-400 uppercase tracking-wide text-xs">Recursos</span>
-          <span class="text-white font-medium">{{ guild.resources.level }}</span>
+          <span class="text-gray-400 uppercase tracking-wide text-lg">Recursos</span>
+          <span class="text-white font-medium text-base">{{ guild.resources.level }}</span>
         </div>
         <div class="flex flex-col">
-          <span class="text-gray-400 uppercase tracking-wide text-xs">Rel. Governo</span>
-          <span class="text-white font-medium">{{ guild.relations.government }}</span>
+          <span class="text-gray-400 uppercase tracking-wide text-lg">Rel. Governo</span>
+          <span class="text-white font-medium text-base">{{ guild.relations.government }}</span>
         </div>
         <div class="flex flex-col">
-          <span class="text-gray-400 uppercase tracking-wide text-xs">Rel. População</span>
-          <span class="text-white font-medium">{{ guild.relations.population }}</span>
+          <span class="text-gray-400 uppercase tracking-wide text-lg">Rel. População</span>
+          <span class="text-white font-medium text-base">{{ guild.relations.population }}</span>
         </div>
       </div>
 
@@ -47,7 +47,7 @@
             <MapPinIcon class="w-4 h-4 inline mr-2" />
             Sede localizada em: <span class="font-medium">{{ guild.settlementType }}</span>
           </span>
-          <span class="text-xs text-gray-400">
+          <span class="text-sm text-gray-400">
             Criada em: {{ formatDate(guild.createdAt) }}
           </span>
         </div>
@@ -78,7 +78,7 @@
         <div class="flex items-center justify-between mb-4">
           <div>
             <h3 class="text-lg font-semibold text-white mb-2">Contratos Disponíveis</h3>
-            <p class="text-sm text-gray-400">
+            <p class="text-md text-gray-400">
               Total de {{ contracts.length }} contratos para esta sede da guilda
             </p>
           </div>

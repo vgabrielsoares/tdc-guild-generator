@@ -64,8 +64,6 @@ const createMockContract = (overrides: Partial<Contract> = {}): Contract => ({
   deadline: {
     type: DeadlineType.DIAS,
     value: "7",
-    isFlexible: false,
-    isArbitrary: false,
   },
   prerequisites: [],
   clauses: [],
