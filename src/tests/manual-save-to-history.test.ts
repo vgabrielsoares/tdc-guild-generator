@@ -6,6 +6,8 @@ import { SettlementType, type Guild } from '@/types/guild';
 describe('Manual Save to History', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+    // Limpar localStorage para isolar os testes
+    localStorage.clear();
   });
 
   it('should save guild to history manually with correct date conversion', async () => {

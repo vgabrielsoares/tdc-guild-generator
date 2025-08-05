@@ -7,6 +7,8 @@ import { convertToGuild } from './utils/test-helpers';
 describe('Guild Improvements', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+    // Limpar localStorage para isolar os testes
+    localStorage.clear();
   });
 
   describe('Guild Name Update', () => {
