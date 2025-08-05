@@ -43,6 +43,30 @@ import {
 } from "../../data/tables/contract-complications-tables";
 
 import {
+  ALLY_APPEARANCE_CHANCE_TABLE,
+  ALLY_TYPES_TABLE,
+  ALLY_APPEARANCE_TIMING_TABLE,
+  ALLY_ARTIFACT_TABLE,
+  ALLY_POWERFUL_CREATURE_TABLE,
+  ALLY_UNEXPECTED_TABLE,
+  ALLY_SUPERNATURAL_HELP_TABLE,
+  ALLY_ORDINARY_CIVILIANS_TABLE,
+  ALLY_NATURE_TABLE,
+  ALLY_ORGANIZATIONS_TABLE,
+  ALLY_REFUGE_TABLE,
+  ALLY_ADVENTURERS_TABLE,
+  ALLY_ADVENTURER_LEVEL_TABLE,
+  ALLY_FRIENDLY_MONSTROSITY_TABLE,
+  ALLY_MONSTROSITY_CHARACTERISTICS_TABLE,
+} from "../../data/tables/contract-rewards-tables";
+
+import {
+  SEVERE_CONSEQUENCES_CHANCE_TABLE,
+  SEVERE_CONSEQUENCES_TYPES_TABLE,
+  SEVERE_CONSEQUENCE_DETAIL_TABLES,
+} from "../../data/tables/contract-consequences-tables";
+
+import {
   MAIN_LOCATION_TABLE,
   LOCATION_IMPORTANCE_TABLE,
   LOCATION_PECULIARITY_TABLE,
@@ -64,6 +88,9 @@ import {
   ComplicationCategory,
   TwistWho,
   TwistWhat,
+  AllyCategory,
+  AllyTiming,
+  SevereConsequenceCategory,
 } from "../../types/contract";
 import type {
   Contract,
@@ -74,6 +101,8 @@ import type {
   Antagonist,
   Complication,
   Twist,
+  Ally,
+  SevereConsequence,
 } from "../../types/contract";
 import type { Guild } from "../../types/guild";
 import { VisitorLevel, RelationLevel } from "../../types/guild";
@@ -197,7 +226,13 @@ export class ContractGenerator {
     // 15. Gerar reviravoltas
     const twists = this.generateTwists();
 
-    // 16. Gerar descrição completa do contrato
+    // 16. Gerar aliados
+    const allies = this.generateAllies();
+
+    // 17. Gerar consequências severas (para quando o contrato falha)
+    const severeConsequences = this.generateSevereConsequences();
+
+    // 18. Gerar descrição completa do contrato
     const fullDescription = this.generateFullContractDescription({
       objective,
       location,
@@ -205,6 +240,8 @@ export class ContractGenerator {
       antagonist,
       complications,
       twists,
+      allies,
+      severeConsequences,
       prerequisites,
       clauses,
       finalValueResult,
@@ -212,7 +249,7 @@ export class ContractGenerator {
       paymentType,
     });
 
-    // 17. Estrutura básica do contrato
+    // 19. Estrutura básica do contrato
     const contract: Contract = {
       id: this.generateId(),
       title: `Contrato #${Math.floor(Math.random() * 10000)
@@ -230,6 +267,8 @@ export class ContractGenerator {
       antagonist,
       complications,
       twists,
+      allies,
+      severeConsequences,
       value: finalValueResult,
       deadline,
       paymentType,
@@ -724,12 +763,12 @@ export class ContractGenerator {
     if (!entry) {
       return {
         name: "Funcionário desconhecido",
-        description: "Contratante do governo não identificado"
+        description: "Contratante do governo não identificado",
       };
     }
     return {
       name: entry.result.name,
-      description: entry.result.description
+      description: entry.result.description,
     };
   }
 
@@ -1420,6 +1459,8 @@ export class ContractGenerator {
     antagonist: Antagonist;
     complications: Complication[];
     twists: Twist[];
+    allies: Ally[];
+    severeConsequences: SevereConsequence[];
     prerequisites: string[];
     clauses: string[];
     finalValueResult: ContractValue;
@@ -1438,6 +1479,8 @@ export class ContractGenerator {
       antagonist,
       complications,
       twists,
+      allies,
+      severeConsequences,
       prerequisites,
       clauses,
       finalValueResult,
@@ -1507,35 +1550,56 @@ export class ContractGenerator {
       sections.push(`**Complicações:**\n${complicationTexts}`);
     }
 
-    // 6. Reviravoltas (se houver)
+    // 6. Aliados (se houver)
+    if (allies.length > 0) {
+      const allyTexts = allies
+        .map(
+          (ally) => `• ${ally.name} (${ally.category}) - ${ally.description}`
+        )
+        .join("\n");
+      sections.push(`**Aliados potenciais:**\n${allyTexts}`);
+    }
+
+    // 7. Reviravoltas (se houver)
     if (twists.length > 0) {
       const twistTexts = twists.map((t) => `• ${t.description}`).join("\n");
       sections.push(`**Reviravoltas:**\n${twistTexts}`);
     }
 
-    // 7. Recompensa e incentivos
+    // 8. Recompensa e incentivos
     sections.push(
       `**Recompensa:** ${finalValueResult.finalGoldReward} moedas de ouro`
     );
 
-    // 8. Prazo
+    // 9. Consequências severas (se houver)
+    if (severeConsequences.length > 0) {
+      const consequenceTexts = severeConsequences
+        .map(
+          (consequence) =>
+            `• ${consequence.description}\n  Afeta contratados: ${consequence.affectsContractors}`
+        )
+        .join("\n");
+      sections.push(`**Consequências por falha:**\n${consequenceTexts}`);
+    }
+
+    // 10. Prazo
     if (deadline.type !== DeadlineType.SEM_PRAZO) {
       sections.push(`**Prazo:** ${deadline.value}`);
     }
 
-    // 9. Pré-requisitos (se houver)
+    // 11. Pré-requisitos (se houver)
     if (prerequisites.length > 0) {
       const prerequisiteTexts = prerequisites.map((p) => `• ${p}`).join("\n");
       sections.push(`**Pré-requisitos:**\n${prerequisiteTexts}`);
     }
 
-    // 10. Cláusulas (se houver)
+    // 12. Cláusulas (se houver)
     if (clauses.length > 0) {
       const clauseTexts = clauses.map((c) => `• ${c}`).join("\n");
       sections.push(`**Cláusulas:**\n${clauseTexts}`);
     }
 
-    // 11. Tipo de pagamento
+    // 13. Tipo de pagamento
     const paymentText = this.getPaymentTypeDescription(paymentType);
     sections.push(`**Forma de pagamento:** ${paymentText}`);
 
@@ -1561,6 +1625,471 @@ export class ContractGenerator {
         return "Pagamento total na guilda + serviços do contratante";
       default:
         return "Pagamento a definir";
+    }
+  }
+
+  // ===== GERAÇÃO DE ALIADOS =====
+
+  /**
+   * Gera aliados que podem aparecer durante o contrato
+   * Baseado nas regras da seção "Aliados"
+   */
+  private static generateAllies(): Ally[] {
+    const allies: Ally[] = [];
+
+    // 1. Verificar se aliados aparecerão (1d20, 11-20 = Sim)
+    const willAlliesAppear = rollOnTable(
+      ALLY_APPEARANCE_CHANCE_TABLE,
+      [],
+      "Aparição de Aliados"
+    );
+
+    if (!willAlliesAppear.result) {
+      return allies; // Nenhum aliado aparecerá
+    }
+
+    // 2. Determinar o tipo de aliado (1d20)
+    const allyTypeResult = rollOnTable(ALLY_TYPES_TABLE, [], "Tipo de Aliado");
+    const allyCategory = this.mapStringToAllyCategory(
+      allyTypeResult.result as string
+    );
+
+    // 3. Determinar quando/como o aliado surgirá (1d20)
+    const timingResult = rollOnTable(
+      ALLY_APPEARANCE_TIMING_TABLE,
+      [],
+      "Tempo de Aparição"
+    );
+    const allyTiming = this.mapStringToAllyTiming(
+      timingResult.result as string
+    );
+
+    // 4. Gerar detalhes específicos do aliado
+    const allyDetails = this.generateAllyDetails(allyCategory);
+
+    // 5. Criar o objeto do aliado
+    const ally: Ally = {
+      category: allyCategory,
+      specificType: allyDetails.specificType,
+      name: allyDetails.name,
+      description: allyDetails.description,
+      timing: allyTiming,
+      powerLevel: allyDetails.powerLevel,
+      characteristics: allyDetails.characteristics,
+    };
+
+    allies.push(ally);
+
+    // Verificar se precisa rolar duas vezes (resultado 20 nas tabelas)
+    if (
+      allyTypeResult.result === "Role duas vezes e use ambos" ||
+      timingResult.result === "Role duas vezes e use ambos"
+    ) {
+      // Gerar segundo aliado
+      const secondAlly = this.generateSingleAlly();
+      if (secondAlly) {
+        allies.push(secondAlly);
+      }
+    }
+
+    return allies;
+  }
+
+  /**
+   * Gera um único aliado (usado para rolagens duplas)
+   */
+  private static generateSingleAlly(): Ally | null {
+    const allyTypeResult = rollOnTable(
+      ALLY_TYPES_TABLE,
+      [],
+      "Tipo de Aliado Individual"
+    );
+
+    // Evitar loops infinitos em rolagens duplas
+    if (allyTypeResult.result === "Role duas vezes e use ambos") {
+      return null;
+    }
+
+    const allyCategory = this.mapStringToAllyCategory(
+      allyTypeResult.result as string
+    );
+    const timingResult = rollOnTable(
+      ALLY_APPEARANCE_TIMING_TABLE,
+      [],
+      "Tempo de Aparição Individual"
+    );
+    const allyTiming = this.mapStringToAllyTiming(
+      timingResult.result as string
+    );
+    const allyDetails = this.generateAllyDetails(allyCategory);
+
+    return {
+      category: allyCategory,
+      specificType: allyDetails.specificType,
+      name: allyDetails.name,
+      description: allyDetails.description,
+      timing: allyTiming,
+      powerLevel: allyDetails.powerLevel,
+      characteristics: allyDetails.characteristics,
+    };
+  }
+
+  /**
+   * Gera detalhes específicos baseados na categoria do aliado
+   */
+  private static generateAllyDetails(category: AllyCategory): {
+    specificType: string;
+    name: string;
+    description: string;
+    powerLevel?: number;
+    characteristics?: string[];
+  } {
+    let specificType = "";
+    let name = "";
+    let description = "";
+    let powerLevel: number | undefined;
+    let characteristics: string[] | undefined;
+
+    switch (category) {
+      case AllyCategory.ARTEFATO: {
+        const artifactResult = rollOnTable(
+          ALLY_ARTIFACT_TABLE,
+          [],
+          "Artefato Aliado"
+        );
+        specificType = artifactResult.result as string;
+        name = `Artefato: ${specificType}`;
+        description = `Um ${specificType.toLowerCase()} que pode auxiliar na missão.`;
+        break;
+      }
+
+      case AllyCategory.CRIATURA_PODEROSA: {
+        const creatureResult = rollOnTable(
+          ALLY_POWERFUL_CREATURE_TABLE,
+          [],
+          "Criatura Poderosa"
+        );
+        specificType = creatureResult.result as string;
+        name = specificType;
+        description = `${specificType} que se oferece para ajudar na missão.`;
+        break;
+      }
+
+      case AllyCategory.INESPERADO: {
+        const unexpectedResult = rollOnTable(
+          ALLY_UNEXPECTED_TABLE,
+          [],
+          "Aliado Inesperado"
+        );
+        specificType = unexpectedResult.result as string;
+        name = specificType;
+        description = `${specificType} que aparece de forma inesperada.`;
+        break;
+      }
+
+      case AllyCategory.AJUDA_SOBRENATURAL: {
+        const supernaturalResult = rollOnTable(
+          ALLY_SUPERNATURAL_HELP_TABLE,
+          [],
+          "Ajuda Sobrenatural"
+        );
+        specificType = supernaturalResult.result as string;
+        name = specificType;
+        description = `${specificType} oferece assistência sobrenatural.`;
+        break;
+      }
+
+      case AllyCategory.CIVIS_ORDINARIOS: {
+        const civilianResult = rollOnTable(
+          ALLY_ORDINARY_CIVILIANS_TABLE,
+          [],
+          "Civis Ordinários"
+        );
+        specificType = civilianResult.result as string;
+        name = specificType;
+        description = `${specificType} que decide ajudar na missão.`;
+        break;
+      }
+
+      case AllyCategory.NATUREZA: {
+        const natureResult = rollOnTable(
+          ALLY_NATURE_TABLE,
+          [],
+          "Natureza Aliada"
+        );
+        specificType = natureResult.result as string;
+        name = specificType;
+        description = `${specificType} oferece auxílio natural.`;
+        break;
+      }
+
+      case AllyCategory.ORGANIZACAO: {
+        const orgResult = rollOnTable(
+          ALLY_ORGANIZATIONS_TABLE,
+          [],
+          "Organização Aliada"
+        );
+        specificType = orgResult.result as string;
+        name = specificType;
+        description = `${specificType} oferece suporte organizacional.`;
+        break;
+      }
+
+      case AllyCategory.REFUGIO: {
+        const refugeResult = rollOnTable(ALLY_REFUGE_TABLE, [], "Refúgio");
+        specificType = refugeResult.result as string;
+        name = specificType;
+        description = `${specificType} serve como refúgio seguro.`;
+        break;
+      }
+
+      case AllyCategory.AVENTUREIROS: {
+        const adventurerResult = rollOnTable(
+          ALLY_ADVENTURERS_TABLE,
+          [],
+          "Aventureiro Aliado"
+        );
+        specificType = adventurerResult.result as string;
+        name = specificType;
+
+        // Determinar nível do aventureiro
+        const levelResult = rollOnTable(
+          ALLY_ADVENTURER_LEVEL_TABLE,
+          [],
+          "Nível do Aventureiro"
+        );
+        const levelString = levelResult.result as string;
+        powerLevel = parseInt(levelString.replace("NA ", ""));
+
+        description = `${specificType} (${levelString}) que se junta à missão.`;
+        break;
+      }
+
+      case AllyCategory.MONSTRUOSIDADE_AMIGAVEL: {
+        const monstrosityResult = rollOnTable(
+          ALLY_FRIENDLY_MONSTROSITY_TABLE,
+          [],
+          "Monstruosidade Amigável"
+        );
+        specificType = monstrosityResult.result as string;
+        name = specificType;
+
+        // Determinar características da monstruosidade
+        const charResult = rollOnTable(
+          ALLY_MONSTROSITY_CHARACTERISTICS_TABLE,
+          [],
+          "Características da Monstruosidade"
+        );
+        characteristics = [charResult.result as string];
+
+        description = `${specificType} ${characteristics[0].toLowerCase()} que oferece ajuda.`;
+        break;
+      }
+
+      default:
+        specificType = "Aliado genérico";
+        name = "Aliado";
+        description = "Um aliado inesperado surge para ajudar.";
+    }
+
+    return { specificType, name, description, powerLevel, characteristics };
+  }
+
+  /**
+   * Mapeia string para AllyCategory enum
+   */
+  private static mapStringToAllyCategory(categoryStr: string): AllyCategory {
+    switch (categoryStr) {
+      case "Artefato":
+        return AllyCategory.ARTEFATO;
+      case "Criatura poderosa":
+        return AllyCategory.CRIATURA_PODEROSA;
+      case "Inesperado":
+        return AllyCategory.INESPERADO;
+      case "Ajuda sobrenatural":
+        return AllyCategory.AJUDA_SOBRENATURAL;
+      case "Civis ordinários":
+        return AllyCategory.CIVIS_ORDINARIOS;
+      case "Natureza":
+        return AllyCategory.NATUREZA;
+      case "Organização":
+        return AllyCategory.ORGANIZACAO;
+      case "Refúgio":
+        return AllyCategory.REFUGIO;
+      case "Aventureiros":
+        return AllyCategory.AVENTUREIROS;
+      case "Monstruosidade amigável":
+        return AllyCategory.MONSTRUOSIDADE_AMIGAVEL;
+      default:
+        return AllyCategory.CIVIS_ORDINARIOS;
+    }
+  }
+
+  /**
+   * Mapeia string para AllyTiming enum
+   */
+  private static mapStringToAllyTiming(timingStr: string): AllyTiming {
+    switch (timingStr) {
+      case "Correndo perigo":
+        return AllyTiming.CORRENDO_PERIGO;
+      case "De um jeito constrangedor":
+        return AllyTiming.JEITO_CONSTRANGEDOR;
+      case "De maneira comum e pacata":
+        return AllyTiming.MANEIRA_COMUM;
+      case "Pedindo ajuda durante um descanso":
+        return AllyTiming.PEDINDO_AJUDA_DESCANSO;
+      case "Ainda no assentamento":
+        return AllyTiming.AINDA_ASSENTAMENTO;
+      case "Já estará lidando com a complicação":
+        return AllyTiming.LIDANDO_COMPLICACAO;
+      case "1d4 dias após o começo do contrato":
+        return AllyTiming.UM_D4_DIAS_APOS;
+      case "2d4 dias após o começo do contrato":
+        return AllyTiming.DOIS_D4_DIAS_APOS;
+      case "Magicamente invocado":
+        return AllyTiming.MAGICAMENTE_INVOCADO;
+      case "Para salvar o dia":
+        return AllyTiming.PARA_SALVAR_DIA;
+      default:
+        return AllyTiming.MANEIRA_COMUM;
+    }
+  }
+
+  // ===== GERAÇÃO DE CONSEQUÊNCIAS SEVERAS =====
+
+  /**
+   * Gera consequências severas que podem ocorrer se o contrato falhar
+   * Baseado nas regras da seção "Chance de Consequências Severas"
+   */
+  private static generateSevereConsequences(): SevereConsequence[] {
+    const consequences: SevereConsequence[] = [];
+
+    // 1. Verificar se haverá consequências severas (1d20, 1-2 = Sim)
+    const willHaveConsequences = rollOnTable(
+      SEVERE_CONSEQUENCES_CHANCE_TABLE,
+      [],
+      "Chance de Consequências Severas"
+    );
+
+    if (!willHaveConsequences.result) {
+      return consequences; // Nenhuma consequência severa
+    }
+
+    // 2. Determinar o tipo de consequência severa (1d20)
+    const typeResult = rollOnTable(
+      SEVERE_CONSEQUENCES_TYPES_TABLE,
+      [],
+      "Tipo de Consequência Severa"
+    );
+    const consequenceCategory = typeResult.result as SevereConsequenceCategory;
+
+    // 3. Gerar detalhes específicos da consequência
+    const detailTable = SEVERE_CONSEQUENCE_DETAIL_TABLES[consequenceCategory];
+    if (detailTable) {
+      const detailResult = rollOnTable(
+        detailTable,
+        [],
+        "Detalhamento da Consequência"
+      );
+      const specificConsequence = detailResult.result as string;
+
+      // 4. Criar o objeto da consequência
+      const consequence: SevereConsequence = {
+        category: consequenceCategory,
+        specificConsequence,
+        description: this.generateConsequenceDescription(
+          consequenceCategory,
+          specificConsequence
+        ),
+        affectsContractors: this.generateContractorConsequenceDescription(
+          consequenceCategory,
+          specificConsequence
+        ),
+      };
+
+      consequences.push(consequence);
+
+      // Verificar se precisa rolar duas vezes (resultado "Role duas vezes e use ambos")
+      if (specificConsequence === "Role duas vezes e use ambos") {
+        const secondConsequence = this.generateSingleSevereConsequence();
+        if (secondConsequence) {
+          consequences.push(secondConsequence);
+        }
+      }
+    }
+
+    return consequences;
+  }
+
+  /**
+   * Gera uma única consequência severa (usado para rolagens duplas)
+   */
+  private static generateSingleSevereConsequence(): SevereConsequence | null {
+    const typeResult = rollOnTable(
+      SEVERE_CONSEQUENCES_TYPES_TABLE,
+      [],
+      "Tipo de Consequência Severa"
+    );
+    const consequenceCategory = typeResult.result as SevereConsequenceCategory;
+
+    const detailTable = SEVERE_CONSEQUENCE_DETAIL_TABLES[consequenceCategory];
+    if (!detailTable) return null;
+
+    const detailResult = rollOnTable(
+      detailTable,
+      [],
+      "Detalhamento da Consequência"
+    );
+    const specificConsequence = detailResult.result as string;
+
+    // Evitar loops infinitos
+    if (specificConsequence === "Role duas vezes e use ambos") {
+      return null;
+    }
+
+    return {
+      category: consequenceCategory,
+      specificConsequence,
+      description: this.generateConsequenceDescription(
+        consequenceCategory,
+        specificConsequence
+      ),
+      affectsContractors: this.generateContractorConsequenceDescription(
+        consequenceCategory,
+        specificConsequence
+      ),
+    };
+  }
+
+  /**
+   * Gera descrição da consequência severa
+   */
+  private static generateConsequenceDescription(
+    category: SevereConsequenceCategory,
+    specific: string
+  ): string {
+    const categoryName = category.toLowerCase();
+    return `Em caso de falha no contrato, pode ocorrer: ${categoryName} - ${specific}`;
+  }
+
+  /**
+   * Verifica se a consequência afeta os contratados e gera descrição apropriada
+   */
+  private static generateContractorConsequenceDescription(
+    category: SevereConsequenceCategory,
+    specific: string
+  ): string {
+    // Baseado nas regras do markdown, gerar uma descrição do que acontece com os contratados
+    const affectsContractors =
+      category === SevereConsequenceCategory.MORTE_IMPORTANTES ||
+      category === SevereConsequenceCategory.PERSEGUICAO ||
+      specific.toLowerCase().includes("contratado") ||
+      specific.toLowerCase().includes("morte");
+
+    if (affectsContractors) {
+      return "Os contratados podem ser diretamente afetados por esta consequência";
+    } else {
+      return "A consequência afeta primariamente o ambiente ou região do contrato";
     }
   }
 }

@@ -169,6 +169,12 @@ export interface Contract {
   // Reviravoltas
   twists: Twist[];
 
+  // Aliados que podem surgir durante o contrato
+  allies: Ally[];
+
+  // Consequências severas por falha
+  severeConsequences: SevereConsequence[];
+
   // Datas importantes
   createdAt: Date;
   expiresAt?: Date;
@@ -248,6 +254,8 @@ export const ContractSchema = z.object({
   antagonist: z.lazy(() => AntagonistSchema),
   complications: z.array(z.lazy(() => ComplicationSchema)),
   twists: z.array(z.lazy(() => TwistSchema)),
+  allies: z.array(z.lazy(() => AllySchema)),
+  severeConsequences: z.array(z.lazy(() => SevereConsequenceSchema)),
   createdAt: z.date(),
   expiresAt: z.date().optional(),
   completedAt: z.date().optional(),
