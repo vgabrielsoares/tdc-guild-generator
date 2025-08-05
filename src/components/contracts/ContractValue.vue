@@ -46,82 +46,247 @@
       </div>
     </div>
 
-    <!-- Tooltip com detalhes completos -->
-    <div v-if="showTooltip" class="value-tooltip">
-      <div class="tooltip-section">
-        <h4 class="tooltip-title">Valores do Contrato</h4>
-        
-        <div class="tooltip-item">
-          <span class="tooltip-label">Valor Base (1d100):</span>
-          <span class="tooltip-value">{{ value.baseValue }}</span>
-        </div>
-        
-        <div class="tooltip-item">
-          <span class="tooltip-label">Experiência (XP):</span>
-          <span class="tooltip-value">{{ formattedExperienceValue }}</span>
-        </div>
-        
-        <div class="tooltip-item">
-          <span class="tooltip-label">Recompensa (pontos):</span>
-          <span class="tooltip-value">{{ formattedRewardValue }}</span>
-        </div>
-        
-        <div class="tooltip-item">
-          <span class="tooltip-label">Pagamento final:</span>
-          <span class="tooltip-value font-bold">{{ formattedGoldValue }} PO$</span>
-        </div>
-      </div>
+    <!-- Tooltip com detalhes dos valores -->
+    <div v-if="props.value && enableTooltip" class="relative">
+      <transition
+        enter-active-class="transition duration-200 ease-out"
+        enter-from-class="transform scale-95 opacity-0"
+        enter-to-class="transform scale-100 opacity-100"
+        leave-active-class="transition duration-75 ease-in"
+        leave-from-class="transform scale-100 opacity-100"
+        leave-to-class="transform scale-95 opacity-0"
+      >
+        <div
+          v-show="isTooltipVisible"
+          class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-50 bg-slate-900 text-white text-sm rounded-lg p-4 shadow-xl border border-slate-700 min-w-[320px] max-w-[450px]"
+        >
+          <!-- Seta do tooltip -->
+          <div
+            class="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-slate-900"
+          ></div>
 
-      <div v-if="hasModifiers" class="tooltip-section">
-        <h4 class="tooltip-title">Modificadores</h4>
-        
-        <div v-if="value.modifiers.distance !== 0" class="tooltip-item">
-          <span class="tooltip-label">Distância:</span>
-          <span :class="getModifierClass(value.modifiers.distance)">
-            {{ formatModifier(value.modifiers.distance) }}
-          </span>
-        </div>
-        
-        <div v-if="value.modifiers.populationRelationValue !== 0" class="tooltip-item">
-          <span class="tooltip-label">Relação População:</span>
-          <span :class="getModifierClass(value.modifiers.populationRelationValue)">
-            {{ formatModifier(value.modifiers.populationRelationValue) }}
-          </span>
-        </div>
-        
-        <div v-if="value.modifiers.governmentRelationValue !== 0" class="tooltip-item">
-          <span class="tooltip-label">Relação Governo:</span>
-          <span :class="getModifierClass(value.modifiers.governmentRelationValue)">
-            {{ formatModifier(value.modifiers.governmentRelationValue) }}
-          </span>
-        </div>
-        
-        <div v-if="value.modifiers.staffPreparation !== 0" class="tooltip-item">
-          <span class="tooltip-label">Funcionários:</span>
-          <span :class="getModifierClass(value.modifiers.staffPreparation)">
-            {{ formatModifier(value.modifiers.staffPreparation) }}
-          </span>
-        </div>
-        
-        <div v-if="value.modifiers.requirementsAndClauses > 0" class="tooltip-item">
-          <span class="tooltip-label">Pré-req./Cláusulas:</span>
-          <span class="text-green-300">
-            +{{ value.modifiers.requirementsAndClauses }}
-          </span>
-        </div>
-      </div>
+          <!-- Conteúdo do tooltip -->
+          <div class="space-y-3">
+            <!-- Valor base -->
+            <div
+              class="flex justify-between items-center border-b border-slate-600 pb-2"
+            >
+              <span class="text-slate-300">Valor Base (1d100):</span>
+              <span class="font-mono text-blue-300">{{
+                props.value.baseValue
+              }}</span>
+            </div>
 
-      <div v-if="hasDifficultyMultipliers" class="tooltip-section">
-        <h4 class="tooltip-title">Multiplicadores de Dificuldade</h4>
-        
-        <div class="tooltip-item">
-          <span class="tooltip-label">Mult. Experiência:</span>
-          <span class="tooltip-value">×{{ value.modifiers.difficultyMultiplier.experienceMultiplier }}</span>
-        </div>
-        
-        <div class="tooltip-item">
-          <span class="tooltip-label">Mult. Recompensa:</span>
-          <span class="tooltip-value">×{{ value.modifiers.difficultyMultiplier.rewardMultiplier }}</span>
+            <!-- Modificadores aplicados às rolagens -->
+            <div class="space-y-3">
+              <!-- Modificadores para rolagem de Valor XP -->
+              <div>
+                <div
+                  class="text-purple-300 text-xs font-semibold uppercase tracking-wide border-b border-purple-700 pb-1"
+                >
+                  Modificadores na Rolagem XP:
+                </div>
+
+                <div class="space-y-1 mt-2">
+                  <template
+                    v-for="modifier in xpModifiers"
+                    :key="'xp-' + modifier.key"
+                  >
+                    <div class="flex justify-between items-center">
+                      <span class="text-slate-400 text-xs"
+                        >{{ modifier.label }}:</span
+                      >
+                      <span
+                        class="font-mono text-xs"
+                        :class="[
+                          modifier.value > 0
+                            ? 'text-green-400'
+                            : modifier.value < 0
+                              ? 'text-red-400'
+                              : 'text-slate-400',
+                        ]"
+                      >
+                        {{ modifier.value > 0 ? "+" : "" }}{{ modifier.value }}
+                      </span>
+                    </div>
+                  </template>
+
+                  <!-- Total Modificadores XP -->
+                  <div
+                    class="flex justify-between items-center border-t border-purple-700 pt-1 mt-2"
+                  >
+                    <span class="text-purple-300 text-xs font-semibold"
+                      >Total de Modificadores:</span
+                    >
+                    <span
+                      class="font-mono text-xs font-semibold"
+                      :class="[
+                        totalXpModifiers > 0
+                          ? 'text-green-400'
+                          : totalXpModifiers < 0
+                            ? 'text-red-400'
+                            : 'text-slate-400',
+                      ]"
+                    >
+                      {{ totalXpModifiers > 0 ? "+" : ""
+                      }}{{ totalXpModifiers }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Modificadores para rolagem de Recompensa -->
+              <div>
+                <div
+                  class="text-yellow-300 text-xs font-semibold uppercase tracking-wide border-b border-yellow-700 pb-1"
+                >
+                  Modificadores na Rolagem Recompensa:
+                </div>
+
+                <div class="space-y-1 mt-2">
+                  <template
+                    v-for="modifier in rewardModifiers"
+                    :key="'reward-' + modifier.key"
+                  >
+                    <div class="flex justify-between items-center">
+                      <span class="text-slate-400 text-xs"
+                        >{{ modifier.label }}:</span
+                      >
+                      <span
+                        class="font-mono text-xs"
+                        :class="[
+                          modifier.value > 0
+                            ? 'text-green-400'
+                            : modifier.value < 0
+                              ? 'text-red-400'
+                              : 'text-slate-400',
+                        ]"
+                      >
+                        {{ modifier.value > 0 ? "+" : "" }}{{ modifier.value }}
+                      </span>
+                    </div>
+                  </template>
+
+                  <!-- Total Modificadores Recompensa -->
+                  <div
+                    class="flex justify-between items-center border-t border-yellow-700 pt-1 mt-2"
+                  >
+                    <span class="text-yellow-300 text-xs font-semibold"
+                      >Total de Modificadores:</span
+                    >
+                    <span
+                      class="font-mono text-xs font-semibold"
+                      :class="[
+                        totalRewardModifiers > 0
+                          ? 'text-green-400'
+                          : totalRewardModifiers < 0
+                            ? 'text-red-400'
+                            : 'text-slate-400',
+                      ]"
+                    >
+                      {{ totalRewardModifiers > 0 ? "+" : ""
+                      }}{{ totalRewardModifiers }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Valores finais com explicação do cálculo -->
+            <div class="space-y-2 border-t border-slate-600 pt-2">
+              <div
+                class="text-slate-300 text-xs font-semibold uppercase tracking-wide"
+              >
+                Cálculo Final:
+              </div>
+
+              <!-- Processo de cálculo -->
+              <div class="text-xs text-slate-400 space-y-1">
+                <div class="flex justify-between">
+                  <span>Valor Base (1d100):</span>
+                  <span class="font-mono">{{ props.value.baseValue }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>+ Modificadores aplicados</span>
+                  <span class="font-mono">→ Rolagem modificada</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>= Valor da tabela</span>
+                  <span class="font-mono">→ Consulta tabela</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>× Multiplicador dificuldade</span>
+                  <span class="font-mono">→ Valor final</span>
+                </div>
+              </div>
+
+              <!-- Separador -->
+              <div class="border-t border-slate-700 pt-2"></div>
+
+              <!-- Valores finais -->
+              <div class="space-y-1">
+                <div class="flex justify-between items-center">
+                  <span class="text-purple-300">Valor XP:</span>
+                  <span class="font-mono text-purple-300 font-semibold">
+                    {{ props.value.experienceValue }}
+                  </span>
+                </div>
+
+                <div class="flex justify-between items-center">
+                  <span class="text-yellow-300">Recompensa:</span>
+                  <span class="font-mono text-yellow-300 font-semibold">
+                    {{ props.value.rewardValue }} pts
+                  </span>
+                </div>
+
+                <div class="flex justify-between items-center">
+                  <span class="text-amber-300">Ouro Final:</span>
+                  <span class="font-mono text-amber-300 font-semibold">
+                    {{ props.value.finalGoldReward }} PO$
+                  </span>
+                </div>
+
+                <div class="text-xs text-slate-500 mt-1">
+                  * Ouro = Recompensa ÷ 10
+                </div>
+              </div>
+            </div>
+
+            <!-- Multiplicadores de dificuldade -->
+            <div
+              v-if="
+                props.value.modifiers.difficultyMultiplier
+                  .experienceMultiplier > 1 ||
+                props.value.modifiers.difficultyMultiplier.rewardMultiplier > 1
+              "
+              class="space-y-1 border-t border-slate-600 pt-2"
+            >
+              <div
+                class="text-slate-300 text-xs font-semibold uppercase tracking-wide"
+              >
+                Multiplicadores de Dificuldade:
+              </div>
+
+              <div class="flex justify-between items-center">
+                <span class="text-purple-300 text-xs">XP:</span>
+                <span class="font-mono text-purple-300 text-xs">
+                  x{{
+                    props.value.modifiers.difficultyMultiplier
+                      .experienceMultiplier
+                  }}
+                </span>
+              </div>
+
+              <div class="flex justify-between items-center">
+                <span class="text-yellow-300 text-xs">Recompensa:</span>
+                <span class="font-mono text-yellow-300 text-xs">
+                  x{{
+                    props.value.modifiers.difficultyMultiplier.rewardMultiplier
+                  }}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -263,6 +428,123 @@ const modifierClasses = computed(() => {
   return getModifierClass(total);
 });
 
+// Separar modificadores por categoria (XP vs Recompensa)
+const xpModifiers = computed(() => {
+  if (!props.value?.modifiers) return [];
+
+  const modifiers = props.value.modifiers;
+  const result = [];
+
+  // Distância afeta ambos (XP e Recompensa)
+  if (modifiers.distance !== 0) {
+    result.push({
+      key: "distance",
+      label: "Distância",
+      value: modifiers.distance,
+    });
+  }
+
+  // Relação com população afeta valor de XP
+  if (modifiers.populationRelationValue !== 0) {
+    result.push({
+      key: "populationValue",
+      label: "Relação Pop.",
+      value: modifiers.populationRelationValue,
+    });
+  }
+
+  // Relação com governo afeta valor de XP
+  if (modifiers.governmentRelationValue !== 0) {
+    result.push({
+      key: "governmentValue",
+      label: "Relação Gov.",
+      value: modifiers.governmentRelationValue,
+    });
+  }
+
+  return result;
+});
+
+const rewardModifiers = computed(() => {
+  if (!props.value?.modifiers) return [];
+
+  const modifiers = props.value.modifiers;
+  const result = [];
+
+  // Distância afeta ambos (XP e Recompensa)
+  if (modifiers.distance !== 0) {
+    result.push({
+      key: "distance",
+      label: "Distância",
+      value: modifiers.distance,
+    });
+  }
+
+  // Relação com população afeta recompensa
+  if (modifiers.populationRelationReward !== 0) {
+    result.push({
+      key: "populationReward",
+      label: "Relação Pop.",
+      value: modifiers.populationRelationReward,
+    });
+  }
+
+  // Relação com governo afeta recompensa
+  if (modifiers.governmentRelationReward !== 0) {
+    result.push({
+      key: "governmentReward",
+      label: "Relação Gov.",
+      value: modifiers.governmentRelationReward,
+    });
+  }
+
+  // Funcionários afetam apenas recompensa
+  if (modifiers.staffPreparation !== 0) {
+    result.push({
+      key: "staffPreparation",
+      label: "Prep. Funcionários",
+      value: modifiers.staffPreparation,
+    });
+  }
+
+  // Pré-requisitos e cláusulas afetam a rolagem de recompensa
+  if (modifiers.requirementsAndClauses !== 0) {
+    result.push({
+      key: "requirements",
+      label: "Pré-req. & Cláusulas",
+      value: modifiers.requirementsAndClauses,
+    });
+  }
+
+  return result;
+});
+
+const totalXpModifiers = computed(() => {
+  if (!props.value?.modifiers) return 0;
+
+  const modifiers = props.value.modifiers;
+  // Para XP: distância + relações de população/governo + pré-requisitos
+  return (
+    modifiers.distance +
+    modifiers.populationRelationValue +
+    modifiers.governmentRelationValue
+  );
+});
+
+const totalRewardModifiers = computed(() => {
+  if (!props.value?.modifiers) return 0;
+
+  const modifiers = props.value.modifiers;
+  // Para Recompensa: distância + relações + funcionários + pré-requisitos
+  return (
+    modifiers.distance +
+    modifiers.populationRelationReward +
+    modifiers.governmentRelationReward +
+    modifiers.staffPreparation +
+    modifiers.requirementsAndClauses
+  );
+});
+
 const paymentTypeShort = computed(() => {
   if (!props.paymentType) return '';
   
@@ -286,6 +568,16 @@ const paymentTypeShort = computed(() => {
 
 // ===== METHODS =====
 
+function onMouseEnter() {
+  if (enableTooltip.value) {
+    isTooltipVisible.value = true;
+  }
+}
+
+function onMouseLeave() {
+  isTooltipVisible.value = false;
+}
+
 function formatModifier(value: number): string {
   return value >= 0 ? `+${value}` : value.toString();
 }
@@ -300,6 +592,7 @@ function getModifierClass(value: number): string {
 <style scoped>
 .contract-value {
   color: rgb(229, 231, 235);
+  cursor: help;
 }
 
 .value-main {
