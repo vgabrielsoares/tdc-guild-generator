@@ -65,6 +65,25 @@
           </p>
         </div>
       </div>
+
+      <!-- Indicadores especiais -->
+      <div v-if="hasSpecialFeatures" class="flex items-center gap-2 pt-2 border-t border-gray-700">
+        <!-- Indicador de aliados -->
+        <div v-if="contract.allies?.length" 
+             class="flex items-center gap-1 bg-green-900/30 px-2 py-1 rounded-full text-xs text-green-300"
+             title="Aliados disponíveis">
+          <UserPlusIcon class="w-3 h-3" />
+          <span>{{ contract.allies.length }} aliado{{ contract.allies.length > 1 ? 's' : '' }}</span>
+        </div>
+
+        <!-- Indicador de consequências severas -->
+        <div v-if="contract.severeConsequences?.length" 
+             class="flex items-center gap-1 bg-red-900/30 px-2 py-1 rounded-full text-xs text-red-300"
+             title="Consequências por falha">
+          <ShieldExclamationIcon class="w-3 h-3" />
+          <span>Consequências severas</span>
+        </div>
+      </div>
     </div>
 
     <!-- Footer com ações -->
@@ -124,7 +143,9 @@ import {
   BuildingOfficeIcon, 
   QuestionMarkCircleIcon,
   MapPinIcon,
-  XMarkIcon
+  XMarkIcon,
+  UserPlusIcon,
+  ShieldExclamationIcon
 } from '@heroicons/vue/24/outline';
 
 interface Props {
@@ -185,6 +206,11 @@ const isDangerous = computed(() => {
   return [ContractDifficulty.DIFICIL, ContractDifficulty.MORTAL].includes(
     props.contract.difficulty
   );
+});
+
+const hasSpecialFeatures = computed(() => {
+  return (props.contract.allies?.length || 0) > 0 || 
+         (props.contract.severeConsequences?.length || 0) > 0;
 });
 
 const canAccept = computed(() => {
