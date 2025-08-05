@@ -136,6 +136,8 @@ describe("Contract Types - Issue 4.1", () => {
       },
       complications: [],
       twists: [],
+      allies: [],
+      severeConsequences: [],
       createdAt: new Date(),
       generationData: {
         baseRoll: 50,
@@ -270,6 +272,8 @@ describe("Contract Types - Issue 4.1", () => {
         },
         complications: [],
         twists: [],
+        allies: [],
+        severeConsequences: [],
         createdAt: new Date(),
         expiresAt: new Date(Date.now() - 86400000), // 1 dia atrás
         generationData: {
