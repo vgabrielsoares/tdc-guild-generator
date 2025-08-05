@@ -853,59 +853,51 @@ export class ContractGenerator {
    * Gera objetivo principal e especificações
    */
   private static generateObjective(): ContractObjective {
-    // 1. Rolar objetivo principal (1d20)
-    const objectiveResult = rollOnTable(
-      MAIN_OBJECTIVE_TABLE,
-      [],
-      "Objetivo Principal"
-    );
+    // 1. Primeira rolagem para objetivo principal
+    const firstRoll = rollOnTable(MAIN_OBJECTIVE_TABLE, [], "Objetivos Principais");
 
-    // 2. Verificar se deve rolar duas vezes
-    if (shouldRollTwiceForObjective(objectiveResult.result)) {
-      // Gerar dois objetivos separados
-      const firstObjective = this.generateSingleObjective();
-      const secondObjective = this.generateSingleObjective();
+    // 2. Verificar se é "Role duas vezes e use ambos"
+    if (shouldRollTwiceForObjective(firstRoll.result)) {
+      // Rolar duas vezes para obter dois objetivos diferentes
+      let firstObjectiveRoll = rollOnTable(MAIN_OBJECTIVE_TABLE, [], "Objetivos Principais");
+      let secondObjectiveRoll = rollOnTable(MAIN_OBJECTIVE_TABLE, [], "Objetivos Principais");
+
+      // Garantir que não são iguais e que não são "Role duas vezes" novamente
+      let attempts = 0;
+      while (
+        (firstObjectiveRoll.result.description === secondObjectiveRoll.result.description ||
+         shouldRollTwiceForObjective(firstObjectiveRoll.result) ||
+         shouldRollTwiceForObjective(secondObjectiveRoll.result)) &&
+        attempts < 20
+      ) {
+        firstObjectiveRoll = rollOnTable(MAIN_OBJECTIVE_TABLE, [], "Objetivos Principais");
+        secondObjectiveRoll = rollOnTable(MAIN_OBJECTIVE_TABLE, [], "Objetivos Principais");
+        attempts++;
+      }
+
+      const firstObjective = firstObjectiveRoll.result;
+      const secondObjective = secondObjectiveRoll.result;
+
+      // Gerar especificações para ambos os objetivos
+      const firstSpec = this.generateObjectiveSpecification(firstObjective.category);
+      const secondSpec = this.generateObjectiveSpecification(secondObjective.category);
 
       return {
         category: firstObjective.category,
-        description: `${firstObjective.description} Além disso, ${secondObjective.description}`,
-        specificObjective: `${firstObjective.specificObjective} e ${secondObjective.specificObjective}`,
+        description: `${firstObjective.description}. Além disso, ${secondObjective.description.toLowerCase()}`,
+        specificObjective: `${firstSpec.target} e ${secondSpec.target}`,
       };
     }
 
-    // 3. Gerar especificação baseada na categoria
-    const specification = this.generateObjectiveSpecification(
-      objectiveResult.result.category
-    );
+    // 3. Objetivo único - usar o resultado da primeira rolagem
+    const objectiveEntry = firstRoll.result;
+
+    // 4. Gerar especificação baseada na categoria
+    const specification = this.generateObjectiveSpecification(objectiveEntry.category);
 
     return {
-      category: objectiveResult.result.category,
-      description: objectiveResult.result.description,
-      specificObjective: specification.target,
-    };
-  }
-
-  /**
-   * Gera um objetivo individual para casos de "role duas vezes"
-   */
-  private static generateSingleObjective(): ContractObjective {
-    let objectiveResult;
-    do {
-      objectiveResult = rollOnTable(
-        MAIN_OBJECTIVE_TABLE,
-        [],
-        "Objetivo Principal"
-      );
-      // Evitar recursão infinita - se der "role duas vezes", rolar novamente
-    } while (objectiveResult.result.name === "Role duas vezes e use ambos");
-
-    const specification = this.generateObjectiveSpecification(
-      objectiveResult.result.category
-    );
-
-    return {
-      category: objectiveResult.result.category,
-      description: objectiveResult.result.description,
+      category: objectiveEntry.category,
+      description: objectiveEntry.description,
       specificObjective: specification.target,
     };
   }
@@ -927,8 +919,8 @@ export class ContractGenerator {
       const secondSpec = this.generateSingleSpecification(category);
 
       return {
-        target: `${firstSpec.target} e ${secondSpec.target}`,
-        description: `${firstSpec.description} Além disso, ${secondSpec.description}`,
+        target: `${firstSpec.target}, além disso ${secondSpec.target.toLowerCase()}`,
+        description: `${firstSpec.description}. Além disso, ${secondSpec.description.toLowerCase()}`,
       };
     }
 
