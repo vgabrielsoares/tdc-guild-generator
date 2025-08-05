@@ -48,67 +48,47 @@ describe("Contract Value Modifiers - Fixed Roll Logic", () => {
   describe("Lógica de aplicação de modificadores", () => {
     it("deve aplicar modificadores à rolagem, não aos valores finais", () => {
       const mockRollDice = vi.mocked(rollDice);
-      let rollCount = 0;
 
-      mockRollDice.mockImplementation(({ notation }) => {
-        rollCount++;
-
-        if (notation === "1d100") {
-          // Rolagem base do valor do contrato
-          return {
-            result: 40,
-            notation,
-            individual: [40],
-            modifier: 0,
-            timestamp: new Date(),
-          };
-        }
-
-        if (notation === "1d20") {
-          if (rollCount === 2) {
-            // Primeira rolagem d20: distância = 12 (modificador 0)
-            return {
-              result: 12,
-              notation,
-              individual: [12],
-              modifier: 0,
-              timestamp: new Date(),
-            };
-          }
-          if (rollCount === 3) {
-            // Segunda rolagem d20: dificuldade = 5 (multiplicador 1x)
-            return {
-              result: 5,
-              notation,
-              individual: [5],
-              modifier: 0,
-              timestamp: new Date(),
-            };
-          }
-          // Outras rolagens d20 (prazos, etc.)
-          return {
-            result: 10,
-            notation,
-            individual: [10],
-            modifier: 0,
-            timestamp: new Date(),
-          };
-        }
-
-        // Qualquer outra rolagem
-        return {
-          result: 1,
-          notation,
-          individual: [1],
+      // Configurar sequência determinística de rolagens
+      mockRollDice
+        .mockReturnValueOnce({
+          result: 40, // 1d100 base do valor
+          notation: "1d100",
+          individual: [40],
           modifier: 0,
           timestamp: new Date(),
-        };
-      });
+        })
+        .mockReturnValueOnce({
+          result: 12, // 1d20 para distância (modificador 0)
+          notation: "1d20",
+          individual: [12],
+          modifier: 0,
+          timestamp: new Date(),
+        })
+        .mockReturnValueOnce({
+          result: 5, // 1d20 para dificuldade (multiplicador 1x)
+          notation: "1d20",
+          individual: [5],
+          modifier: 0,
+          timestamp: new Date(),
+        })
+        .mockReturnValue({
+          result: 10, // Padrão para outras rolagens
+          notation: "1d20",
+          individual: [10],
+          modifier: 0,
+          timestamp: new Date(),
+        });
 
       const contract = ContractGenerator.generateBaseContract({
         guild: mockGuild,
         skipFrequentatorsReduction: true,
       });
+
+      // Verificar modificadores individualmente
+      expect(contract.value.modifiers.populationRelationValue).toBe(1); // BOA = +1
+      expect(contract.value.modifiers.governmentRelationValue).toBe(-25); // PÉSSIMA = -25
+      expect(contract.value.modifiers.distance).toBe(0); // Rolagem 12 = 0
 
       // Com os modificadores calculados:
       // XP: 40 + 1(população) + (-25)(governo) + 0(distância) = 16 → valor 125
