@@ -1554,21 +1554,17 @@ export class ContractGenerator {
 
     // 1. Contratante
     sections.push(
-      `**Contratante:** ${contractor.name}\n→ ${contractor.description}`
+      `**Contratante:** ${contractor.name} (${contractor.description})`
     );
 
     // 2. Objetivo
-    let objectiveText = `**Objetivo:** ${objective.description}`;
-    if (objective.specificObjective) {
-      objectiveText += `\nDetalhes: ${objective.specificObjective}`;
-    }
+    const objectiveText = `**Objetivo:** ${objective.description} (${objective.specificObjective})`;
     sections.push(objectiveText);
 
     // 3. Localidade com todas as informações organizadas
-    let locationText = `**Local:** ${location.name}`;
+    let locationText = `**Local:** ${location.name} (${location.specification?.location})`;
 
     if (location.specification) {
-      locationText += `\nLocalização específica: ${location.specification.location}`;
       if (
         location.specification.description !== location.specification.location
       ) {
@@ -1601,15 +1597,15 @@ export class ContractGenerator {
 
     // 4. Antagonista
     sections.push(
-      `**Antagonista:** ${antagonist.specificType}\n→ ${antagonist.description}`
+      `**Antagonista:** ${antagonist.specificType}: ${antagonist.description}`
     );
 
     // 5. Complicações
     if (complications.length > 0) {
       const complicationTexts = complications
-        .map((c) => `• ${c.description}`)
+        .map((c) => `${c.description}`)
         .join("\n");
-      sections.push(`**Complicações:**\n${complicationTexts}`);
+      sections.push(`**Complicações:** ${complicationTexts}`);
     }
 
     // 6. Aliados (se houver)
