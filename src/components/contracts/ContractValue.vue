@@ -1,10 +1,8 @@
 <template>
   <div
-    :class="[
-      'contract-value',
-      sizeClasses,
-      difficultyClasses
-    ]"
+    :class="['contract-value', sizeClasses, difficultyClasses]"
+    @mouseenter="onMouseEnter"
+    @mouseleave="onMouseLeave"
   >
     <!-- Valor principal (recompensa em PO$) -->
     <div class="value-main">
@@ -22,7 +20,10 @@
     </div>
 
     <!-- Detalhes extras em tamanho maior -->
-    <div v-if="showDetails && size !== 'xs' && size !== 'sm'" class="value-details">
+    <div
+      v-if="showDetails && size !== 'xs' && size !== 'sm'"
+      class="value-details"
+    >
       <!-- Valor de experiência para o mestre -->
       <div class="value-detail">
         <span class="detail-label">XP:</span>
@@ -288,20 +289,20 @@
             </div>
           </div>
         </div>
-      </div>
+      </transition>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import type { ContractValue } from '@/types/contract';
-import { ContractDifficulty, PaymentType } from '@/types/contract';
+import { computed, ref } from "vue";
+import type { ContractValue } from "@/types/contract";
+import { ContractDifficulty, PaymentType } from "@/types/contract";
 
 interface Props {
   value: ContractValue;
   difficulty?: ContractDifficulty;
-  size?: 'xs' | 'sm' | 'md' | 'lg';
+  size?: "xs" | "sm" | "md" | "lg";
   showDifficulty?: boolean;
   showDetails?: boolean;
   showPaymentType?: boolean;
@@ -310,14 +311,23 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  size: 'md',
+  size: "md",
   showDifficulty: true,
   showDetails: true,
   showPaymentType: false,
-  showTooltip: false
+  showTooltip: true,
 });
 
+// ===== REACTIVE STATE =====
+const isTooltipVisible = ref(false);
+
 // ===== COMPUTED =====
+
+const enableTooltip = computed(() => {
+  // Habilita tooltip por padrão, exceto quando explicitamente desabilitado
+  // ou em tamanhos muito pequenos onde não faz sentido
+  return props.showTooltip && props.size !== "xs";
+});
 
 const formattedGoldValue = computed(() => {
   const value = props.value.finalGoldReward;
@@ -335,96 +345,87 @@ const formattedExperienceValue = computed(() => {
   return value.toString();
 });
 
-const formattedRewardValue = computed(() => {
-  const value = props.value.rewardValue;
-  if (value >= 1000) {
-    return `${(value / 1000).toFixed(1)}k`;
-  }
-  return value.toString();
-});
-
 const sizeClasses = computed(() => {
   switch (props.size) {
-    case 'xs':
-      return 'text-xs space-y-0.5';
-    case 'sm':
-      return 'text-sm space-y-1';
-    case 'md':
-      return 'text-base space-y-1';
-    case 'lg':
-      return 'text-lg space-y-2';
+    case "xs":
+      return "text-xs space-y-0.5";
+    case "sm":
+      return "text-sm space-y-1";
+    case "md":
+      return "text-base space-y-1";
+    case "lg":
+      return "text-lg space-y-2";
     default:
-      return 'text-base space-y-1';
+      return "text-base space-y-1";
   }
 });
 
 const difficultyClasses = computed(() => {
-  if (!props.difficulty) return '';
-  
+  if (!props.difficulty) return "";
+
   switch (props.difficulty) {
     case ContractDifficulty.FACIL:
-      return 'border-l-4 border-green-500 pl-2';
+      return "border-l-4 border-green-500 pl-2";
     case ContractDifficulty.MEDIO:
-      return 'border-l-4 border-yellow-500 pl-2';
+      return "border-l-4 border-yellow-500 pl-2";
     case ContractDifficulty.DIFICIL:
-      return 'border-l-4 border-orange-500 pl-2';
+      return "border-l-4 border-orange-500 pl-2";
     case ContractDifficulty.MORTAL:
-      return 'border-l-4 border-red-500 pl-2';
+      return "border-l-4 border-red-500 pl-2";
     default:
-      return '';
+      return "";
   }
 });
 
 const difficultyTextClasses = computed(() => {
-  if (!props.difficulty) return 'text-gray-400';
-  
+  if (!props.difficulty) return "text-gray-400";
+
   switch (props.difficulty) {
     case ContractDifficulty.FACIL:
-      return 'text-green-400';
+      return "text-green-400";
     case ContractDifficulty.MEDIO:
-      return 'text-yellow-400';
+      return "text-yellow-400";
     case ContractDifficulty.DIFICIL:
-      return 'text-orange-400';
+      return "text-orange-400";
     case ContractDifficulty.MORTAL:
-      return 'text-red-400';
+      return "text-red-400";
     default:
-      return 'text-gray-400';
+      return "text-gray-400";
   }
 });
 
 const hasModifiers = computed(() => {
   const mods = props.value.modifiers;
-  return mods.distance !== 0 ||
-         mods.populationRelationValue !== 0 ||
-         mods.governmentRelationValue !== 0 ||
-         mods.staffPreparation !== 0 ||
-         mods.requirementsAndClauses > 0;
-});
-
-const hasDifficultyMultipliers = computed(() => {
-  const mods = props.value.modifiers.difficultyMultiplier;
-  return mods.experienceMultiplier !== 1 || mods.rewardMultiplier !== 1;
+  return (
+    mods.distance !== 0 ||
+    mods.populationRelationValue !== 0 ||
+    mods.governmentRelationValue !== 0 ||
+    mods.staffPreparation !== 0 ||
+    mods.requirementsAndClauses > 0
+  );
 });
 
 const totalModifierDisplay = computed(() => {
   const mods = props.value.modifiers;
-  const total = mods.distance + 
-                mods.populationRelationValue + 
-                mods.governmentRelationValue + 
-                mods.staffPreparation + 
-                mods.requirementsAndClauses;
-  
+  const total =
+    mods.distance +
+    mods.populationRelationValue +
+    mods.governmentRelationValue +
+    mods.staffPreparation +
+    mods.requirementsAndClauses;
+
   return formatModifier(total);
 });
 
 const modifierClasses = computed(() => {
   const mods = props.value.modifiers;
-  const total = mods.distance + 
-                mods.populationRelationValue + 
-                mods.governmentRelationValue + 
-                mods.staffPreparation + 
-                mods.requirementsAndClauses;
-  
+  const total =
+    mods.distance +
+    mods.populationRelationValue +
+    mods.governmentRelationValue +
+    mods.staffPreparation +
+    mods.requirementsAndClauses;
+
   return getModifierClass(total);
 });
 
@@ -546,23 +547,23 @@ const totalRewardModifiers = computed(() => {
 });
 
 const paymentTypeShort = computed(() => {
-  if (!props.paymentType) return '';
-  
+  if (!props.paymentType) return "";
+
   switch (props.paymentType) {
     case PaymentType.DIRETO_CONTRATANTE:
-      return 'Direto';
+      return "Direto";
     case PaymentType.METADE_GUILDA_METADE_CONTRATANTE:
-      return '50/50';
+      return "50/50";
     case PaymentType.METADE_GUILDA_METADE_BENS:
-      return '50/50 Bens';
+      return "50/50 Bens";
     case PaymentType.BENS_SERVICOS:
-      return 'Bens';
+      return "Bens";
     case PaymentType.TOTAL_GUILDA:
-      return 'Guilda';
+      return "Guilda";
     case PaymentType.TOTAL_GUILDA_MAIS_SERVICOS:
-      return 'Guilda+';
+      return "Guilda+";
     default:
-      return '';
+      return "";
   }
 });
 
@@ -583,9 +584,9 @@ function formatModifier(value: number): string {
 }
 
 function getModifierClass(value: number): string {
-  if (value > 0) return 'text-green-300';
-  if (value < 0) return 'text-red-300';
-  return 'text-gray-400';
+  if (value > 0) return "text-green-300";
+  if (value < 0) return "text-red-300";
+  return "text-gray-400";
 }
 </script>
 
@@ -647,7 +648,9 @@ function getModifierClass(value: number): string {
   border: 1px solid rgb(75, 85, 99);
   border-radius: 0.5rem;
   padding: 0.75rem;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
   min-width: 16rem;
   top: 100%;
   left: 0;
