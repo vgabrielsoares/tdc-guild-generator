@@ -86,38 +86,16 @@ export const useGuildStore = defineStore("guild", () => {
 
   const guildHistory = computed({
     get: () => {
-      // Filtrar e corrigir guildas com datas inválidas
-      const validGuilds = storage.data.value.guildHistory
-        .map((guild) => {
-          try {
-            // Verificar se a guilda é válida
-            if (!guild || !guild.id || !guild.name) return null;
+      // retornar diretamente o storage, apenas com validação básica
+      const storedGuilds = storage.data.value.guildHistory;
+      
+      // Filtrar apenas guildas com problemas críticos (IDs ou nomes ausentes)
+      const validGuilds = storedGuilds.filter((guild) => {
+        return guild && guild.id && guild.name;
+      });
 
-            // Corrigir data se necessário
-            if (guild.createdAt && !(guild.createdAt instanceof Date)) {
-              return {
-                ...guild,
-                createdAt: new Date(guild.createdAt),
-              };
-            }
-
-            // Verificar se a data é válida
-            if (!guild.createdAt || isNaN(guild.createdAt.getTime())) {
-              return {
-                ...guild,
-                createdAt: new Date(),
-              };
-            }
-
-            return guild;
-          } catch {
-            return null; // Remove guildas que causam erro
-          }
-        })
-        .filter((guild): guild is Guild => guild !== null);
-
-      // Atualizar o storage se houve correções
-      if (validGuilds.length !== storage.data.value.guildHistory.length) {
+      // Atualizar o storage apenas se removemos guildas inválidas
+      if (validGuilds.length !== storedGuilds.length) {
         storage.data.value.guildHistory = validGuilds;
       }
 
@@ -264,12 +242,12 @@ export const useGuildStore = defineStore("guild", () => {
     const regeneratedGuild = { ...newGuild, id: originalId };
     currentGuild.value = regeneratedGuild;
 
-    // Atualizar no histórico se existir
-    const historyIndex = guildHistory.value.findIndex(
+    // Atualizar no histórico se existir - modificar o storage diretamente
+    const historyIndex = storage.data.value.guildHistory.findIndex(
       (g) => g.id === originalId
     );
     if (historyIndex !== -1) {
-      guildHistory.value[historyIndex] = regeneratedGuild;
+      storage.data.value.guildHistory[historyIndex] = regeneratedGuild;
     }
 
     return regeneratedGuild;
@@ -319,12 +297,12 @@ export const useGuildStore = defineStore("guild", () => {
 
     currentGuild.value = regeneratedGuild;
 
-    // Atualizar no histórico se existir
-    const historyIndex = guildHistory.value.findIndex(
+    // Atualizar no histórico se existir - modificar o storage diretamente
+    const historyIndex = storage.data.value.guildHistory.findIndex(
       (g) => g.id === originalId
     );
     if (historyIndex !== -1) {
-      guildHistory.value[historyIndex] = regeneratedGuild;
+      storage.data.value.guildHistory[historyIndex] = regeneratedGuild;
     }
   }
 
@@ -371,12 +349,12 @@ export const useGuildStore = defineStore("guild", () => {
 
     currentGuild.value = regeneratedGuild;
 
-    // Atualizar no histórico se existir
-    const historyIndex = guildHistory.value.findIndex(
+    // Atualizar no histórico se existir - modificar o storage diretamente
+    const historyIndex = storage.data.value.guildHistory.findIndex(
       (g) => g.id === originalId
     );
     if (historyIndex !== -1) {
-      guildHistory.value[historyIndex] = regeneratedGuild;
+      storage.data.value.guildHistory[historyIndex] = regeneratedGuild;
     }
   }
 
@@ -413,12 +391,12 @@ export const useGuildStore = defineStore("guild", () => {
 
     currentGuild.value = regeneratedGuild;
 
-    // Atualizar no histórico se existir
-    const historyIndex = guildHistory.value.findIndex(
+    // Atualizar no histórico se existir - modificar o storage diretamente
+    const historyIndex = storage.data.value.guildHistory.findIndex(
       (g) => g.id === originalGuild.id
     );
     if (historyIndex !== -1) {
-      guildHistory.value[historyIndex] = regeneratedGuild;
+      storage.data.value.guildHistory[historyIndex] = regeneratedGuild;
     }
   }
 
@@ -428,29 +406,45 @@ export const useGuildStore = defineStore("guild", () => {
       throw new Error("Invalid guild object");
     }
 
-    // Evitar duplicatas baseadas no ID
-    const existingIndex = guildHistory.value.findIndex(
-      (g) => g.id === guild.id
+    // Garantir que as datas sejam objetos Date antes de salvar
+    let guildToSave: Guild;
+    if (guild.updatedAt) {
+      guildToSave = {
+        ...guild,
+        createdAt: guild.createdAt instanceof Date ? guild.createdAt : new Date(guild.createdAt || Date.now()),
+        updatedAt: guild.updatedAt instanceof Date ? guild.updatedAt : new Date(guild.updatedAt),
+      };
+    } else {
+      guildToSave = {
+        ...guild,
+        createdAt: guild.createdAt instanceof Date ? guild.createdAt : new Date(guild.createdAt || Date.now()),
+      };
+    }
+
+    // Evitar duplicatas baseadas no ID - verificar no storage diretamente
+    const existingIndex = storage.data.value.guildHistory.findIndex(
+      (g) => g.id === guildToSave.id
     );
     if (existingIndex === -1) {
-      guildHistory.value.unshift(guild);
+      // Modificar o storage diretamente para garantir persistência
+      storage.data.value.guildHistory.unshift(guildToSave);
 
       // Limitar histórico a 50 guildas
-      if (guildHistory.value.length > 50) {
-        guildHistory.value = guildHistory.value.slice(0, 50);
+      if (storage.data.value.guildHistory.length > 50) {
+        storage.data.value.guildHistory = storage.data.value.guildHistory.slice(0, 50);
       }
     }
   }
 
   function removeFromHistory(guildId: string): boolean {
-    const guild = guildHistory.value.find((g) => g.id === guildId);
+    const guild = storage.data.value.guildHistory.find((g) => g.id === guildId);
 
     // Não permitir remoção se a guilda estiver bloqueada
     if (guild?.locked) {
       return false;
     }
 
-    const initialLength = guildHistory.value.length;
+    const initialLength = storage.data.value.guildHistory.length;
 
     // Se a guilda atual está sendo removida, limpar
     if (currentGuild.value?.id === guildId) {
@@ -458,26 +452,28 @@ export const useGuildStore = defineStore("guild", () => {
       lastConfig.value = null;
     }
 
-    guildHistory.value = guildHistory.value.filter((g) => g.id !== guildId);
+    // Modificar o storage diretamente
+    storage.data.value.guildHistory = storage.data.value.guildHistory.filter((g) => g.id !== guildId);
 
-    const removed = guildHistory.value.length < initialLength;
+    const removed = storage.data.value.guildHistory.length < initialLength;
     return removed;
   }
 
   function clearHistory(): void {
-    // Manter apenas as guildas bloqueadas
-    guildHistory.value = guildHistory.value.filter((g) => g.locked);
+    // Manter apenas as guildas bloqueadas - modificar o storage diretamente
+    storage.data.value.guildHistory = storage.data.value.guildHistory.filter((g) => g.locked);
   }
 
   function toggleGuildLock(guildId: string): boolean {
-    const guildIndex = guildHistory.value.findIndex((g) => g.id === guildId);
+    const guildIndex = storage.data.value.guildHistory.findIndex((g) => g.id === guildId);
     if (guildIndex === -1) {
       return false;
     }
 
-    const guild = guildHistory.value[guildIndex];
+    const guild = storage.data.value.guildHistory[guildIndex];
     const newGuild = { ...guild, locked: !guild.locked };
-    guildHistory.value[guildIndex] = newGuild;
+    // Modificar o storage diretamente
+    storage.data.value.guildHistory[guildIndex] = newGuild;
 
     // Se a guilda atual está sendo modificada, atualizar também
     if (currentGuild.value?.id === guildId) {
@@ -488,7 +484,7 @@ export const useGuildStore = defineStore("guild", () => {
   }
 
   function loadGuildFromHistory(guildId: string): Guild | null {
-    const guild = guildHistory.value.find((g) => g.id === guildId);
+    const guild = storage.data.value.guildHistory.find((g) => g.id === guildId);
     if (guild) {
       currentGuild.value = guild;
       return guild;
@@ -538,15 +534,15 @@ export const useGuildStore = defineStore("guild", () => {
 
     currentGuild.value = updatedGuild;
 
-    // Atualizar no histórico se existe
-    const historyIndex = guildHistory.value.findIndex(
+    // Atualizar no histórico se existe - modificar o storage diretamente
+    const historyIndex = storage.data.value.guildHistory.findIndex(
       (g) => g.id === updatedGuild.id
     );
     if (historyIndex !== -1) {
-      guildHistory.value = [
-        ...guildHistory.value.slice(0, historyIndex),
+      storage.data.value.guildHistory = [
+        ...storage.data.value.guildHistory.slice(0, historyIndex),
         updatedGuild,
-        ...guildHistory.value.slice(historyIndex + 1),
+        ...storage.data.value.guildHistory.slice(historyIndex + 1),
       ];
     }
 
