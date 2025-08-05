@@ -170,8 +170,65 @@
                   </div>
                 </section>
 
-                <!-- 5. Aliados (Placeholder - Não implementado ainda) -->
-                <!-- TODO: Implementar seção de aliados -->
+                <!-- 5. Aliados -->
+                <section v-if="contract.allies?.length">
+                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Aliados Potenciais</h4>
+                  <div class="space-y-3">
+                    <div 
+                      v-for="ally in contract.allies" 
+                      :key="ally.name"
+                      class="bg-green-900/20 rounded-lg p-4 border border-green-500/30"
+                    >
+                      <div class="flex items-center gap-2 mb-2">
+                        <UserPlusIcon class="w-5 h-5 text-green-400" />
+                        <span class="font-medium text-white">{{ ally.name }}</span>
+                        <span class="text-sm text-green-300 bg-green-800/50 px-2 py-1 rounded">
+                          {{ getCategoryDisplayName(ally.category) }}
+                        </span>
+                      </div>
+                      <p class="text-gray-300 text-sm mb-2">{{ ally.description }}</p>
+                      
+                      <!-- Detalhes específicos do aliado -->
+                      <div class="mt-3 p-3 bg-gray-800 rounded border border-gray-500">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                          <div>
+                            <div class="text-gray-400 mb-1">
+                              <strong>Tipo específico:</strong>
+                            </div>
+                            <p class="text-gray-200">{{ ally.specificType }}</p>
+                          </div>
+                          <div>
+                            <div class="text-gray-400 mb-1">
+                              <strong>Quando aparece:</strong>
+                            </div>
+                            <p class="text-gray-200">{{ getTimingDisplayName(ally.timing) }}</p>
+                          </div>
+                          
+                          <!-- Nível de poder para aventureiros -->
+                          <div v-if="ally.powerLevel !== undefined" class="md:col-span-2">
+                            <div class="text-gray-400 mb-1">
+                              <strong>Nível de Ameaça:</strong>
+                            </div>
+                            <p class="text-gray-200">NA {{ ally.powerLevel }}</p>
+                          </div>
+                          
+                          <!-- Características para monstruosidades -->
+                          <div v-if="ally.characteristics?.length" class="md:col-span-2">
+                            <div class="text-gray-400 mb-1">
+                              <strong>Características especiais:</strong>
+                            </div>
+                            <ul class="text-gray-200 space-y-1">
+                              <li v-for="characteristic in ally.characteristics" :key="characteristic" class="flex items-start gap-2">
+                                <span class="text-green-400 mt-0.5">•</span>
+                                <span>{{ characteristic }}</span>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
 
                 <!-- 7. Reviravoltas -->
                 <section v-if="contract.twists?.length">
@@ -197,7 +254,55 @@
                   </div>
                 </section>
 
-                <!-- 6. Recompensas e Incentivos -->
+                <!-- 6. Consequências Severas -->
+                <section v-if="contract.severeConsequences?.length">
+                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Consequências por Falha</h4>
+                  <div class="space-y-3">
+                    <div 
+                      v-for="consequence in contract.severeConsequences" 
+                      :key="consequence.description"
+                      class="bg-red-900/20 rounded-lg p-4 border border-red-500/30"
+                    >
+                      <div class="flex items-center gap-2 mb-2">
+                        <ShieldExclamationIcon class="w-5 h-5 text-red-400" />
+                        <span class="font-medium text-white">{{ consequence.category }}</span>
+                        <span class="text-sm text-red-300 bg-red-800/50 px-2 py-1 rounded">
+                          Consequência Severa
+                        </span>
+                      </div>
+                      <p class="text-gray-300 text-sm mb-2">{{ consequence.description }}</p>
+                      
+                      <!-- Detalhes específicos da consequência -->
+                      <div class="mt-3 p-3 bg-gray-800 rounded border border-gray-500">
+                        <div class="space-y-3 text-sm">
+                          <div>
+                            <div class="text-gray-400 mb-1">
+                              <strong>Consequência específica:</strong>
+                            </div>
+                            <p class="text-gray-200">{{ consequence.specificConsequence }}</p>
+                          </div>
+                          
+                          <div>
+                            <div class="text-gray-400 mb-1">
+                              <strong>Impacto nos contratados:</strong>
+                            </div>
+                            <p class="text-gray-200">{{ consequence.affectsContractors }}</p>
+                          </div>
+                          
+                          <!-- Efeito adicional se existir -->
+                          <div v-if="consequence.additionalEffect">
+                            <div class="text-gray-400 mb-1">
+                              <strong>Efeito adicional:</strong>
+                            </div>
+                            <p class="text-gray-200">{{ consequence.additionalEffect }}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- 7. Recompensas e Incentivos -->
                 <section>
                   <h4 class="text-lg font-semibold text-amber-400 mb-2">Recompensas e Incentivos</h4>
                   <ContractValue
@@ -310,10 +415,6 @@
                     </div>
                   </div>
                 </section>
-
-
-                <!-- 8. Consequências Severas (Placeholder - Não implementado ainda) -->
-                <!-- TODO: Implementar seção de consequências severas -->
 
                 <!-- Pré-requisitos e Cláusulas -->
                 <section v-if="contract.prerequisites?.length || contract.clauses?.length">
@@ -435,7 +536,9 @@ import {
   FaceSmileIcon,
   ExclamationTriangleIcon,
   DocumentTextIcon,
-  InformationCircleIcon
+  InformationCircleIcon,
+  UserPlusIcon,
+  ShieldExclamationIcon
 } from '@heroicons/vue/24/outline';
 import {
   XCircleIcon
@@ -580,10 +683,47 @@ function getCategoryDisplayName(category: string): string {
     'PROBLEMAS_DIPLOMATICOS': 'Problemas Diplomáticos',
     'PROTECAO': 'Proteção',
     'CONTRA_TEMPO_AMISTOSO': 'Contra-tempo Amistoso',
-    'ENCONTRO_HOSTIL': 'Encontro Hostil'
+    'ENCONTRO_HOSTIL': 'Encontro Hostil',
+    // Categorias de Aliados
+    'ARTEFATO': 'Artefato',
+    'CRIATURA_PODEROSA': 'Criatura Poderosa',
+    'INESPERADO': 'Inesperado',
+    'AJUDA_SOBRENATURAL': 'Ajuda Sobrenatural',
+    'CIVIS_ORDINARIOS': 'Civis Ordinários',
+    'NATUREZA': 'Natureza',
+    'REFUGIO': 'Refúgio',
+    'AVENTUREIROS': 'Aventureiros',
+    'MONSTRUOSIDADE_AMIGAVEL': 'Monstruosidade Amigável',
+    // Categorias de Consequências
+    'MALDICAO': 'Maldição',
+    'GUERRA': 'Guerra',
+    'CALAMIDADE_NATURAL': 'Calamidade Natural',
+    'PRAGA': 'Praga',
+    'EVENTOS_SOBRENATURAIS': 'Eventos Sobrenaturais',
+    'FOME_SECA': 'Fome/Seca',
+    'CRISE_ECONOMICA': 'Crise Econômica',
+    'PERSEGUICAO': 'Perseguição',
+    'MORTE_IMPORTANTES': 'Morte de Importantes'
   };
   
   return categoryMap[category] || category;
+}
+
+function getTimingDisplayName(timing: string): string {
+  const timingMap: Record<string, string> = {
+    'CORRENDO_PERIGO': 'Correndo perigo',
+    'JEITO_CONSTRANGEDOR': 'De um jeito constrangedor',
+    'MANEIRA_COMUM': 'De maneira comum e pacata',
+    'PEDINDO_AJUDA_DESCANSO': 'Pedindo ajuda durante um descanso',
+    'AINDA_ASSENTAMENTO': 'Ainda no assentamento',
+    'LIDANDO_COMPLICACAO': 'Já estará lidando com a complicação',
+    'UM_D4_DIAS_APOS': '1d4 dias após o começo do contrato',
+    'DOIS_D4_DIAS_APOS': '2d4 dias após o começo do contrato',
+    'MAGICAMENTE_INVOCADO': 'Magicamente invocado',
+    'PARA_SALVAR_DIA': 'Para salvar o dia'
+  };
+  
+  return timingMap[timing] || timing;
 }
 
 function getDifficultyDescription(difficulty: ContractDifficulty): string {
