@@ -310,7 +310,6 @@
                     :difficulty="contract.difficulty"
                     :payment-type="contract.paymentType"
                     size="lg"
-                    :show-tooltip="false"
                   />
 
                 <!-- Recompensas e Incentivos -->
@@ -338,67 +337,10 @@
                     </div>
                   </div>
                 </section>
-                  
-                  <!-- Detalhes dos Modificadores -->
-                  <div class="mt-4 bg-gray-700 rounded-lg p-4 border border-gray-600">
-                    <h5 class="font-medium text-white mb-3">Detalhamento dos Modificadores</h5>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <div class="space-y-2">
-                          <div class="flex justify-between">
-                            <span class="text-gray-400">Rolagem Base (1d100):</span>
-                            <span class="text-white font-mono">{{ contract.value.baseValue }}</span>
-                          </div>
-                          <div v-if="contract.value.modifiers.distance !== 0" class="flex justify-between">
-                            <span class="text-gray-400">Distância:</span>
-                            <span :class="getModifierClass(contract.value.modifiers.distance)">
-                              {{ formatModifier(contract.value.modifiers.distance) }}
-                            </span>
-                          </div>
-                          <div v-if="contract.value.modifiers.populationRelationValue !== 0" class="flex justify-between">
-                            <span class="text-gray-400">Relação População:</span>
-                            <span :class="getModifierClass(contract.value.modifiers.populationRelationValue)">
-                              {{ formatModifier(contract.value.modifiers.populationRelationValue) }}
-                            </span>
-                          </div>
-                          <div v-if="contract.value.modifiers.governmentRelationValue !== 0" class="flex justify-between">
-                            <span class="text-gray-400">Relação Governo:</span>
-                            <span :class="getModifierClass(contract.value.modifiers.governmentRelationValue)">
-                              {{ formatModifier(contract.value.modifiers.governmentRelationValue) }}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div>
-                        <div class="space-y-2">
-                          <div v-if="contract.value.modifiers.staffPreparation !== 0" class="flex justify-between">
-                            <span class="text-gray-400">Funcionários:</span>
-                            <span :class="getModifierClass(contract.value.modifiers.staffPreparation)">
-                              {{ formatModifier(contract.value.modifiers.staffPreparation) }}
-                            </span>
-                          </div>
-                          <div v-if="contract.value.modifiers.requirementsAndClauses > 0" class="flex justify-between">
-                            <span class="text-gray-400">Pré-req./Cláusulas:</span>
-                            <span class="text-green-300">
-                              +{{ contract.value.modifiers.requirementsAndClauses }}
-                            </span>
-                          </div>
-                          <div class="flex justify-between border-t border-gray-600 pt-2">
-                            <span class="text-gray-400 font-medium">Mult. Experiência:</span>
-                            <span class="text-white">×{{ contract.value.modifiers.difficultyMultiplier.experienceMultiplier }}</span>
-                          </div>
-                          <div class="flex justify-between">
-                            <span class="text-gray-400 font-medium">Mult. Recompensa:</span>
-                            <span class="text-white">×{{ contract.value.modifiers.difficultyMultiplier.rewardMultiplier }}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
 
-                  <!-- Prazo e Pagamento -->
+                  <!-- Prazo e Tipo de Pagamento -->
                   <div class="mt-4">
-                    <h5 class="font-medium text-white mb-2">Prazo e Pagamento</h5>
+                    <h5 class="font-medium text-white mb-2">Prazo e Tipo de Pagamento</h5>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
                         <h6 class="font-medium text-white mb-2 flex items-center gap-2">
@@ -420,7 +362,7 @@
                       <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
                         <h6 class="font-medium text-white mb-2 flex items-center gap-2">
                           <CurrencyDollarIcon class="w-5 h-5 text-amber-400" />
-                          Pagamento
+                          Tipo de Pagamento
                         </h6>
                         <div class="text-sm">
                           <div class="text-gray-300">{{ getPaymentTypeDescription(contract.paymentType) }}</div>
