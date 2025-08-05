@@ -58,6 +58,19 @@ import {
   ALLY_ADVENTURER_LEVEL_TABLE,
   ALLY_FRIENDLY_MONSTROSITY_TABLE,
   ALLY_MONSTROSITY_CHARACTERISTICS_TABLE,
+  // Tabelas de recompensas adicionais
+  REWARD_CHANCE_TABLE,
+  REWARD_TYPES_TABLE,
+  REWARD_RICHES_TABLE,
+  REWARD_MAGICAL_ARTIFACTS_TABLE,
+  REWARD_POWER_TABLE,
+  REWARD_KNOWLEDGE_TABLE,
+  REWARD_INFLUENCE_TABLE,
+  REWARD_GLORY_TABLE,
+  REWARD_MORAL_TABLE,
+  REWARD_ALTERNATIVE_PAYMENT_TABLE,
+  REWARD_BIZARRE_TABLE,
+  REWARD_DECEPTIVE_TABLE,
 } from "../../data/tables/contract-rewards-tables";
 
 import {
@@ -91,6 +104,7 @@ import {
   AllyCategory,
   AllyTiming,
   SevereConsequenceCategory,
+  RewardCategory,
 } from "../../types/contract";
 import type {
   Contract,
@@ -103,6 +117,7 @@ import type {
   Twist,
   Ally,
   SevereConsequence,
+  AdditionalReward,
 } from "../../types/contract";
 import type { Guild } from "../../types/guild";
 import { VisitorLevel, RelationLevel } from "../../types/guild";
@@ -232,7 +247,10 @@ export class ContractGenerator {
     // 17. Gerar consequências severas (para quando o contrato falha)
     const severeConsequences = this.generateSevereConsequences();
 
-    // 18. Gerar descrição completa do contrato
+    // 18. Gerar recompensas adicionais
+    const additionalRewards = this.generateAdditionalRewards();
+
+    // 19. Gerar descrição completa do contrato
     const fullDescription = this.generateFullContractDescription({
       objective,
       location,
@@ -242,6 +260,7 @@ export class ContractGenerator {
       twists,
       allies,
       severeConsequences,
+      additionalRewards,
       prerequisites,
       clauses,
       finalValueResult,
@@ -269,6 +288,7 @@ export class ContractGenerator {
       twists,
       allies,
       severeConsequences,
+      additionalRewards: additionalRewards || [],
       value: finalValueResult,
       deadline,
       paymentType,
@@ -1461,6 +1481,7 @@ export class ContractGenerator {
     twists: Twist[];
     allies: Ally[];
     severeConsequences: SevereConsequence[];
+    additionalRewards: AdditionalReward[];
     prerequisites: string[];
     clauses: string[];
     finalValueResult: ContractValue;
@@ -1481,6 +1502,7 @@ export class ContractGenerator {
       twists,
       allies,
       severeConsequences,
+      additionalRewards,
       prerequisites,
       clauses,
       finalValueResult,
@@ -1566,12 +1588,23 @@ export class ContractGenerator {
       sections.push(`**Reviravoltas:**\n${twistTexts}`);
     }
 
-    // 8. Recompensa e incentivos
+    // 8. Recompensa principal
     sections.push(
       `**Recompensa:** ${finalValueResult.finalGoldReward} moedas de ouro`
     );
 
-    // 9. Consequências severas (se houver)
+    // 9. Recompensas e incentivos (se houver)
+    if (additionalRewards.length > 0) {
+      const rewardTexts = additionalRewards
+        .map((reward) => {
+          const prefix = reward.isPositive ? "✓" : "⚠";
+          return `${prefix} ${reward.description}`;
+        })
+        .join("\n");
+      sections.push(`**Recompensas e Incentivos:**\n${rewardTexts}`);
+    }
+
+    // 10. Consequências severas (se houver)
     if (severeConsequences.length > 0) {
       const consequenceTexts = severeConsequences
         .map(
@@ -1582,24 +1615,24 @@ export class ContractGenerator {
       sections.push(`**Consequências por falha:**\n${consequenceTexts}`);
     }
 
-    // 10. Prazo
+    // 11. Prazo
     if (deadline.type !== DeadlineType.SEM_PRAZO) {
       sections.push(`**Prazo:** ${deadline.value}`);
     }
 
-    // 11. Pré-requisitos (se houver)
+    // 12. Pré-requisitos (se houver)
     if (prerequisites.length > 0) {
       const prerequisiteTexts = prerequisites.map((p) => `• ${p}`).join("\n");
       sections.push(`**Pré-requisitos:**\n${prerequisiteTexts}`);
     }
 
-    // 12. Cláusulas (se houver)
+    // 13. Cláusulas (se houver)
     if (clauses.length > 0) {
       const clauseTexts = clauses.map((c) => `• ${c}`).join("\n");
       sections.push(`**Cláusulas:**\n${clauseTexts}`);
     }
 
-    // 13. Tipo de pagamento
+    // 14. Tipo de pagamento
     const paymentText = this.getPaymentTypeDescription(paymentType);
     sections.push(`**Forma de pagamento:** ${paymentText}`);
 
@@ -2091,5 +2124,182 @@ export class ContractGenerator {
     } else {
       return "A consequência afeta primariamente o ambiente ou região do contrato";
     }
+  }
+
+  // ===== GERAÇÃO DE RECOMPENSAS ADICIONAIS =====
+
+  /**
+   * Gera recompensas adicionais para o contrato
+   */
+  private static generateAdditionalRewards(): AdditionalReward[] {
+    const rewards: AdditionalReward[] = [];
+
+    // 1. Verificar se haverá recompensas adicionais (1d20, 1-13 = Não, 14-20 = Sim)
+    const willHaveRewards = rollOnTable(
+      REWARD_CHANCE_TABLE,
+      [],
+      "Chance de Recompensas Adicionais"
+    );
+
+    if (!willHaveRewards.result) {
+      return rewards; // Nenhuma recompensa adicional
+    }
+
+    // 2. Determinar o tipo de recompensa (1d20)
+    const typeResult = rollOnTable(
+      REWARD_TYPES_TABLE,
+      [],
+      "Tipo de Recompensa Adicional"
+    );
+    const rewardType = typeResult.result as string;
+
+    // 3. Gerar detalhes específicos da recompensa
+    const rewardDetail = this.generateRewardDetail(rewardType);
+    if (rewardDetail) {
+      // Verificar se precisa rolar duas vezes antes de adicionar
+      if (rewardDetail.specificReward === "Role duas vezes e use ambos") {
+        // Substituir pela geração de duas recompensas reais
+        const firstReward = this.generateSingleAdditionalReward();
+        const secondReward = this.generateSingleAdditionalReward();
+
+        if (firstReward) rewards.push(firstReward);
+        if (secondReward) rewards.push(secondReward);
+      } else {
+        // Recompensa normal, adicionar diretamente
+        rewards.push(rewardDetail);
+      }
+    }
+
+    return rewards;
+  }
+
+  /**
+   * Gera uma única recompensa adicional (usado para rolagens duplas)
+   */
+  private static generateSingleAdditionalReward(): AdditionalReward | null {
+    // Tenta até 3 vezes para evitar loops infinitos
+    for (let attempts = 0; attempts < 3; attempts++) {
+      const typeResult = rollOnTable(
+        REWARD_TYPES_TABLE,
+        [],
+        "Tipo de Recompensa Adicional"
+      );
+      const rewardType = typeResult.result as string;
+
+      const rewardDetail = this.generateRewardDetail(rewardType);
+
+      // Se não é "Role duas vezes e use ambos", retorna a recompensa
+      if (
+        rewardDetail &&
+        rewardDetail.specificReward !== "Role duas vezes e use ambos"
+      ) {
+        return rewardDetail;
+      }
+    }
+
+    // Se ainda não conseguiu uma recompensa válida, força uma recompensa padrão
+    return {
+      category: RewardCategory.MORAL,
+      specificReward: "Satisfação pessoal",
+      description: "Benefício para a comunidade: Satisfação pessoal",
+      isPositive: true,
+    };
+  }
+
+  /**
+   * Gera os detalhes específicos de uma recompensa baseado no tipo
+   */
+  private static generateRewardDetail(
+    rewardType: string
+  ): AdditionalReward | null {
+    let detailTable;
+    let category: RewardCategory;
+    let isPositive = true;
+
+    // Mapear tipo para categoria e tabela correspondente
+    switch (rewardType) {
+      case "Riquezas":
+        detailTable = REWARD_RICHES_TABLE;
+        category = RewardCategory.RIQUEZAS;
+        break;
+      case "Artefatos mágicos":
+        detailTable = REWARD_MAGICAL_ARTIFACTS_TABLE;
+        category = RewardCategory.ARTEFATOS_MAGICOS;
+        break;
+      case "Poder":
+        detailTable = REWARD_POWER_TABLE;
+        category = RewardCategory.PODER;
+        break;
+      case "Conhecimento":
+        detailTable = REWARD_KNOWLEDGE_TABLE;
+        category = RewardCategory.CONHECIMENTO;
+        break;
+      case "Influência e renome":
+        detailTable = REWARD_INFLUENCE_TABLE;
+        category = RewardCategory.INFLUENCIA_RENOME;
+        break;
+      case "Glória":
+        detailTable = REWARD_GLORY_TABLE;
+        category = RewardCategory.GLORIA;
+        break;
+      case "Moral":
+        detailTable = REWARD_MORAL_TABLE;
+        category = RewardCategory.MORAL;
+        break;
+      case "Pagamento diferenciado":
+        detailTable = REWARD_ALTERNATIVE_PAYMENT_TABLE;
+        category = RewardCategory.PAGAMENTO_DIFERENCIADO;
+        break;
+      case "Recompensa bizarra":
+        detailTable = REWARD_BIZARRE_TABLE;
+        category = RewardCategory.RECOMPENSA_BIZARRA;
+        break;
+      case "Aparências enganam":
+        detailTable = REWARD_DECEPTIVE_TABLE;
+        category = RewardCategory.APARENCIAS_ENGANAM;
+        isPositive = false; // Este tipo é negativo
+        break;
+      default:
+        return null;
+    }
+
+    if (!detailTable) return null;
+
+    const detailResult = rollOnTable(
+      detailTable,
+      [],
+      `Detalhamento ${rewardType}`
+    );
+    const specificReward = detailResult.result as string;
+
+    return {
+      category,
+      specificReward,
+      description: this.generateRewardDescription(category, specificReward),
+      isPositive,
+    };
+  }
+
+  /**
+   * Gera uma descrição clara para a recompensa
+   */
+  private static generateRewardDescription(
+    category: RewardCategory,
+    specific: string
+  ): string {
+    const categoryDescriptions: Record<RewardCategory, string> = {
+      [RewardCategory.RIQUEZAS]: "Riqueza material adicional",
+      [RewardCategory.ARTEFATOS_MAGICOS]: "Objeto mágico de valor",
+      [RewardCategory.PODER]: "Influência ou autoridade",
+      [RewardCategory.CONHECIMENTO]: "Informação valiosa ou secreta",
+      [RewardCategory.INFLUENCIA_RENOME]: "Conexões sociais e reputação",
+      [RewardCategory.GLORIA]: "Reconhecimento público",
+      [RewardCategory.MORAL]: "Benefício para a comunidade",
+      [RewardCategory.PAGAMENTO_DIFERENCIADO]: "Pagamento não monetário",
+      [RewardCategory.RECOMPENSA_BIZARRA]: "Benefício inusitado",
+      [RewardCategory.APARENCIAS_ENGANAM]: "Complicação ou engano",
+    };
+
+    return `${categoryDescriptions[category]}: ${specific}`;
   }
 }

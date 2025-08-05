@@ -175,6 +175,9 @@ export interface Contract {
   // Consequências severas por falha
   severeConsequences: SevereConsequence[];
 
+  // Recompensas adicionais
+  additionalRewards?: AdditionalReward[];
+
   // Datas importantes
   createdAt: Date;
   expiresAt?: Date;
@@ -256,6 +259,7 @@ export const ContractSchema = z.object({
   twists: z.array(z.lazy(() => TwistSchema)),
   allies: z.array(z.lazy(() => AllySchema)),
   severeConsequences: z.array(z.lazy(() => SevereConsequenceSchema)),
+  additionalRewards: z.array(z.lazy(() => AdditionalRewardSchema)).optional(),
   createdAt: z.date(),
   expiresAt: z.date().optional(),
   completedAt: z.date().optional(),
