@@ -1,5 +1,6 @@
 import { rollDice } from "../dice";
 import { rollOnTable } from "../tableRoller";
+import type { TableEntry } from "@/types/tables";
 import {
   CONTRACT_DICE_BY_SIZE,
   CONTRACT_VALUE_TABLE,
@@ -170,23 +171,27 @@ export class ContractGenerator {
     // 1. Rolar valor base (1d100)
     const baseRoll = rollDice({ notation: "1d100" }).result;
 
-    // 2. Calcular valor aplicando todos os modificadores
-    const valueCalculationResult = this.calculateContractValue(baseRoll, guild);
-    const { contractValue, prerequisites, clauses } = valueCalculationResult;
-
-    // 3. Gerar rolagens adicionais para dados de geração
+    // 2. Gerar rolagens adicionais para dados de geração
     const distanceRoll = rollDice({ notation: "1d20" }).result;
     const difficultyRoll = rollDice({ notation: "1d20" }).result;
 
-    // 4. Gerar deadline usando a tabela
-    const deadline = this.generateDeadline();
-
-    // 5. Determinar dificuldade baseada na rolagem
+    // 3. Determinar dificuldade baseada na rolagem
     const difficultyEntry = CONTRACT_DIFFICULTY_TABLE.find(
       (entry) => difficultyRoll >= entry.min && difficultyRoll <= entry.max
     );
     const difficulty =
       difficultyEntry?.result.difficulty || ContractDifficulty.MEDIO;
+
+    // 4. Calcular valor aplicando todos os modificadores, incluindo dificuldade
+    const valueCalculationResult = this.calculateContractValue(
+      baseRoll,
+      guild,
+      difficultyEntry
+    );
+    const { contractValue, prerequisites, clauses } = valueCalculationResult;
+
+    // 5. Gerar deadline usando a tabela
+    const deadline = this.generateDeadline();
 
     // 6. Gerar contratante seguindo as regras do markdown
     const contractor = this.generateContractor(guild);
@@ -419,7 +424,12 @@ export class ContractGenerator {
    */
   private static calculateContractValue(
     baseRoll: number,
-    guild: Guild
+    guild: Guild,
+    difficultyEntry?: TableEntry<{
+      difficulty: ContractDifficulty;
+      experienceMultiplier: number;
+      rewardMultiplier: number;
+    }>
   ): {
     contractValue: ContractValue;
     prerequisites: string[];
@@ -486,7 +496,8 @@ export class ContractGenerator {
     }
 
     // 7. Aplicar multiplicadores de dificuldade
-    const difficultyMultipliers = this.calculateDifficultyMultipliers();
+    const difficultyMultipliers =
+      this.calculateDifficultyMultipliers(difficultyEntry);
     experienceValue = Math.floor(
       experienceValue * difficultyMultipliers.experienceMultiplier
     );
@@ -605,15 +616,16 @@ export class ContractGenerator {
   /**
    * Calcula multiplicadores de dificuldade
    */
-  private static calculateDifficultyMultipliers(): {
+  private static calculateDifficultyMultipliers(
+    difficultyEntry?: TableEntry<{
+      difficulty: ContractDifficulty;
+      experienceMultiplier: number;
+      rewardMultiplier: number;
+    }>
+  ): {
     experienceMultiplier: number;
     rewardMultiplier: number;
   } {
-    const difficultyRoll = rollDice({ notation: "1d20" }).result;
-    const difficultyEntry = CONTRACT_DIFFICULTY_TABLE.find(
-      (entry) => difficultyRoll >= entry.min && difficultyRoll <= entry.max
-    );
-
     return {
       experienceMultiplier: difficultyEntry?.result.experienceMultiplier || 1,
       rewardMultiplier: difficultyEntry?.result.rewardMultiplier || 1,
@@ -1617,9 +1629,7 @@ export class ContractGenerator {
     }
 
     // 8. Valor em XP
-    sections.push(
-      `**Experiência:** ${finalValueResult.experienceValue} XP`
-    );
+    sections.push(`**Experiência:** ${finalValueResult.experienceValue} XP`);
 
     // 9. Recompensa principal
     sections.push(
