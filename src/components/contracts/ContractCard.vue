@@ -83,6 +83,14 @@
           <ShieldExclamationIcon class="w-3 h-3" />
           <span>Consequências severas</span>
         </div>
+
+        <!-- Indicador de recompensas adicionais -->
+        <div v-if="contract.additionalRewards?.length" 
+             class="flex items-center gap-1 bg-amber-900/30 px-2 py-1 rounded-full text-xs text-amber-300"
+             :title="getAdditionalRewardsTooltip(contract.additionalRewards)">
+          <GiftIcon class="w-3 h-3" />
+          <span>{{ contract.additionalRewards.length }} extra{{ contract.additionalRewards.length > 1 ? 's' : '' }}</span>
+        </div>
       </div>
     </div>
 
@@ -145,7 +153,8 @@ import {
   MapPinIcon,
   XMarkIcon,
   UserPlusIcon,
-  ShieldExclamationIcon
+  ShieldExclamationIcon,
+  GiftIcon
 } from '@heroicons/vue/24/outline';
 
 interface Props {
@@ -210,7 +219,8 @@ const isDangerous = computed(() => {
 
 const hasSpecialFeatures = computed(() => {
   return (props.contract.allies?.length || 0) > 0 || 
-         (props.contract.severeConsequences?.length || 0) > 0;
+         (props.contract.severeConsequences?.length || 0) > 0 ||
+         (props.contract.additionalRewards?.length || 0) > 0;
 });
 
 const canAccept = computed(() => {
@@ -230,6 +240,25 @@ const canAbandon = computed(() => {
     Status.EM_ANDAMENTO
   ].includes(props.contract.status);
 });
+
+// ===== FUNCTIONS =====
+
+function getAdditionalRewardsTooltip(rewards: { isPositive: boolean }[]): string {
+  if (!rewards || rewards.length === 0) return '';
+  
+  const positiveRewards = rewards.filter(r => r.isPositive);
+  const negativeRewards = rewards.filter(r => r.isPositive === false);
+  
+  const parts = [];
+  if (positiveRewards.length > 0) {
+    parts.push(`${positiveRewards.length} recompensa${positiveRewards.length > 1 ? 's' : ''} adicional${positiveRewards.length > 1 ? 'is' : ''}`);
+  }
+  if (negativeRewards.length > 0) {
+    parts.push(`${negativeRewards.length} problema${negativeRewards.length > 1 ? 's' : ''} oculto${negativeRewards.length > 1 ? 's' : ''}`);
+  }
+  
+  return parts.join(' e ');
+}
 </script>
 
 <style scoped>

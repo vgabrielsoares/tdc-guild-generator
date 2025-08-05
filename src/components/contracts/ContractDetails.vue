@@ -302,9 +302,9 @@
                   </div>
                 </section>
 
-                <!-- 7. Recompensas e Incentivos -->
+                <!-- 7. Pagamento -->
                 <section>
-                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Recompensas e Incentivos</h4>
+                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Pagamento</h4>
                   <ContractValue
                     :value="contract.value"
                     :difficulty="contract.difficulty"
@@ -312,6 +312,32 @@
                     size="lg"
                     :show-tooltip="false"
                   />
+
+                <!-- Recompensas e Incentivos -->
+                <section v-if="contract.additionalRewards?.length">
+                  <h4 class="text-lg font-semibold text-amber-400 mb-2 flex items-center gap-2">
+                    <GiftIcon class="w-5 h-5" />
+                    Recompensas e Incentivos
+                  </h4>
+                  <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
+                    <div class="space-y-3">
+                      <div v-for="reward in contract.additionalRewards" :key="reward.specificReward" 
+                           class="flex items-start gap-3 p-3 rounded-lg border"
+                           :class="reward.isPositive ? 'bg-green-900/20 border-green-600/30' : 'bg-red-900/20 border-red-600/30'">
+                        <div class="flex-shrink-0 mt-0.5">
+                          <CheckCircleIcon v-if="reward.isPositive" class="w-5 h-5 text-green-400" />
+                          <ExclamationTriangleIcon v-else class="w-5 h-5 text-red-400" />
+                        </div>
+                        <div class="flex-1">
+                          <div class="font-medium text-white mb-1">{{ getCategoryDisplayName(reward.category) }}</div>
+                          <div class="text-sm text-gray-300">{{ reward.specificReward }}</div>
+                          <div v-if="reward.description && reward.description !== reward.specificReward" 
+                               class="text-xs text-gray-400 mt-1">{{ reward.description }}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
                   
                   <!-- Detalhes dos Modificadores -->
                   <div class="mt-4 bg-gray-700 rounded-lg p-4 border border-gray-600">
@@ -538,7 +564,9 @@ import {
   DocumentTextIcon,
   InformationCircleIcon,
   UserPlusIcon,
-  ShieldExclamationIcon
+  ShieldExclamationIcon,
+  GiftIcon,
+  CheckCircleIcon
 } from '@heroicons/vue/24/outline';
 import {
   XCircleIcon
@@ -703,7 +731,18 @@ function getCategoryDisplayName(category: string): string {
     'FOME_SECA': 'Fome/Seca',
     'CRISE_ECONOMICA': 'Crise Econômica',
     'PERSEGUICAO': 'Perseguição',
-    'MORTE_IMPORTANTES': 'Morte de Importantes'
+    'MORTE_IMPORTANTES': 'Morte de Importantes',
+    // Categorias de Recompensas Adicionais
+    'RIQUEZAS': 'Riquezas',
+    'ARTEFATOS_MAGICOS': 'Artefatos Mágicos',
+    'PODER': 'Poder',
+    'CONHECIMENTO': 'Conhecimento',
+    'INFLUENCIA_RENOME': 'Influência e Renome',
+    'GLORIA': 'Glória',
+    'MORAL': 'Moral',
+    'PAGAMENTO_DIFERENCIADO': 'Pagamento Diferenciado',
+    'RECOMPENSA_BIZARRA': 'Recompensa Bizarra',
+    'APARENCIAS_ENGANAM': 'Aparências Enganam'
   };
   
   return categoryMap[category] || category;
