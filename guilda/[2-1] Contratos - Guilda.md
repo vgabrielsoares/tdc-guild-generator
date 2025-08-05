@@ -170,6 +170,8 @@ A distância determina o quão longe está o local determinado para o cumpriment
 
 #### Tabela de Distância
 
+> Um hexágono equivale a 6 milhas (9,6 km). Arredonde para 9 ou 10 km.
+
 | 1d20  | Distância                | Modificador |
 | ----- | ------------------------ | ----------- |
 | 1-4   | Um hexágono ou menos     | -20         |
