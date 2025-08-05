@@ -1,5 +1,5 @@
 // Teste do Store de Contratos
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { setActivePinia, createPinia } from "pinia";
 import { useContractsStore } from "@/stores/contracts";
 import { useGuildStore } from "@/stores/guild";
@@ -9,10 +9,89 @@ import {
   ContractorType,
 } from "@/types/contract";
 import { createTestGuild } from "../utils/test-helpers";
+import { rollDice, rollOnTable } from "@/utils/dice";
+
+// Mock das funções de dados
+vi.mock("@/utils/dice");
 
 describe("Contracts Store", () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+
+    // Mock abrangente do rollDice e rollOnTable para todas as operações
+    const mockRollDice = vi.mocked(rollDice);
+    const mockRollOnTable = vi.mocked(rollOnTable);
+
+    mockRollDice.mockImplementation(({ notation }: { notation: string }) => {
+      // Mock baseado no tipo de rolagem
+      if (notation === "1d20") {
+        return {
+          result: 10,
+          notation,
+          individual: [10],
+          modifier: 0,
+          timestamp: new Date(),
+        };
+      }
+      if (notation === "1d6+1") {
+        return {
+          result: 4,
+          notation,
+          individual: [3],
+          modifier: 1,
+          timestamp: new Date(),
+        };
+      }
+      if (notation === "1d4") {
+        return {
+          result: 2,
+          notation,
+          individual: [2],
+          modifier: 0,
+          timestamp: new Date(),
+        };
+      }
+      if (notation === "1d100") {
+        return {
+          result: 50,
+          notation,
+          individual: [50],
+          modifier: 0,
+          timestamp: new Date(),
+        };
+      }
+      if (notation === "1d6") {
+        return {
+          result: 3,
+          notation,
+          individual: [3],
+          modifier: 0,
+          timestamp: new Date(),
+        };
+      }
+
+      // Rolagens genéricas
+      return {
+        result: 1,
+        notation,
+        individual: [1],
+        modifier: 0,
+        timestamp: new Date(),
+      };
+    });
+
+    // Mock do rollOnTable para lifecycle manager
+    mockRollOnTable.mockImplementation(() => ({
+      roll: {
+        result: 7,
+        notation: "1d20",
+        individual: [7],
+        modifier: 0,
+        timestamp: new Date(),
+      },
+      result: "1 semana",
+      tableEntry: { min: 7, max: 8, result: "1 semana" },
+    }));
   });
 
   describe("Inicialização", () => {
