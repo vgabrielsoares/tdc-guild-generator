@@ -30,14 +30,6 @@
         <span class="detail-value">{{ formattedExperienceValue }}</span>
       </div>
 
-      <!-- Modificadores aplicados -->
-      <div v-if="hasModifiers" class="value-detail">
-        <span class="detail-label">Mods:</span>
-        <span :class="modifierClasses">
-          {{ totalModifierDisplay }}
-        </span>
-      </div>
-
       <!-- Tipo de pagamento -->
       <div v-if="showPaymentType" class="value-detail">
         <span class="detail-label">Pagamento:</span>
@@ -394,41 +386,6 @@ const difficultyTextClasses = computed(() => {
   }
 });
 
-const hasModifiers = computed(() => {
-  const mods = props.value.modifiers;
-  return (
-    mods.distance !== 0 ||
-    mods.populationRelationValue !== 0 ||
-    mods.governmentRelationValue !== 0 ||
-    mods.staffPreparation !== 0 ||
-    mods.requirementsAndClauses > 0
-  );
-});
-
-const totalModifierDisplay = computed(() => {
-  const mods = props.value.modifiers;
-  const total =
-    mods.distance +
-    mods.populationRelationValue +
-    mods.governmentRelationValue +
-    mods.staffPreparation +
-    mods.requirementsAndClauses;
-
-  return formatModifier(total);
-});
-
-const modifierClasses = computed(() => {
-  const mods = props.value.modifiers;
-  const total =
-    mods.distance +
-    mods.populationRelationValue +
-    mods.governmentRelationValue +
-    mods.staffPreparation +
-    mods.requirementsAndClauses;
-
-  return getModifierClass(total);
-});
-
 // Separar modificadores por categoria (XP vs Recompensa)
 const xpModifiers = computed(() => {
   if (!props.value?.modifiers) return [];
@@ -579,15 +536,6 @@ function onMouseLeave() {
   isTooltipVisible.value = false;
 }
 
-function formatModifier(value: number): string {
-  return value >= 0 ? `+${value}` : value.toString();
-}
-
-function getModifierClass(value: number): string {
-  if (value > 0) return "text-green-300";
-  if (value < 0) return "text-red-300";
-  return "text-gray-400";
-}
 </script>
 
 <style scoped>
@@ -608,18 +556,18 @@ function getModifierClass(value: number): string {
 }
 
 .value-currency {
-  font-size: 0.75rem;
+  font-size: 1rem;
   color: rgb(156, 163, 175);
   font-weight: 500;
 }
 
 .value-difficulty {
-  font-size: 0.75rem;
+  font-size: 1rem;
   font-weight: 500;
 }
 
 .value-details {
-  font-size: 0.75rem;
+  font-size: 1rem;
 }
 
 .value-details > * + * {
@@ -666,7 +614,7 @@ function getModifierClass(value: number): string {
 }
 
 .tooltip-title {
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 600;
   color: rgb(251, 191, 36);
   border-bottom: 1px solid rgb(75, 85, 99);
@@ -677,7 +625,7 @@ function getModifierClass(value: number): string {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.75rem;
+  font-size: 1rem;
 }
 
 .tooltip-label {

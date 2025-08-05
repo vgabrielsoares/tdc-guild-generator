@@ -33,7 +33,7 @@
                   <h3 class="text-xl font-semibold text-amber-400">
                     {{ contract.title || `Contrato ${contract.id.slice(0, 8)}` }}
                   </h3>
-                  <p class="text-sm text-gray-400">
+                  <p class="text-md text-gray-400">
                     {{ contractorTypeLabel }} - {{ contract.contractorName || 'Nome não especificado' }}
                   </p>
                 </div>
@@ -90,7 +90,7 @@
                     
                     <!-- Especificação da localidade -->
                     <div v-if="contract.location.specification" class="mt-3 p-3 bg-gray-800 rounded border border-gray-500">
-                      <div class="text-sm text-gray-400 mb-1">
+                      <div class="text-md text-gray-400 mb-1">
                         <strong>Localização específica:</strong>
                       </div>
                       <p class="text-gray-200 mb-1">{{ contract.location.specification.location }}</p>
@@ -101,7 +101,7 @@
 
                     <!-- Distrito específico -->
                     <div v-if="contract.location.district" class="mt-3 p-3 bg-gray-800 rounded border border-gray-500">
-                      <div class="text-sm text-gray-400 mb-1">
+                      <div class="text-md text-gray-400 mb-1">
                         <strong>Distrito:</strong>
                       </div>
                       <p class="text-gray-200">
@@ -112,7 +112,7 @@
 
                     <!-- Importância do local -->
                     <div v-if="contract.location.importance && contract.location.importance.type !== 'nenhuma'" class="mt-3 p-3 bg-gray-800 rounded border border-gray-500">
-                      <div class="text-sm text-gray-400 mb-1">
+                      <div class="text-md text-gray-400 mb-1">
                         <strong>Importância:</strong>
                       </div>
                       <p class="text-gray-200 mb-1">{{ contract.location.importance.name }}</p>
@@ -123,7 +123,7 @@
 
                     <!-- Peculiaridade do local -->
                     <div v-if="contract.location.peculiarity && contract.location.peculiarity.type !== 'nenhuma'" class="mt-3 p-3 bg-gray-800 rounded border border-gray-500">
-                      <div class="text-sm text-gray-400 mb-1">
+                      <div class="text-md text-gray-400 mb-1">
                         <strong>Peculiaridade:</strong>
                       </div>
                       <p class="text-gray-200 mb-1">{{ contract.location.peculiarity.name }}</p>
@@ -145,7 +145,7 @@
                         {{ getCategoryDisplayName(contract.antagonist.category) }}
                       </span>
                     </div>
-                    <p class="text-gray-300 text-sm">{{ contract.antagonist.description }}</p>
+                    <p class="text-gray-300 text-md">{{ contract.antagonist.description }}</p>
                   </div>
                 </section>
 
@@ -165,7 +165,7 @@
                           {{ getCategoryDisplayName(complication.category) }}
                         </span>
                       </div>
-                      <p class="text-gray-300 text-sm">{{ complication.description }}</p>
+                      <p class="text-gray-300 text-md">{{ complication.description }}</p>
                     </div>
                   </div>
                 </section>
@@ -186,7 +186,7 @@
                           {{ getCategoryDisplayName(ally.category) }}
                         </span>
                       </div>
-                      <p class="text-gray-300 text-sm mb-2">{{ ally.description }}</p>
+                      <p class="text-gray-300 text-md mb-2">{{ ally.description }}</p>
                       
                       <!-- Detalhes específicos do aliado -->
                       <div class="mt-3 p-3 bg-gray-800 rounded border border-gray-500">
@@ -247,7 +247,7 @@
                         </span>
                       </div>
                       <p class="text-gray-300 text-sm mb-1">{{ twist.description }}</p>
-                      <div v-if="twist.what" class="text-xs text-purple-200">
+                      <div v-if="twist.what" class="text-sm text-purple-200">
                         <strong>Revelação:</strong> {{ twist.what }}
                       </div>
                     </div>
@@ -331,7 +331,7 @@
                           <div class="font-medium text-white mb-1">{{ getCategoryDisplayName(reward.category) }}</div>
                           <div class="text-sm text-gray-300">{{ reward.specificReward }}</div>
                           <div v-if="reward.description && reward.description !== reward.specificReward" 
-                               class="text-xs text-gray-400 mt-1">{{ reward.description }}</div>
+                               class="text-sm text-gray-400 mt-1">{{ reward.description }}</div>
                         </div>
                       </div>
                     </div>
@@ -347,7 +347,7 @@
                           <ClockIcon class="w-5 h-5 text-amber-400" />
                           Prazo
                         </h6>
-                        <div class="space-y-1 text-sm">
+                        <div class="space-y-1 text-md">
                           <div class="flex justify-between">
                             <span class="text-gray-400">Tipo:</span>
                             <span class="text-white">{{ contract.deadline.type }}</span>
@@ -364,7 +364,7 @@
                           <CurrencyDollarIcon class="w-5 h-5 text-amber-400" />
                           Tipo de Pagamento
                         </h6>
-                        <div class="text-sm">
+                        <div class="text-md">
                           <div class="text-gray-300">{{ getPaymentTypeDescription(contract.paymentType) }}</div>
                         </div>
                       </div>
@@ -381,7 +381,7 @@
                         <ExclamationTriangleIcon class="w-5 h-5 text-yellow-400" />
                         Pré-requisitos
                       </h5>
-                      <ul class="text-sm text-gray-300 space-y-1">
+                      <ul class="text-md text-gray-300 space-y-1">
                         <li v-for="prerequisite in contract.prerequisites" :key="prerequisite" class="flex items-start gap-2">
                           <span class="text-yellow-400 mt-0.5">•</span>
                           <span>{{ prerequisite }}</span>
@@ -394,7 +394,7 @@
                         <DocumentTextIcon class="w-5 h-5 text-blue-400" />
                         Cláusulas Especiais
                       </h5>
-                      <ul class="text-sm text-gray-300 space-y-1">
+                      <ul class="text-md text-gray-300 space-y-1">
                         <li v-for="clause in contract.clauses" :key="clause" class="flex items-start gap-2">
                           <span class="text-blue-400 mt-0.5">•</span>
                           <span>{{ clause }}</span>
@@ -408,7 +408,7 @@
                 <section v-if="showDebugInfo" class="border-t border-gray-600 pt-4">
                   <h4 class="text-lg font-semibold text-amber-400 mb-2">Informações de Geração</h4>
                   <div class="bg-gray-900 rounded-lg p-4 border border-gray-700">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm font-mono">
                       <div>
                         <div class="text-gray-400">ID: {{ contract.id }}</div>
                         <div class="text-gray-400">Criado: {{ formatDate(contract.createdAt) }}</div>

@@ -22,7 +22,7 @@
         <ContractStatus :status="contract.status" size="sm" />
       </div>
       
-      <p class="text-sm text-gray-400 mt-1">
+      <p class="text-md text-gray-400 mt-1">
         {{ contractorTypeLabel }} - {{ contract.contractorName || 'Nome não especificado' }}
       </p>
     </div>
@@ -31,19 +31,19 @@
     <div class="p-4 space-y-3">
       <!-- Objetivo -->
       <div v-if="contract.objective">
-        <p class="text-sm font-medium text-gray-300">
+        <p class="text-md font-medium text-gray-300">
           {{ contract.objective.category }}
         </p>
-        <p class="text-sm text-gray-400 line-clamp-2">
+        <p class="text-md text-gray-400 line-clamp-2">
           {{ contract.objective.description }}
         </p>
       </div>
 
       <!-- Localização -->
-      <div v-if="contract.location" class="flex items-center gap-2 text-sm text-gray-400">
+      <div v-if="contract.location" class="flex items-center gap-2 text-md text-gray-400">
         <MapPinIcon class="w-4 h-4 text-amber-400" />
         <span>{{ contract.location.name }}</span>
-        <span v-if="contract.location.description" class="text-xs">
+        <span v-if="contract.location.description" class="text-md">
           ({{ contract.location.description }})
         </span>
       </div>
@@ -53,11 +53,11 @@
         <ContractValue
           :value="contract.value"
           :difficulty="contract.difficulty"
-          size="sm"
+          size="md"
         />
         
         <div v-if="contract.deadline.type !== 'Sem prazo'" class="text-right">
-          <p class="text-sm font-medium text-gray-300">
+          <p class="text-md font-medium text-gray-300">
             {{ contract.deadline.value }}
           </p>
         </div>
@@ -67,7 +67,7 @@
       <div v-if="hasSpecialFeatures" class="flex items-center gap-2 pt-2 border-t border-gray-700">
         <!-- Indicador de aliados -->
         <div v-if="contract.allies?.length" 
-             class="flex items-center gap-1 bg-green-900/30 px-2 py-1 rounded-full text-xs text-green-300"
+             class="flex items-center gap-1 bg-green-900/30 px-2 py-1 rounded-full text-md text-green-300"
              title="Aliados disponíveis">
           <UserPlusIcon class="w-3 h-3" />
           <span>{{ contract.allies.length }} aliado{{ contract.allies.length > 1 ? 's' : '' }}</span>
@@ -75,7 +75,7 @@
 
         <!-- Indicador de consequências severas -->
         <div v-if="contract.severeConsequences?.length" 
-             class="flex items-center gap-1 bg-red-900/30 px-2 py-1 rounded-full text-xs text-red-300"
+             class="flex items-center gap-1 bg-red-900/30 px-2 py-1 rounded-full text-md text-red-300"
              title="Consequências por falha">
           <ShieldExclamationIcon class="w-3 h-3" />
           <span>Consequências severas</span>
@@ -83,7 +83,7 @@
 
         <!-- Indicador de recompensas adicionais -->
         <div v-if="contract.additionalRewards?.length" 
-             class="flex items-center gap-1 bg-amber-900/30 px-2 py-1 rounded-full text-xs text-amber-300"
+             class="flex items-center gap-1 bg-amber-900/30 px-2 py-1 rounded-full text-md text-amber-300"
              :title="getAdditionalRewardsTooltip(contract.additionalRewards)">
           <GiftIcon class="w-3 h-3" />
           <span>{{ contract.additionalRewards.length }} extra{{ contract.additionalRewards.length > 1 ? 's' : '' }}</span>
@@ -97,7 +97,7 @@
         <button
           v-if="canAccept"
           @click="$emit('accept', contract)"
-          class="flex-1 bg-green-600 hover:bg-green-700 text-white text-sm py-2 px-3 rounded transition-colors"
+          class="flex-1 bg-green-600 hover:bg-green-700 text-white text-md py-2 px-3 rounded transition-colors"
         >
           Aceitar
         </button>
@@ -105,14 +105,14 @@
         <button
           v-if="canComplete"
           @click="$emit('complete', contract)"
-          class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 px-3 rounded transition-colors"
+          class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-md py-2 px-3 rounded transition-colors"
         >
           Concluir
         </button>
         
         <button
           @click="$emit('view-details', contract)"
-          class="flex-1 bg-gray-600 hover:bg-gray-700 text-white text-sm py-2 px-3 rounded transition-colors"
+          class="flex-1 bg-gray-600 hover:bg-gray-700 text-white text-md py-2 px-3 rounded transition-colors"
         >
           Detalhes
         </button>
@@ -120,7 +120,7 @@
         <button
           v-if="canAbandon"
           @click="$emit('abandon', contract)"
-          class="bg-red-600 hover:bg-red-700 text-white text-sm py-2 px-3 rounded transition-colors"
+          class="bg-red-600 hover:bg-red-700 text-white text-md py-2 px-3 rounded transition-colors"
         >
           <XMarkIcon class="w-4 h-4" />
         </button>

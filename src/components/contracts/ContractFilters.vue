@@ -194,7 +194,7 @@
         <span
           v-for="activeFilter in activeFilters"
           :key="activeFilter.key"
-          class="inline-flex items-center gap-1 px-2 py-1 bg-amber-600/20 border border-amber-600/50 rounded text-xs text-amber-200"
+          class="inline-flex items-center gap-1 px-2 py-1 bg-amber-600/20 border border-amber-600/50 rounded text-sm text-amber-200"
         >
           {{ activeFilter.label }}
           <button
@@ -444,7 +444,7 @@ function applyQuickFilter(filterType: string) {
 }
 
 function quickFilterClasses(filterType: string): string {
-  const baseClasses = 'px-3 py-1 rounded-full text-xs font-medium transition-colors';
+  const baseClasses = 'px-3 py-1 rounded-full text-sm font-medium transition-colors';
   
   // Verificar se o filtro está ativo
   let isActive = false;
@@ -506,7 +506,7 @@ function removeFilter(filterKey: string) {
 
 .filter-label {
   display: block;
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 500;
   color: rgb(209, 213, 219);
 }
@@ -517,7 +517,7 @@ function removeFilter(filterKey: string) {
   border: 1px solid rgb(75, 85, 99);
   border-radius: 0.375rem;
   color: white;
-  font-size: 0.875rem;
+  font-size: 1rem;
   padding: 0.5rem 0.75rem;
   transition: border-color 0.2s;
 }
@@ -538,7 +538,7 @@ function removeFilter(filterKey: string) {
   border: 1px solid rgb(75, 85, 99);
   border-radius: 0.375rem;
   color: white;
-  font-size: 0.875rem;
+  font-size: 1rem;
   padding: 0.5rem 0.75rem;
   transition: border-color 0.2s;
 }
