@@ -584,16 +584,6 @@ function handleAbandon() {
   }
 }
 
-function formatModifier(value: number): string {
-  return value > 0 ? `+${value}` : `${value}`;
-}
-
-function getModifierClass(value: number): string {
-  if (value > 0) return 'text-green-400';
-  if (value < 0) return 'text-red-400';
-  return 'text-gray-400';
-}
-
 function getPaymentTypeDescription(paymentType: PaymentType): string {
   switch (paymentType) {
     case PaymentType.DIRETO_CONTRATANTE:
