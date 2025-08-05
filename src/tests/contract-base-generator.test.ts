@@ -26,6 +26,7 @@ import {
   ContractorType,
   PaymentType,
   ContractDifficulty,
+  DeadlineType,
 } from "@/types/contract";
 import type { Guild } from "@/types/guild";
 import type { Contract } from "@/types/contract";
@@ -428,8 +429,9 @@ describe("ContractGenerator - Issue 4.11 - Implementação Completa", () => {
 
       expect(contract.deadline.type).toBeDefined();
       expect(contract.deadline.value).toBeDefined();
-      expect(typeof contract.deadline.isFlexible).toBe("boolean");
-      expect(typeof contract.deadline.isArbitrary).toBe("boolean");
+      
+      // Verificar que o tipo é um dos valores válidos
+      expect(Object.values(DeadlineType)).toContain(contract.deadline.type);
     });
   });
 });

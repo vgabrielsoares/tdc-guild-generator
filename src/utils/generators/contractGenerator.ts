@@ -667,8 +667,6 @@ export class ContractGenerator {
       return {
         type: DeadlineType.SEM_PRAZO,
         value: "Sem prazo",
-        isFlexible: true,
-        isArbitrary: true,
       };
     }
 
@@ -695,10 +693,6 @@ export class ContractGenerator {
       type = DeadlineType.DIAS;
     } else if (finalValue.includes("semana")) {
       type = DeadlineType.SEMANAS;
-    } else if (result.isArbitrary) {
-      type = DeadlineType.ARBITRARIO;
-    } else if (result.hasOpportunityWindow) {
-      type = DeadlineType.JANELA_OPORTUNIDADE;
     } else {
       type = DeadlineType.SEM_PRAZO;
     }
@@ -706,8 +700,6 @@ export class ContractGenerator {
     return {
       type,
       value: finalValue,
-      isFlexible: result.isFlexible,
-      isArbitrary: result.isArbitrary,
     };
   }
 
@@ -1526,8 +1518,6 @@ export class ContractGenerator {
     deadline: {
       type: DeadlineType;
       value?: string;
-      isFlexible: boolean;
-      isArbitrary: boolean;
     };
     paymentType: PaymentType;
   }): string {

@@ -33,8 +33,6 @@ export enum DeadlineType {
   SEM_PRAZO = "Sem prazo",
   DIAS = "Dias",
   SEMANAS = "Semanas",
-  ARBITRARIO = "Arbitrário",
-  JANELA_OPORTUNIDADE = "Janela de oportunidade",
 }
 
 // Tipos de pagamento disponíveis
@@ -148,9 +146,7 @@ export interface Contract {
   // Prazo e tempo
   deadline: {
     type: DeadlineType;
-    value?: string; // "3 dias", "1 semana", etc.
-    isFlexible: boolean;
-    isArbitrary: boolean;
+    value?: string;
   };
 
   // Tipo de pagamento
@@ -223,8 +219,6 @@ export const ContractValueSchema = z.object({
 export const DeadlineSchema = z.object({
   type: z.nativeEnum(DeadlineType),
   value: z.string().optional(),
-  isFlexible: z.boolean(),
-  isArbitrary: z.boolean(),
 });
 
 // Schema para dados de geração

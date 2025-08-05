@@ -60,9 +60,6 @@
           <p class="text-sm font-medium text-gray-300">
             {{ contract.deadline.value }}
           </p>
-          <p class="text-xs text-gray-500">
-            {{ contract.deadline.isFlexible ? 'Flexível' : 'Rígido' }}
-          </p>
         </div>
       </div>
 

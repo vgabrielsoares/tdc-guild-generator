@@ -122,8 +122,6 @@ describe("Contract Types - Issue 4.1", () => {
       },
       deadline: {
         type: DeadlineType.SEM_PRAZO,
-        isFlexible: true,
-        isArbitrary: false,
       },
       paymentType: PaymentType.TOTAL_GUILDA,
       prerequisites: [],
@@ -258,8 +256,6 @@ describe("Contract Types - Issue 4.1", () => {
         deadline: {
           type: DeadlineType.DIAS,
           value: "3 dias",
-          isFlexible: false,
-          isArbitrary: true,
         },
         paymentType: PaymentType.TOTAL_GUILDA,
         prerequisites: [],

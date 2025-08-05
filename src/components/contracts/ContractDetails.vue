@@ -414,18 +414,6 @@
                             <span class="text-gray-400">Tempo:</span>
                             <span class="text-white">{{ contract.deadline.value }}</span>
                           </div>
-                          <div class="flex justify-between">
-                            <span class="text-gray-400">Flexibilidade:</span>
-                            <span :class="contract.deadline.isFlexible ? 'text-green-400' : 'text-orange-400'">
-                              {{ contract.deadline.isFlexible ? 'Flexível' : 'Rígido' }}
-                            </span>
-                          </div>
-                          <div class="flex justify-between">
-                            <span class="text-gray-400">Arbitrário:</span>
-                            <span :class="contract.deadline.isArbitrary ? 'text-yellow-400' : 'text-blue-400'">
-                              {{ contract.deadline.isArbitrary ? 'Sim' : 'Não' }}
-                            </span>
-                          </div>
                         </div>
                       </div>
 

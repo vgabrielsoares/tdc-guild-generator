@@ -111,7 +111,6 @@ describe('Contract Base Tables - Issue 4.3', () => {
 
       const semPrazo = CONTRACT_DEADLINE_TABLE.find(e => e.min === 11);
       expect(semPrazo?.result.deadline).toBe("Sem prazo");
-      expect(semPrazo?.result.isArbitrary).toBe(true);
     });
   });
 
