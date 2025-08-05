@@ -56,9 +56,14 @@ describe("AntagonistGenerator", () => {
     it("deve gerar descrições simples e diretas", () => {
       const antagonist = AntagonistGenerator.generateAntagonist();
       expect(antagonist.description.length).toBeGreaterThan(10);
-      expect(antagonist.description).toContain(
-        antagonist.specificType.toLowerCase()
+      
+      // Com múltiplos resultados, specificType pode conter apenas uma parte da descrição
+      // Vamos verificar se alguma parte do specificType está na descrição
+      const specificTypes = antagonist.specificType.split(' E ');
+      const hasMatchingType = specificTypes.some(type => 
+        antagonist.description.toLowerCase().includes(type.toLowerCase().trim())
       );
+      expect(hasMatchingType).toBe(true);
     });
 
     it("deve validar categorias", () => {
