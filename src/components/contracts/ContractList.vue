@@ -11,21 +11,6 @@
           ({{ filteredContracts.length }} de {{ totalContracts }})
         </span>
       </div>
-      
-      <div class="flex items-center gap-2">
-        <!-- Botão de regenerar contratos -->
-        <button
-          @click="$emit('regenerate')"
-          class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded transition-colors text-sm"
-          :disabled="isLoading"
-        >
-          <ArrowPathIcon 
-            class="w-4 h-4"
-            :class="{ 'animate-spin': isLoading }"
-          />
-          Regenerar
-        </button>
-      </div>
     </div>
 
     <!-- Filtros rápidos -->
