@@ -8,13 +8,17 @@ import {
   ContractorType,
   DeadlineType,
   calculateBreachPenalty,
+  type ContractsStorageState,
+  type GuildContracts,
+  createEmptyGuildContracts,
+  canGuildGenerateContracts,
+  migrateContractsToGuildFormat,
 } from "@/types/contract";
 import {
   ContractLifecycleManager,
   type ContractLifecycleState,
   markExpiredContracts,
   processContractDeadlines,
-  getContractResolutionStats,
 } from "@/utils/generators/contractLifeCycle";
 import {
   ContractGenerator,
@@ -24,11 +28,12 @@ import { useGuildStore } from "./guild";
 import { useStorage } from "@/composables/useStorage";
 
 export const useContractsStore = defineStore("contracts", () => {
-  // Estado dos contratos
+  // Estado dos contratos atuais (da guilda selecionada)
   const contracts = ref<Contract[]>([]);
   const isLoading = ref(false);
   const lastUpdate = ref<Date | null>(null);
   const generationError = ref<string | null>(null);
+  const currentGuildId = ref<string | null>(null);
 
   // Gerenciador de ciclo de vida
   const lifecycleManager = new ContractLifecycleManager();
@@ -44,11 +49,11 @@ export const useContractsStore = defineStore("contracts", () => {
     hasDeadline: null as boolean | null,
   });
 
-  // Persistência
-  const storage = useStorage("contracts-store", {
-    contracts: [] as Contract[],
-    lastUpdate: null as string | null,
-    lifecycle: {} as ContractLifecycleState,
+  // Persistência segregada por guilda
+  const storage = useStorage<ContractsStorageState>("contracts-store-v2", {
+    guildContracts: {},
+    currentGuildId: null,
+    globalLastUpdate: null,
   });
 
   // ===== COMPUTED =====
@@ -108,15 +113,16 @@ export const useContractsStore = defineStore("contracts", () => {
       );
     }
 
-    // Filtro por texto (busca em título, descrição, objetivo)
+    // Filtro por texto (busca em descrição, objetivo, localização)
     if (filters.value.searchText.trim()) {
-      const searchLower = filters.value.searchText.toLowerCase().trim();
+      const searchLower = filters.value.searchText.toLowerCase();
       result = result.filter(
         (c) =>
-          c.title.toLowerCase().includes(searchLower) ||
           c.description.toLowerCase().includes(searchLower) ||
-          c.objective?.description.toLowerCase().includes(searchLower) ||
-          c.contractorName?.toLowerCase().includes(searchLower)
+          c.title.toLowerCase().includes(searchLower) ||
+          c.objective?.description?.toLowerCase().includes(searchLower) ||
+          c.contractorName?.toLowerCase().includes(searchLower) ||
+          c.location?.name?.toLowerCase().includes(searchLower)
       );
     }
 
@@ -134,106 +140,133 @@ export const useContractsStore = defineStore("contracts", () => {
       );
     }
 
-    // Filtro por prazo
+    // Filtro por existência de prazo
     if (filters.value.hasDeadline !== null) {
-      if (filters.value.hasDeadline) {
-        result = result.filter(
-          (c) => c.deadline.type !== DeadlineType.SEM_PRAZO
-        );
-      } else {
-        result = result.filter(
-          (c) => c.deadline.type === DeadlineType.SEM_PRAZO
-        );
-      }
+      const hasDeadline = filters.value.hasDeadline;
+      result = result.filter((c) => {
+        const contractHasDeadline = c.deadline.type !== DeadlineType.SEM_PRAZO;
+        return contractHasDeadline === hasDeadline;
+      });
     }
 
     return result;
   });
 
-  // Estatísticas dos contratos filtrados
-  const filteredStats = computed(() => {
-    const filtered = filteredContracts.value;
-    return {
-      total: filtered.length,
-      available: filtered.filter((c) => c.status === ContractStatus.DISPONIVEL)
-        .length,
-      accepted: filtered.filter((c) => c.status === ContractStatus.ACEITO)
-        .length,
-      inProgress: filtered.filter(
-        (c) => c.status === ContractStatus.EM_ANDAMENTO
-      ).length,
-      completed: filtered.filter(
-        (c) =>
-          c.status === ContractStatus.CONCLUIDO ||
-          c.status === ContractStatus.RESOLVIDO_POR_OUTROS
-      ).length,
-      failed: filtered.filter(
-        (c) =>
-          c.status === ContractStatus.FALHOU ||
-          c.status === ContractStatus.QUEBRADO ||
-          c.status === ContractStatus.ANULADO
-      ).length,
-      totalValue: filtered.reduce((sum, c) => sum + c.value.finalGoldReward, 0),
-      averageValue:
-        filtered.length > 0
-          ? filtered.reduce((sum, c) => sum + c.value.finalGoldReward, 0) /
-            filtered.length
-          : 0,
-    };
-  });
+  // Estatísticas dos contratos
+  const contractStats = computed(() => ({
+    total: contracts.value.length,
+    available: availableContracts.value.length,
+    accepted: acceptedContracts.value.length,
+    inProgress: inProgressContracts.value.length,
+    completed: completedContracts.value.length,
+    failed: failedContracts.value.length,
+    expired: expiredContracts.value.length,
+  }));
 
-  // Estatísticas gerais
-  const contractStats = computed(() =>
-    getContractResolutionStats(contracts.value)
-  );
+  // Verificar se a guilda atual pode gerar contratos
+  const canGenerateContracts = computed(() => {
+    if (!currentGuildId.value) return false;
+
+    const guildData = storage.data.value.guildContracts[currentGuildId.value];
+    return !guildData || canGuildGenerateContracts(guildData);
+  });
 
   // Informações do gerenciador de ciclo de vida
   const nextActions = computed(() => lifecycleManager.getNextActions());
 
-  // ===== ACTIONS =====
+  // ===== MÉTODOS AUXILIARES =====
 
   /**
-   * Inicializa o store carregando dados persistidos
+   * Salva os contratos da guilda atual no storage
    */
-  const initializeStore = async () => {
-    try {
-      storage.load();
-      if (storage.data.value.contracts.length > 0) {
-        contracts.value = storage.data.value.contracts;
-        lastUpdate.value = storage.data.value.lastUpdate
-          ? new Date(storage.data.value.lastUpdate)
-          : null;
+  const saveToStorage = () => {
+    if (!currentGuildId.value) return;
 
-        if (Object.keys(storage.data.value.lifecycle).length > 0) {
-          lifecycleManager.importState(storage.data.value.lifecycle);
-        }
-      }
-    } catch (error) {
-      generationError.value = "Erro ao carregar dados salvos";
+    const guildData: GuildContracts =
+      storage.data.value.guildContracts[currentGuildId.value] ||
+      createEmptyGuildContracts(currentGuildId.value);
+
+    guildData.contracts = contracts.value;
+    guildData.lastUpdate = lastUpdate.value;
+
+    storage.data.value.guildContracts[currentGuildId.value] = guildData;
+    storage.data.value.currentGuildId = currentGuildId.value;
+    storage.data.value.globalLastUpdate = new Date();
+  };
+
+  /**
+   * Carrega os contratos de uma guilda específica
+   */
+  const loadGuildContracts = (guildId: string) => {
+    const guildData = storage.data.value.guildContracts[guildId];
+
+    if (guildData) {
+      contracts.value = guildData.contracts;
+      lastUpdate.value = guildData.lastUpdate;
+    } else {
+      contracts.value = [];
+      lastUpdate.value = null;
+      // Criar entrada vazia para a guilda
+      storage.data.value.guildContracts[guildId] =
+        createEmptyGuildContracts(guildId);
+    }
+
+    currentGuildId.value = guildId;
+    storage.data.value.currentGuildId = guildId;
+  };
+
+  /**
+   * Remove todos os contratos de uma guilda do storage
+   */
+  const cleanupGuildContracts = (guildId: string) => {
+    delete storage.data.value.guildContracts[guildId];
+
+    // Se era a guilda atual, limpar o estado
+    if (currentGuildId.value === guildId) {
+      contracts.value = [];
+      lastUpdate.value = null;
+      currentGuildId.value = null;
+      storage.data.value.currentGuildId = null;
     }
   };
 
   /**
-   * Limpa contratos quando a guilda muda
+   * Migra contratos do formato antigo se existirem
    */
-  const clearContractsForNewGuild = () => {
-    contracts.value = [];
-    lastUpdate.value = null;
-    saveToStorage();
+  const migrateOldData = () => {
+    const oldStorage = useStorage("contracts-store", {
+      contracts: [] as Contract[],
+      lastUpdate: null as string | null,
+      lifecycle: {} as ContractLifecycleState,
+    });
+
+    if (oldStorage.data.value.contracts.length > 0 && currentGuildId.value) {
+      const migratedData = migrateContractsToGuildFormat(
+        oldStorage.data.value.contracts,
+        currentGuildId.value
+      );
+      storage.data.value.guildContracts[currentGuildId.value] = migratedData;
+      oldStorage.reset(); // Limpar dados antigos
+      saveToStorage();
+    }
   };
 
   /**
-   * Salva o estado atual no storage
+   * Sincroniza com a guilda atual do store de guild
    */
-  const saveToStorage = () => {
-    try {
-      storage.data.value = {
-        contracts: contracts.value,
-        lastUpdate: lastUpdate.value?.toISOString() || null,
-        lifecycle: lifecycleManager.exportState(),
-      };
-    } catch (error) {
-      // Erro silencioso no salvamento
+  const syncWithCurrentGuild = () => {
+    const guildStore = useGuildStore();
+    const currentGuild = guildStore.currentGuild;
+
+    if (currentGuild && currentGuild.id !== currentGuildId.value) {
+      loadGuildContracts(currentGuild.id);
+      migrateOldData(); // Tentar migrar dados antigos se necessário
+    } else if (!currentGuild && currentGuildId.value) {
+      // Guilda foi desmarcada, limpar estado
+      contracts.value = [];
+      lastUpdate.value = null;
+      currentGuildId.value = null;
+      storage.data.value.currentGuildId = null;
     }
   };
 
@@ -242,6 +275,25 @@ export const useContractsStore = defineStore("contracts", () => {
    */
   const initializeLifecycle = () => {
     lifecycleManager.initializeResolutionTimes();
+  };
+
+  // ===== ACTIONS =====
+
+  /**
+   * Inicializa o store
+   */
+  const initializeStore = async () => {
+    try {
+      // Sincronizar com a guilda atual
+      syncWithCurrentGuild();
+
+      // Inicializar o lifecycle
+      initializeLifecycle();
+
+      generationError.value = null;
+    } catch (error) {
+      generationError.value = "Erro ao inicializar store de contratos";
+    }
   };
 
   /**
@@ -256,10 +308,21 @@ export const useContractsStore = defineStore("contracts", () => {
       return;
     }
 
+    if (!canGenerateContracts.value) {
+      generationError.value =
+        "Esta guilda já teve contratos gerados. Use o sistema de timeline para novos contratos.";
+      return;
+    }
+
     isLoading.value = true;
     generationError.value = null;
 
     try {
+      // Garantir que estamos sincronizados com a guilda
+      if (currentGuildId.value !== currentGuild.id) {
+        loadGuildContracts(currentGuild.id);
+      }
+
       const config: ContractGenerationConfig = {
         guild: currentGuild,
         skipFrequentatorsReduction: false,
@@ -269,6 +332,12 @@ export const useContractsStore = defineStore("contracts", () => {
 
       // Adicionar novos contratos
       contracts.value.push(...newContracts);
+
+      // Marcar que contratos foram gerados para esta guilda
+      const guildData = storage.data.value.guildContracts[currentGuild.id];
+      if (guildData) {
+        guildData.generationCount += 1;
+      }
 
       lifecycleManager.markNewContractsGenerated();
       lastUpdate.value = new Date();
@@ -301,115 +370,26 @@ export const useContractsStore = defineStore("contracts", () => {
   };
 
   /**
-   * Força a resolução automática de contratos (para teste/debug)
+   * Atualiza o status de um contrato específico
    */
-  const forceResolution = () => {
-    contracts.value = lifecycleManager.forceContractResolution(contracts.value);
-    lastUpdate.value = new Date();
-    saveToStorage();
-  };
-
-  /**
-   * Aceita um contrato
-   */
-  const acceptContract = (contractId: string) => {
-    const contract = contracts.value.find((c) => c.id === contractId);
-    if (contract && contract.status === ContractStatus.DISPONIVEL) {
-      contract.status = ContractStatus.ACEITO;
-      lastUpdate.value = new Date();
-      saveToStorage();
-    }
-  };
-
-  /**
-   * Inicia um contrato aceito
-   */
-  const startContract = (contractId: string) => {
-    const contract = contracts.value.find((c) => c.id === contractId);
-    if (contract && contract.status === ContractStatus.ACEITO) {
-      contract.status = ContractStatus.EM_ANDAMENTO;
-      lastUpdate.value = new Date();
-      saveToStorage();
-    }
-  };
-
-  /**
-   * Completa um contrato em andamento
-   */
-  const completeContract = (contractId: string) => {
-    const contract = contracts.value.find((c) => c.id === contractId);
-    if (contract && contract.status === ContractStatus.EM_ANDAMENTO) {
-      contract.status = ContractStatus.CONCLUIDO;
-      contract.completedAt = new Date();
-      lastUpdate.value = new Date();
-      saveToStorage();
-    }
-  };
-
-  /**
-   * Marca um contrato como falhado
-   */
-  const failContract = (contractId: string) => {
-    const contract = contracts.value.find((c) => c.id === contractId);
-    if (
-      contract &&
-      (contract.status === ContractStatus.ACEITO ||
-        contract.status === ContractStatus.EM_ANDAMENTO)
-    ) {
-      contract.status = ContractStatus.FALHOU;
-      lastUpdate.value = new Date();
-      saveToStorage();
-    }
-  };
-
-  /**
-   * Quebra um contrato (aplica penalidade)
-   * 10% da recompensa em PO$ como multa
-   */
-  const breakContract = (contractId: string): number => {
-    const contract = contracts.value.find((c) => c.id === contractId);
-    if (
-      contract &&
-      (contract.status === ContractStatus.ACEITO ||
-        contract.status === ContractStatus.EM_ANDAMENTO)
-    ) {
-      contract.status = ContractStatus.QUEBRADO;
-      lastUpdate.value = new Date();
-      saveToStorage();
-
-      // Retorna o valor da penalidade (10% da recompensa)
-      return calculateBreachPenalty(contract.value.finalGoldReward);
-    }
-    return 0;
-  };
-
-  /**
-   * Cancela/anula um contrato
-   */
-  const cancelContract = (contractId: string) => {
+  const updateContractStatus = (
+    contractId: string,
+    newStatus: ContractStatus
+  ) => {
     const contract = contracts.value.find((c) => c.id === contractId);
     if (contract) {
-      contract.status = ContractStatus.ANULADO;
+      contract.status = newStatus;
       lastUpdate.value = new Date();
       saveToStorage();
     }
   };
 
   /**
-   * Adiciona um novo contrato
-   */
-  const addContract = (contract: Contract) => {
-    contracts.value.push(contract);
-    lastUpdate.value = new Date();
-    saveToStorage();
-  };
-
-  /**
-   * Remove um contrato
+   * Remove um contrato específico
    */
   const removeContract = (contractId: string) => {
     const index = contracts.value.findIndex((c) => c.id === contractId);
-    if (index >= 0) {
+    if (index !== -1) {
       contracts.value.splice(index, 1);
       lastUpdate.value = new Date();
       saveToStorage();
@@ -417,68 +397,33 @@ export const useContractsStore = defineStore("contracts", () => {
   };
 
   /**
-   * Limpa todos os contratos
+   * Reseta todos os contratos
    */
-  const clearContracts = () => {
+  const resetContracts = () => {
     contracts.value = [];
     lastUpdate.value = new Date();
+    generationError.value = null;
+    // TODO: lifecycleManager não tem método reset implementado ainda
     saveToStorage();
   };
 
   /**
-   * Obtém um contrato por ID
+   * Aplica penalidade por quebra de contrato
    */
-  const getContractById = (contractId: string): Contract | undefined => {
-    return contracts.value.find((c) => c.id === contractId);
-  };
-
-  // ===== FILTROS =====
-
-  /**
-   * Define filtro por status
-   */
-  const setStatusFilter = (status: ContractStatus | null) => {
-    filters.value.status = status;
-  };
-
-  /**
-   * Define filtro por dificuldade
-   */
-  const setDifficultyFilter = (difficulty: ContractDifficulty | null) => {
-    filters.value.difficulty = difficulty;
+  const applyBreachPenalty = (contractId: string) => {
+    const contract = contracts.value.find((c) => c.id === contractId);
+    if (contract) {
+      const penalty = calculateBreachPenalty(contract.value.finalGoldReward);
+      contract.status = ContractStatus.QUEBRADO;
+      lastUpdate.value = new Date();
+      saveToStorage();
+      return penalty;
+    }
+    return 0;
   };
 
   /**
-   * Define filtro por contratante
-   */
-  const setContractorFilter = (contractor: ContractorType | null) => {
-    filters.value.contractor = contractor;
-  };
-
-  /**
-   * Define filtro por texto de busca
-   */
-  const setSearchFilter = (searchText: string) => {
-    filters.value.searchText = searchText;
-  };
-
-  /**
-   * Define filtro por faixa de valores
-   */
-  const setValueRangeFilter = (min: number | null, max: number | null) => {
-    filters.value.minValue = min;
-    filters.value.maxValue = max;
-  };
-
-  /**
-   * Define filtro por prazo
-   */
-  const setDeadlineFilter = (hasDeadline: boolean | null) => {
-    filters.value.hasDeadline = hasDeadline;
-  };
-
-  /**
-   * Limpa todos os filtros
+   * Limpa filtros ativos
    */
   const clearFilters = () => {
     filters.value = {
@@ -492,31 +437,126 @@ export const useContractsStore = defineStore("contracts", () => {
     };
   };
 
-  // ===== ESTADO E VERIFICAÇÕES =====
+  /**
+   * Define um filtro específico
+   */
+  const setFilter = <K extends keyof typeof filters.value>(
+    key: K,
+    value: (typeof filters.value)[K]
+  ) => {
+    filters.value[key] = value;
+  };
 
   /**
-   * Verifica se é hora de processar resoluções
+   * Aceita um contrato específico
+   */
+  const acceptContract = (contractId: string) => {
+    updateContractStatus(contractId, ContractStatus.ACEITO);
+  };
+
+  /**
+   * Completa um contrato específico
+   */
+  const completeContract = (contractId: string) => {
+    updateContractStatus(contractId, ContractStatus.CONCLUIDO);
+  };
+
+  /**
+   * Quebra um contrato e aplica penalidade
+   */
+  const breakContract = (contractId: string) => {
+    return applyBreachPenalty(contractId);
+  };
+
+  /**
+   * Limpa todos os contratos (alias para resetContracts)
+   */
+  const clearContracts = () => {
+    resetContracts();
+  };
+
+  /**
+   * Limpa contratos para nova guilda (alias para compatibilidade)
+   */
+  const clearContractsForNewGuild = () => {
+    resetContracts();
+  };
+
+  // ===== FUNÇÕES ESPECÍFICAS DE FILTROS (Compatibilidade) =====
+
+  /**
+   * Define filtro por status
+   */
+  const setStatusFilter = (status: ContractStatus | null) => {
+    setFilter("status", status);
+  };
+
+  /**
+   * Define filtro por dificuldade
+   */
+  const setDifficultyFilter = (difficulty: ContractDifficulty | null) => {
+    setFilter("difficulty", difficulty);
+  };
+
+  /**
+   * Define filtro por tipo de contratante
+   */
+  const setContractorFilter = (contractor: ContractorType | null) => {
+    setFilter("contractor", contractor);
+  };
+
+  /**
+   * Define filtro por texto de busca
+   */
+  const setSearchFilter = (searchText: string) => {
+    setFilter("searchText", searchText);
+  };
+
+  /**
+   * Define filtro por range de valores
+   */
+  const setValueRangeFilter = (
+    minValue: number | null,
+    maxValue: number | null
+  ) => {
+    setFilter("minValue", minValue);
+    setFilter("maxValue", maxValue);
+  };
+
+  /**
+   * Define filtro por existência de prazo
+   */
+  const setDeadlineFilter = (hasDeadline: boolean | null) => {
+    setFilter("hasDeadline", hasDeadline);
+  };
+
+  // ===== FUNÇÕES DO CICLO DE VIDA (Compatibilidade) =====
+
+  /**
+   * Verifica se deve processar ciclo de vida
    */
   const shouldProcessLifecycle = (): boolean => {
-    return lifecycleManager.shouldResolveContracts();
+    return contracts.value.length > 0;
   };
 
   /**
-   * Verifica se é hora de gerar novos contratos
+   * Verifica se deve gerar novos contratos
    */
   const shouldGenerateNewContracts = (): boolean => {
-    return lifecycleManager.shouldGenerateNewContracts();
+    return canGenerateContracts.value;
   };
 
   /**
-   * Exporta estado para persistência externa (backup/debug)
+   * Exporta estado completo do store
    */
   const exportState = () => {
     return {
       contracts: contracts.value,
-      lastUpdate: lastUpdate.value?.toISOString() || null,
+      lastUpdate: lastUpdate.value,
       lifecycle: lifecycleManager.exportState(),
       filters: filters.value,
+      currentGuildId: currentGuildId.value,
+      guildContracts: storage.data.value.guildContracts,
     };
   };
 
@@ -541,6 +581,71 @@ export const useContractsStore = defineStore("contracts", () => {
   };
 
   /**
+   * Inicia um contrato aceito
+   */
+  const startContract = (contractId: string) => {
+    const contract = contracts.value.find((c) => c.id === contractId);
+    if (contract && contract.status === ContractStatus.ACEITO) {
+      contract.status = ContractStatus.EM_ANDAMENTO;
+      lastUpdate.value = new Date();
+      saveToStorage();
+    }
+  };
+
+  /**
+   * Marca um contrato como falhado
+   */
+  const failContract = (contractId: string) => {
+    const contract = contracts.value.find((c) => c.id === contractId);
+    if (
+      contract &&
+      (contract.status === ContractStatus.ACEITO ||
+        contract.status === ContractStatus.EM_ANDAMENTO)
+    ) {
+      contract.status = ContractStatus.FALHOU;
+      lastUpdate.value = new Date();
+      saveToStorage();
+    }
+  };
+
+  /**
+   * Cancela/anula um contrato
+   */
+  const cancelContract = (contractId: string) => {
+    const contract = contracts.value.find((c) => c.id === contractId);
+    if (contract) {
+      contract.status = ContractStatus.ANULADO;
+      lastUpdate.value = new Date();
+      saveToStorage();
+    }
+  };
+
+  /**
+   * Adiciona um novo contrato
+   */
+  const addContract = (contract: Contract) => {
+    contracts.value.push(contract);
+    lastUpdate.value = new Date();
+    saveToStorage();
+  };
+
+  /**
+   * Obtém um contrato por ID
+   */
+  const getContractById = (contractId: string): Contract | undefined => {
+    return contracts.value.find((c) => c.id === contractId);
+  };
+
+  /**
+   * Força a resolução automática de contratos (para teste/debug)
+   */
+  const forceResolution = () => {
+    contracts.value = lifecycleManager.forceContractResolution(contracts.value);
+    lastUpdate.value = new Date();
+    saveToStorage();
+  };
+
+  /**
    * Processa automaticamente o ciclo de vida se necessário
    */
   const autoProcessLifecycle = () => {
@@ -558,16 +663,64 @@ export const useContractsStore = defineStore("contracts", () => {
     saveToStorage();
   };
 
-  // Inicializa o store na criação
-  initializeLifecycle();
-  initializeStore();
+  // ===== ESTATÍSTICAS FILTRADAS =====
 
+  /**
+   * Estatísticas dos contratos filtrados
+   */
+  const filteredStats = computed(() => {
+    const filtered = filteredContracts.value;
+    return {
+      total: filtered.length,
+      available: filtered.filter((c) => c.status === ContractStatus.DISPONIVEL)
+        .length,
+      accepted: filtered.filter((c) => c.status === ContractStatus.ACEITO)
+        .length,
+      inProgress: filtered.filter(
+        (c) => c.status === ContractStatus.EM_ANDAMENTO
+      ).length,
+      completed: filtered.filter(
+        (c) =>
+          c.status === ContractStatus.CONCLUIDO ||
+          c.status === ContractStatus.RESOLVIDO_POR_OUTROS
+      ).length,
+      failed: filtered.filter(
+        (c) =>
+          c.status === ContractStatus.FALHOU ||
+          c.status === ContractStatus.QUEBRADO ||
+          c.status === ContractStatus.ANULADO
+      ).length,
+      totalValue: filtered.reduce((sum, c) => sum + c.value.finalGoldReward, 0),
+      averageValue:
+        filtered.length > 0
+          ? filtered.reduce((sum, c) => sum + c.value.finalGoldReward, 0) /
+            filtered.length
+          : 0,
+    };
+  });
+
+  /**
+   * Limpa dados de guildas removidas do histórico
+   */
+  const cleanupRemovedGuilds = (existingGuildIds: string[]) => {
+    const storageGuildIds = Object.keys(storage.data.value.guildContracts);
+    const toRemove = storageGuildIds.filter(
+      (id) => !existingGuildIds.includes(id)
+    );
+
+    toRemove.forEach((guildId) => {
+      cleanupGuildContracts(guildId);
+    });
+  };
+
+  // Retornar a API pública do store
   return {
     // ===== ESTADO =====
     contracts: readonly(contracts),
     isLoading: readonly(isLoading),
     lastUpdate: readonly(lastUpdate),
     generationError: readonly(generationError),
+    currentGuildId: readonly(currentGuildId),
     filters: readonly(filters),
 
     // ===== COMPUTED =====
@@ -578,16 +731,26 @@ export const useContractsStore = defineStore("contracts", () => {
     failedContracts,
     expiredContracts,
     filteredContracts,
-    filteredStats,
     contractStats,
+    canGenerateContracts,
     nextActions,
+
+    // ===== ACTIONS - Core =====
+    initializeStore,
+    syncWithCurrentGuild,
+    loadGuildContracts,
+    cleanupGuildContracts,
+    cleanupRemovedGuilds,
 
     // ===== ACTIONS - Geração e Ciclo de Vida =====
     generateContracts,
     processContractLifecycle,
-    forceResolution,
-    autoProcessLifecycle,
-    updateAndProcess,
+    updateContractStatus,
+    removeContract,
+    resetContracts,
+    applyBreachPenalty,
+    clearFilters,
+    setFilter,
 
     // ===== ACTIONS - Gerenciamento Manual =====
     acceptContract,
@@ -598,10 +761,9 @@ export const useContractsStore = defineStore("contracts", () => {
     cancelContract,
 
     // ===== ACTIONS - CRUD =====
-    addContract,
-    removeContract,
     clearContracts,
     clearContractsForNewGuild,
+    addContract,
     getContractById,
 
     // ===== ACTIONS - Filtros =====
@@ -611,18 +773,20 @@ export const useContractsStore = defineStore("contracts", () => {
     setSearchFilter,
     setValueRangeFilter,
     setDeadlineFilter,
-    clearFilters,
 
     // ===== ACTIONS - Estado =====
     shouldProcessLifecycle,
     shouldGenerateNewContracts,
+    forceResolution,
+    autoProcessLifecycle,
+    updateAndProcess,
+
+    // ===== ACTIONS - Exportação e Estatísticas =====
     exportState,
     importState,
-    initializeStore,
+    filteredStats,
 
     // ===== FUNÇÕES DO GERENCIADOR =====
     initializeLifecycle,
   };
 });
-
-export type ContractsStore = ReturnType<typeof useContractsStore>;
