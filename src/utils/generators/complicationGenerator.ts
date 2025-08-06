@@ -4,10 +4,14 @@
  * Este arquivo implementa as regras de Complicações e Reviravoltas
  * - Complicações: Tipo (1d20) + Detalhamento específico da categoria
  * - Reviravoltas: Chance (1d20, 19-20 = Sim) + Elementos ("Quem?", "Na verdade...", "Mas...")
- * - Tratamento de "Role duas vezes e use ambos"
+ * - Sistema de múltiplas rolagens que permite recursão infinita mas evita repetir opções
  */
 
 import { rollOnTable } from "@/utils/dice";
+import {
+  rollMultipleWithCombining,
+  createTextBasedRollAgainChecker,
+} from "@/utils/multiRollHandler";
 import type { Complication, Twist } from "@/types/contract";
 import {
   COMPLICATION_TYPES_TABLE,
@@ -27,8 +31,8 @@ import {
  *
  * Processo:
  * 1. Rola 1d20 na tabela de tipos de complicações
- * 2. Rola 1d20 na tabela de detalhamento da categoria específica
- * 3. Trata caso especial "Role duas vezes e use ambos"
+ * 2. Usa sistema de múltiplas rolagens na tabela de detalhamento
+ * 3. Permite recursão teórica infinita mas coleta apenas resultados únicos
  *
  * @returns Complicação gerada com categoria e detalhamento específico
  */
@@ -40,40 +44,15 @@ export function generateComplication(): Complication {
   });
   const category = categoryResult.result;
 
-  // 2. Rolar o detalhamento específico da categoria
+  // 2. Usar sistema de múltiplas rolagens no detalhamento
   const detailTable = COMPLICATION_DETAIL_TABLES[category];
-  const detailResult = rollOnTable({
-    table: detailTable,
-    context: `Detalhamento ${category}`,
-  });
-  let specificDetail = detailResult.result;
+  const specificDetail = rollMultipleWithCombining(
+    detailTable,
+    createTextBasedRollAgainChecker("Role duas vezes"),
+    `Detalhamento ${category}`
+  );
 
-  // 3. Tratar caso especial "Role duas vezes e use ambos"
-  if (specificDetail === "Role duas vezes e use ambos") {
-    const firstRoll = rollOnTable({
-      table: detailTable,
-      context: `Detalhamento ${category} - Primeira rolagem`,
-    });
-    const secondRoll = rollOnTable({
-      table: detailTable,
-      context: `Detalhamento ${category} - Segunda rolagem`,
-    });
-
-    // Evitar recursão infinita se as duas rolagens também derem "role duas vezes"
-    const firstDetail =
-      firstRoll.result === "Role duas vezes e use ambos"
-        ? getAlternativeResult(detailTable)
-        : firstRoll.result;
-
-    const secondDetail =
-      secondRoll.result === "Role duas vezes e use ambos"
-        ? getAlternativeResult(detailTable)
-        : secondRoll.result;
-
-    specificDetail = `${firstDetail} E ${secondDetail}`;
-  }
-
-  // 4. Montar resultado conforme especificação
+  // 3. Montar resultado conforme especificação
   const description = `${category}: ${specificDetail}`;
 
   return {
@@ -150,27 +129,4 @@ export function generateTwist(): Twist {
     andSecond,
     description,
   };
-}
-
-/**
- * Obtém um resultado alternativo da tabela para evitar "Role duas vezes" recursivo
- *
- * @param table - Tabela para rolar resultado alternativo
- * @returns Resultado que não seja "Role duas vezes"
- */
-function getAlternativeResult(
-  table: Array<{ min: number; max: number; result: string }>
-): string {
-  // Filtra resultados que não sejam "Role duas vezes"
-  const validEntries = table.filter(
-    (entry) => !entry.result.includes("Role duas vezes")
-  );
-
-  if (validEntries.length === 0) {
-    return "Complicação indefinida";
-  }
-
-  // Pega um resultado aleatório dos válidos
-  const randomIndex = Math.floor(Math.random() * validEntries.length);
-  return validEntries[randomIndex].result;
 }

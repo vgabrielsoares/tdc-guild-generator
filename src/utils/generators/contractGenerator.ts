@@ -1,5 +1,6 @@
 import { rollDice } from "../dice";
 import { rollOnTable } from "../tableRoller";
+import type { TableEntry } from "@/types/tables";
 import {
   CONTRACT_DICE_BY_SIZE,
   CONTRACT_VALUE_TABLE,
@@ -43,6 +44,43 @@ import {
 } from "../../data/tables/contract-complications-tables";
 
 import {
+  ALLY_APPEARANCE_CHANCE_TABLE,
+  ALLY_TYPES_TABLE,
+  ALLY_APPEARANCE_TIMING_TABLE,
+  ALLY_ARTIFACT_TABLE,
+  ALLY_POWERFUL_CREATURE_TABLE,
+  ALLY_UNEXPECTED_TABLE,
+  ALLY_SUPERNATURAL_HELP_TABLE,
+  ALLY_ORDINARY_CIVILIANS_TABLE,
+  ALLY_NATURE_TABLE,
+  ALLY_ORGANIZATIONS_TABLE,
+  ALLY_REFUGE_TABLE,
+  ALLY_ADVENTURERS_TABLE,
+  ALLY_ADVENTURER_LEVEL_TABLE,
+  ALLY_FRIENDLY_MONSTROSITY_TABLE,
+  ALLY_MONSTROSITY_CHARACTERISTICS_TABLE,
+  // Tabelas de recompensas adicionais
+  REWARD_CHANCE_TABLE,
+  REWARD_TYPES_TABLE,
+  REWARD_RICHES_TABLE,
+  REWARD_MAGICAL_ARTIFACTS_TABLE,
+  REWARD_POWER_TABLE,
+  REWARD_KNOWLEDGE_TABLE,
+  REWARD_INFLUENCE_TABLE,
+  REWARD_GLORY_TABLE,
+  REWARD_MORAL_TABLE,
+  REWARD_ALTERNATIVE_PAYMENT_TABLE,
+  REWARD_BIZARRE_TABLE,
+  REWARD_DECEPTIVE_TABLE,
+} from "../../data/tables/contract-rewards-tables";
+
+import {
+  SEVERE_CONSEQUENCES_CHANCE_TABLE,
+  SEVERE_CONSEQUENCES_TYPES_TABLE,
+  SEVERE_CONSEQUENCE_DETAIL_TABLES,
+} from "../../data/tables/contract-consequences-tables";
+
+import {
   MAIN_LOCATION_TABLE,
   LOCATION_IMPORTANCE_TABLE,
   LOCATION_PECULIARITY_TABLE,
@@ -64,6 +102,10 @@ import {
   ComplicationCategory,
   TwistWho,
   TwistWhat,
+  AllyCategory,
+  AllyTiming,
+  SevereConsequenceCategory,
+  RewardCategory,
 } from "../../types/contract";
 import type {
   Contract,
@@ -74,6 +116,9 @@ import type {
   Antagonist,
   Complication,
   Twist,
+  Ally,
+  SevereConsequence,
+  AdditionalReward,
 } from "../../types/contract";
 import type { Guild } from "../../types/guild";
 import { VisitorLevel, RelationLevel } from "../../types/guild";
@@ -126,76 +171,58 @@ export class ContractGenerator {
     // 1. Rolar valor base (1d100)
     const baseRoll = rollDice({ notation: "1d100" }).result;
 
-    // 2. Aplicar modificador de funcionários à rolagem se necessário
-    let adjustedRoll = baseRoll;
-    const staffDescription = guild.staff.employees || "";
-    if (staffDescription.toLowerCase().includes("experientes")) {
-      adjustedRoll += STAFF_PREPARATION_ROLL_MODIFIERS["experientes"] || 2;
-    } else if (staffDescription.toLowerCase().includes("despreparados")) {
-      adjustedRoll += STAFF_PREPARATION_ROLL_MODIFIERS["despreparados"] || -2;
-    }
-
-    // Garantir que o roll ajustado esteja dentro dos limites da tabela
-    adjustedRoll = Math.max(1, Math.min(100, adjustedRoll));
-
-    // 3. Calcular valor usando a rolagem ajustada
-    const valueResult = this.calculateContractValue(adjustedRoll, guild);
-
-    // 4. Gerar rolagens adicionais para dados de geração
+    // 2. Gerar rolagens adicionais para dados de geração
     const distanceRoll = rollDice({ notation: "1d20" }).result;
     const difficultyRoll = rollDice({ notation: "1d20" }).result;
 
-    // 5. Gerar deadline usando a tabela
-    const deadline = this.generateDeadline();
-
-    // 6. Determinar dificuldade baseada na rolagem
+    // 3. Determinar dificuldade baseada na rolagem
     const difficultyEntry = CONTRACT_DIFFICULTY_TABLE.find(
       (entry) => difficultyRoll >= entry.min && difficultyRoll <= entry.max
     );
     const difficulty =
       difficultyEntry?.result.difficulty || ContractDifficulty.MEDIO;
 
-    // 7. Gerar contratante seguindo as regras do markdown
+    // 4. Calcular valor aplicando todos os modificadores, incluindo dificuldade
+    const valueCalculationResult = this.calculateContractValue(
+      baseRoll,
+      guild,
+      difficultyEntry,
+      distanceRoll
+    );
+    const { contractValue, prerequisites, clauses } = valueCalculationResult;
+
+    // 5. Gerar deadline usando a tabela
+    const deadline = this.generateDeadline();
+
+    // 6. Gerar contratante seguindo as regras do markdown
     const contractor = this.generateContractor(guild);
 
-    // 8. Gerar objetivo conforme tabela do markdown
+    // 7. Gerar objetivo conforme tabela do markdown
     const objective = this.generateObjective();
 
-    // 9. Gerar localidade conforme tabela do markdown
+    // 8. Gerar localidade conforme tabela do markdown
     const location = this.generateLocation();
 
-    // 10. Gerar pré-requisitos baseados no valor
-    const prerequisites = this.generatePrerequisites(
-      valueResult.experienceValue
-    );
+    // 9. Gerar tipo de pagamento
+    const paymentType = this.generatePaymentType(contractValue.rewardValue);
 
-    // 11. Gerar cláusulas especiais
-    const clauses = this.generateClauses(valueResult.rewardValue);
-
-    // 12. Aplicar bônus por pré-requisitos e cláusulas
-    const totalBonuses = (prerequisites.length + clauses.length) * 5;
-    const finalValueResult = {
-      ...valueResult,
-      rewardValue: valueResult.rewardValue + totalBonuses,
-      finalGoldReward:
-        Math.round((valueResult.rewardValue + totalBonuses) * 0.1 * 100) / 100,
-      modifiers: {
-        ...valueResult.modifiers,
-        requirementsAndClauses: totalBonuses,
-      },
-    };
-
-    // 13. Gerar tipo de pagamento
-    const paymentType = this.generatePaymentType(finalValueResult.rewardValue);
-
-    // 13. Gerar antagonista
+    // 10. Gerar antagonista
     const antagonist = this.generateAntagonist();
 
-    // 14. Gerar complicações
+    // 11. Gerar complicações
     const complications = this.generateComplications();
 
-    // 15. Gerar reviravoltas
+    // 12. Gerar reviravoltas
     const twists = this.generateTwists();
+
+    // 13. Gerar aliados
+    const allies = this.generateAllies();
+
+    // 14. Gerar consequências severas (para quando o contrato falha)
+    const severeConsequences = this.generateSevereConsequences();
+
+    // 15. Gerar recompensas adicionais
+    const additionalRewards = this.generateAdditionalRewards();
 
     // 16. Gerar descrição completa do contrato
     const fullDescription = this.generateFullContractDescription({
@@ -205,11 +232,15 @@ export class ContractGenerator {
       antagonist,
       complications,
       twists,
+      allies,
+      severeConsequences,
+      additionalRewards,
       prerequisites,
       clauses,
-      finalValueResult,
+      finalValueResult: contractValue,
       deadline,
       paymentType,
+      distanceRoll,
     });
 
     // 17. Estrutura básica do contrato
@@ -230,7 +261,10 @@ export class ContractGenerator {
       antagonist,
       complications,
       twists,
-      value: finalValueResult,
+      allies,
+      severeConsequences,
+      additionalRewards: additionalRewards || [],
+      value: contractValue,
       deadline,
       paymentType,
       generationData: {
@@ -384,144 +418,222 @@ export class ContractGenerator {
   /**
    * Calcula o valor do contrato
    * 1. Rola 1d100 para valor base na tabela
-   * 2. Aplica modificadores de distância
-   * 3. Aplica modificadores de relações
-   * 4. Aplica modificadores de funcionários
-   * 5. Aplica multiplicadores de dificuldade
+   * 2. Calcula modificadores que afetam a rolagem
+   * 3. Gera pré-requisitos e cláusulas baseados no valor preliminar
+   * 4. Aplica modificadores à rolagem
+   * 5. Consulta a tabela novamente com as rolagens modificadas
+   * 6. Aplica multiplicadores de dificuldade
    */
   private static calculateContractValue(
     baseRoll: number,
-    guild: Guild
-  ): ContractValue {
+    guild: Guild,
+    difficultyEntry?: TableEntry<{
+      difficulty: ContractDifficulty;
+      experienceMultiplier: number;
+      rewardMultiplier: number;
+    }>,
+    distanceRoll?: number
+  ): {
+    contractValue: ContractValue;
+    prerequisites: string[];
+    clauses: string[];
+  } {
     // 1. Obter valor base da tabela usando a rolagem 1d100
-    const tableEntry = CONTRACT_VALUE_TABLE.find(
+    const baseTableEntry = CONTRACT_VALUE_TABLE.find(
       (entry) => baseRoll >= entry.min && baseRoll <= entry.max
     );
-    let baseValue = tableEntry?.result || 75;
+    let baseValue = baseTableEntry?.result || 75;
 
     // Tratar caso especial 101+ (valor anterior * 1.1)
     if (baseRoll > 100) {
       baseValue = calculateExtendedValue(baseRoll, baseValue);
     }
 
-    // 2. Calcular modificadores
-    const modifiers = this.calculateModifiers(guild);
+    // 2. Calcular todos os modificadores que afetam a rolagem
+    const rollModifiers = this.calculateRollModifiers(guild, distanceRoll);
 
-    // 3. Separar valores de experiência e recompensa (começam iguais)
-    let experienceValue = baseValue;
-    let rewardValue = baseValue;
+    // 3. Gerar pré-requisitos e cláusulas baseados no valor base preliminar
+    // Isso nos permite calcular o bônus que será aplicado à rolagem
+    const preliminaryExperienceValue = baseValue;
+    const preliminaryRewardValue = baseValue;
 
-    // 4. Aplicar modificadores de distância
-    experienceValue += modifiers.distance;
-    rewardValue += modifiers.distance;
+    const prerequisites = this.generatePrerequisites(
+      preliminaryExperienceValue
+    );
+    const clauses = this.generateClauses(preliminaryRewardValue);
 
-    // 5. Aplicar modificadores de relação com população
-    experienceValue += modifiers.populationRelationValue;
-    rewardValue += modifiers.populationRelationReward;
+    // 4. Calcular bônus de pré-requisitos e cláusulas (+5 por item na rolagem)
+    const requirementsBonusToRoll = (prerequisites.length + clauses.length) * 5;
 
-    // 6. Aplicar modificadores de relação com governo
-    experienceValue += modifiers.governmentRelationValue;
-    rewardValue += modifiers.governmentRelationReward;
+    // 5. Aplicar modificadores às rolagens separadas para XP e Recompensa
+    // Incluindo bônus de pré-requisitos e cláusulas
+    const experienceRoll = Math.max(
+      1,
+      Math.min(100, baseRoll + rollModifiers.experienceModifier)
+    );
+    const rewardRoll = Math.max(
+      1,
+      Math.min(
+        100,
+        baseRoll + rollModifiers.rewardModifier + requirementsBonusToRoll
+      )
+    );
 
-    // 7. Aplicar modificadores de funcionários (já aplicados na rolagem)
-    // staffPreparation é aplicado à rolagem d100, não ao valor final
+    // 6. Consultar a tabela novamente com as rolagens modificadas
+    const experienceTableEntry = CONTRACT_VALUE_TABLE.find(
+      (entry) => experienceRoll >= entry.min && experienceRoll <= entry.max
+    );
+    let experienceValue = experienceTableEntry?.result || 75;
 
-    // 8. Aplicar multiplicadores de dificuldade
+    const rewardTableEntry = CONTRACT_VALUE_TABLE.find(
+      (entry) => rewardRoll >= entry.min && rewardRoll <= entry.max
+    );
+    let rewardValue = rewardTableEntry?.result || 75;
+
+    // Tratar casos especiais 101+ para ambas as rolagens
+    if (experienceRoll > 100) {
+      experienceValue = calculateExtendedValue(experienceRoll, experienceValue);
+    }
+    if (rewardRoll > 100) {
+      rewardValue = calculateExtendedValue(rewardRoll, rewardValue);
+    }
+
+    // 7. Aplicar multiplicadores de dificuldade
+    const difficultyMultipliers =
+      this.calculateDifficultyMultipliers(difficultyEntry);
     experienceValue = Math.floor(
-      experienceValue * modifiers.difficultyMultiplier.experienceMultiplier
+      experienceValue * difficultyMultipliers.experienceMultiplier
     );
     rewardValue = Math.floor(
-      rewardValue * modifiers.difficultyMultiplier.rewardMultiplier
+      rewardValue * difficultyMultipliers.rewardMultiplier
     );
 
-    // 9. Garantir valores mínimos
+    // 8. Garantir valores mínimos
     experienceValue = Math.max(1, experienceValue);
     rewardValue = Math.max(1, rewardValue);
 
-    // 10. Calcular PO$ final (recompensa * 0.1)
-    const finalGoldReward = Math.round(rewardValue * 0.1 * 100) / 100;
+    // 9. Calcular PO$ final (recompensa * 0.1)
+    const finalGoldReward = Math.round(rewardValue * 10) / 100;
 
-    return {
+    // 10. Construir objeto de modificadores para referência
+    const modifiers: ContractModifiers = {
+      distance: rollModifiers.distance,
+      populationRelationValue: rollModifiers.populationRelationValue,
+      populationRelationReward: rollModifiers.populationRelationReward,
+      governmentRelationValue: rollModifiers.governmentRelationValue,
+      governmentRelationReward: rollModifiers.governmentRelationReward,
+      staffPreparation: rollModifiers.staffPreparation,
+      difficultyMultiplier: difficultyMultipliers,
+      requirementsAndClauses: requirementsBonusToRoll,
+    };
+
+    const contractValue: ContractValue = {
       baseValue, // Valor original da tabela
       experienceValue, // Valor para estruturar o contrato (orçamento XP)
       rewardValue, // Valor da recompensa em pontos
       finalGoldReward, // Valor final em PO$
       modifiers,
     };
+
+    return {
+      contractValue,
+      prerequisites,
+      clauses,
+    };
   }
 
   /**
-   * Calcula modificadores baseados na guilda seguindo as regras do markdown
+   * Calcula modificadores que afetam a rolagem d100
    */
-  private static calculateModifiers(guild: Guild): ContractModifiers {
-    const modifiers: ContractModifiers = {
-      distance: 0,
-      populationRelationValue: 0,
-      populationRelationReward: 0,
-      governmentRelationValue: 0,
-      governmentRelationReward: 0,
-      staffPreparation: 0,
-      difficultyMultiplier: {
-        experienceMultiplier: 1,
-        rewardMultiplier: 1,
-      },
-      requirementsAndClauses: 0,
-    };
+  private static calculateRollModifiers(guild: Guild, distanceRoll?: number): {
+    experienceModifier: number;
+    rewardModifier: number;
+    distance: number;
+    populationRelationValue: number;
+    populationRelationReward: number;
+    governmentRelationValue: number;
+    governmentRelationReward: number;
+    staffPreparation: number;
+  } {
+    let experienceModifier = 0;
+    let rewardModifier = 0;
 
-    // 1. Rolar distância (1d20) e aplicar modificadores
-    const distanceRoll = rollDice({ notation: "1d20" }).result;
+    // 1. Modificadores de distância (afetam tanto valor quanto recompensa)
+    const finalDistanceRoll = distanceRoll || rollDice({ notation: "1d20" }).result;
     const distanceEntry = CONTRACT_DISTANCE_TABLE.find(
-      (entry) => distanceRoll >= entry.min && distanceRoll <= entry.max
+      (entry) => finalDistanceRoll >= entry.min && finalDistanceRoll <= entry.max
     );
-    if (distanceEntry) {
-      modifiers.distance = distanceEntry.result.valueModifier;
-    }
+    const distanceModifier = distanceEntry?.result.valueModifier || 0;
+    experienceModifier += distanceModifier;
+    rewardModifier += distanceModifier;
 
-    // 2. Aplicar modificadores por relação com população
+    // 2. Modificadores por relação com população
     const populationRelation = this.mapRelationLevelToString(
       guild.relations.population
     );
     const populationMods = POPULATION_RELATION_MODIFIERS[
       populationRelation
-    ] || { valueModifier: 0, rewardModifier: 0 };
-    modifiers.populationRelationValue = populationMods.valueModifier;
-    modifiers.populationRelationReward = populationMods.rewardModifier;
+    ] || {
+      valueModifier: 0,
+      rewardModifier: 0,
+    };
+    experienceModifier += populationMods.valueModifier;
+    rewardModifier += populationMods.rewardModifier;
 
-    // 3. Aplicar modificadores por relação com governo
+    // 3. Modificadores por relação com governo
     const governmentRelation = this.mapRelationLevelToString(
       guild.relations.government
     );
     const governmentMods = GOVERNMENT_RELATION_MODIFIERS[
       governmentRelation
-    ] || { valueModifier: 0, rewardModifier: 0 };
-    modifiers.governmentRelationValue = governmentMods.valueModifier;
-    modifiers.governmentRelationReward = governmentMods.rewardModifier;
+    ] || {
+      valueModifier: 0,
+      rewardModifier: 0,
+    };
+    experienceModifier += governmentMods.valueModifier;
+    rewardModifier += governmentMods.rewardModifier;
 
-    // 4. Modificadores de funcionários (aplicados à rolagem d100, não ao valor final)
+    // 4. Modificadores de funcionários (aplicados apenas à rolagem de recompensa)
+    let staffPreparation = 0;
     const staffDescription = guild.staff.employees || "";
     if (staffDescription.toLowerCase().includes("experientes")) {
-      modifiers.staffPreparation =
-        STAFF_PREPARATION_ROLL_MODIFIERS["experientes"] || 2;
+      staffPreparation = STAFF_PREPARATION_ROLL_MODIFIERS["experientes"] || 2;
     } else if (staffDescription.toLowerCase().includes("despreparados")) {
-      modifiers.staffPreparation =
+      staffPreparation =
         STAFF_PREPARATION_ROLL_MODIFIERS["despreparados"] || -2;
     }
+    rewardModifier += staffPreparation; // Funcionários afetam apenas a recompensa
 
-    // 5. Rolar dificuldade (1d20) e aplicar multiplicadores
-    const difficultyRoll = rollDice({ notation: "1d20" }).result;
-    const difficultyEntry = CONTRACT_DIFFICULTY_TABLE.find(
-      (entry) => difficultyRoll >= entry.min && difficultyRoll <= entry.max
-    );
-    if (difficultyEntry) {
-      modifiers.difficultyMultiplier = {
-        experienceMultiplier: difficultyEntry.result.experienceMultiplier,
-        rewardMultiplier: difficultyEntry.result.rewardMultiplier,
-      };
-    }
-
-    return modifiers;
+    return {
+      experienceModifier,
+      rewardModifier,
+      distance: distanceModifier,
+      populationRelationValue: populationMods.valueModifier,
+      populationRelationReward: populationMods.rewardModifier,
+      governmentRelationValue: governmentMods.valueModifier,
+      governmentRelationReward: governmentMods.rewardModifier,
+      staffPreparation,
+    };
   }
 
+  /**
+   * Calcula multiplicadores de dificuldade
+   */
+  private static calculateDifficultyMultipliers(
+    difficultyEntry?: TableEntry<{
+      difficulty: ContractDifficulty;
+      experienceMultiplier: number;
+      rewardMultiplier: number;
+    }>
+  ): {
+    experienceMultiplier: number;
+    rewardMultiplier: number;
+  } {
+    return {
+      experienceMultiplier: difficultyEntry?.result.experienceMultiplier || 1,
+      rewardMultiplier: difficultyEntry?.result.rewardMultiplier || 1,
+    };
+  }
   /**
    * Mapeia RelationLevel enum para strings das tabelas
    */
@@ -570,8 +682,6 @@ export class ContractGenerator {
       return {
         type: DeadlineType.SEM_PRAZO,
         value: "Sem prazo",
-        isFlexible: true,
-        isArbitrary: true,
       };
     }
 
@@ -598,10 +708,6 @@ export class ContractGenerator {
       type = DeadlineType.DIAS;
     } else if (finalValue.includes("semana")) {
       type = DeadlineType.SEMANAS;
-    } else if (result.isArbitrary) {
-      type = DeadlineType.ARBITRARIO;
-    } else if (result.hasOpportunityWindow) {
-      type = DeadlineType.JANELA_OPORTUNIDADE;
     } else {
       type = DeadlineType.SEM_PRAZO;
     }
@@ -609,8 +715,6 @@ export class ContractGenerator {
     return {
       type,
       value: finalValue,
-      isFlexible: result.isFlexible,
-      isArbitrary: result.isArbitrary,
     };
   }
 
@@ -724,12 +828,12 @@ export class ContractGenerator {
     if (!entry) {
       return {
         name: "Funcionário desconhecido",
-        description: "Contratante do governo não identificado"
+        description: "Contratante do governo não identificado",
       };
     }
     return {
       name: entry.result.name,
-      description: entry.result.description
+      description: entry.result.description,
     };
   }
 
@@ -752,59 +856,51 @@ export class ContractGenerator {
    * Gera objetivo principal e especificações
    */
   private static generateObjective(): ContractObjective {
-    // 1. Rolar objetivo principal (1d20)
-    const objectiveResult = rollOnTable(
-      MAIN_OBJECTIVE_TABLE,
-      [],
-      "Objetivo Principal"
-    );
+    // 1. Primeira rolagem para objetivo principal
+    const firstRoll = rollOnTable(MAIN_OBJECTIVE_TABLE, [], "Objetivos Principais");
 
-    // 2. Verificar se deve rolar duas vezes
-    if (shouldRollTwiceForObjective(objectiveResult.result)) {
-      // Gerar dois objetivos separados
-      const firstObjective = this.generateSingleObjective();
-      const secondObjective = this.generateSingleObjective();
+    // 2. Verificar se é "Role duas vezes e use ambos"
+    if (shouldRollTwiceForObjective(firstRoll.result)) {
+      // Rolar duas vezes para obter dois objetivos diferentes
+      let firstObjectiveRoll = rollOnTable(MAIN_OBJECTIVE_TABLE, [], "Objetivos Principais");
+      let secondObjectiveRoll = rollOnTable(MAIN_OBJECTIVE_TABLE, [], "Objetivos Principais");
+
+      // Garantir que não são iguais e que não são "Role duas vezes" novamente
+      let attempts = 0;
+      while (
+        (firstObjectiveRoll.result.description === secondObjectiveRoll.result.description ||
+         shouldRollTwiceForObjective(firstObjectiveRoll.result) ||
+         shouldRollTwiceForObjective(secondObjectiveRoll.result)) &&
+        attempts < 20
+      ) {
+        firstObjectiveRoll = rollOnTable(MAIN_OBJECTIVE_TABLE, [], "Objetivos Principais");
+        secondObjectiveRoll = rollOnTable(MAIN_OBJECTIVE_TABLE, [], "Objetivos Principais");
+        attempts++;
+      }
+
+      const firstObjective = firstObjectiveRoll.result;
+      const secondObjective = secondObjectiveRoll.result;
+
+      // Gerar especificações para ambos os objetivos
+      const firstSpec = this.generateObjectiveSpecification(firstObjective.category);
+      const secondSpec = this.generateObjectiveSpecification(secondObjective.category);
 
       return {
         category: firstObjective.category,
-        description: `${firstObjective.description} Além disso, ${secondObjective.description}`,
-        specificObjective: `${firstObjective.specificObjective} e ${secondObjective.specificObjective}`,
+        description: `${firstObjective.description}. Além disso, ${secondObjective.description.toLowerCase()}`,
+        specificObjective: `${firstSpec.target} e ${secondSpec.target}`,
       };
     }
 
-    // 3. Gerar especificação baseada na categoria
-    const specification = this.generateObjectiveSpecification(
-      objectiveResult.result.category
-    );
+    // 3. Objetivo único - usar o resultado da primeira rolagem
+    const objectiveEntry = firstRoll.result;
+
+    // 4. Gerar especificação baseada na categoria
+    const specification = this.generateObjectiveSpecification(objectiveEntry.category);
 
     return {
-      category: objectiveResult.result.category,
-      description: objectiveResult.result.description,
-      specificObjective: specification.target,
-    };
-  }
-
-  /**
-   * Gera um objetivo individual para casos de "role duas vezes"
-   */
-  private static generateSingleObjective(): ContractObjective {
-    let objectiveResult;
-    do {
-      objectiveResult = rollOnTable(
-        MAIN_OBJECTIVE_TABLE,
-        [],
-        "Objetivo Principal"
-      );
-      // Evitar recursão infinita - se der "role duas vezes", rolar novamente
-    } while (objectiveResult.result.name === "Role duas vezes e use ambos");
-
-    const specification = this.generateObjectiveSpecification(
-      objectiveResult.result.category
-    );
-
-    return {
-      category: objectiveResult.result.category,
-      description: objectiveResult.result.description,
+      category: objectiveEntry.category,
+      description: objectiveEntry.description,
       specificObjective: specification.target,
     };
   }
@@ -826,8 +922,8 @@ export class ContractGenerator {
       const secondSpec = this.generateSingleSpecification(category);
 
       return {
-        target: `${firstSpec.target} e ${secondSpec.target}`,
-        description: `${firstSpec.description} Além disso, ${secondSpec.description}`,
+        target: `${firstSpec.target}, além disso ${secondSpec.target.toLowerCase()}`,
+        description: `${firstSpec.description}. Além disso, ${secondSpec.description.toLowerCase()}`,
       };
     }
 
@@ -1411,6 +1507,132 @@ export class ContractGenerator {
   }
 
   /**
+   * Obter a descrição da distância baseada na rolagem
+   */
+  private static getDistanceDescription(distanceRoll: number): string {
+    const distanceEntry = CONTRACT_DISTANCE_TABLE.find(
+      (entry) => distanceRoll >= entry.min && distanceRoll <= entry.max
+    );
+    return distanceEntry?.result.description || "Distância não especificada";
+  }
+
+  /**
+   * Obter a descrição da distância de um contrato
+   */
+  static getContractDistanceDescription(contract: Contract): string {
+    if (!contract.generationData.distanceRoll) {
+      return "Distância não especificada";
+    }
+    return this.getDistanceDescription(contract.generationData.distanceRoll);
+  }
+
+  /**
+   * Mapeamento de números em texto para valores numéricos e suas configurações
+   */
+  private static readonly HEXAGON_PATTERNS = [
+    { 
+      pattern: /Um hexágono/i, 
+      value: 1,
+      getRanges: (desc: string) => desc.includes("ou menos") 
+        ? { min: 0, max: 1 } 
+        : { min: 1, max: 10 }
+    },
+    { 
+      pattern: /Dois hexágonos/i, 
+      value: 2,
+      getRanges: (desc: string) => desc.includes("ou menos") 
+        ? { min: 0, max: 2 } 
+        : { min: 2, max: 10 }
+    },
+    { 
+      pattern: /Três hexágonos/i, 
+      value: 3,
+      getRanges: (desc: string) => desc.includes("ou menos") 
+        ? { min: 0, max: 3 } 
+        : { min: 3, max: 10 }
+    },
+    { pattern: /Quatro hexágonos/i, value: 4, getRanges: () => ({ min: 4, max: 10 }) },
+    { pattern: /Cinco hexágonos/i, value: 5, getRanges: () => ({ min: 5, max: 10 }) },
+    { pattern: /Seis hexágonos/i, value: 6, getRanges: () => ({ min: 6, max: 10 }) },
+    { pattern: /Sete hexágonos/i, value: 7, getRanges: () => ({ min: 7, max: 10 }) },
+    { pattern: /Oito hexágonos/i, value: 8, getRanges: () => ({ min: 8, max: 10 }) },
+  ] as const;
+
+  /**
+   * Constante para conversão de hexágonos para quilômetros
+   */
+  private static readonly KM_PER_HEXAGON = 9.5;
+
+  /**
+   * Extrai informações de hexágonos da descrição de distância
+   */
+  private static extractHexagonsFromDescription(description: string): { min: number; max: number } | null {
+    const matchedPattern = this.HEXAGON_PATTERNS.find(pattern => 
+      pattern.pattern.test(description)
+    );
+
+    return matchedPattern ? matchedPattern.getRanges(description) : null;
+  }
+
+  /**
+   * Converte hexágonos para quilômetros com arredondamento apropriado
+   */
+  private static hexagonsToKilometers(hexagons: { min: number; max: number }): { min: number; max: number } {
+    return {
+      min: Math.round(hexagons.min * this.KM_PER_HEXAGON * 10) / 10,
+      max: Math.round(hexagons.max * this.KM_PER_HEXAGON * 10) / 10
+    };
+  }
+
+  /**
+   * Obtém entrada da tabela de distância baseada na rolagem
+   */
+  private static getDistanceTableEntry(distanceRoll: number) {
+    return CONTRACT_DISTANCE_TABLE.find(
+      (entry) => distanceRoll >= entry.min && distanceRoll <= entry.max
+    );
+  }
+
+  /**
+   * Obter informações detalhadas da distância de um contrato
+   */
+  static getContractDistanceDetails(contract: Contract): {
+    description: string;
+    hexagons: { min: number; max: number } | null;
+    kilometers: { min: number; max: number } | null;
+  } {
+    const distanceRoll = contract.generationData.distanceRoll;
+    
+    if (!distanceRoll) {
+      return {
+        description: "Distância não especificada",
+        hexagons: null,
+        kilometers: null
+      };
+    }
+
+    const distanceEntry = this.getDistanceTableEntry(distanceRoll);
+    
+    if (!distanceEntry) {
+      return {
+        description: "Distância não especificada",
+        hexagons: null,
+        kilometers: null
+      };
+    }
+
+    const description = distanceEntry.result.description;
+    const hexagons = this.extractHexagonsFromDescription(description);
+    const kilometers = hexagons ? this.hexagonsToKilometers(hexagons) : null;
+
+    return {
+      description,
+      hexagons,
+      kilometers
+    };
+  }
+
+  /**
    * Gera descrição completa do contrato englobando todos os elementos
    */
   private static generateFullContractDescription(params: {
@@ -1420,16 +1642,18 @@ export class ContractGenerator {
     antagonist: Antagonist;
     complications: Complication[];
     twists: Twist[];
+    allies: Ally[];
+    severeConsequences: SevereConsequence[];
+    additionalRewards: AdditionalReward[];
     prerequisites: string[];
     clauses: string[];
     finalValueResult: ContractValue;
     deadline: {
       type: DeadlineType;
       value?: string;
-      isFlexible: boolean;
-      isArbitrary: boolean;
     };
     paymentType: PaymentType;
+    distanceRoll?: number;
   }): string {
     const {
       objective,
@@ -1438,32 +1662,32 @@ export class ContractGenerator {
       antagonist,
       complications,
       twists,
+      allies,
+      severeConsequences,
+      additionalRewards,
       prerequisites,
       clauses,
       finalValueResult,
       deadline,
       paymentType,
+      distanceRoll,
     } = params;
 
     const sections: string[] = [];
 
     // 1. Contratante
     sections.push(
-      `**Contratante:** ${contractor.name}\n→ ${contractor.description}`
+      `**Contratante:** ${contractor.name} (${contractor.description})`
     );
 
     // 2. Objetivo
-    let objectiveText = `**Objetivo:** ${objective.description}`;
-    if (objective.specificObjective) {
-      objectiveText += `\nDetalhes: ${objective.specificObjective}`;
-    }
+    const objectiveText = `**Objetivo:** ${objective.description} (${objective.specificObjective})`;
     sections.push(objectiveText);
 
     // 3. Localidade com todas as informações organizadas
-    let locationText = `**Local:** ${location.name}`;
+    let locationText = `**Local:** ${location.name} (${location.specification?.location})`;
 
     if (location.specification) {
-      locationText += `\nLocalização específica: ${location.specification.location}`;
       if (
         location.specification.description !== location.specification.location
       ) {
@@ -1494,48 +1718,104 @@ export class ContractGenerator {
 
     sections.push(locationText);
 
-    // 4. Antagonista
-    sections.push(
-      `**Antagonista:** ${antagonist.specificType}\n→ ${antagonist.description}`
-    );
-
-    // 5. Complicações
-    if (complications.length > 0) {
-      const complicationTexts = complications
-        .map((c) => `• ${c.description}`)
-        .join("\n");
-      sections.push(`**Complicações:**\n${complicationTexts}`);
+    // 4. Distância
+    if (distanceRoll) {
+      const distanceDescription = this.getDistanceDescription(distanceRoll);
+      
+      // Obter detalhes da distância para mostrar a aproximação correta em km
+      const distanceDetails = this.getContractDistanceDetails({
+        generationData: { distanceRoll }
+      } as Contract);
+      
+      let kmInfo = "";
+      if (distanceDetails.kilometers) {
+        if (distanceDetails.kilometers.min === distanceDetails.kilometers.max) {
+          kmInfo = ` (aproximadamente ${distanceDetails.kilometers.min} km)`;
+        } else {
+          kmInfo = ` (aproximadamente ${distanceDetails.kilometers.min}-${distanceDetails.kilometers.max} km)`;
+        }
+      }
+      
+      sections.push(`**Distância:** ${distanceDescription}${kmInfo}`);
     }
 
-    // 6. Reviravoltas (se houver)
+    // 5. Antagonista
+    sections.push(
+      `**Antagonista:** ${antagonist.specificType}: ${antagonist.description}`
+    );
+
+    // 6. Complicações
+    if (complications.length > 0) {
+      const complicationTexts = complications
+        .map((c) => `${c.description}`)
+        .join("\n");
+      sections.push(`**Complicações:** ${complicationTexts}`);
+    }
+
+    // 7. Aliados (se houver)
+    if (allies.length > 0) {
+      const allyTexts = allies
+        .map(
+          (ally) => `• ${ally.name} (${ally.category}) - ${ally.description}`
+        )
+        .join("\n");
+      sections.push(`**Aliados potenciais:**\n${allyTexts}`);
+    }
+
+    // 8. Reviravoltas (se houver)
     if (twists.length > 0) {
       const twistTexts = twists.map((t) => `• ${t.description}`).join("\n");
       sections.push(`**Reviravoltas:**\n${twistTexts}`);
     }
 
-    // 7. Recompensa e incentivos
+    // 9. Valor em XP
+    sections.push(`**Experiência:** ${finalValueResult.experienceValue} XP`);
+
+    // 10. Recompensa principal
     sections.push(
       `**Recompensa:** ${finalValueResult.finalGoldReward} moedas de ouro`
     );
 
-    // 8. Prazo
+    // 11. Recompensas e incentivos (se houver)
+    if (additionalRewards.length > 0) {
+      const rewardTexts = additionalRewards
+        .map((reward) => {
+          const prefix = reward.isPositive ? "✓" : "⚠";
+          return `${prefix} ${reward.description}`;
+        })
+        .join("\n");
+      sections.push(`**Recompensas e Incentivos:**\n${rewardTexts}`);
+    }
+
+    // 12. Consequências severas (se houver)
+    if (severeConsequences.length > 0) {
+      const consequenceTexts = severeConsequences
+        .map(
+          (consequence) =>
+            `• ${consequence.description}\n  Afeta contratados: ${consequence.affectsContractors}`
+        )
+        .join("\n");
+      sections.push(`**Consequências por falha:**\n${consequenceTexts}`);
+    }
+
+    // 13. Prazo
     if (deadline.type !== DeadlineType.SEM_PRAZO) {
       sections.push(`**Prazo:** ${deadline.value}`);
     }
 
-    // 9. Pré-requisitos (se houver)
+    // 14. Pré-requisitos (se houver)
     if (prerequisites.length > 0) {
       const prerequisiteTexts = prerequisites.map((p) => `• ${p}`).join("\n");
       sections.push(`**Pré-requisitos:**\n${prerequisiteTexts}`);
     }
 
-    // 10. Cláusulas (se houver)
+    // 15. Cláusulas (se houver)
     if (clauses.length > 0) {
       const clauseTexts = clauses.map((c) => `• ${c}`).join("\n");
       sections.push(`**Cláusulas:**\n${clauseTexts}`);
     }
 
-    // 11. Tipo de pagamento
+    // 16. Tipo de pagamento
     const paymentText = this.getPaymentTypeDescription(paymentType);
     sections.push(`**Forma de pagamento:** ${paymentText}`);
 
@@ -1562,5 +1842,647 @@ export class ContractGenerator {
       default:
         return "Pagamento a definir";
     }
+  }
+
+  // ===== GERAÇÃO DE ALIADOS =====
+
+  /**
+   * Gera aliados que podem aparecer durante o contrato
+   * Baseado nas regras da seção "Aliados"
+   */
+  private static generateAllies(): Ally[] {
+    const allies: Ally[] = [];
+
+    // 1. Verificar se aliados aparecerão (1d20, 11-20 = Sim)
+    const willAlliesAppear = rollOnTable(
+      ALLY_APPEARANCE_CHANCE_TABLE,
+      [],
+      "Aparição de Aliados"
+    );
+
+    if (!willAlliesAppear.result) {
+      return allies; // Nenhum aliado aparecerá
+    }
+
+    // 2. Determinar o tipo de aliado (1d20)
+    const allyTypeResult = rollOnTable(ALLY_TYPES_TABLE, [], "Tipo de Aliado");
+    const allyCategory = this.mapStringToAllyCategory(
+      allyTypeResult.result as string
+    );
+
+    // 3. Determinar quando/como o aliado surgirá (1d20)
+    const timingResult = rollOnTable(
+      ALLY_APPEARANCE_TIMING_TABLE,
+      [],
+      "Tempo de Aparição"
+    );
+    const allyTiming = this.mapStringToAllyTiming(
+      timingResult.result as string
+    );
+
+    // 4. Gerar detalhes específicos do aliado
+    const allyDetails = this.generateAllyDetails(allyCategory);
+
+    // 5. Criar o objeto do aliado
+    const ally: Ally = {
+      category: allyCategory,
+      specificType: allyDetails.specificType,
+      name: allyDetails.name,
+      description: allyDetails.description,
+      timing: allyTiming,
+      powerLevel: allyDetails.powerLevel,
+      characteristics: allyDetails.characteristics,
+    };
+
+    allies.push(ally);
+
+    // Verificar se precisa rolar duas vezes (resultado 20 nas tabelas)
+    if (
+      allyTypeResult.result === "Role duas vezes e use ambos" ||
+      timingResult.result === "Role duas vezes e use ambos"
+    ) {
+      // Gerar segundo aliado
+      const secondAlly = this.generateSingleAlly();
+      if (secondAlly) {
+        allies.push(secondAlly);
+      }
+    }
+
+    return allies;
+  }
+
+  /**
+   * Gera um único aliado (usado para rolagens duplas)
+   */
+  private static generateSingleAlly(): Ally | null {
+    const allyTypeResult = rollOnTable(
+      ALLY_TYPES_TABLE,
+      [],
+      "Tipo de Aliado Individual"
+    );
+
+    // Evitar loops infinitos em rolagens duplas
+    if (allyTypeResult.result === "Role duas vezes e use ambos") {
+      return null;
+    }
+
+    const allyCategory = this.mapStringToAllyCategory(
+      allyTypeResult.result as string
+    );
+    const timingResult = rollOnTable(
+      ALLY_APPEARANCE_TIMING_TABLE,
+      [],
+      "Tempo de Aparição Individual"
+    );
+    const allyTiming = this.mapStringToAllyTiming(
+      timingResult.result as string
+    );
+    const allyDetails = this.generateAllyDetails(allyCategory);
+
+    return {
+      category: allyCategory,
+      specificType: allyDetails.specificType,
+      name: allyDetails.name,
+      description: allyDetails.description,
+      timing: allyTiming,
+      powerLevel: allyDetails.powerLevel,
+      characteristics: allyDetails.characteristics,
+    };
+  }
+
+  /**
+   * Gera detalhes específicos baseados na categoria do aliado
+   */
+  private static generateAllyDetails(category: AllyCategory): {
+    specificType: string;
+    name: string;
+    description: string;
+    powerLevel?: number;
+    characteristics?: string[];
+  } {
+    let specificType = "";
+    let name = "";
+    let description = "";
+    let powerLevel: number | undefined;
+    let characteristics: string[] | undefined;
+
+    switch (category) {
+      case AllyCategory.ARTEFATO: {
+        const artifactResult = rollOnTable(
+          ALLY_ARTIFACT_TABLE,
+          [],
+          "Artefato Aliado"
+        );
+        specificType = artifactResult.result as string;
+        name = `Artefato: ${specificType}`;
+        description = `Um ${specificType.toLowerCase()} que pode auxiliar na missão.`;
+        break;
+      }
+
+      case AllyCategory.CRIATURA_PODEROSA: {
+        const creatureResult = rollOnTable(
+          ALLY_POWERFUL_CREATURE_TABLE,
+          [],
+          "Criatura Poderosa"
+        );
+        specificType = creatureResult.result as string;
+        name = specificType;
+        description = `${specificType} que se oferece para ajudar na missão.`;
+        break;
+      }
+
+      case AllyCategory.INESPERADO: {
+        const unexpectedResult = rollOnTable(
+          ALLY_UNEXPECTED_TABLE,
+          [],
+          "Aliado Inesperado"
+        );
+        specificType = unexpectedResult.result as string;
+        name = specificType;
+        description = `${specificType} que aparece de forma inesperada.`;
+        break;
+      }
+
+      case AllyCategory.AJUDA_SOBRENATURAL: {
+        const supernaturalResult = rollOnTable(
+          ALLY_SUPERNATURAL_HELP_TABLE,
+          [],
+          "Ajuda Sobrenatural"
+        );
+        specificType = supernaturalResult.result as string;
+        name = specificType;
+        description = `${specificType} oferece assistência sobrenatural.`;
+        break;
+      }
+
+      case AllyCategory.CIVIS_ORDINARIOS: {
+        const civilianResult = rollOnTable(
+          ALLY_ORDINARY_CIVILIANS_TABLE,
+          [],
+          "Civis Ordinários"
+        );
+        specificType = civilianResult.result as string;
+        name = specificType;
+        description = `${specificType} que decide ajudar na missão.`;
+        break;
+      }
+
+      case AllyCategory.NATUREZA: {
+        const natureResult = rollOnTable(
+          ALLY_NATURE_TABLE,
+          [],
+          "Natureza Aliada"
+        );
+        specificType = natureResult.result as string;
+        name = specificType;
+        description = `${specificType} oferece auxílio natural.`;
+        break;
+      }
+
+      case AllyCategory.ORGANIZACAO: {
+        const orgResult = rollOnTable(
+          ALLY_ORGANIZATIONS_TABLE,
+          [],
+          "Organização Aliada"
+        );
+        specificType = orgResult.result as string;
+        name = specificType;
+        description = `${specificType} oferece suporte organizacional.`;
+        break;
+      }
+
+      case AllyCategory.REFUGIO: {
+        const refugeResult = rollOnTable(ALLY_REFUGE_TABLE, [], "Refúgio");
+        specificType = refugeResult.result as string;
+        name = specificType;
+        description = `${specificType} serve como refúgio seguro.`;
+        break;
+      }
+
+      case AllyCategory.AVENTUREIROS: {
+        const adventurerResult = rollOnTable(
+          ALLY_ADVENTURERS_TABLE,
+          [],
+          "Aventureiro Aliado"
+        );
+        specificType = adventurerResult.result as string;
+        name = specificType;
+
+        // Determinar nível do aventureiro
+        const levelResult = rollOnTable(
+          ALLY_ADVENTURER_LEVEL_TABLE,
+          [],
+          "Nível do Aventureiro"
+        );
+        const levelString = levelResult.result as string;
+        powerLevel = parseInt(levelString.replace("NA ", ""));
+
+        description = `${specificType} (${levelString}) que se junta à missão.`;
+        break;
+      }
+
+      case AllyCategory.MONSTRUOSIDADE_AMIGAVEL: {
+        const monstrosityResult = rollOnTable(
+          ALLY_FRIENDLY_MONSTROSITY_TABLE,
+          [],
+          "Monstruosidade Amigável"
+        );
+        specificType = monstrosityResult.result as string;
+        name = specificType;
+
+        // Determinar características da monstruosidade
+        const charResult = rollOnTable(
+          ALLY_MONSTROSITY_CHARACTERISTICS_TABLE,
+          [],
+          "Características da Monstruosidade"
+        );
+        characteristics = [charResult.result as string];
+
+        description = `${specificType} ${characteristics[0].toLowerCase()} que oferece ajuda.`;
+        break;
+      }
+
+      default:
+        specificType = "Aliado genérico";
+        name = "Aliado";
+        description = "Um aliado inesperado surge para ajudar.";
+    }
+
+    return { specificType, name, description, powerLevel, characteristics };
+  }
+
+  /**
+   * Mapeia string para AllyCategory enum
+   */
+  private static mapStringToAllyCategory(categoryStr: string): AllyCategory {
+    switch (categoryStr) {
+      case "Artefato":
+        return AllyCategory.ARTEFATO;
+      case "Criatura poderosa":
+        return AllyCategory.CRIATURA_PODEROSA;
+      case "Inesperado":
+        return AllyCategory.INESPERADO;
+      case "Ajuda sobrenatural":
+        return AllyCategory.AJUDA_SOBRENATURAL;
+      case "Civis ordinários":
+        return AllyCategory.CIVIS_ORDINARIOS;
+      case "Natureza":
+        return AllyCategory.NATUREZA;
+      case "Organização":
+        return AllyCategory.ORGANIZACAO;
+      case "Refúgio":
+        return AllyCategory.REFUGIO;
+      case "Aventureiros":
+        return AllyCategory.AVENTUREIROS;
+      case "Monstruosidade amigável":
+        return AllyCategory.MONSTRUOSIDADE_AMIGAVEL;
+      default:
+        return AllyCategory.CIVIS_ORDINARIOS;
+    }
+  }
+
+  /**
+   * Mapeia string para AllyTiming enum
+   */
+  private static mapStringToAllyTiming(timingStr: string): AllyTiming {
+    switch (timingStr) {
+      case "Correndo perigo":
+        return AllyTiming.CORRENDO_PERIGO;
+      case "De um jeito constrangedor":
+        return AllyTiming.JEITO_CONSTRANGEDOR;
+      case "De maneira comum e pacata":
+        return AllyTiming.MANEIRA_COMUM;
+      case "Pedindo ajuda durante um descanso":
+        return AllyTiming.PEDINDO_AJUDA_DESCANSO;
+      case "Ainda no assentamento":
+        return AllyTiming.AINDA_ASSENTAMENTO;
+      case "Já estará lidando com a complicação":
+        return AllyTiming.LIDANDO_COMPLICACAO;
+      case "1d4 dias após o começo do contrato":
+        return AllyTiming.UM_D4_DIAS_APOS;
+      case "2d4 dias após o começo do contrato":
+        return AllyTiming.DOIS_D4_DIAS_APOS;
+      case "Magicamente invocado":
+        return AllyTiming.MAGICAMENTE_INVOCADO;
+      case "Para salvar o dia":
+        return AllyTiming.PARA_SALVAR_DIA;
+      default:
+        return AllyTiming.MANEIRA_COMUM;
+    }
+  }
+
+  // ===== GERAÇÃO DE CONSEQUÊNCIAS SEVERAS =====
+
+  /**
+   * Gera consequências severas que podem ocorrer se o contrato falhar
+   * Baseado nas regras da seção "Chance de Consequências Severas"
+   */
+  private static generateSevereConsequences(): SevereConsequence[] {
+    const consequences: SevereConsequence[] = [];
+
+    // 1. Verificar se haverá consequências severas (1d20, 1-2 = Sim)
+    const willHaveConsequences = rollOnTable(
+      SEVERE_CONSEQUENCES_CHANCE_TABLE,
+      [],
+      "Chance de Consequências Severas"
+    );
+
+    if (!willHaveConsequences.result) {
+      return consequences; // Nenhuma consequência severa
+    }
+
+    // 2. Determinar o tipo de consequência severa (1d20)
+    const typeResult = rollOnTable(
+      SEVERE_CONSEQUENCES_TYPES_TABLE,
+      [],
+      "Tipo de Consequência Severa"
+    );
+    const consequenceCategory = typeResult.result as SevereConsequenceCategory;
+
+    // 3. Gerar detalhes específicos da consequência
+    const detailTable = SEVERE_CONSEQUENCE_DETAIL_TABLES[consequenceCategory];
+    if (detailTable) {
+      const detailResult = rollOnTable(
+        detailTable,
+        [],
+        "Detalhamento da Consequência"
+      );
+      const specificConsequence = detailResult.result as string;
+
+      // 4. Criar o objeto da consequência
+      const consequence: SevereConsequence = {
+        category: consequenceCategory,
+        specificConsequence,
+        description: this.generateConsequenceDescription(
+          consequenceCategory,
+          specificConsequence
+        ),
+        affectsContractors: this.generateContractorConsequenceDescription(
+          consequenceCategory,
+          specificConsequence
+        ),
+      };
+
+      consequences.push(consequence);
+
+      // Verificar se precisa rolar duas vezes (resultado "Role duas vezes e use ambos")
+      if (specificConsequence === "Role duas vezes e use ambos") {
+        const secondConsequence = this.generateSingleSevereConsequence();
+        if (secondConsequence) {
+          consequences.push(secondConsequence);
+        }
+      }
+    }
+
+    return consequences;
+  }
+
+  /**
+   * Gera uma única consequência severa (usado para rolagens duplas)
+   */
+  private static generateSingleSevereConsequence(): SevereConsequence | null {
+    const typeResult = rollOnTable(
+      SEVERE_CONSEQUENCES_TYPES_TABLE,
+      [],
+      "Tipo de Consequência Severa"
+    );
+    const consequenceCategory = typeResult.result as SevereConsequenceCategory;
+
+    const detailTable = SEVERE_CONSEQUENCE_DETAIL_TABLES[consequenceCategory];
+    if (!detailTable) return null;
+
+    const detailResult = rollOnTable(
+      detailTable,
+      [],
+      "Detalhamento da Consequência"
+    );
+    const specificConsequence = detailResult.result as string;
+
+    // Evitar loops infinitos
+    if (specificConsequence === "Role duas vezes e use ambos") {
+      return null;
+    }
+
+    return {
+      category: consequenceCategory,
+      specificConsequence,
+      description: this.generateConsequenceDescription(
+        consequenceCategory,
+        specificConsequence
+      ),
+      affectsContractors: this.generateContractorConsequenceDescription(
+        consequenceCategory,
+        specificConsequence
+      ),
+    };
+  }
+
+  /**
+   * Gera descrição da consequência severa
+   */
+  private static generateConsequenceDescription(
+    category: SevereConsequenceCategory,
+    specific: string
+  ): string {
+    const categoryName = category.toLowerCase();
+    return `Em caso de falha no contrato, pode ocorrer: ${categoryName} - ${specific}`;
+  }
+
+  /**
+   * Verifica se a consequência afeta os contratados e gera descrição apropriada
+   */
+  private static generateContractorConsequenceDescription(
+    category: SevereConsequenceCategory,
+    specific: string
+  ): string {
+    // Baseado nas regras do markdown, gerar uma descrição do que acontece com os contratados
+    const affectsContractors =
+      category === SevereConsequenceCategory.MORTE_IMPORTANTES ||
+      category === SevereConsequenceCategory.PERSEGUICAO ||
+      specific.toLowerCase().includes("contratado") ||
+      specific.toLowerCase().includes("morte");
+
+    if (affectsContractors) {
+      return "Os contratados podem ser diretamente afetados por esta consequência";
+    } else {
+      return "A consequência afeta primariamente o ambiente ou região do contrato";
+    }
+  }
+
+  // ===== GERAÇÃO DE RECOMPENSAS ADICIONAIS =====
+
+  /**
+   * Gera recompensas adicionais para o contrato
+   */
+  private static generateAdditionalRewards(): AdditionalReward[] {
+    const rewards: AdditionalReward[] = [];
+
+    // 1. Verificar se haverá recompensas adicionais (1d20, 1-13 = Não, 14-20 = Sim)
+    const willHaveRewards = rollOnTable(
+      REWARD_CHANCE_TABLE,
+      [],
+      "Chance de Recompensas Adicionais"
+    );
+
+    if (!willHaveRewards.result) {
+      return rewards; // Nenhuma recompensa adicional
+    }
+
+    // 2. Determinar o tipo de recompensa (1d20)
+    const typeResult = rollOnTable(
+      REWARD_TYPES_TABLE,
+      [],
+      "Tipo de Recompensa Adicional"
+    );
+    const rewardType = typeResult.result as string;
+
+    // 3. Gerar detalhes específicos da recompensa
+    const rewardDetail = this.generateRewardDetail(rewardType);
+    if (rewardDetail) {
+      // Verificar se precisa rolar duas vezes antes de adicionar
+      if (rewardDetail.specificReward === "Role duas vezes e use ambos") {
+        // Substituir pela geração de duas recompensas reais
+        const firstReward = this.generateSingleAdditionalReward();
+        const secondReward = this.generateSingleAdditionalReward();
+
+        if (firstReward) rewards.push(firstReward);
+        if (secondReward) rewards.push(secondReward);
+      } else {
+        // Recompensa normal, adicionar diretamente
+        rewards.push(rewardDetail);
+      }
+    }
+
+    return rewards;
+  }
+
+  /**
+   * Gera uma única recompensa adicional (usado para rolagens duplas)
+   */
+  private static generateSingleAdditionalReward(): AdditionalReward | null {
+    // Tenta até 3 vezes para evitar loops infinitos
+    for (let attempts = 0; attempts < 3; attempts++) {
+      const typeResult = rollOnTable(
+        REWARD_TYPES_TABLE,
+        [],
+        "Tipo de Recompensa Adicional"
+      );
+      const rewardType = typeResult.result as string;
+
+      const rewardDetail = this.generateRewardDetail(rewardType);
+
+      // Se não é "Role duas vezes e use ambos", retorna a recompensa
+      if (
+        rewardDetail &&
+        rewardDetail.specificReward !== "Role duas vezes e use ambos"
+      ) {
+        return rewardDetail;
+      }
+    }
+
+    // Se ainda não conseguiu uma recompensa válida, força uma recompensa padrão
+    return {
+      category: RewardCategory.MORAL,
+      specificReward: "Satisfação pessoal",
+      description: "Benefício para a comunidade: Satisfação pessoal",
+      isPositive: true,
+    };
+  }
+
+  /**
+   * Gera os detalhes específicos de uma recompensa baseado no tipo
+   */
+  private static generateRewardDetail(
+    rewardType: string
+  ): AdditionalReward | null {
+    let detailTable;
+    let category: RewardCategory;
+    let isPositive = true;
+
+    // Mapear tipo para categoria e tabela correspondente
+    switch (rewardType) {
+      case "Riquezas":
+        detailTable = REWARD_RICHES_TABLE;
+        category = RewardCategory.RIQUEZAS;
+        break;
+      case "Artefatos mágicos":
+        detailTable = REWARD_MAGICAL_ARTIFACTS_TABLE;
+        category = RewardCategory.ARTEFATOS_MAGICOS;
+        break;
+      case "Poder":
+        detailTable = REWARD_POWER_TABLE;
+        category = RewardCategory.PODER;
+        break;
+      case "Conhecimento":
+        detailTable = REWARD_KNOWLEDGE_TABLE;
+        category = RewardCategory.CONHECIMENTO;
+        break;
+      case "Influência e renome":
+        detailTable = REWARD_INFLUENCE_TABLE;
+        category = RewardCategory.INFLUENCIA_RENOME;
+        break;
+      case "Glória":
+        detailTable = REWARD_GLORY_TABLE;
+        category = RewardCategory.GLORIA;
+        break;
+      case "Moral":
+        detailTable = REWARD_MORAL_TABLE;
+        category = RewardCategory.MORAL;
+        break;
+      case "Pagamento diferenciado":
+        detailTable = REWARD_ALTERNATIVE_PAYMENT_TABLE;
+        category = RewardCategory.PAGAMENTO_DIFERENCIADO;
+        break;
+      case "Recompensa bizarra":
+        detailTable = REWARD_BIZARRE_TABLE;
+        category = RewardCategory.RECOMPENSA_BIZARRA;
+        break;
+      case "Aparências enganam":
+        detailTable = REWARD_DECEPTIVE_TABLE;
+        category = RewardCategory.APARENCIAS_ENGANAM;
+        isPositive = false; // Este tipo é negativo
+        break;
+      default:
+        return null;
+    }
+
+    if (!detailTable) return null;
+
+    const detailResult = rollOnTable(
+      detailTable,
+      [],
+      `Detalhamento ${rewardType}`
+    );
+    const specificReward = detailResult.result as string;
+
+    return {
+      category,
+      specificReward,
+      description: this.generateRewardDescription(category, specificReward),
+      isPositive,
+    };
+  }
+
+  /**
+   * Gera uma descrição clara para a recompensa
+   */
+  private static generateRewardDescription(
+    category: RewardCategory,
+    specific: string
+  ): string {
+    const categoryDescriptions: Record<RewardCategory, string> = {
+      [RewardCategory.RIQUEZAS]: "Riqueza material adicional",
+      [RewardCategory.ARTEFATOS_MAGICOS]: "Objeto mágico de valor",
+      [RewardCategory.PODER]: "Influência ou autoridade",
+      [RewardCategory.CONHECIMENTO]: "Informação valiosa ou secreta",
+      [RewardCategory.INFLUENCIA_RENOME]: "Conexões sociais e reputação",
+      [RewardCategory.GLORIA]: "Reconhecimento público",
+      [RewardCategory.MORAL]: "Benefício para a comunidade",
+      [RewardCategory.PAGAMENTO_DIFERENCIADO]: "Pagamento não monetário",
+      [RewardCategory.RECOMPENSA_BIZARRA]: "Benefício inusitado",
+      [RewardCategory.APARENCIAS_ENGANAM]: "Complicação ou engano",
+    };
+
+    return `${categoryDescriptions[category]}: ${specific}`;
   }
 }

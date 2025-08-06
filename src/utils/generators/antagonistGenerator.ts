@@ -1,10 +1,9 @@
-import { rollOnTable } from "@/utils/tableRoller";
+import { rollMultipleWithCombining, createTextBasedRollAgainChecker } from "@/utils/multiRollHandler";
 import type { Antagonist } from "@/types/contract";
 import {
   ANTAGONIST_TYPES_TABLE,
   ANTAGONIST_DETAIL_TABLE_MAP,
   mapAntagonistTypeToCategory,
-  shouldRollTwice,
 } from "@/data/tables/contract-antagonist-tables";
 
 // ===== GERADOR DE ANTAGONISTAS =====
@@ -17,42 +16,51 @@ export class AntagonistGenerator {
    * Gera um antagonista principal seguindo as regras das tabelas
    */
   static generateAntagonist(): Antagonist {
-    // Rola na tabela principal para determinar o tipo
-    const typeResult = rollOnTable(ANTAGONIST_TYPES_TABLE);
+    // Usa sistema de múltiplas rolagens para tipos de antagonistas
+    const typeResults = rollMultipleWithCombining(
+      ANTAGONIST_TYPES_TABLE,
+      createTextBasedRollAgainChecker('Role duas vezes'),
+      'Tipos de Antagonistas',
+      2  // Limitar a 2 tipos máximo
+    );
 
-    // Se der "Role duas vezes", gera dois antagonistas separados
-    if (shouldRollTwice(typeResult.result)) {
-      return this.generateMultipleAntagonists();
+    // Se houve múltiplos tipos, gera antagonistas combinados
+    if (typeResults.includes(' E ')) {
+      return this.generateCombinedAntagonists(typeResults);
     }
 
     // Gera detalhes do antagonista baseado no tipo
-    return this.generateSingleAntagonist(typeResult.result);
+    return this.generateSingleAntagonist(typeResults);
   }
 
   /**
-   * Gera múltiplos antagonistas quando o resultado indica "Role duas vezes"
+   * Gera múltiplos antagonistas combinados baseado nos tipos coletados
    */
-  private static generateMultipleAntagonists(): Antagonist {
-    // Rola até obter tipos válidos (não "Role duas vezes")
-    let firstType = rollOnTable(ANTAGONIST_TYPES_TABLE).result;
-    while (shouldRollTwice(firstType)) {
-      firstType = rollOnTable(ANTAGONIST_TYPES_TABLE).result;
+  private static generateCombinedAntagonists(combinedTypes: string): Antagonist {
+    const types = combinedTypes.split(' E ').map(t => t.trim());
+    const antagonists = types.map(type => this.generateSingleAntagonist(type));
+
+    if (antagonists.length === 2) {
+      const [first, second] = antagonists;
+      return {
+        category: first.category,
+        specificType: `${first.specificType} e ${second.specificType}`,
+        name: `${first.name} & ${second.name}`,
+        description: `Dupla ameaça: ${first.description} Em adição, ${second.description}`,
+      };
     }
 
-    let secondType = rollOnTable(ANTAGONIST_TYPES_TABLE).result;
-    while (shouldRollTwice(secondType)) {
-      secondType = rollOnTable(ANTAGONIST_TYPES_TABLE).result;
-    }
+    // Para mais de 2 antagonistas, combina tudo
+    const combinedCategory = antagonists[0].category;
+    const combinedSpecificType = antagonists.map(a => a.specificType).join(', ');
+    const combinedName = antagonists.map(a => a.name).join(' & ');
+    const combinedDescription = `Múltiplas ameaças: ${antagonists.map(a => a.description).join(' Além disso, ')}`;
 
-    const firstAntagonist = this.generateSingleAntagonist(firstType);
-    const secondAntagonist = this.generateSingleAntagonist(secondType);
-
-    // Combina os dois antagonistas
     return {
-      category: firstAntagonist.category,
-      specificType: `${firstAntagonist.specificType} e ${secondAntagonist.specificType}`,
-      name: `${firstAntagonist.name} & ${secondAntagonist.name}`,
-      description: `Dupla ameaça: ${firstAntagonist.description} Em adição, ${secondAntagonist.description}`,
+      category: combinedCategory,
+      specificType: combinedSpecificType,
+      name: combinedName,
+      description: combinedDescription,
     };
   }
 
@@ -68,24 +76,12 @@ export class AntagonistGenerator {
       );
     }
 
-    // Rola na tabela de detalhes
-    const detailResult = rollOnTable(detailTable);
-    let specificType = detailResult.result;
-
-    // Se der "Role duas vezes" na tabela de detalhes, combina dois resultados
-    if (shouldRollTwice(specificType)) {
-      let firstDetail = rollOnTable(detailTable).result;
-      while (shouldRollTwice(firstDetail)) {
-        firstDetail = rollOnTable(detailTable).result;
-      }
-
-      let secondDetail = rollOnTable(detailTable).result;
-      while (shouldRollTwice(secondDetail)) {
-        secondDetail = rollOnTable(detailTable).result;
-      }
-
-      specificType = `${firstDetail} e ${secondDetail}`;
-    }
+    // Usa novo sistema de múltiplas rolagens para detalhes específicos
+    const specificType = rollMultipleWithCombining(
+      detailTable,
+      createTextBasedRollAgainChecker('Role duas vezes'),
+      `Detalhes ${antagonistType}`
+    );
 
     const category = mapAntagonistTypeToCategory(antagonistType);
 

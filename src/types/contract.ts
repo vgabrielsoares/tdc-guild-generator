@@ -33,8 +33,6 @@ export enum DeadlineType {
   SEM_PRAZO = "Sem prazo",
   DIAS = "Dias",
   SEMANAS = "Semanas",
-  ARBITRARIO = "Arbitrário",
-  JANELA_OPORTUNIDADE = "Janela de oportunidade",
 }
 
 // Tipos de pagamento disponíveis
@@ -142,15 +140,19 @@ export interface Contract {
   objective?: ContractObjective;
   location?: ContractLocation;
 
+  // Distância do contrato
+  distance?: {
+    roll: number;
+    result: string;
+  };
+
   // Valores e recompensas
   value: ContractValue;
 
   // Prazo e tempo
   deadline: {
     type: DeadlineType;
-    value?: string; // "3 dias", "1 semana", etc.
-    isFlexible: boolean;
-    isArbitrary: boolean;
+    value?: string;
   };
 
   // Tipo de pagamento
@@ -168,6 +170,15 @@ export interface Contract {
 
   // Reviravoltas
   twists: Twist[];
+
+  // Aliados que podem surgir durante o contrato
+  allies: Ally[];
+
+  // Consequências severas por falha
+  severeConsequences: SevereConsequence[];
+
+  // Recompensas adicionais
+  additionalRewards?: AdditionalReward[];
 
   // Datas importantes
   createdAt: Date;
@@ -214,8 +225,6 @@ export const ContractValueSchema = z.object({
 export const DeadlineSchema = z.object({
   type: z.nativeEnum(DeadlineType),
   value: z.string().optional(),
-  isFlexible: z.boolean(),
-  isArbitrary: z.boolean(),
 });
 
 // Schema para dados de geração
@@ -248,6 +257,9 @@ export const ContractSchema = z.object({
   antagonist: z.lazy(() => AntagonistSchema),
   complications: z.array(z.lazy(() => ComplicationSchema)),
   twists: z.array(z.lazy(() => TwistSchema)),
+  allies: z.array(z.lazy(() => AllySchema)),
+  severeConsequences: z.array(z.lazy(() => SevereConsequenceSchema)),
+  additionalRewards: z.array(z.lazy(() => AdditionalRewardSchema)).optional(),
   createdAt: z.date(),
   expiresAt: z.date().optional(),
   completedAt: z.date().optional(),

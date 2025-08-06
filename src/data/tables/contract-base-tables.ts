@@ -105,12 +105,9 @@ export const CROWD_REDUCTION_TABLE: TableEntry<{ description: string; reduction:
 
 // ===== PRAZO PARA CONCLUSÃO (1d20) =====
 
-// Interface para representar prazos com metadados
+// Interface para representar prazos
 interface DeadlineResult {
   deadline: string;
-  isFlexible: boolean;
-  isArbitrary: boolean;
-  hasOpportunityWindow: boolean;
 }
 
 // Tabela de prazos para conclusão de contratos
@@ -118,91 +115,61 @@ export const CONTRACT_DEADLINE_TABLE: TableEntry<DeadlineResult>[] = [
   { 
     min: 1, max: 1, 
     result: { 
-      deadline: "1d4 dias", 
-      isFlexible: true, 
-      isArbitrary: false,
-      hasOpportunityWindow: false
+      deadline: "1d4 dias"
     } 
   },
   { 
     min: 2, max: 2, 
     result: { 
-      deadline: "3 dias", 
-      isFlexible: true, 
-      isArbitrary: false,
-      hasOpportunityWindow: false
+      deadline: "3 dias"
     } 
   },
   { 
     min: 3, max: 3, 
     result: { 
-      deadline: "1d4+2 dias", 
-      isFlexible: true, 
-      isArbitrary: false,
-      hasOpportunityWindow: false
+      deadline: "1d4+2 dias"
     } 
   },
   { 
     min: 4, max: 4, 
     result: { 
-      deadline: "1d6+1 dias", 
-      isFlexible: true, 
-      isArbitrary: false,
-      hasOpportunityWindow: false
+      deadline: "1d6+1 dias"
     } 
   },
   { 
     min: 5, max: 5, 
     result: { 
-      deadline: "1d8+2 dias", 
-      isFlexible: true, 
-      isArbitrary: false,
-      hasOpportunityWindow: false
+      deadline: "1d8+2 dias"
     } 
   },
   { 
     min: 6, max: 6, 
     result: { 
-      deadline: "1d12+2 dias", 
-      isFlexible: true, 
-      isArbitrary: false,
-      hasOpportunityWindow: false
+      deadline: "1d12+2 dias"
     } 
   },
   { 
     min: 7, max: 8, 
     result: { 
-      deadline: "1 semana", 
-      isFlexible: true, 
-      isArbitrary: false,
-      hasOpportunityWindow: false
+      deadline: "1 semana"
     } 
   },
   { 
     min: 9, max: 9, 
     result: { 
-      deadline: "1d4+1 semanas", 
-      isFlexible: true, 
-      isArbitrary: false,
-      hasOpportunityWindow: false
+      deadline: "1d4+1 semanas"
     } 
   },
   { 
     min: 10, max: 10, 
     result: { 
-      deadline: "1d20+2 dias", 
-      isFlexible: true, 
-      isArbitrary: false,
-      hasOpportunityWindow: false
+      deadline: "1d20+2 dias"
     } 
   },
   { 
     min: 11, max: 999, 
     result: { 
-      deadline: "Sem prazo", 
-      isFlexible: true, 
-      isArbitrary: true,
-      hasOpportunityWindow: false
+      deadline: "Sem prazo"
     } 
   },
 ];

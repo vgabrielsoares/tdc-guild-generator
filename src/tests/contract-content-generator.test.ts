@@ -113,14 +113,14 @@ describe("Contract Content Generator (Issue 4.12)", () => {
 
       if (contract.contractorType === ContractorType.GOVERNO) {
         const governmentTypes = [
-          "Arcanista Diplomata",
-          "Membro Importante do Clero",
-          "Nobre Poderoso",
-          "Círculo Familiar dos Governantes",
-          "Agente Burocrático",
-          "Militar de Alto Escalão",
-          "Governo de Outro Assentamento",
-          "Líder Local",
+          "Arcanista diplomata",
+          "Membro importante do clero",
+          "Nobre poderoso",
+          "Círculo familiar dos governantes",
+          "Agente burocrático",
+          "Militar de alto escalão",
+          "Membro do governo de outro assentamento",
+          "Líder local",
         ];
 
         expect(
@@ -334,6 +334,7 @@ describe("Contract Content Generator (Issue 4.12)", () => {
     test("deve manter compatibilidade com geração múltipla", () => {
       const contracts = ContractGenerator.generateMultipleContracts({
         guild: mockGuild,
+        skipFrequentatorsReduction: true, // Garantir que sempre haverá contratos
       });
 
       expect(contracts.length).toBeGreaterThan(0);

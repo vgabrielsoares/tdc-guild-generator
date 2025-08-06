@@ -2,7 +2,7 @@
   <div class="space-y-6">
     <div class="text-center">
       <h1 class="text-3xl font-medieval font-bold text-gold-400 mb-4">
-        <font-awesome-icon icon="scroll" class="mr-2" />
+        <DocumentTextIcon class="w-8 h-8 inline mr-2" />
         Contratos da Guilda
       </h1>
       <p class="text-lg text-gray-300 mb-8">
@@ -14,7 +14,7 @@
     <div v-if="guild" class="bg-gradient-to-r from-amber-900/20 to-yellow-900/20 border border-amber-600/50 rounded-lg p-6">
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-xl font-semibold text-amber-400 flex items-center">
-          <font-awesome-icon icon="crown" class="mr-2" />
+          <BuildingOfficeIcon class="w-5 h-5 mr-2" />
           {{ guild.name }}
         </h3>
         <span class="text-sm px-3 py-1 bg-amber-600 text-amber-100 rounded-full">
@@ -24,30 +24,30 @@
       
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
         <div class="flex flex-col">
-          <span class="text-gray-400 uppercase tracking-wide text-xs">Sede</span>
-          <span class="text-white font-medium">{{ guild.structure.size }}</span>
+          <span class="text-gray-400 uppercase tracking-wide text-lg">Sede</span>
+          <span class="text-white font-medium text-base">{{ guild.structure.size }}</span>
         </div>
         <div class="flex flex-col">
-          <span class="text-gray-400 uppercase tracking-wide text-xs">Recursos</span>
-          <span class="text-white font-medium">{{ guild.resources.level }}</span>
+          <span class="text-gray-400 uppercase tracking-wide text-lg">Recursos</span>
+          <span class="text-white font-medium text-base">{{ guild.resources.level }}</span>
         </div>
         <div class="flex flex-col">
-          <span class="text-gray-400 uppercase tracking-wide text-xs">Rel. Governo</span>
-          <span class="text-white font-medium">{{ guild.relations.government }}</span>
+          <span class="text-gray-400 uppercase tracking-wide text-lg">Rel. Governo</span>
+          <span class="text-white font-medium text-base">{{ guild.relations.government }}</span>
         </div>
         <div class="flex flex-col">
-          <span class="text-gray-400 uppercase tracking-wide text-xs">Rel. População</span>
-          <span class="text-white font-medium">{{ guild.relations.population }}</span>
+          <span class="text-gray-400 uppercase tracking-wide text-lg">Rel. População</span>
+          <span class="text-white font-medium text-base">{{ guild.relations.population }}</span>
         </div>
       </div>
 
       <div class="mt-4 pt-4 border-t border-amber-600/30">
         <div class="flex items-center justify-between">
           <span class="text-sm text-amber-200">
-            <font-awesome-icon icon="map-marker-alt" class="mr-2" />
+            <MapPinIcon class="w-4 h-4 inline mr-2" />
             Sede localizada em: <span class="font-medium">{{ guild.settlementType }}</span>
           </span>
-          <span class="text-xs text-gray-400">
+          <span class="text-sm text-gray-400">
             Criada em: {{ formatDate(guild.createdAt) }}
           </span>
         </div>
@@ -56,7 +56,7 @@
 
     <!-- Aviso quando não há guilda -->
     <div v-else class="bg-red-900/20 border border-red-600/50 rounded-lg p-8 text-center">
-      <font-awesome-icon icon="exclamation-triangle" class="text-red-400 text-4xl mb-4" />
+      <ExclamationTriangleIcon class="w-16 h-16 text-red-400 mx-auto mb-4" />
       <h2 class="text-xl font-semibold text-red-400 mb-2">Nenhuma Guilda Encontrada</h2>
       <p class="text-gray-300 mb-6">
         Para gerar contratos, você precisa primeiro ter uma guilda ativa. 
@@ -66,7 +66,7 @@
         to="/guild" 
         class="inline-flex items-center px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-lg transition-colors"
       >
-        <font-awesome-icon icon="plus" class="mr-2" />
+        <PlusIcon class="w-4 h-4 mr-2" />
         Gerar Nova Guilda
       </router-link>
     </div>
@@ -78,7 +78,7 @@
         <div class="flex items-center justify-between mb-4">
           <div>
             <h3 class="text-lg font-semibold text-white mb-2">Contratos Disponíveis</h3>
-            <p class="text-sm text-gray-400">
+            <p class="text-md text-gray-400">
               Total de {{ contracts.length }} contratos para esta sede da guilda
             </p>
           </div>
@@ -88,10 +88,10 @@
               :disabled="isLoading"
               class="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white font-medium rounded-lg transition-colors flex items-center"
             >
-              <font-awesome-icon 
-                :icon="isLoading ? 'spinner' : 'plus'" 
+              <component
+                :is="generateButtonIcon"
                 :class="{ 'animate-spin': isLoading }" 
-                class="mr-2" 
+                class="w-4 h-4 mr-2" 
               />
               {{ isLoading ? 'Gerando...' : contracts.length > 0 ? 'Gerar Novos' : 'Gerar Contratos' }}
             </button>
@@ -101,10 +101,9 @@
               :disabled="isLoading"
               class="px-4 py-2 bg-amber-600 hover:bg-amber-700 disabled:bg-gray-600 text-white font-medium rounded-lg transition-colors flex items-center"
             >
-              <font-awesome-icon 
-                :icon="isLoading ? 'spinner' : 'refresh'" 
+              <ArrowPathIcon
                 :class="{ 'animate-spin': isLoading }" 
-                class="mr-2" 
+                class="w-4 h-4 mr-2" 
               />
               Regenerar Todos
             </button>
@@ -174,6 +173,14 @@ import type { Contract } from '@/types/contract';
 import ContractList from '@/components/contracts/ContractList.vue';
 import ContractFilters from '@/components/contracts/ContractFilters.vue';
 import ContractDetails from '@/components/contracts/ContractDetails.vue';
+import { 
+  DocumentTextIcon, 
+  BuildingOfficeIcon, 
+  MapPinIcon, 
+  ExclamationTriangleIcon, 
+  PlusIcon, 
+  ArrowPathIcon 
+} from '@heroicons/vue/24/outline';
 
 // Interface para os filtros
 interface ContractFilterState {
@@ -214,6 +221,10 @@ const currentFilters = ref<ContractFilterState>({
 const contracts = computed(() => contractsStore.contracts);
 const isLoading = computed(() => contractsStore.isLoading);
 const guild = computed(() => guildStore.currentGuild);
+
+const generateButtonIcon = computed(() => {
+  return isLoading.value ? ArrowPathIcon : PlusIcon;
+});
 
 // Contratos filtrados com base nos filtros locais
 const filteredContracts = computed(() => {

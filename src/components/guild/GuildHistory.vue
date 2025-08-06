@@ -157,14 +157,30 @@ const lockedCount = computed(() => {
   return guildStore.guildHistory.filter(g => g.locked).length;
 });
 
-const formatDate = (date: Date): string => {
-  return new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  }).format(date);
+const formatDate = (date: Date | string | null | undefined): string => {
+  try {
+    if (!date) return 'Data inválida';
+    
+    // Converter para Date se for string
+    const dateObj = date instanceof Date ? date : new Date(date);
+    
+    // Verificar se a data é válida
+    if (isNaN(dateObj.getTime())) {
+      return 'Data inválida';
+    }
+    
+    return new Intl.DateTimeFormat('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(dateObj);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.warn('Erro ao formatar data:', error);
+    return 'Data inválida';
+  }
 };
 
 const loadGuild = (guildId: string) => {

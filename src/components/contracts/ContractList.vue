@@ -3,28 +3,13 @@
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <font-awesome-icon :icon="['fas', 'scroll']" class="text-amber-400 text-xl" />
+        <DocumentTextIcon class="w-6 h-6 text-amber-400" />
         <h3 class="text-xl font-semibold text-amber-400">
           Lista de Contratos
         </h3>
         <span v-if="totalContracts > 0" class="text-sm text-gray-400">
           ({{ filteredContracts.length }} de {{ totalContracts }})
         </span>
-      </div>
-      
-      <div class="flex items-center gap-2">
-        <!-- Botão de regenerar contratos -->
-        <button
-          @click="$emit('regenerate')"
-          class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded transition-colors text-sm"
-          :disabled="isLoading"
-        >
-          <font-awesome-icon 
-            :icon="['fas', 'sync-alt']" 
-            :class="{ 'animate-spin': isLoading }"
-          />
-          Regenerar
-        </button>
       </div>
     </div>
 
@@ -68,10 +53,7 @@
 
     <!-- Estado vazio -->
     <div v-else-if="!isLoading" class="text-center py-8">
-      <font-awesome-icon 
-        :icon="['fas', 'scroll']" 
-        class="text-gray-500 text-4xl mb-4"
-      />
+      <DocumentTextIcon class="w-16 h-16 text-gray-500 mx-auto mb-4" />
       <h4 class="text-lg font-medium text-gray-400 mb-2">
         Nenhum contrato encontrado
       </h4>
@@ -89,10 +71,7 @@
 
     <!-- Loading state -->
     <div v-if="isLoading" class="text-center py-8">
-      <font-awesome-icon 
-        :icon="['fas', 'spinner']" 
-        class="text-amber-400 text-3xl animate-spin mb-4"
-      />
+      <ArrowPathIcon class="w-12 h-12 text-amber-400 mx-auto animate-spin mb-4" />
       <p class="text-gray-400">
         Gerando contratos...
       </p>
@@ -131,6 +110,7 @@ import { computed } from 'vue';
 import type { Contract } from '@/types/contract';
 import { ContractStatus } from '@/types/contract';
 import ContractCard from './ContractCard.vue';
+import { DocumentTextIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 
 interface Props {
   contracts: Contract[];
