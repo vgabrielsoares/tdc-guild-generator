@@ -74,6 +74,23 @@ export enum UnsignedResolutionResult {
   MOTIVO_ESTRANHO = "Nenhum foi assinado, e há algum motivo estranho para isso",
 }
 
+// ===== INTERFACES PARA STORAGE POR GUILDA =====
+
+// Interface para contratos agrupados por guilda
+export interface GuildContracts {
+  guildId: string;
+  contracts: Contract[];
+  lastUpdate: Date | null;
+  generationCount: number; // Número de vezes que contratos foram gerados para esta guilda
+}
+
+// Interface para todo o storage de contratos segregado por guilda
+export interface ContractsStorageState {
+  guildContracts: Record<string, GuildContracts>;
+  currentGuildId: string | null;
+  globalLastUpdate: Date | null;
+}
+
 // ===== INTERFACES PARA VALOR E RECOMPENSA =====
 
 // Interface para controlar valores e recompensas do contrato
@@ -1095,4 +1112,73 @@ export function validateThemeKeyword(data: unknown): ThemeKeyword {
  */
 export function validateUnusualContractor(data: unknown): UnusualContractor {
   return UnusualContractorSchema.parse(data);
+}
+
+// ===== SCHEMAS ZOD PARA STORAGE POR GUILDA =====
+
+export const GuildContractsSchema = z.object({
+  guildId: z.string().min(1, "ID da guilda é obrigatório"),
+  contracts: z.array(ContractSchema),
+  lastUpdate: z.date().nullable(),
+  generationCount: z.number().min(0).default(0),
+});
+
+export const ContractsStorageStateSchema = z.object({
+  guildContracts: z.record(z.string(), GuildContractsSchema),
+  currentGuildId: z.string().nullable(),
+  globalLastUpdate: z.date().nullable(),
+});
+
+/**
+ * Valida dados de contratos de uma guilda usando o schema Zod
+ */
+export function validateGuildContracts(data: unknown): GuildContracts {
+  return GuildContractsSchema.parse(data);
+}
+
+/**
+ * Valida o estado de storage de contratos usando o schema Zod
+ */
+export function validateContractsStorageState(
+  data: unknown
+): ContractsStorageState {
+  return ContractsStorageStateSchema.parse(data);
+}
+
+// ===== UTILITÁRIOS PARA STORAGE POR GUILDA =====
+
+/**
+ * Cria uma estrutura vazia de contratos para uma guilda
+ */
+export function createEmptyGuildContracts(guildId: string): GuildContracts {
+  return {
+    guildId,
+    contracts: [],
+    lastUpdate: null,
+    generationCount: 0,
+  };
+}
+
+/**
+ * Verifica se uma guilda pode gerar novos contratos (apenas uma vez)
+ */
+export function canGuildGenerateContracts(
+  guildContracts: GuildContracts
+): boolean {
+  return guildContracts.generationCount === 0;
+}
+
+/**
+ * Migra contratos do formato antigo (global) para o novo formato (por guilda)
+ */
+export function migrateContractsToGuildFormat(
+  oldContracts: Contract[],
+  guildId: string
+): GuildContracts {
+  return {
+    guildId,
+    contracts: oldContracts,
+    lastUpdate: new Date(),
+    generationCount: oldContracts.length > 0 ? 1 : 0,
+  };
 }
