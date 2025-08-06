@@ -134,7 +134,53 @@
                   </div>
                 </section>
 
-                <!-- 3. Antagonista -->
+                <!-- 3. Distância -->
+                <section v-if="contract.generationData.distanceRoll">
+                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Distância</h4>
+                  <div class="bg-blue-900/20 rounded-lg p-4 border border-blue-500/30">
+                    <div class="flex items-center gap-2 mb-2">
+                      <MapPinIcon class="w-5 h-5 text-blue-400" />
+                      <span class="font-medium text-white">{{ distanceDetails?.description || 'Distância não especificada' }}</span>
+                    </div>
+                    
+                    <div v-if="distanceDetails?.hexagons" class="space-y-2">
+                      <!-- Distância em hexágonos -->
+                      <div class="flex items-center justify-between text-md">
+                        <span class="text-gray-400">Hexágonos:</span>
+                        <span class="text-gray-300">
+                          <template v-if="distanceDetails.hexagons.min === distanceDetails.hexagons.max">
+                            {{ distanceDetails.hexagons.min }} hexágono{{ distanceDetails.hexagons.min > 1 ? 's' : '' }}
+                          </template>
+                          <template v-else>
+                            {{ distanceDetails.hexagons.min }}-{{ distanceDetails.hexagons.max }} hexágonos
+                          </template>
+                        </span>
+                      </div>
+                      
+                      <!-- Distância em quilômetros -->
+                      <div v-if="distanceDetails.kilometers" class="flex items-center justify-between text-md">
+                        <span class="text-gray-400">Distância aproximada:</span>
+                        <span class="text-gray-300">
+                          <template v-if="distanceDetails.kilometers.min === distanceDetails.kilometers.max">
+                            {{ distanceDetails.kilometers.min }} km
+                          </template>
+                          <template v-else>
+                            {{ distanceDetails.kilometers.min }}-{{ distanceDetails.kilometers.max }} km
+                          </template>
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div class="text-sm text-gray-400 mt-3 pt-2 border-t border-blue-500/20">
+                      <div class="flex items-center gap-1">
+                        <InformationCircleIcon class="w-3 h-3" />
+                        <span>1 hexágono = 9,5 km (6 milhas)</span>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- 4. Antagonista -->
                 <section>
                   <h4 class="text-lg font-semibold text-amber-400 mb-2">Antagonista</h4>
                   <div class="bg-red-900/20 rounded-lg p-4 border border-red-500/30">
@@ -149,7 +195,7 @@
                   </div>
                 </section>
 
-                <!-- 4. Complicações -->
+                <!-- 5. Complicações -->
                 <section v-if="contract.complications?.length">
                   <h4 class="text-lg font-semibold text-amber-400 mb-2">Complicações</h4>
                   <div class="space-y-3">
@@ -170,7 +216,7 @@
                   </div>
                 </section>
 
-                <!-- 5. Aliados -->
+                <!-- 6. Aliados -->
                 <section v-if="contract.allies?.length">
                   <h4 class="text-lg font-semibold text-amber-400 mb-2">Aliados Potenciais</h4>
                   <div class="space-y-3">
@@ -254,7 +300,7 @@
                   </div>
                 </section>
 
-                <!-- 6. Consequências Severas -->
+                <!-- 8. Consequências Severas -->
                 <section v-if="contract.severeConsequences?.length">
                   <h4 class="text-lg font-semibold text-amber-400 mb-2">Consequências por Falha</h4>
                   <div class="space-y-3">
@@ -302,7 +348,7 @@
                   </div>
                 </section>
 
-                <!-- 7. Pagamento -->
+                <!-- 9. Pagamento -->
                 <section>
                   <h4 class="text-lg font-semibold text-amber-400 mb-2">Pagamento</h4>
                   <ContractValue
@@ -477,6 +523,7 @@
 import { computed } from 'vue';
 import type { Contract } from '@/types/contract';
 import { ContractorType, ContractDifficulty, PaymentType } from '@/types/contract';
+import { ContractGenerator } from '@/utils/generators/contractGenerator';
 import ContractStatus from './ContractStatus.vue';
 import ContractValue from './ContractValue.vue';
 import {
@@ -560,6 +607,11 @@ const canAbandon = computed(() => {
   ].includes(props.contract.status);
 });
 
+const distanceDetails = computed(() => {
+  if (!props.contract) return null;
+  return getDistanceDetails(props.contract);
+});
+
 // ===== METHODS =====
 
 function closeModal() {
@@ -582,6 +634,14 @@ function handleAbandon() {
   if (props.contract) {
     emit('abandon', props.contract);
   }
+}
+
+function getDistanceDetails(contract: Contract): {
+  description: string;
+  hexagons: { min: number; max: number } | null;
+  kilometers: { min: number; max: number } | null;
+} {
+  return ContractGenerator.getContractDistanceDetails(contract);
 }
 
 function getPaymentTypeDescription(paymentType: PaymentType): string {
