@@ -1527,6 +1527,73 @@ export class ContractGenerator {
   }
 
   /**
+   * Mapeamento de números em texto para valores numéricos e suas configurações
+   */
+  private static readonly HEXAGON_PATTERNS = [
+    { 
+      pattern: /Um hexágono/i, 
+      value: 1,
+      getRanges: (desc: string) => desc.includes("ou menos") 
+        ? { min: 0, max: 1 } 
+        : { min: 1, max: 10 }
+    },
+    { 
+      pattern: /Dois hexágonos/i, 
+      value: 2,
+      getRanges: (desc: string) => desc.includes("ou menos") 
+        ? { min: 0, max: 2 } 
+        : { min: 2, max: 10 }
+    },
+    { 
+      pattern: /Três hexágonos/i, 
+      value: 3,
+      getRanges: (desc: string) => desc.includes("ou menos") 
+        ? { min: 0, max: 3 } 
+        : { min: 3, max: 10 }
+    },
+    { pattern: /Quatro hexágonos/i, value: 4, getRanges: () => ({ min: 4, max: 10 }) },
+    { pattern: /Cinco hexágonos/i, value: 5, getRanges: () => ({ min: 5, max: 10 }) },
+    { pattern: /Seis hexágonos/i, value: 6, getRanges: () => ({ min: 6, max: 10 }) },
+    { pattern: /Sete hexágonos/i, value: 7, getRanges: () => ({ min: 7, max: 10 }) },
+    { pattern: /Oito hexágonos/i, value: 8, getRanges: () => ({ min: 8, max: 10 }) },
+  ] as const;
+
+  /**
+   * Constante para conversão de hexágonos para quilômetros
+   */
+  private static readonly KM_PER_HEXAGON = 9.5;
+
+  /**
+   * Extrai informações de hexágonos da descrição de distância
+   */
+  private static extractHexagonsFromDescription(description: string): { min: number; max: number } | null {
+    const matchedPattern = this.HEXAGON_PATTERNS.find(pattern => 
+      pattern.pattern.test(description)
+    );
+
+    return matchedPattern ? matchedPattern.getRanges(description) : null;
+  }
+
+  /**
+   * Converte hexágonos para quilômetros com arredondamento apropriado
+   */
+  private static hexagonsToKilometers(hexagons: { min: number; max: number }): { min: number; max: number } {
+    return {
+      min: Math.round(hexagons.min * this.KM_PER_HEXAGON * 10) / 10,
+      max: Math.round(hexagons.max * this.KM_PER_HEXAGON * 10) / 10
+    };
+  }
+
+  /**
+   * Obtém entrada da tabela de distância baseada na rolagem
+   */
+  private static getDistanceTableEntry(distanceRoll: number) {
+    return CONTRACT_DISTANCE_TABLE.find(
+      (entry) => distanceRoll >= entry.min && distanceRoll <= entry.max
+    );
+  }
+
+  /**
    * Obter informações detalhadas da distância de um contrato
    */
   static getContractDistanceDetails(contract: Contract): {
@@ -1534,7 +1601,9 @@ export class ContractGenerator {
     hexagons: { min: number; max: number } | null;
     kilometers: { min: number; max: number } | null;
   } {
-    if (!contract.generationData.distanceRoll) {
+    const distanceRoll = contract.generationData.distanceRoll;
+    
+    if (!distanceRoll) {
       return {
         description: "Distância não especificada",
         hexagons: null,
@@ -1542,10 +1611,8 @@ export class ContractGenerator {
       };
     }
 
-    const distanceEntry = CONTRACT_DISTANCE_TABLE.find(
-      (entry) => contract.generationData.distanceRoll! >= entry.min && contract.generationData.distanceRoll! <= entry.max
-    );
-
+    const distanceEntry = this.getDistanceTableEntry(distanceRoll);
+    
     if (!distanceEntry) {
       return {
         description: "Distância não especificada",
@@ -1554,58 +1621,9 @@ export class ContractGenerator {
       };
     }
 
-    // Extrair números da descrição para calcular hexágonos
     const description = distanceEntry.result.description;
-    let hexagons: { min: number; max: number } | null = null;
-    let kilometers: { min: number; max: number } | null = null;
-
-    // Padrões para extrair hexágonos da descrição
-    const oneHexPattern = /Um hexágono/i;
-    const twoHexPattern = /Dois hexágonos/i;
-    const threeHexPattern = /Três hexágonos/i;
-    const fourHexPattern = /Quatro hexágonos/i;
-    const fiveHexPattern = /Cinco hexágonos/i;
-    const sixHexPattern = /Seis hexágonos/i;
-    const sevenHexPattern = /Sete hexágonos/i;
-    const eightHexPattern = /Oito hexágonos/i;
-
-    if (oneHexPattern.test(description)) {
-      if (description.includes("ou menos")) {
-        hexagons = { min: 0, max: 1 };
-      } else {
-        hexagons = { min: 1, max: 10 }; // "ou mais"
-      }
-    } else if (twoHexPattern.test(description)) {
-      if (description.includes("ou menos")) {
-        hexagons = { min: 0, max: 2 };
-      } else {
-        hexagons = { min: 2, max: 10 };
-      }
-    } else if (threeHexPattern.test(description)) {
-      if (description.includes("ou menos")) {
-        hexagons = { min: 0, max: 3 };
-      } else {
-        hexagons = { min: 3, max: 10 };
-      }
-    } else if (fourHexPattern.test(description)) {
-      hexagons = { min: 4, max: 10 };
-    } else if (fiveHexPattern.test(description)) {
-      hexagons = { min: 5, max: 10 };
-    } else if (sixHexPattern.test(description)) {
-      hexagons = { min: 6, max: 10 };
-    } else if (sevenHexPattern.test(description)) {
-      hexagons = { min: 7, max: 10 };
-    } else if (eightHexPattern.test(description)) {
-      hexagons = { min: 8, max: 10 };
-    }
-
-    // Calcular quilômetros (1 hexágono = 9.5 km)
-    if (hexagons) {
-      kilometers = {
-        min: Math.round(hexagons.min * 9.5 * 10) / 10,
-        max: Math.round(hexagons.max * 9.5 * 10) / 10
-      };
-    }
+    const hexagons = this.extractHexagonsFromDescription(description);
+    const kilometers = hexagons ? this.hexagonsToKilometers(hexagons) : null;
 
     return {
       description,
