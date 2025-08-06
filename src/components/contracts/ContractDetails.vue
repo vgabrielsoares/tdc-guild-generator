@@ -142,35 +142,52 @@
                       <MapPinIcon class="w-5 h-5 text-blue-400" />
                       <span class="font-medium text-white">{{ distanceDetails?.description || 'Distância não especificada' }}</span>
                     </div>
-                    
-                    <div v-if="distanceDetails?.hexagons" class="space-y-2">
-                      <!-- Distância em hexágonos -->
-                      <div class="flex items-center justify-between text-md">
-                        <span class="text-gray-400">Hexágonos:</span>
-                        <span class="text-gray-300">
-                          <template v-if="distanceDetails.hexagons.min === distanceDetails.hexagons.max">
-                            {{ distanceDetails.hexagons.min }} hexágono{{ distanceDetails.hexagons.min > 1 ? 's' : '' }}
-                          </template>
-                          <template v-else>
-                            {{ distanceDetails.hexagons.min }}-{{ distanceDetails.hexagons.max }} hexágonos
-                          </template>
-                        </span>
-                      </div>
-                      
-                      <!-- Distância em quilômetros -->
-                      <div v-if="distanceDetails.kilometers" class="flex items-center justify-between text-md">
-                        <span class="text-gray-400">Distância aproximada:</span>
-                        <span class="text-gray-300">
-                          <template v-if="distanceDetails.kilometers.min === distanceDetails.kilometers.max">
-                            {{ distanceDetails.kilometers.min }} km
-                          </template>
-                          <template v-else>
-                            {{ distanceDetails.kilometers.min }}-{{ distanceDetails.kilometers.max }} km
-                          </template>
-                        </span>
+                    <div v-if="distanceDetails?.hexagons || distanceDetails?.kilometers" class="mt-4">
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Hexágonos -->
+                        <div>
+                          <div class="flex justify-center md:justify-middle">
+                            <span class="text-gray-400 font-medium">Hexágonos</span>
+                          </div>
+                          <div class="flex justify-center md:justify-middle mt-1">
+                            <span class="text-gray-300 text-lg font-semibold">
+                              <template v-if="distanceDetails?.hexagons">
+                                <template v-if="distanceDetails.hexagons.min === distanceDetails.hexagons.max">
+                                  {{ distanceDetails.hexagons.min }} hexágono{{ distanceDetails.hexagons.min > 1 ? 's' : '' }}
+                                </template>
+                                <template v-else>
+                                  {{ distanceDetails.hexagons.min }}-{{ distanceDetails.hexagons.max }} hexágonos
+                                </template>
+                              </template>
+                              <template v-else>
+                                —
+                              </template>
+                            </span>
+                          </div>
+                        </div>
+                        <!-- Distância aproximada -->
+                        <div>
+                          <div class="flex justify-center md:justify-middle">
+                            <span class="text-gray-400 font-medium">Distância aproximada</span>
+                          </div>
+                          <div class="flex justify-center md:justify-middle mt-1">
+                            <span class="text-gray-300 text-lg font-semibold">
+                              <template v-if="distanceDetails?.kilometers">
+                                <template v-if="distanceDetails.kilometers.min === distanceDetails.kilometers.max">
+                                  {{ distanceDetails.kilometers.min }} km
+                                </template>
+                                <template v-else>
+                                  {{ distanceDetails.kilometers.min }}-{{ distanceDetails.kilometers.max }} km
+                                </template>
+                              </template>
+                              <template v-else>
+                                —
+                              </template>
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    
                     <div class="text-sm text-gray-400 mt-3 pt-2 border-t border-blue-500/20">
                       <div class="flex items-center gap-1">
                         <InformationCircleIcon class="w-3 h-3" />
