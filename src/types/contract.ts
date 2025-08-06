@@ -140,6 +140,12 @@ export interface Contract {
   objective?: ContractObjective;
   location?: ContractLocation;
 
+  // Distância do contrato
+  distance?: {
+    roll: number;
+    result: string;
+  };
+
   // Valores e recompensas
   value: ContractValue;
 
