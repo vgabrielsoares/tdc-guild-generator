@@ -240,6 +240,7 @@ export class ContractGenerator {
       finalValueResult: contractValue,
       deadline,
       paymentType,
+      distanceRoll,
     });
 
     // 17. Estrutura básica do contrato
@@ -1506,6 +1507,114 @@ export class ContractGenerator {
   }
 
   /**
+   * Obter a descrição da distância baseada na rolagem
+   */
+  private static getDistanceDescription(distanceRoll: number): string {
+    const distanceEntry = CONTRACT_DISTANCE_TABLE.find(
+      (entry) => distanceRoll >= entry.min && distanceRoll <= entry.max
+    );
+    return distanceEntry?.result.description || "Distância não especificada";
+  }
+
+  /**
+   * Obter a descrição da distância de um contrato
+   */
+  static getContractDistanceDescription(contract: Contract): string {
+    if (!contract.generationData.distanceRoll) {
+      return "Distância não especificada";
+    }
+    return this.getDistanceDescription(contract.generationData.distanceRoll);
+  }
+
+  /**
+   * Obter informações detalhadas da distância de um contrato
+   */
+  static getContractDistanceDetails(contract: Contract): {
+    description: string;
+    hexagons: { min: number; max: number } | null;
+    kilometers: { min: number; max: number } | null;
+  } {
+    if (!contract.generationData.distanceRoll) {
+      return {
+        description: "Distância não especificada",
+        hexagons: null,
+        kilometers: null
+      };
+    }
+
+    const distanceEntry = CONTRACT_DISTANCE_TABLE.find(
+      (entry) => contract.generationData.distanceRoll! >= entry.min && contract.generationData.distanceRoll! <= entry.max
+    );
+
+    if (!distanceEntry) {
+      return {
+        description: "Distância não especificada",
+        hexagons: null,
+        kilometers: null
+      };
+    }
+
+    // Extrair números da descrição para calcular hexágonos
+    const description = distanceEntry.result.description;
+    let hexagons: { min: number; max: number } | null = null;
+    let kilometers: { min: number; max: number } | null = null;
+
+    // Padrões para extrair hexágonos da descrição
+    const oneHexPattern = /Um hexágono/i;
+    const twoHexPattern = /Dois hexágonos/i;
+    const threeHexPattern = /Três hexágonos/i;
+    const fourHexPattern = /Quatro hexágonos/i;
+    const fiveHexPattern = /Cinco hexágonos/i;
+    const sixHexPattern = /Seis hexágonos/i;
+    const sevenHexPattern = /Sete hexágonos/i;
+    const eightHexPattern = /Oito hexágonos/i;
+
+    if (oneHexPattern.test(description)) {
+      if (description.includes("ou menos")) {
+        hexagons = { min: 0, max: 1 };
+      } else {
+        hexagons = { min: 1, max: 10 }; // "ou mais"
+      }
+    } else if (twoHexPattern.test(description)) {
+      if (description.includes("ou menos")) {
+        hexagons = { min: 0, max: 2 };
+      } else {
+        hexagons = { min: 2, max: 10 };
+      }
+    } else if (threeHexPattern.test(description)) {
+      if (description.includes("ou menos")) {
+        hexagons = { min: 0, max: 3 };
+      } else {
+        hexagons = { min: 3, max: 10 };
+      }
+    } else if (fourHexPattern.test(description)) {
+      hexagons = { min: 4, max: 10 };
+    } else if (fiveHexPattern.test(description)) {
+      hexagons = { min: 5, max: 10 };
+    } else if (sixHexPattern.test(description)) {
+      hexagons = { min: 6, max: 10 };
+    } else if (sevenHexPattern.test(description)) {
+      hexagons = { min: 7, max: 10 };
+    } else if (eightHexPattern.test(description)) {
+      hexagons = { min: 8, max: 10 };
+    }
+
+    // Calcular quilômetros (1 hexágono = 9.5 km)
+    if (hexagons) {
+      kilometers = {
+        min: Math.round(hexagons.min * 9.5 * 10) / 10,
+        max: Math.round(hexagons.max * 9.5 * 10) / 10
+      };
+    }
+
+    return {
+      description,
+      hexagons,
+      kilometers
+    };
+  }
+
+  /**
    * Gera descrição completa do contrato englobando todos os elementos
    */
   private static generateFullContractDescription(params: {
@@ -1526,6 +1635,7 @@ export class ContractGenerator {
       value?: string;
     };
     paymentType: PaymentType;
+    distanceRoll?: number;
   }): string {
     const {
       objective,
@@ -1542,6 +1652,7 @@ export class ContractGenerator {
       finalValueResult,
       deadline,
       paymentType,
+      distanceRoll,
     } = params;
 
     const sections: string[] = [];
@@ -1589,12 +1700,33 @@ export class ContractGenerator {
 
     sections.push(locationText);
 
-    // 4. Antagonista
+    // 4. Distância
+    if (distanceRoll) {
+      const distanceDescription = this.getDistanceDescription(distanceRoll);
+      
+      // Obter detalhes da distância para mostrar a aproximação correta em km
+      const distanceDetails = this.getContractDistanceDetails({
+        generationData: { distanceRoll }
+      } as Contract);
+      
+      let kmInfo = "";
+      if (distanceDetails.kilometers) {
+        if (distanceDetails.kilometers.min === distanceDetails.kilometers.max) {
+          kmInfo = ` (aproximadamente ${distanceDetails.kilometers.min} km)`;
+        } else {
+          kmInfo = ` (aproximadamente ${distanceDetails.kilometers.min}-${distanceDetails.kilometers.max} km)`;
+        }
+      }
+      
+      sections.push(`**Distância:** ${distanceDescription}${kmInfo}`);
+    }
+
+    // 5. Antagonista
     sections.push(
       `**Antagonista:** ${antagonist.specificType}: ${antagonist.description}`
     );
 
-    // 5. Complicações
+    // 6. Complicações
     if (complications.length > 0) {
       const complicationTexts = complications
         .map((c) => `${c.description}`)
@@ -1602,7 +1734,7 @@ export class ContractGenerator {
       sections.push(`**Complicações:** ${complicationTexts}`);
     }
 
-    // 6. Aliados (se houver)
+    // 7. Aliados (se houver)
     if (allies.length > 0) {
       const allyTexts = allies
         .map(
@@ -1612,21 +1744,21 @@ export class ContractGenerator {
       sections.push(`**Aliados potenciais:**\n${allyTexts}`);
     }
 
-    // 7. Reviravoltas (se houver)
+    // 8. Reviravoltas (se houver)
     if (twists.length > 0) {
       const twistTexts = twists.map((t) => `• ${t.description}`).join("\n");
       sections.push(`**Reviravoltas:**\n${twistTexts}`);
     }
 
-    // 8. Valor em XP
+    // 9. Valor em XP
     sections.push(`**Experiência:** ${finalValueResult.experienceValue} XP`);
 
-    // 9. Recompensa principal
+    // 10. Recompensa principal
     sections.push(
       `**Recompensa:** ${finalValueResult.finalGoldReward} moedas de ouro`
     );
 
-    // 10. Recompensas e incentivos (se houver)
+    // 11. Recompensas e incentivos (se houver)
     if (additionalRewards.length > 0) {
       const rewardTexts = additionalRewards
         .map((reward) => {
@@ -1637,7 +1769,7 @@ export class ContractGenerator {
       sections.push(`**Recompensas e Incentivos:**\n${rewardTexts}`);
     }
 
-    // 11. Consequências severas (se houver)
+    // 12. Consequências severas (se houver)
     if (severeConsequences.length > 0) {
       const consequenceTexts = severeConsequences
         .map(
@@ -1648,24 +1780,24 @@ export class ContractGenerator {
       sections.push(`**Consequências por falha:**\n${consequenceTexts}`);
     }
 
-    // 12. Prazo
+    // 13. Prazo
     if (deadline.type !== DeadlineType.SEM_PRAZO) {
       sections.push(`**Prazo:** ${deadline.value}`);
     }
 
-    // 13. Pré-requisitos (se houver)
+    // 14. Pré-requisitos (se houver)
     if (prerequisites.length > 0) {
       const prerequisiteTexts = prerequisites.map((p) => `• ${p}`).join("\n");
       sections.push(`**Pré-requisitos:**\n${prerequisiteTexts}`);
     }
 
-    // 14. Cláusulas (se houver)
+    // 15. Cláusulas (se houver)
     if (clauses.length > 0) {
       const clauseTexts = clauses.map((c) => `• ${c}`).join("\n");
       sections.push(`**Cláusulas:**\n${clauseTexts}`);
     }
 
-    // 15. Tipo de pagamento
+    // 16. Tipo de pagamento
     const paymentText = this.getPaymentTypeDescription(paymentType);
     sections.push(`**Forma de pagamento:** ${paymentText}`);
 
