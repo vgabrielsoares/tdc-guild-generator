@@ -296,8 +296,6 @@ export const useTimelineStore = defineStore("timeline", () => {
 
     timelines.value[currentTimeline.value.guildId] = updatedTimeline;
 
-    success("Evento agendado", `Evento agendado para ${formatGameDate(date)}`);
-
     return event;
   }
 
@@ -322,8 +320,6 @@ export const useTimelineStore = defineStore("timeline", () => {
     };
 
     timelines.value[currentTimeline.value.guildId] = updatedTimeline;
-
-    info("Evento removido", "Evento foi removido da timeline");
 
     return true;
   }
