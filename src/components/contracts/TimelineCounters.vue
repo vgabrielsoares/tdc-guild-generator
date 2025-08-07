@@ -18,62 +18,6 @@
 
     <!-- Contadores de contratos -->
     <div v-if="contractCounters" class="space-y-3">
-      <!-- Próximos novos contratos -->
-      <div
-        v-if="contractCounters.daysUntilNewContracts !== null"
-        class="flex items-center justify-between p-3 bg-green-900/30 rounded-lg border border-green-800/30"
-      >
-        <div class="flex items-center space-x-2">
-          <svg
-            class="w-5 h-5 text-green-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-            ></path>
-          </svg>
-          <span class="text-sm font-medium text-green-300"
-            >Novos Contratos</span
-          >
-        </div>
-        <span class="text-sm font-bold text-green-100">
-          {{ formatDaysCounter(contractCounters.daysUntilNewContracts) }}
-        </span>
-      </div>
-
-      <!-- Próximas resoluções -->
-      <div
-        v-if="contractCounters.daysUntilResolution !== null"
-        class="flex items-center justify-between p-3 bg-yellow-900/30 rounded-lg border border-yellow-800/30"
-      >
-        <div class="flex items-center space-x-2">
-          <svg
-            class="w-5 h-5 text-yellow-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-            ></path>
-          </svg>
-          <span class="text-sm font-medium text-yellow-300"
-            >Resolução Automática</span
-          >
-        </div>
-        <span class="text-sm font-bold text-yellow-100">
-          {{ formatDaysCounter(contractCounters.daysUntilResolution) }}
-        </span>
-      </div>
-
       <!-- Próximo evento geral -->
       <div
         v-if="nextEvent"
