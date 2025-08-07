@@ -8,7 +8,7 @@
         <div
           :class="[
             'w-full max-w-xs rounded-lg shadow-lg px-4 py-3 flex items-center gap-3 pointer-events-auto relative group',
-            toastTypeClass(toast.type)
+            toastTypeClass(toast.type),
           ]"
           role="status"
           tabindex="0"
@@ -26,15 +26,31 @@
             @click="removeToast(toast.id)"
             aria-label="Fechar"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
           <!-- Barra de progresso -->
-          <div class="absolute left-0 bottom-0 h-1 w-full bg-gray-300/30 rounded-b-lg overflow-hidden">
+          <div
+            class="absolute left-0 bottom-0 h-1 w-full bg-gray-300/30 rounded-b-lg overflow-hidden"
+          >
             <div
               class="h-full transition-all duration-100 linear"
-              :style="{ width: getToastProgress(toast.id) + '%', background: toastTypeBarColor(toast.type) }"
+              :style="{
+                width: getToastProgress(toast.id) + '%',
+                background: toastTypeBarColor(toast.type),
+              }"
             ></div>
           </div>
         </div>
@@ -44,9 +60,9 @@
 </template>
 
 <script setup lang="ts">
-import { storeToRefs } from 'pinia';
-import { useToastStore, ToastType } from '../../stores/toast';
-import { watch, onUnmounted } from 'vue';
+import { storeToRefs } from "pinia";
+import { useToastStore, ToastType } from "../../stores/toast";
+import { watch, onUnmounted } from "vue";
 
 const { toasts } = storeToRefs(useToastStore());
 const { removeToast } = useToastStore();
@@ -59,7 +75,7 @@ interface ToastTimeout {
   paused: boolean;
 }
 
-import { ref, onMounted } from 'vue';
+import { ref, onMounted } from "vue";
 const progressUpdate = ref(0);
 
 function updateProgressLoop() {
@@ -76,25 +92,27 @@ const getToastProgress = (id: string): number => {
   void progressUpdate.value;
   const t = toastTimeouts.get(id);
   if (!t) return 100;
-  const toast = toasts.value.find(toast => toast.id === id);
+  const toast = toasts.value.find((toast) => toast.id === id);
   const duration = toast?.duration ?? 3500;
   // O tempo restante real do toast
-  const remaining = t.paused ? t.remaining : Math.max(0, t.remaining - (Date.now() - t.start));
+  const remaining = t.paused
+    ? t.remaining
+    : Math.max(0, t.remaining - (Date.now() - t.start));
   return Math.max(0, Math.min(100, (remaining / duration) * 100));
 };
 
 const toastTypeBarColor = (type: ToastType) => {
   switch (type) {
     case ToastType.SUCCESS:
-      return '#22c55e'; // green-500
+      return "#22c55e"; // green-500
     case ToastType.ERROR:
-      return '#ef4444'; // red-500
+      return "#ef4444"; // red-500
     case ToastType.INFO:
-      return '#3b82f6'; // blue-500
+      return "#3b82f6"; // blue-500
     case ToastType.WARNING:
-      return '#eab308'; // yellow-500
+      return "#eab308"; // yellow-500
     default:
-      return '#a3a3a3'; // gray-400
+      return "#a3a3a3"; // gray-400
   }
 };
 
@@ -108,7 +126,7 @@ function clearToastTimeout(id: string) {
   }
 }
 
-import type { Toast } from '../../stores/toast';
+import type { Toast } from "../../stores/toast";
 function setToastTimeout(toast: Toast) {
   clearToastTimeout(toast.id);
   const duration = toast.duration ?? 3500;
@@ -170,15 +188,15 @@ onUnmounted(() => {
 function toastTypeClass(type: ToastType) {
   switch (type) {
     case ToastType.SUCCESS:
-      return 'bg-green-900/90 text-green-100 border border-green-700';
+      return "bg-green-900/90 text-green-100 border border-green-700";
     case ToastType.ERROR:
-      return 'bg-red-900/90 text-red-100 border border-red-700';
+      return "bg-red-900/90 text-red-100 border border-red-700";
     case ToastType.INFO:
-      return 'bg-blue-900/90 text-blue-100 border border-blue-700';
+      return "bg-blue-900/90 text-blue-100 border border-blue-700";
     case ToastType.WARNING:
-      return 'bg-yellow-900/90 text-yellow-100 border border-yellow-700';
+      return "bg-yellow-900/90 text-yellow-100 border border-yellow-700";
     default:
-      return 'bg-gray-800/90 text-gray-100 border border-gray-600';
+      return "bg-gray-800/90 text-gray-100 border border-gray-600";
   }
 }
 </script>
@@ -186,7 +204,9 @@ function toastTypeClass(type: ToastType) {
 <style scoped>
 .toast-fade-enter-active,
 .toast-fade-leave-active {
-  transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1), transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  transition:
+    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .toast-fade-enter-from,
 .toast-fade-leave-to {
