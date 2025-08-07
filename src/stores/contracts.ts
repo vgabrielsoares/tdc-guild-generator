@@ -40,12 +40,12 @@ import {
   rollSignedContractResolutionTime,
   rollUnsignedContractResolutionTime,
 } from "@/utils/generators/contractLifeCycle";
-import { addDays, createGameDate } from "@/utils/date-utils";
+import { addDays, createGameDate, isDateAfter, getDaysDifference } from "@/utils/date-utils";
 
 export const useContractsStore = defineStore("contracts", () => {
   // Store dependencies
   const timelineStore = useTimelineStore();
-  const { success, info } = useToast();
+  const { success, info, warning } = useToast();
 
   // Estado dos contratos atuais (da guilda selecionada)
   const contracts = ref<Contract[]>([]);
@@ -498,6 +498,9 @@ export const useContractsStore = defineStore("contracts", () => {
   const processTimeAdvance = (result: TimeAdvanceResult) => {
     if (!result || !result.triggeredEvents) return;
 
+    // Verificar contratos aceitos que passaram do prazo
+    checkAndBreakOverdueContracts();
+
     // Processar eventos de contratos
     processTimelineEvents(result.triggeredEvents);
 
@@ -757,10 +760,114 @@ export const useContractsStore = defineStore("contracts", () => {
   };
 
   /**
+   * Converte deadline em dias baseado no tipo e valor
+   */
+  const convertDeadlineToDays = (deadline: Contract['deadline']): number => {
+    if (deadline.type === DeadlineType.SEM_PRAZO) {
+      return 0; // Sem prazo
+    }
+    
+    if (!deadline.value) return 7; // Default de 1 semana
+    
+    const value = deadline.value.toLowerCase();
+    
+    // Extrair número de dias
+    if (deadline.type === DeadlineType.DIAS && value.includes('dia')) {
+      const match = value.match(/(\d+)/);
+      return match ? parseInt(match[1]) : 7;
+    }
+    
+    // Extrair número de semanas e converter para dias
+    if (deadline.type === DeadlineType.SEMANAS && value.includes('semana')) {
+      const match = value.match(/(\d+)/);
+      return match ? parseInt(match[1]) * 7 : 7;
+    }
+    
+    return 7; // Default de 1 semana
+  };
+
+  /**
+   * Verifica contratos aceitos que passaram do prazo e os quebra automaticamente
+   */
+  const checkAndBreakOverdueContracts = () => {
+    const timelineStore = useTimelineStore();
+    const currentDate = timelineStore.currentGameDate;
+    
+    if (!currentDate) return;
+    
+    const acceptedContracts = contracts.value.filter(
+      c => c.status === ContractStatus.ACEITO && c.deadlineDate
+    );
+    
+    for (const contract of acceptedContracts) {
+      if (contract.deadlineDate && isDateAfter(currentDate, contract.deadlineDate)) {
+        // Contrato passou do prazo, quebrar automaticamente
+        breakContractWithPenalty(contract.id, `Prazo excedido em ${getDaysDifference(contract.deadlineDate, currentDate)} dias`);
+      }
+    }
+  };
+
+  /**
+   * Quebra um contrato específico e aplica penalidade
+   */
+  const breakContractWithPenalty = (contractId: string, reason: string = 'Contrato quebrado') => {
+    const contract = contracts.value.find((c) => c.id === contractId);
+    if (contract) {
+      const timelineStore = useTimelineStore();
+      const currentDate = timelineStore.currentGameDate;
+      
+      if (currentDate) {
+        contract.brokenAt = currentDate;
+      }
+      
+      // Calcular penalidade (10% da recompensa)
+      const penaltyAmount = Math.floor(contract.value.finalGoldReward * 0.1);
+      contract.penalty = {
+        amount: penaltyAmount,
+        reason: reason,
+        appliedAt: currentDate || createGameDate(1, 1, 1000)
+      };
+      
+      // Atualizar status
+      contract.status = ContractStatus.QUEBRADO;
+      lastUpdate.value = new Date();
+      saveToStorage();
+      
+      // Mostrar notificação
+      warning('Contrato Quebrado', `${contract.objective?.description || 'Contrato'} foi quebrado. Multa: ${penaltyAmount} PO$`);
+      
+      return penaltyAmount;
+    }
+    return 0;
+  };
+
+  /**
    * Aceita um contrato específico
    */
   const acceptContract = (contractId: string) => {
-    updateContractStatus(contractId, ContractStatus.ACEITO);
+    const contract = contracts.value.find((c) => c.id === contractId);
+    if (contract) {
+      const timelineStore = useTimelineStore();
+      const currentDate = timelineStore.currentGameDate;
+      
+      if (!currentDate) {
+        return;
+      }
+      
+      // Define a data de aceitação
+      contract.acceptedAt = currentDate;
+      
+      // Calcula a data limite baseada no prazo do contrato
+      const deadlineDays = convertDeadlineToDays(contract.deadline);
+      if (deadlineDays > 0) {
+        contract.deadlineDate = addDays(currentDate, deadlineDays);
+      }
+      
+      // Atualiza o status
+      contract.status = ContractStatus.ACEITO;
+      lastUpdate.value = new Date();
+      saveToStorage();
+    }
   };
 
   /**
@@ -1068,6 +1175,7 @@ export const useContractsStore = defineStore("contracts", () => {
     completeContract,
     failContract,
     breakContract,
+    breakContractWithPenalty,
     cancelContract,
 
     // ===== ACTIONS - CRUD =====
@@ -1106,5 +1214,6 @@ export const useContractsStore = defineStore("contracts", () => {
     processUnsignedContractResolution,
     processTimelineEvents,
     processTimeAdvance,
+    checkAndBreakOverdueContracts,
   };
 });
