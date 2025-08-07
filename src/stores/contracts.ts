@@ -26,8 +26,23 @@ import {
 } from "@/utils/generators/contractGenerator";
 import { useGuildStore } from "./guild";
 import { useStorage } from "@/composables/useStorage";
+import { useTimelineStore } from "./timeline";
+import {
+  ScheduledEventType,
+  type ScheduledEvent,
+  type TimeAdvanceResult,
+} from "@/types/timeline";
+import {
+  rollNewContractsTime,
+  rollSignedContractResolutionTime,
+  rollUnsignedContractResolutionTime,
+} from "@/utils/generators/contractLifeCycle";
+import { addDays, createGameDate } from "@/utils/date-utils";
 
 export const useContractsStore = defineStore("contracts", () => {
+  // Store dependencies
+  const timelineStore = useTimelineStore();
+
   // Estado dos contratos atuais (da guilda selecionada)
   const contracts = ref<Contract[]>([]);
   const isLoading = ref(false);
@@ -213,6 +228,9 @@ export const useContractsStore = defineStore("contracts", () => {
 
     currentGuildId.value = guildId;
     storage.data.value.currentGuildId = guildId;
+
+    // Inicializar timeline para esta guilda
+    timelineStore.setCurrentGuild(guildId);
   };
 
   /**
@@ -277,6 +295,127 @@ export const useContractsStore = defineStore("contracts", () => {
     lifecycleManager.initializeResolutionTimes();
   };
 
+  /**
+   * Agenda eventos de timeline baseados no ciclo de vida dos contratos
+   */
+  const scheduleContractEvents = () => {
+    if (!timelineStore.currentGameDate) {
+      return;
+    }
+
+    // Agendar próximos novos contratos baseado nas regras
+    const daysUntilNewContracts = rollNewContractsTime();
+    const newContractsDate = addDays(
+      timelineStore.currentGameDate,
+      daysUntilNewContracts
+    );
+
+    timelineStore.scheduleEvent(
+      ScheduledEventType.NEW_CONTRACTS,
+      newContractsDate,
+      "Novos contratos disponíveis",
+      { source: "contract_generation", guildId: currentGuildId.value }
+    );
+
+    // Agendar resolução automática de contratos
+    const signedTime = rollSignedContractResolutionTime();
+    const unsignedTime = rollUnsignedContractResolutionTime();
+
+    if (signedTime) {
+      const signedResolutionDate = addDays(
+        timelineStore.currentGameDate,
+        signedTime
+      );
+      timelineStore.scheduleEvent(
+        ScheduledEventType.CONTRACT_RESOLUTION,
+        signedResolutionDate,
+        "Resolução automática de contratos assinados",
+        {
+          source: "signed_resolution",
+          guildId: currentGuildId.value,
+          resolutionType: "signed",
+        }
+      );
+    }
+
+    if (unsignedTime) {
+      const unsignedResolutionDate = addDays(
+        timelineStore.currentGameDate,
+        unsignedTime
+      );
+      timelineStore.scheduleEvent(
+        ScheduledEventType.CONTRACT_RESOLUTION,
+        unsignedResolutionDate,
+        "Resolução automática de contratos não assinados",
+        {
+          source: "unsigned_resolution",
+          guildId: currentGuildId.value,
+          resolutionType: "unsigned",
+        }
+      );
+    }
+  };
+
+  /**
+   * Processa eventos de timeline relacionados a contratos
+   */
+  const processTimelineEvents = (triggeredEvents: ScheduledEvent[]) => {
+    if (!currentGuildId.value) return;
+
+    triggeredEvents.forEach((event) => {
+      // Só processar eventos da guilda atual
+      if (event.data?.guildId !== currentGuildId.value) return;
+
+      switch (event.type) {
+        case ScheduledEventType.NEW_CONTRACTS:
+          // Gerar novos contratos automaticamente
+          generateContracts();
+          break;
+
+        case ScheduledEventType.CONTRACT_RESOLUTION:
+          // Processar resolução automática
+          processContractLifecycle();
+          // Reagendar próximas resoluções
+          scheduleContractEvents();
+          break;
+
+        case ScheduledEventType.CONTRACT_EXPIRATION:
+          // Processar expiração específica de contrato
+          if (event.data && typeof event.data.contractId === "string") {
+            const contract = contracts.value.find(
+              (c) => c.id === event.data!.contractId
+            );
+            if (contract && contract.status === ContractStatus.DISPONIVEL) {
+              updateContractStatus(contract.id, ContractStatus.EXPIRADO);
+            }
+          }
+          break;
+      }
+    });
+  };
+
+  /**
+   * Integração com passagem de tempo do timeline
+   */
+  const processTimeAdvance = (result: TimeAdvanceResult) => {
+    if (!result || !result.triggeredEvents) return;
+
+    // Processar eventos de contratos
+    processTimelineEvents(result.triggeredEvents);
+
+    // Processar prazos baseado na data atual do jogo
+    if (timelineStore.currentGameDate) {
+      // Converter GameDate para Date para verificar prazos
+      const currentJSDate = new Date(); // Para compatibilidade com sistema existente
+      contracts.value = processContractDeadlines(
+        contracts.value,
+        currentJSDate
+      );
+      contracts.value = markExpiredContracts(contracts.value);
+      saveToStorage();
+    }
+  };
+
   // ===== ACTIONS =====
 
   /**
@@ -323,6 +462,16 @@ export const useContractsStore = defineStore("contracts", () => {
         loadGuildContracts(currentGuild.id);
       }
 
+      // Garantir que a timeline está inicializada
+      if (!timelineStore.currentGameDate) {
+        timelineStore.setCurrentGuild(currentGuild.id);
+        // Se ainda não há data, inicializar com data padrão
+        if (!timelineStore.currentGameDate) {
+          const defaultDate = createGameDate(1, 1, 1);
+          timelineStore.createTimelineForGuild(currentGuild.id, defaultDate);
+        }
+      }
+
       const config: ContractGenerationConfig = {
         guild: currentGuild,
         skipFrequentatorsReduction: false,
@@ -342,6 +491,9 @@ export const useContractsStore = defineStore("contracts", () => {
       lifecycleManager.markNewContractsGenerated();
       lastUpdate.value = new Date();
       saveToStorage();
+
+      // Agendar eventos de timeline após gerar contratos
+      scheduleContractEvents();
     } catch (error) {
       generationError.value =
         error instanceof Error ? error.message : "Erro desconhecido na geração";
@@ -788,5 +940,10 @@ export const useContractsStore = defineStore("contracts", () => {
 
     // ===== FUNÇÕES DO GERENCIADOR =====
     initializeLifecycle,
+
+    // ===== INTEGRAÇÃO COM TIMELINE =====
+    scheduleContractEvents,
+    processTimelineEvents,
+    processTimeAdvance,
   };
 });
