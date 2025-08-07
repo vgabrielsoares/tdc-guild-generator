@@ -27,24 +27,27 @@ function generateId(): string {
 }
 
 export const useTimelineStore = defineStore('timeline', () => {
-  // Estado reativo
-  const timelines = ref<Map<string, GuildTimeline>>(new Map());
+  // Estado interno
+  const timelines = ref<Record<string, GuildTimeline>>({});
   const currentGuildId = ref<string | null>(null);
-  
-  // Composables
-  const { data: storedTimelines, reset: resetStorage } = useStorage('guild-timelines', new Map<string, GuildTimeline>());
+
+  // Callbacks para integração com outros stores
+  const timeAdvanceCallbacks = ref<((result: TimeAdvanceResult) => void)[]>([]);
+
+  // Storage e utilitários
+  const { data: storedTimelines, reset: resetStorage } = useStorage('guild-timelines', {} as Record<string, GuildTimeline>);
   const { success, info, warning } = useToast();
   
   // Carregar dados do storage na inicialização
-  if (storedTimelines.value instanceof Map && storedTimelines.value.size > 0) {
-    timelines.value = new Map(storedTimelines.value);
+  if (storedTimelines.value && typeof storedTimelines.value === 'object') {
+    timelines.value = { ...storedTimelines.value };
   }
   
   // Auto-save quando timelines mudam
   watch(
     timelines,
     (newTimelines) => {
-      storedTimelines.value = new Map(newTimelines);
+      storedTimelines.value = { ...newTimelines };
     },
     { deep: true }
   );
@@ -52,7 +55,7 @@ export const useTimelineStore = defineStore('timeline', () => {
   // Computed: Timeline atual
   const currentTimeline = computed((): GuildTimeline | null => {
     if (!currentGuildId.value) return null;
-    return timelines.value.get(currentGuildId.value) || null;
+    return timelines.value[currentGuildId.value] || null;
   });
   
   // Computed: Data atual do jogo
@@ -116,7 +119,7 @@ export const useTimelineStore = defineStore('timeline', () => {
     currentGuildId.value = guildId;
     
     // Criar timeline se não existir
-    if (!timelines.value.has(guildId)) {
+    if (!timelines.value[guildId]) {
       createTimelineForGuild(guildId);
     }
   }
@@ -134,10 +137,8 @@ export const useTimelineStore = defineStore('timeline', () => {
       updatedAt: now,
     };
     
-    timelines.value.set(guildId, timeline);
-    
-    info('Timeline criada', `Nova timeline iniciada em ${formatGameDate(timeline.currentDate)}`);
-    
+    timelines.value[guildId] = timeline;
+        
     return timeline;
   }
   
@@ -145,8 +146,8 @@ export const useTimelineStore = defineStore('timeline', () => {
    * Remove a timeline de uma guilda (quando guilda é removida)
    */
   function removeTimelineForGuild(guildId: string): void {
-    if (timelines.value.has(guildId)) {
-      timelines.value.delete(guildId);
+    if (timelines.value[guildId]) {
+      delete timelines.value[guildId];
       
       // Se era a timeline atual, limpar referência
       if (currentGuildId.value === guildId) {
@@ -181,7 +182,7 @@ export const useTimelineStore = defineStore('timeline', () => {
       updatedAt: new Date(),
     };
     
-    timelines.value.set(currentTimeline.value.guildId, updatedTimeline);
+    timelines.value[currentTimeline.value.guildId] = updatedTimeline;
     
     const result: TimeAdvanceResult = {
       newDate,
@@ -191,13 +192,21 @@ export const useTimelineStore = defineStore('timeline', () => {
     
     // Notificar sobre eventos processados
     if (triggeredEvents.length > 0) {
-      success(
-        'Eventos processados', 
-        `${triggeredEvents.length} evento(s) foram processados`
+      // Only show toast for important events
+      const importantEvents = triggeredEvents.filter(e => 
+        e.description && !e.description.toLowerCase().includes('rotina')
       );
+      
+      if (importantEvents.length > 0) {
+        success(
+          'Eventos processados', 
+          `${importantEvents.length} evento(s) processados`
+        );
+      }
     }
     
-    info('Tempo avançado', `Agora é ${formatGameDate(newDate)}`);
+    // Notificar outros stores sobre a mudança de tempo
+    notifyTimeAdvanceCallbacks(result);
     
     return result;
   }
@@ -225,7 +234,7 @@ export const useTimelineStore = defineStore('timeline', () => {
       updatedAt: new Date(),
     };
     
-    timelines.value.set(currentTimeline.value.guildId, updatedTimeline);
+    timelines.value[currentTimeline.value.guildId] = updatedTimeline;
     
     const result: TimeAdvanceResult = {
       newDate: date,
@@ -240,7 +249,9 @@ export const useTimelineStore = defineStore('timeline', () => {
       );
     }
     
-    info('Data definida', `Data atual definida para ${formatGameDate(date)}`);
+    
+    // Notificar outros stores sobre a mudança de tempo
+    notifyTimeAdvanceCallbacks(result);
     
     return result;
   }
@@ -276,7 +287,7 @@ export const useTimelineStore = defineStore('timeline', () => {
       updatedAt: new Date(),
     };
     
-    timelines.value.set(currentTimeline.value.guildId, updatedTimeline);
+    timelines.value[currentTimeline.value.guildId] = updatedTimeline;
     
     success('Evento agendado', `Evento agendado para ${formatGameDate(date)}`);
     
@@ -301,7 +312,7 @@ export const useTimelineStore = defineStore('timeline', () => {
       updatedAt: new Date(),
     };
     
-    timelines.value.set(currentTimeline.value.guildId, updatedTimeline);
+    timelines.value[currentTimeline.value.guildId] = updatedTimeline;
     
     info('Evento removido', 'Evento foi removido da timeline');
     
@@ -328,7 +339,7 @@ export const useTimelineStore = defineStore('timeline', () => {
       updatedAt: new Date(),
     };
     
-    timelines.value.set(currentTimeline.value.guildId, updatedTimeline);
+    timelines.value[currentTimeline.value.guildId] = updatedTimeline;
     
     info('Eventos limpos', 'Todos os eventos foram removidos da timeline');
   }
@@ -337,11 +348,41 @@ export const useTimelineStore = defineStore('timeline', () => {
    * Reseta todas as timelines (usado para limpeza)
    */
   function resetAllTimelines(): void {
-    timelines.value.clear();
+    timelines.value = {};
     currentGuildId.value = null;
     resetStorage();
     
     info('Timelines resetadas', 'Todas as timelines foram removidas');
+  }
+
+  /**
+   * Registra um callback para ser chamado quando o tempo avança
+   */
+  function registerTimeAdvanceCallback(callback: (result: TimeAdvanceResult) => void): void {
+    timeAdvanceCallbacks.value.push(callback);
+  }
+
+  /**
+   * Remove um callback de time advance
+   */
+  function unregisterTimeAdvanceCallback(callback: (result: TimeAdvanceResult) => void): void {
+    const index = timeAdvanceCallbacks.value.indexOf(callback);
+    if (index > -1) {
+      timeAdvanceCallbacks.value.splice(index, 1);
+    }
+  }
+
+  /**
+   * Notifica todos os callbacks registrados sobre mudança de tempo
+   */
+  function notifyTimeAdvanceCallbacks(result: TimeAdvanceResult): void {
+    timeAdvanceCallbacks.value.forEach(callback => {
+      try {
+        callback(result);
+      } catch (error) {
+        // Silenciar erro para evitar breaking da app
+      }
+    });
   }
   
   return {
@@ -367,5 +408,9 @@ export const useTimelineStore = defineStore('timeline', () => {
     getEventsByType,
     clearEvents,
     resetAllTimelines,
+
+    // Callbacks de integração
+    registerTimeAdvanceCallback,
+    unregisterTimeAdvanceCallback,
   };
 });
