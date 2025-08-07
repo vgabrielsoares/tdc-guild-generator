@@ -1,6 +1,6 @@
 <template>
   <div
-    class="fixed inset-x-0 top-4 z-50 flex flex-col items-center space-y-2 pointer-events-none"
+    class="fixed top-4 right-4 z-50 flex flex-col items-end space-y-2 pointer-events-none"
     aria-live="assertive"
   >
     <TransitionGroup name="toast-fade" tag="div">
