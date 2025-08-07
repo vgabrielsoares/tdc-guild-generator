@@ -401,6 +401,44 @@
                   </div>
                 </section>
 
+                <!-- Penalidades e Multas -->
+                <section v-if="contract.penalty">
+                  <h4 class="text-lg font-semibold text-red-400 mb-2 flex items-center gap-2">
+                    <ExclamationTriangleIcon class="w-5 h-5" />
+                    Penalidade Aplicada
+                  </h4>
+                  <div class="bg-red-900/20 rounded-lg p-4 border border-red-600/30">
+                    <div class="flex items-start gap-3">
+                      <div class="flex-shrink-0 mt-0.5">
+                        <XCircleIcon class="w-6 h-6 text-red-400" />
+                      </div>
+                      <div class="flex-1">
+                        <div class="font-medium text-red-200 mb-2">Multa por Quebra de Contrato</div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <div class="text-sm text-gray-400 mb-1">Valor da Multa:</div>
+                            <div class="text-lg font-bold text-red-300">
+                              {{ contract.penalty.amount }} PO
+                            </div>
+                          </div>
+                          <div>
+                            <div class="text-sm text-gray-400 mb-1">Data da Aplicação:</div>
+                            <div class="text-sm text-gray-200">
+                              {{ formatGameDate(contract.penalty.appliedAt) }}
+                            </div>
+                          </div>
+                        </div>
+                        <div class="mt-3">
+                          <div class="text-sm text-gray-400 mb-1">Motivo:</div>
+                          <div class="text-sm text-red-200 bg-red-900/30 p-2 rounded border border-red-600/20">
+                            {{ contract.penalty.reason }}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
                   <!-- Prazo e Tipo de Pagamento -->
                   <div class="mt-4">
                     <h5 class="font-medium text-white mb-2">Prazo e Tipo de Pagamento</h5>
@@ -785,6 +823,10 @@ function formatDate(date: Date): string {
     hour: '2-digit',
     minute: '2-digit'
   }).format(date);
+}
+
+function formatGameDate(gameDate: { day: number; month: number; year: number }): string {
+  return `${gameDate.day.toString().padStart(2, '0')}/${gameDate.month.toString().padStart(2, '0')}/${gameDate.year}`;
 }
 
 function formatMarkdown(text: string): string {

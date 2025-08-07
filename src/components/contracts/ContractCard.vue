@@ -88,6 +88,14 @@
           <GiftIcon class="w-3 h-3" />
           <span>{{ contract.additionalRewards.length }} extra{{ contract.additionalRewards.length > 1 ? 's' : '' }}</span>
         </div>
+
+        <!-- Indicador de penalidade -->
+        <div v-if="contract.penalty" 
+             class="flex items-center gap-1 bg-red-900/40 px-2 py-1 rounded-full text-md text-red-300"
+             title="Multa aplicada por quebra de contrato">
+          <XCircleIcon class="w-3 h-3" />
+          <span>Multa: {{ contract.penalty.amount }} PO</span>
+        </div>
       </div>
     </div>
 
@@ -145,6 +153,9 @@ import {
   ShieldExclamationIcon,
   GiftIcon
 } from '@heroicons/vue/24/outline';
+import {
+  XCircleIcon
+} from '@heroicons/vue/24/solid';
 
 interface Props {
   contract: Contract;
@@ -209,7 +220,8 @@ const isDangerous = computed(() => {
 const hasSpecialFeatures = computed(() => {
   return (props.contract.allies?.length || 0) > 0 || 
          (props.contract.severeConsequences?.length || 0) > 0 ||
-         (props.contract.additionalRewards?.length || 0) > 0;
+         (props.contract.additionalRewards?.length || 0) > 0 ||
+         !!props.contract.penalty;
 });
 
 const canAccept = computed(() => {

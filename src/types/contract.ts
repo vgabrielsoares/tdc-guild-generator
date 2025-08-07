@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { GameDate } from "@/types/timeline";
 
 // Status do contrato durante seu ciclo de vida
 export enum ContractStatus {
@@ -201,6 +202,16 @@ export interface Contract {
   createdAt: Date;
   expiresAt?: Date;
   completedAt?: Date;
+  acceptedAt?: GameDate;
+  deadlineDate?: GameDate;
+  brokenAt?: GameDate;
+
+  // Informações de multa por quebra de contrato
+  penalty?: {
+    amount: number;
+    reason: string;
+    appliedAt: GameDate; // Data da aplicação da multa
+  };
 
   // Metadados para geração
   generationData: {
