@@ -93,7 +93,7 @@ const getToastProgress = (id: string): number => {
   const t = toastTimeouts.get(id);
   if (!t) return 100;
   const toast = toasts.value.find((toast) => toast.id === id);
-  const duration = toast?.duration ?? 3500;
+  const duration = toast?.duration ?? 5000;
   // O tempo restante real do toast
   const remaining = t.paused
     ? t.remaining
