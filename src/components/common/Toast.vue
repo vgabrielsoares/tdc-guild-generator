@@ -22,7 +22,7 @@
           <span class="font-semibold">{{ toast.title }}</span>
           <span v-if="toast.message" class="text-sm">{{ toast.message }}</span>
           <button
-            class="ml-auto text-gray-400 hover:text-gray-700 focus:outline-none transition-colors duration-200"
+            class="ml-auto text-gray-300 hover:text-white focus:outline-none transition-colors duration-200"
             @click="removeToast(toast.id)"
             aria-label="Fechar"
           >
@@ -170,15 +170,15 @@ onUnmounted(() => {
 function toastTypeClass(type: ToastType) {
   switch (type) {
     case ToastType.SUCCESS:
-      return 'bg-green-100 text-green-800 border border-green-300';
+      return 'bg-green-900/90 text-green-100 border border-green-700';
     case ToastType.ERROR:
-      return 'bg-red-100 text-red-800 border border-red-300';
+      return 'bg-red-900/90 text-red-100 border border-red-700';
     case ToastType.INFO:
-      return 'bg-blue-100 text-blue-800 border border-blue-300';
+      return 'bg-blue-900/90 text-blue-100 border border-blue-700';
     case ToastType.WARNING:
-      return 'bg-yellow-100 text-yellow-800 border border-yellow-300';
+      return 'bg-yellow-900/90 text-yellow-100 border border-yellow-700';
     default:
-      return 'bg-gray-100 text-gray-800 border border-gray-300';
+      return 'bg-gray-800/90 text-gray-100 border border-gray-600';
   }
 }
 </script>
