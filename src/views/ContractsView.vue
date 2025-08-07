@@ -73,45 +73,7 @@
 
     <!-- Contratos (só mostra se há guilda) -->
     <template v-if="guild">
-      <!-- Botão de Gerar Contratos -->
-      <div class="bg-gray-800 border border-gray-700 rounded-lg p-6">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <h3 class="text-lg font-semibold text-white mb-2">Contratos Disponíveis</h3>
-            <p class="text-md text-gray-400">
-              Total de {{ contracts.length }} contratos para esta sede da guilda
-            </p>
-          </div>
-          <div class="flex gap-3">
-            <button
-              @click="handleGenerateContracts"
-              :disabled="isLoading"
-              class="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white font-medium rounded-lg transition-colors flex items-center"
-            >
-              <component
-                :is="generateButtonIcon"
-                :class="{ 'animate-spin': isLoading }" 
-                class="w-4 h-4 mr-2" 
-              />
-              {{ isLoading ? 'Gerando...' : contracts.length > 0 ? 'Gerar Novos' : 'Gerar Contratos' }}
-            </button>
-            <button
-              v-if="contracts.length > 0"
-              @click="handleRegenerateContracts"
-              :disabled="isLoading"
-              class="px-4 py-2 bg-amber-600 hover:bg-amber-700 disabled:bg-gray-600 text-white font-medium rounded-lg transition-colors flex items-center"
-            >
-              <ArrowPathIcon
-                :class="{ 'animate-spin': isLoading }" 
-                class="w-4 h-4 mr-2" 
-              />
-              Regenerar Todos
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Filtros Avançados -->
+            <!-- Filtros Avançados -->
       <ContractFilters
         v-if="contracts.length > 0"
         :contracts="contracts as Contract[]"
@@ -125,6 +87,54 @@
         @update-deadline="handleFilterUpdate('hasDeadline', $event)"
         @clear-filters="handleClearFilters"
       />
+      <!-- Timeline e Contadores -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <!-- Contadores de Timeline (coluna principal) -->
+        <div class="lg:col-span-2">
+          <ContractTimeline 
+            @generate-contracts="handleGenerateContracts"
+            @force-resolution="handleForceResolution"
+          />
+        </div>
+        
+        <!-- Controles de Timeline (sidebar) -->
+        <div class="space-y-6">
+          <!-- Abas -->
+          <div class="bg-gray-800 rounded-lg border border-gray-700">
+            <div class="flex border-b border-gray-700">
+              <button 
+                @click="activeTab = 'counters'"
+                :class="[
+                  'flex-1 px-4 py-3 text-sm font-medium transition-colors',
+                  activeTab === 'counters' 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-gray-800 text-gray-300 hover:text-white hover:bg-gray-700'
+                ]"
+              >
+                Contadores
+              </button>
+              <button 
+                @click="activeTab = 'control'"
+                :class="[
+                  'flex-1 px-4 py-3 text-sm font-medium transition-colors',
+                  activeTab === 'control' 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-gray-800 text-gray-300 hover:text-white hover:bg-gray-700'
+                ]"
+              >
+                Controles
+              </button>
+            </div>
+          </div>
+          
+          <!-- Conteúdo das abas -->
+          <TimelineCounters v-if="activeTab === 'counters'" />
+          <TimelineControl v-if="activeTab === 'control'" />
+        </div>
+      </div>
+
+
+
 
       <!-- Lista de Contratos -->
       <ContractList
@@ -169,17 +179,20 @@
 import { ref, computed, onMounted } from 'vue';
 import { useContractsStore } from '@/stores/contracts';
 import { useGuildStore } from '@/stores/guild';
+import { useTimelineIntegration } from '@/composables/useTimelineIntegration';
 import type { Contract } from '@/types/contract';
 import ContractList from '@/components/contracts/ContractList.vue';
 import ContractFilters from '@/components/contracts/ContractFilters.vue';
 import ContractDetails from '@/components/contracts/ContractDetails.vue';
+import ContractTimeline from '@/components/contracts/ContractTimeline.vue';
+import TimelineCounters from '@/components/contracts/TimelineCounters.vue';
+import TimelineControl from '@/components/common/TimelineControl.vue';
 import { 
   DocumentTextIcon, 
   BuildingOfficeIcon, 
   MapPinIcon, 
   ExclamationTriangleIcon, 
-  PlusIcon, 
-  ArrowPathIcon 
+  PlusIcon
 } from '@heroicons/vue/24/outline';
 
 // Interface para os filtros
@@ -197,9 +210,14 @@ interface ContractFilterState {
 const contractsStore = useContractsStore();
 const guildStore = useGuildStore();
 
+// ===== INTEGRAÇÃO DE TIMELINE =====
+// Inicializa automaticamente a integração entre timeline e contratos
+useTimelineIntegration();
+
 // ===== STATE =====
 const currentPage = ref(1);
 const pageSize = ref(5);
+const activeTab = ref<'counters' | 'control'>('counters');
 const toastMessage = ref<string>('');
 
 // Modal de detalhes
@@ -221,10 +239,6 @@ const currentFilters = ref<ContractFilterState>({
 const contracts = computed(() => contractsStore.contracts);
 const isLoading = computed(() => contractsStore.isLoading);
 const guild = computed(() => guildStore.currentGuild);
-
-const generateButtonIcon = computed(() => {
-  return isLoading.value ? ArrowPathIcon : PlusIcon;
-});
 
 // Contratos filtrados com base nos filtros locais
 const filteredContracts = computed(() => {
@@ -356,30 +370,6 @@ async function handleGenerateContracts() {
   }
 }
 
-async function handleRegenerateContracts() {
-  try {
-    if (!guild.value) {
-      showToast('É necessário ter uma guilda ativa para regenerar contratos');
-      return;
-    }
-    
-    // Confirmar se há contratos para limpar
-    if (contracts.value.length > 0) {
-      // Limpar contratos existentes
-      contractsStore.clearContracts();
-      showToast('Contratos anteriores removidos.');
-    }
-    
-    // Gerar novos contratos
-    await contractsStore.generateContracts();
-    currentPage.value = 1; // Reset para primeira página
-    showToast(`Contratos regenerados para a guilda "${guild.value.name}"!`);
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
-    showToast(`Erro ao regenerar contratos: ${errorMessage}`);
-  }
-}
-
 // Métodos para filtros
 function handleFilterUpdate(filterKey: keyof ContractFilterState, value: string | number | boolean | null) {
   currentFilters.value[filterKey] = value as never;
@@ -421,6 +411,17 @@ function formatDate(date: Date): string {
     hour: '2-digit',
     minute: '2-digit'
   }).format(date);
+}
+
+// Métodos para integração com timeline
+function handleForceResolution() {
+  try {
+    contractsStore.forceResolution();
+    showToast('Resolução automática de contratos forçada!');
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+    showToast(`Erro ao forçar resolução: ${errorMessage}`);
+  }
 }
 
 // ===== LIFECYCLE =====
