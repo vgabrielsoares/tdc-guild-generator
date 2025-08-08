@@ -132,7 +132,7 @@
               <button
                 @click="activeTab = 'counters'"
                 :class="[
-                  'flex-1 px-4 py-3 text-sm font-medium transition-colors',
+                  'flex-1 px-4 py-3 text-sm font-medium transition-colors rounded-tl-lg rounded-bl-lg',
                   activeTab === 'counters'
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-800 text-gray-300 hover:text-white hover:bg-gray-700',
@@ -143,7 +143,7 @@
               <button
                 @click="activeTab = 'control'"
                 :class="[
-                  'flex-1 px-4 py-3 text-sm font-medium transition-colors',
+                  'flex-1 px-4 py-3 text-sm font-medium transition-colors rounded-tr-lg rounded-br-lg',
                   activeTab === 'control'
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-800 text-gray-300 hover:text-white hover:bg-gray-700',
@@ -357,7 +357,10 @@ async function handleCompleteContract(contract: Contract) {
 
 async function handleAbandonContract(contract: Contract) {
   try {
-    const penalty = contractsStore.breakContractWithPenalty(contract.id, 'Abandonado pelos aventureiros');
+    const penalty = contractsStore.breakContractWithPenalty(
+      contract.id,
+      "Abandonado pelos aventureiros"
+    );
     if (penalty > 0) {
       showToast(`Contrato abandonado. Multa: ${penalty} PO$`);
     } else {

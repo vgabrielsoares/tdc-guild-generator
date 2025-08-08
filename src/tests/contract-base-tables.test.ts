@@ -151,14 +151,30 @@ describe('Contract Base Tables - Issue 4.3', () => {
       expect(calculateExtendedValue(100, 2500)).toBe(2500);
     });
 
-    it('should multiply by 1.1 for rolls 101+', () => {
-      expect(calculateExtendedValue(101, 1000)).toBe(1100);
-      expect(calculateExtendedValue(105, 2000)).toBe(2200);
-      expect(calculateExtendedValue(110, 5000)).toBe(5500);
+    it('should follow rule 101+: previous value * 1.1 progression starting from table value 100', () => {
+      // Rolagem 101: 50000 (valor de 100 na tabela) * 1.1 = 55000
+      expect(calculateExtendedValue(101, 50000)).toBe(55000);
+      
+      // Rolagem 102: 55000 * 1.1 = 60500
+      expect(calculateExtendedValue(102, 50000)).toBe(60500);
+      
+      // Rolagem 103: 60500 * 1.1 = 66550
+      expect(calculateExtendedValue(103, 50000)).toBe(66550);
+      
+      // Rolagem 105: aplicar 5 multiplicações
+      // 50000 -> 55000 -> 60500 -> 66550 -> 73205 -> 80525
+      expect(calculateExtendedValue(105, 50000)).toBe(80525);
     });
 
-    it('should floor the result for decimal values', () => {
-      expect(calculateExtendedValue(101, 999)).toBe(1098); // 999 * 1.1 = 1098.9 -> 1098
+    it('should always use table value for roll 100 as base (ignores baseValue parameter for 101+)', () => {
+      // Para rolagens 101+, sempre usar o valor da rolagem 100 na tabela (50000)
+      // independente do baseValue passado
+      expect(calculateExtendedValue(101, 1000)).toBe(55000);
+      expect(calculateExtendedValue(101, 9999)).toBe(55000);
+      expect(calculateExtendedValue(102, 1000)).toBe(60500);
+      
+      // Isso garante consistência: rolagens 101+ sempre seguem a progressão
+      // a partir do valor fixo da rolagem 100 na tabela
     });
   });
 

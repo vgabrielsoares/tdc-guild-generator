@@ -1,6 +1,7 @@
 import { rollDice } from "../dice";
 import { rollOnTable } from "../tableRoller";
 import type { TableEntry } from "@/types/tables";
+import { addDays } from "../date-utils";
 import {
   CONTRACT_DICE_BY_SIZE,
   CONTRACT_VALUE_TABLE,
@@ -92,11 +93,22 @@ import {
 } from "../../data/tables/contract-location-tables";
 
 import {
+  SIGNED_CONTRACT_RESOLUTION_TABLE,
+  canContractReturnToAvailable,
+  shouldCancelContract,
+  shouldGetUnresolvedBonus,
+} from "../../data/tables/contract-reduction-tables";
+
+import { CONTRACT_FAILURE_REASONS_TABLE } from "../../data/tables/contract-modifier-tables";
+
+import {
   ContractStatus,
   ContractDifficulty,
   ContractorType,
   DeadlineType,
   PaymentType,
+  ContractResolution,
+  FailureReason,
   ObjectiveCategory,
   AntagonistCategory,
   ComplicationCategory,
@@ -123,6 +135,7 @@ import type {
 import type { Guild } from "../../types/guild";
 import { VisitorLevel, RelationLevel } from "../../types/guild";
 import { GOVERNMENT_CONTRACTOR_TABLE } from "../../data/tables/contract-content-tables";
+import type { GameDate } from "@/types/timeline";
 
 /**
  * Configuração para geração de contratos
@@ -280,6 +293,129 @@ export class ContractGenerator {
   }
 
   /**
+   * Gera um contrato base com bônus aplicado à rolagem de recompensa
+   * Usado quando contratos não resolvidos ganham bônus de recompensa
+   */
+  static generateBaseContractWithRewardBonus(
+    config: ContractGenerationConfig,
+    rewardRollBonus: number = 0
+  ): Contract {
+    const { guild } = config;
+
+    // 1. Rolar valor base (1d100)
+    const baseRoll = rollDice({ notation: "1d100" }).result;
+
+    // 2. Gerar rolagens adicionais para dados de geração
+    const distanceRoll = rollDice({ notation: "1d20" }).result;
+    const difficultyRoll = rollDice({ notation: "1d20" }).result;
+
+    // 3. Determinar dificuldade baseada na rolagem
+    const difficultyEntry = CONTRACT_DIFFICULTY_TABLE.find(
+      (entry) => difficultyRoll >= entry.min && difficultyRoll <= entry.max
+    );
+    const difficulty =
+      difficultyEntry?.result.difficulty || ContractDifficulty.MEDIO;
+
+    // 4. Calcular valor aplicando o bônus de rolagem de recompensa
+    const valueCalculationResult = this.calculateContractValueWithRewardBonus(
+      baseRoll,
+      guild,
+      difficultyEntry,
+      distanceRoll,
+      rewardRollBonus
+    );
+    const { contractValue, prerequisites, clauses } = valueCalculationResult;
+
+    // 5. Gerar deadline usando a tabela
+    const deadline = this.generateDeadline();
+
+    // 6. Gerar contratante seguindo as regras do markdown
+    const contractor = this.generateContractor(guild);
+
+    // 7. Gerar objetivo conforme tabela do markdown
+    const objective = this.generateObjective();
+
+    // 8. Gerar localidade conforme tabela do markdown
+    const location = this.generateLocation();
+
+    // 9. Gerar tipo de pagamento
+    const paymentType = this.generatePaymentType(contractValue.rewardValue);
+
+    // 10. Gerar antagonista
+    const antagonist = this.generateAntagonist();
+
+    // 11. Gerar complicações
+    const complications = this.generateComplications();
+
+    // 12. Gerar reviravoltas
+    const twists = this.generateTwists();
+
+    // 13. Gerar aliados
+    const allies = this.generateAllies();
+
+    // 14. Gerar consequências severas (para quando o contrato falha)
+    const severeConsequences = this.generateSevereConsequences();
+
+    // 15. Gerar recompensas adicionais
+    const additionalRewards = this.generateAdditionalRewards();
+
+    // 16. Gerar descrição completa do contrato
+    const fullDescription = this.generateFullContractDescription({
+      objective,
+      location,
+      contractor,
+      antagonist,
+      complications,
+      twists,
+      allies,
+      severeConsequences,
+      additionalRewards,
+      prerequisites,
+      clauses,
+      finalValueResult: contractValue,
+      deadline,
+      paymentType,
+      distanceRoll,
+    });
+
+    // 17. Estrutura básica do contrato
+    const contract: Contract = {
+      id: this.generateId(),
+      title: `Contrato #${Math.floor(Math.random() * 10000)
+        .toString()
+        .padStart(4, "0")}`,
+      description: fullDescription,
+      status: ContractStatus.DISPONIVEL,
+      difficulty,
+      contractorType: contractor.type,
+      contractorName: contractor.name,
+      objective,
+      location,
+      prerequisites,
+      clauses,
+      antagonist,
+      complications,
+      twists,
+      allies,
+      severeConsequences,
+      additionalRewards: additionalRewards || [],
+      value: contractValue,
+      deadline,
+      paymentType,
+      generationData: {
+        baseRoll,
+        distanceRoll,
+        difficultyRoll,
+        settlementType: guild.settlementType,
+        rewardRollBonus: rewardRollBonus > 0 ? rewardRollBonus : undefined,
+      },
+      createdAt: new Date(),
+    };
+
+    return contract;
+  }
+
+  /**
    * Calcula a quantidade de contratos gerados baseado no tamanho da sede
    */
   static calculateContractQuantity(
@@ -416,6 +552,148 @@ export class ContractGenerator {
   }
 
   /**
+   * Gera contratos aplicando redução por frequentadores como contratos aceitos por outros
+   * Esta é a função principal que deve ser usada para incluir contratos indisponíveis
+   */
+  static generateContractsWithFrequentatorsReduction(
+    config: ContractGenerationConfig,
+    currentDate: GameDate
+  ): Contract[] {
+    // 1. Calcular quantidade SEM redução por frequentadores
+    const configWithoutReduction = {
+      ...config,
+      skipFrequentatorsReduction: true,
+    };
+    const quantityWithoutReduction = this.calculateContractQuantity(
+      configWithoutReduction
+    );
+
+    // 2. Calcular quantidade COM redução por frequentadores
+    const quantityWithReduction = this.calculateContractQuantity(config);
+
+    // 3. A diferença são os contratos "aceitos por outros aventureiros"
+    const contractsTakenByOthers =
+      quantityWithoutReduction.totalGenerated -
+      quantityWithReduction.totalGenerated;
+
+    // 4. Gerar contratos disponíveis (quantidade após redução)
+    const availableContracts: Contract[] = [];
+    for (let i = 0; i < quantityWithReduction.totalGenerated; i++) {
+      availableContracts.push(this.generateBaseContract(config));
+    }
+
+    // 5. Gerar contratos aceitos por outros aventureiros
+    const takenContracts: Contract[] = [];
+    for (let i = 0; i < contractsTakenByOthers; i++) {
+      const takenContract = this.generateContractTakenByOthers(
+        config,
+        currentDate
+      );
+      takenContracts.push(takenContract);
+    }
+
+    // 6. Retornar todos os contratos (disponíveis + aceitos por outros)
+    return [...availableContracts, ...takenContracts];
+  }
+
+  /**
+   * Gera um contrato que foi aceito por outros aventureiros
+   * Baseado nas regras de resolução de contratos firmados
+   */
+  private static generateContractTakenByOthers(
+    config: ContractGenerationConfig,
+    currentDate: GameDate
+  ): Contract {
+    // Rolar para ver o que aconteceu com o contrato aceito por outros
+    const outcomeRoll = rollDice({ notation: "1d20" }).result;
+    const outcomeEntry = SIGNED_CONTRACT_RESOLUTION_TABLE.find(
+      (entry) => outcomeRoll >= entry.min && outcomeRoll <= entry.max
+    );
+
+    if (!outcomeEntry) {
+      // Fallback - gerar contrato base sem bônus
+      const baseContract = this.generateBaseContract(config);
+      return {
+        ...baseContract,
+        status: ContractStatus.ACEITO_POR_OUTROS,
+        takenByOthersInfo: {
+          takenAt: currentDate,
+          canReturnToAvailable: true,
+        },
+      };
+    }
+
+    const outcome = outcomeEntry.result;
+    let failureReason: FailureReason | undefined;
+
+    // Se não foi resolvido, rolar motivo
+    if (outcome === ContractResolution.NAO_RESOLVIDO) {
+      const reasonRoll = rollDice({ notation: "1d20" }).result;
+      const reasonEntry = CONTRACT_FAILURE_REASONS_TABLE.find(
+        (entry) => reasonRoll >= entry.min && reasonRoll <= entry.max
+      );
+      failureReason = reasonEntry?.result;
+    }
+
+    // Determinar se contrato deve ser anulado
+    if (failureReason && shouldCancelContract(failureReason)) {
+      const baseContract = this.generateBaseContract(config);
+      return {
+        ...baseContract,
+        status: ContractStatus.ANULADO,
+        takenByOthersInfo: {
+          takenAt: currentDate,
+          resolutionReason: failureReason,
+          canReturnToAvailable: false,
+        },
+      };
+    }
+
+    // Determinar se contrato precisa de bônus na rolagem de recompensa
+    const needsRewardBonus = shouldGetUnresolvedBonus(outcome, failureReason);
+
+    // Gerar contrato com bônus aplicado à rolagem se necessário
+    const baseContract = this.generateBaseContractWithRewardBonus(
+      config,
+      needsRewardBonus ? 2 : 0
+    );
+
+    // Determinar se pode voltar a ficar disponível
+    const canReturn = canContractReturnToAvailable(outcome, failureReason);
+
+    // Se foi resolvido ou resolvido com ressalvas, marcar como resolvido por outros
+    if (
+      outcome === ContractResolution.RESOLVIDO ||
+      outcome === ContractResolution.RESOLVIDO_COM_RESSALVAS
+    ) {
+      return {
+        ...baseContract,
+        status: ContractStatus.RESOLVIDO_POR_OUTROS,
+        takenByOthersInfo: {
+          takenAt: currentDate,
+          resolutionReason: outcome,
+          canReturnToAvailable: false,
+        },
+      };
+    }
+
+    // Marcar como aceito por outros aventureiros
+    return {
+      ...baseContract,
+      status: ContractStatus.ACEITO_POR_OUTROS,
+      takenByOthersInfo: {
+        takenAt: currentDate,
+        resolutionReason: failureReason,
+        canReturnToAvailable: canReturn,
+        estimatedResolutionDate: canReturn
+          ? // Adicionar tempo estimado para resolução (1-4 semanas)
+            addDays(currentDate, rollDice({ notation: "1d4" }).result * 7)
+          : undefined,
+      },
+    };
+  }
+
+  /**
    * Calcula o valor do contrato
    * 1. Rola 1d100 para valor base na tabela
    * 2. Calcula modificadores que afetam a rolagem
@@ -469,14 +747,11 @@ export class ContractGenerator {
     // Incluindo bônus de pré-requisitos e cláusulas
     const experienceRoll = Math.max(
       1,
-      Math.min(100, baseRoll + rollModifiers.experienceModifier)
+      baseRoll + rollModifiers.experienceModifier
     );
     const rewardRoll = Math.max(
       1,
-      Math.min(
-        100,
-        baseRoll + rollModifiers.rewardModifier + requirementsBonusToRoll
-      )
+      baseRoll + rollModifiers.rewardModifier + requirementsBonusToRoll
     );
 
     // 6. Consultar a tabela novamente com as rolagens modificadas
@@ -543,9 +818,136 @@ export class ContractGenerator {
   }
 
   /**
+   * Calcula o valor do contrato com bônus adicional aplicado à rolagem de recompensa
+   * Usado quando contratos não resolvidos ganham bônus na recompensa
+   */
+  static calculateContractValueWithRewardBonus(
+    baseRoll: number,
+    guild: Guild,
+    difficultyEntry?: TableEntry<{
+      difficulty: ContractDifficulty;
+      experienceMultiplier: number;
+      rewardMultiplier: number;
+    }>,
+    distanceRoll?: number,
+    rewardRollBonus: number = 0
+  ): {
+    contractValue: ContractValue;
+    prerequisites: string[];
+    clauses: string[];
+  } {
+    // 1. Obter valor base da tabela usando a rolagem 1d100
+    const baseTableEntry = CONTRACT_VALUE_TABLE.find(
+      (entry) => baseRoll >= entry.min && baseRoll <= entry.max
+    );
+    let baseValue = baseTableEntry?.result || 75;
+
+    // Tratar caso especial 101+ (valor anterior * 1.1)
+    if (baseRoll > 100) {
+      baseValue = calculateExtendedValue(baseRoll, baseValue);
+    }
+
+    // 2. Calcular todos os modificadores que afetam a rolagem
+    const rollModifiers = this.calculateRollModifiers(guild, distanceRoll);
+
+    // 3. Gerar pré-requisitos e cláusulas baseados no valor base preliminar
+    // Isso nos permite calcular o bônus que será aplicado à rolagem
+    const preliminaryExperienceValue = baseValue;
+    const preliminaryRewardValue = baseValue;
+
+    const prerequisites = this.generatePrerequisites(
+      preliminaryExperienceValue
+    );
+    const clauses = this.generateClauses(preliminaryRewardValue);
+
+    // 4. Calcular bônus de pré-requisitos e cláusulas (+5 por item na rolagem)
+    const requirementsBonusToRoll = (prerequisites.length + clauses.length) * 5;
+
+    // 5. Aplicar modificadores às rolagens separadas para XP e Recompensa
+    // Incluindo bônus de pré-requisitos e cláusulas + bônus adicional de recompensa
+    const experienceRoll = Math.max(
+      1,
+      baseRoll + rollModifiers.experienceModifier
+    );
+    const rewardRoll = Math.max(
+      1,
+      baseRoll +
+        rollModifiers.rewardModifier +
+        requirementsBonusToRoll +
+        rewardRollBonus
+    );
+
+    // 6. Consultar a tabela novamente com as rolagens modificadas
+    const experienceTableEntry = CONTRACT_VALUE_TABLE.find(
+      (entry) => experienceRoll >= entry.min && experienceRoll <= entry.max
+    );
+    let experienceValue = experienceTableEntry?.result || 75;
+
+    const rewardTableEntry = CONTRACT_VALUE_TABLE.find(
+      (entry) => rewardRoll >= entry.min && rewardRoll <= entry.max
+    );
+    let rewardValue = rewardTableEntry?.result || 75;
+
+    // Tratar casos especiais 101+ para ambas as rolagens
+    if (experienceRoll > 100) {
+      experienceValue = calculateExtendedValue(experienceRoll, experienceValue);
+    }
+    if (rewardRoll > 100) {
+      rewardValue = calculateExtendedValue(rewardRoll, rewardValue);
+    }
+
+    // 7. Aplicar multiplicadores de dificuldade
+    const difficultyMultipliers =
+      this.calculateDifficultyMultipliers(difficultyEntry);
+    experienceValue = Math.floor(
+      experienceValue * difficultyMultipliers.experienceMultiplier
+    );
+    rewardValue = Math.floor(
+      rewardValue * difficultyMultipliers.rewardMultiplier
+    );
+
+    // 8. Garantir valores mínimos
+    experienceValue = Math.max(1, experienceValue);
+    rewardValue = Math.max(1, rewardValue);
+
+    // 9. Calcular PO$ final (recompensa * 0.1)
+    const finalGoldReward = Math.round(rewardValue * 10) / 100;
+
+    // 10. Construir objeto de modificadores para referência
+    const modifiers: ContractModifiers = {
+      distance: rollModifiers.distance,
+      populationRelationValue: rollModifiers.populationRelationValue,
+      populationRelationReward: rollModifiers.populationRelationReward,
+      governmentRelationValue: rollModifiers.governmentRelationValue,
+      governmentRelationReward: rollModifiers.governmentRelationReward,
+      staffPreparation: rollModifiers.staffPreparation,
+      difficultyMultiplier: difficultyMultipliers,
+      requirementsAndClauses: requirementsBonusToRoll,
+      rewardRollBonus: rewardRollBonus > 0 ? rewardRollBonus : undefined,
+    };
+
+    const contractValue: ContractValue = {
+      baseValue, // Valor original da tabela
+      experienceValue, // Valor para estruturar o contrato (orçamento XP)
+      rewardValue, // Valor da recompensa em pontos
+      finalGoldReward, // Valor final em PO$
+      modifiers,
+    };
+
+    return {
+      contractValue,
+      prerequisites,
+      clauses,
+    };
+  }
+
+  /**
    * Calcula modificadores que afetam a rolagem d100
    */
-  private static calculateRollModifiers(guild: Guild, distanceRoll?: number): {
+  private static calculateRollModifiers(
+    guild: Guild,
+    distanceRoll?: number
+  ): {
     experienceModifier: number;
     rewardModifier: number;
     distance: number;
@@ -559,9 +961,11 @@ export class ContractGenerator {
     let rewardModifier = 0;
 
     // 1. Modificadores de distância (afetam tanto valor quanto recompensa)
-    const finalDistanceRoll = distanceRoll || rollDice({ notation: "1d20" }).result;
+    const finalDistanceRoll =
+      distanceRoll || rollDice({ notation: "1d20" }).result;
     const distanceEntry = CONTRACT_DISTANCE_TABLE.find(
-      (entry) => finalDistanceRoll >= entry.min && finalDistanceRoll <= entry.max
+      (entry) =>
+        finalDistanceRoll >= entry.min && finalDistanceRoll <= entry.max
     );
     const distanceModifier = distanceEntry?.result.valueModifier || 0;
     experienceModifier += distanceModifier;
@@ -857,24 +1261,45 @@ export class ContractGenerator {
    */
   private static generateObjective(): ContractObjective {
     // 1. Primeira rolagem para objetivo principal
-    const firstRoll = rollOnTable(MAIN_OBJECTIVE_TABLE, [], "Objetivos Principais");
+    const firstRoll = rollOnTable(
+      MAIN_OBJECTIVE_TABLE,
+      [],
+      "Objetivos Principais"
+    );
 
     // 2. Verificar se é "Role duas vezes e use ambos"
     if (shouldRollTwiceForObjective(firstRoll.result)) {
       // Rolar duas vezes para obter dois objetivos diferentes
-      let firstObjectiveRoll = rollOnTable(MAIN_OBJECTIVE_TABLE, [], "Objetivos Principais");
-      let secondObjectiveRoll = rollOnTable(MAIN_OBJECTIVE_TABLE, [], "Objetivos Principais");
+      let firstObjectiveRoll = rollOnTable(
+        MAIN_OBJECTIVE_TABLE,
+        [],
+        "Objetivos Principais"
+      );
+      let secondObjectiveRoll = rollOnTable(
+        MAIN_OBJECTIVE_TABLE,
+        [],
+        "Objetivos Principais"
+      );
 
       // Garantir que não são iguais e que não são "Role duas vezes" novamente
       let attempts = 0;
       while (
-        (firstObjectiveRoll.result.description === secondObjectiveRoll.result.description ||
-         shouldRollTwiceForObjective(firstObjectiveRoll.result) ||
-         shouldRollTwiceForObjective(secondObjectiveRoll.result)) &&
+        (firstObjectiveRoll.result.description ===
+          secondObjectiveRoll.result.description ||
+          shouldRollTwiceForObjective(firstObjectiveRoll.result) ||
+          shouldRollTwiceForObjective(secondObjectiveRoll.result)) &&
         attempts < 20
       ) {
-        firstObjectiveRoll = rollOnTable(MAIN_OBJECTIVE_TABLE, [], "Objetivos Principais");
-        secondObjectiveRoll = rollOnTable(MAIN_OBJECTIVE_TABLE, [], "Objetivos Principais");
+        firstObjectiveRoll = rollOnTable(
+          MAIN_OBJECTIVE_TABLE,
+          [],
+          "Objetivos Principais"
+        );
+        secondObjectiveRoll = rollOnTable(
+          MAIN_OBJECTIVE_TABLE,
+          [],
+          "Objetivos Principais"
+        );
         attempts++;
       }
 
@@ -882,8 +1307,12 @@ export class ContractGenerator {
       const secondObjective = secondObjectiveRoll.result;
 
       // Gerar especificações para ambos os objetivos
-      const firstSpec = this.generateObjectiveSpecification(firstObjective.category);
-      const secondSpec = this.generateObjectiveSpecification(secondObjective.category);
+      const firstSpec = this.generateObjectiveSpecification(
+        firstObjective.category
+      );
+      const secondSpec = this.generateObjectiveSpecification(
+        secondObjective.category
+      );
 
       return {
         category: firstObjective.category,
@@ -896,7 +1325,9 @@ export class ContractGenerator {
     const objectiveEntry = firstRoll.result;
 
     // 4. Gerar especificação baseada na categoria
-    const specification = this.generateObjectiveSpecification(objectiveEntry.category);
+    const specification = this.generateObjectiveSpecification(
+      objectiveEntry.category
+    );
 
     return {
       category: objectiveEntry.category,
@@ -1530,32 +1961,49 @@ export class ContractGenerator {
    * Mapeamento de números em texto para valores numéricos e suas configurações
    */
   private static readonly HEXAGON_PATTERNS = [
-    { 
-      pattern: /Um hexágono/i, 
+    {
+      pattern: /Um hexágono/i,
       value: 1,
-      getRanges: (desc: string) => desc.includes("ou menos") 
-        ? { min: 0, max: 1 } 
-        : { min: 1, max: 10 }
+      getRanges: (desc: string) =>
+        desc.includes("ou menos") ? { min: 0, max: 1 } : { min: 1, max: 10 },
     },
-    { 
-      pattern: /Dois hexágonos/i, 
+    {
+      pattern: /Dois hexágonos/i,
       value: 2,
-      getRanges: (desc: string) => desc.includes("ou menos") 
-        ? { min: 0, max: 2 } 
-        : { min: 2, max: 10 }
+      getRanges: (desc: string) =>
+        desc.includes("ou menos") ? { min: 0, max: 2 } : { min: 2, max: 10 },
     },
-    { 
-      pattern: /Três hexágonos/i, 
+    {
+      pattern: /Três hexágonos/i,
       value: 3,
-      getRanges: (desc: string) => desc.includes("ou menos") 
-        ? { min: 0, max: 3 } 
-        : { min: 3, max: 10 }
+      getRanges: (desc: string) =>
+        desc.includes("ou menos") ? { min: 0, max: 3 } : { min: 3, max: 10 },
     },
-    { pattern: /Quatro hexágonos/i, value: 4, getRanges: () => ({ min: 4, max: 10 }) },
-    { pattern: /Cinco hexágonos/i, value: 5, getRanges: () => ({ min: 5, max: 10 }) },
-    { pattern: /Seis hexágonos/i, value: 6, getRanges: () => ({ min: 6, max: 10 }) },
-    { pattern: /Sete hexágonos/i, value: 7, getRanges: () => ({ min: 7, max: 10 }) },
-    { pattern: /Oito hexágonos/i, value: 8, getRanges: () => ({ min: 8, max: 10 }) },
+    {
+      pattern: /Quatro hexágonos/i,
+      value: 4,
+      getRanges: () => ({ min: 4, max: 10 }),
+    },
+    {
+      pattern: /Cinco hexágonos/i,
+      value: 5,
+      getRanges: () => ({ min: 5, max: 10 }),
+    },
+    {
+      pattern: /Seis hexágonos/i,
+      value: 6,
+      getRanges: () => ({ min: 6, max: 10 }),
+    },
+    {
+      pattern: /Sete hexágonos/i,
+      value: 7,
+      getRanges: () => ({ min: 7, max: 10 }),
+    },
+    {
+      pattern: /Oito hexágonos/i,
+      value: 8,
+      getRanges: () => ({ min: 8, max: 10 }),
+    },
   ] as const;
 
   /**
@@ -1566,8 +2014,10 @@ export class ContractGenerator {
   /**
    * Extrai informações de hexágonos da descrição de distância
    */
-  private static extractHexagonsFromDescription(description: string): { min: number; max: number } | null {
-    const matchedPattern = this.HEXAGON_PATTERNS.find(pattern => 
+  private static extractHexagonsFromDescription(
+    description: string
+  ): { min: number; max: number } | null {
+    const matchedPattern = this.HEXAGON_PATTERNS.find((pattern) =>
       pattern.pattern.test(description)
     );
 
@@ -1577,10 +2027,13 @@ export class ContractGenerator {
   /**
    * Converte hexágonos para quilômetros com arredondamento apropriado
    */
-  private static hexagonsToKilometers(hexagons: { min: number; max: number }): { min: number; max: number } {
+  private static hexagonsToKilometers(hexagons: { min: number; max: number }): {
+    min: number;
+    max: number;
+  } {
     return {
       min: Math.round(hexagons.min * this.KM_PER_HEXAGON * 10) / 10,
-      max: Math.round(hexagons.max * this.KM_PER_HEXAGON * 10) / 10
+      max: Math.round(hexagons.max * this.KM_PER_HEXAGON * 10) / 10,
     };
   }
 
@@ -1602,22 +2055,22 @@ export class ContractGenerator {
     kilometers: { min: number; max: number } | null;
   } {
     const distanceRoll = contract.generationData.distanceRoll;
-    
+
     if (!distanceRoll) {
       return {
         description: "Distância não especificada",
         hexagons: null,
-        kilometers: null
+        kilometers: null,
       };
     }
 
     const distanceEntry = this.getDistanceTableEntry(distanceRoll);
-    
+
     if (!distanceEntry) {
       return {
         description: "Distância não especificada",
         hexagons: null,
-        kilometers: null
+        kilometers: null,
       };
     }
 
@@ -1628,7 +2081,7 @@ export class ContractGenerator {
     return {
       description,
       hexagons,
-      kilometers
+      kilometers,
     };
   }
 
@@ -1721,12 +2174,12 @@ export class ContractGenerator {
     // 4. Distância
     if (distanceRoll) {
       const distanceDescription = this.getDistanceDescription(distanceRoll);
-      
+
       // Obter detalhes da distância para mostrar a aproximação correta em km
       const distanceDetails = this.getContractDistanceDetails({
-        generationData: { distanceRoll }
+        generationData: { distanceRoll },
       } as Contract);
-      
+
       let kmInfo = "";
       if (distanceDetails.kilometers) {
         if (distanceDetails.kilometers.min === distanceDetails.kilometers.max) {
@@ -1735,7 +2188,7 @@ export class ContractGenerator {
           kmInfo = ` (aproximadamente ${distanceDetails.kilometers.min}-${distanceDetails.kilometers.max} km)`;
         }
       }
-      
+
       sections.push(`**Distância:** ${distanceDescription}${kmInfo}`);
     }
 
@@ -1772,9 +2225,10 @@ export class ContractGenerator {
     sections.push(`**Experiência:** ${finalValueResult.experienceValue} XP`);
 
     // 10. Recompensa principal
-    sections.push(
-      `**Recompensa:** ${finalValueResult.finalGoldReward} moedas de ouro`
-    );
+    const formattedReward = Number(
+      finalValueResult.finalGoldReward.toFixed(1)
+    ).toString();
+    sections.push(`**Recompensa:** ${formattedReward} PO$`);
 
     // 11. Recompensas e incentivos (se houver)
     if (additionalRewards.length > 0) {
@@ -2484,5 +2938,33 @@ export class ContractGenerator {
     };
 
     return `${categoryDescriptions[category]}: ${specific}`;
+  }
+
+  /**
+   * Atualiza a descrição do contrato quando a recompensa é reajustada
+   * Mostra o valor anterior e o novo valor com o motivo do reajuste
+   */
+  public static updateContractDescriptionWithBonusReward(
+    contract: Contract,
+    previousValue: number,
+    reason: string = "bônus por não resolução"
+  ): string {
+    // Função auxiliar para formatar valores evitando dízimas periódicas
+    const formatCurrency = (value: number): string => {
+      return Number(value.toFixed(1)).toString();
+    };
+
+    // Buscar a seção de recompensa na descrição atual
+    const currentDescription = contract.description;
+    const rewardPattern =
+      /\*\*Recompensa:\*\* ([\d.,]+) PO\$( \*\(reajustada\)\*)?/;
+
+    const formattedPrevious = formatCurrency(previousValue);
+    const formattedCurrent = formatCurrency(contract.value.finalGoldReward);
+
+    // Substituir a seção de recompensa existente
+    const bonusText = `**Recompensa:** ${formattedCurrent} PO$ **(reajustada)**\n> Histórico do Reajuste\n- **Valor original:** ${formattedPrevious} PO$\n- **Bônus aplicado:** Por ${reason}\n- **Valor atual:** ${formattedCurrent} PO$`;
+
+    return currentDescription.replace(rewardPattern, bonusText);
   }
 }
