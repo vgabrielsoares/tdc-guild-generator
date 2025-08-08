@@ -26,6 +26,7 @@ import {
   ContractGenerator,
   type ContractGenerationConfig,
 } from "@/utils/generators/contractGenerator";
+import { CONTRACT_DIFFICULTY_TABLE } from "@/data/tables/contract-base-tables";
 import { useGuildStore } from "./guild";
 import { useStorage } from "@/composables/useStorage";
 import { useTimelineStore } from "./timeline";
@@ -176,7 +177,11 @@ export const useContractsStore = defineStore("contracts", () => {
     total: contracts.value.length,
     available: availableContracts.value.length,
     accepted: acceptedContracts.value.length,
-    inProgress: inProgressContracts.value.length,
+    inProgress: contracts.value.filter(c => 
+      c.status === ContractStatus.ACEITO || 
+      c.status === ContractStatus.EM_ANDAMENTO ||
+      c.status === ContractStatus.ACEITO_POR_OUTROS
+    ).length,
     completed: completedContracts.value.length,
     failed: failedContracts.value.length,
     expired: expiredContracts.value.length,
@@ -191,7 +196,18 @@ export const useContractsStore = defineStore("contracts", () => {
   });
 
   // Informações do gerenciador de ciclo de vida
-  const nextActions = computed(() => lifecycleManager.getNextActions());
+  const nextActions = computed(() => {
+    const timelineStore = useTimelineStore();
+    const currentGameDate = timelineStore.currentGameDate;
+    
+    // Se não há data do jogo, usar a data atual do sistema
+    let gameDate: Date | undefined;
+    if (currentGameDate) {
+      gameDate = new Date(currentGameDate.year, currentGameDate.month - 1, currentGameDate.day);
+    }
+    
+    return lifecycleManager.getNextActions(gameDate);
+  });
 
   // ===== MÉTODOS AUXILIARES =====
 
@@ -403,22 +419,21 @@ export const useContractsStore = defineStore("contracts", () => {
    * Baseado na tabela "Resoluções para Contratos Firmados"
    */
   const processSignedContractResolution = () => {
-    // Aplicar resolução automática apenas aos contratos EM_ANDAMENTO (assinados)
     const signedContracts = contracts.value.filter(
-      c => c.status === ContractStatus.EM_ANDAMENTO
+      c => c.status === ContractStatus.ACEITO_POR_OUTROS
     );
 
     if (signedContracts.length === 0) {
       return;
     }
 
-    // Aplicar resolução específica para contratos assinados
+    // Aplicar resolução específica para contratos assinados por outros aventureiros
     contracts.value = applySignedContractResolution(contracts.value);
     lastUpdate.value = new Date();
     saveToStorage();
 
-    success("Resolução de Contratos Assinados", 
-           `${signedContracts.length} contrato(s) assinado(s) foi(ram) processado(s)`);
+    success("Resolução de Contratos Aceitos por Outros", 
+           `${signedContracts.length} contrato(s) aceito(s) por outros aventureiros foi(ram) processado(s)`);
   };
 
   /**
@@ -571,7 +586,10 @@ export const useContractsStore = defineStore("contracts", () => {
         skipFrequentatorsReduction: false,
       };
 
-      const newContracts = ContractGenerator.generateMultipleContracts(config);
+      const newContracts = ContractGenerator.generateContractsWithFrequentatorsReduction(
+        config, 
+        timelineStore.currentGameDate!
+      );
 
       // Adicionar novos contratos
       contracts.value.push(...newContracts);
@@ -637,7 +655,10 @@ export const useContractsStore = defineStore("contracts", () => {
         skipFrequentatorsReduction: false,
       };
 
-      const newContracts = ContractGenerator.generateMultipleContracts(config);
+      const newContracts = ContractGenerator.generateContractsWithFrequentatorsReduction(
+        config, 
+        timelineStore.currentGameDate!
+      );
 
       // Adicionar novos contratos
       contracts.value.push(...newContracts);
@@ -828,17 +849,150 @@ export const useContractsStore = defineStore("contracts", () => {
         appliedAt: currentDate || createGameDate(1, 1, 1000)
       };
       
-      // Atualizar status
-      contract.status = ContractStatus.QUEBRADO;
+      // Aplicar bônus de recompensa para futuros aventureiros (+2 na rolagem)
+      // contratos quebrados/abandonados ficam com recompensa maior
+      applyRewardBonusToContract(contractId, 2);
+      
+      // Atualizar status para DISPONIVEL (contrato volta a ficar disponível com bônus)
+      contract.status = ContractStatus.DISPONIVEL;
+      
+      // Resetar dados relacionados ao aceite anterior
+      contract.acceptedAt = undefined;
+      if (currentDate) {
+        contract.brokenAt = currentDate; // Manter registro de quando foi quebrado
+      }
+      
       lastUpdate.value = new Date();
       saveToStorage();
       
       // Mostrar notificação
-      warning('Contrato Quebrado', `${contract.objective?.description || 'Contrato'} foi quebrado. Multa: ${penaltyAmount} PO$`);
+      warning('Contrato Quebrado', 
+             `${contract.objective?.description || 'Contrato'} foi quebrado. Multa: ${formatCurrency(penaltyAmount)} PO$. ` +
+             `O contrato voltou a ficar disponível com recompensa aumentada para ${formatCurrency(contract.value.finalGoldReward)} PO$.`);
       
       return penaltyAmount;
     }
     return 0;
+  };
+
+  // ===== UTILITY FUNCTIONS =====
+
+  /**
+   * Formata valores monetários evitando dízimas periódicas
+   */
+  const formatCurrency = (value: number): string => {
+    return Number(value.toFixed(1)).toString();
+  };
+
+  /**
+   * Aplica bônus de recompensa a um contrato específico
+   * Usado quando contratos não são resolvidos no prazo
+   * 
+   * O bônus avança posições na tabela d100
+   * e recalcula o valor com todos os modificadores originais aplicados.
+   * O bônus sempre resulta em valor maior ou igual ao anterior.
+   */
+  const applyRewardBonusToContract = (contractId: string, bonusAmount: number = 2): boolean => {
+    const contract = contracts.value.find((c) => c.id === contractId);
+    if (!contract) return false;
+
+    const guild = useGuildStore().currentGuild;
+    if (!guild) return false;
+
+    // Armazenar o valor anterior para o histórico
+    const previousValue = contract.value.finalGoldReward;
+
+    // Recalcular valor usando progressão na tabela d100
+    // O bônus adiciona pontos diretamente à rolagem, avançando posições na tabela
+    const currentBonusTotal = (contract.generationData.rewardRollBonus || 0) + bonusAmount;
+    
+    // Buscar o difficultyEntry usando o difficultyRoll armazenado
+    const difficultyEntry = contract.generationData.difficultyRoll
+      ? CONTRACT_DIFFICULTY_TABLE.find(
+          (entry) => contract.generationData.difficultyRoll! >= entry.min && contract.generationData.difficultyRoll! <= entry.max
+        )
+      : undefined;
+    
+    // Recalcular o contrato inteiro com o novo bônus de recompensa
+    const newContractValue = ContractGenerator.calculateContractValueWithRewardBonus(
+      contract.generationData.baseRoll,
+      guild,
+      difficultyEntry,
+      contract.generationData.distanceRoll,
+      currentBonusTotal
+    );
+
+    // Se o novo valor for menor que o anterior, aplicar bônus direto
+    // Isso pode acontecer devido a modificadores muito negativos ou flutuações nos cálculos
+    let finalContractValue = newContractValue.contractValue;
+    
+    if (finalContractValue.finalGoldReward < previousValue) {
+      // Calcular diferença mínima esperada (aproximadamente 5-10% por ponto de bônus)
+      const minimumIncrease = previousValue * (bonusAmount * 0.05); // 5% por ponto de bônus como mínimo
+      const guaranteedNewValue = previousValue + minimumIncrease;
+      
+      // Ajustar todos os valores proporcionalmente
+      const scaleFactor = guaranteedNewValue / finalContractValue.finalGoldReward;
+      
+      finalContractValue = {
+        ...finalContractValue,
+        rewardValue: Math.floor(finalContractValue.rewardValue * scaleFactor),
+        finalGoldReward: Math.round(guaranteedNewValue * 10) / 10, // Arredondar para 1 casa decimal
+        modifiers: {
+          ...finalContractValue.modifiers,
+          rewardRollBonus: currentBonusTotal
+        }
+      };
+    }
+
+    // Atualizar o valor do contrato com os novos cálculos
+    contract.value = finalContractValue;
+
+    // Registrar o bônus aplicado nos dados de geração
+    contract.generationData = {
+      ...contract.generationData,
+      rewardRollBonus: currentBonusTotal
+    };
+
+    // Atualizar a descrição do contrato para mostrar o reajuste
+    contract.description = ContractGenerator.updateContractDescriptionWithBonusReward(
+      contract,
+      previousValue,
+      "quebra de contrato"
+    );
+
+    lastUpdate.value = new Date();
+    saveToStorage();
+    
+    info('Contrato Atualizado', 
+         `O contrato teve sua recompensa aumentada de ${formatCurrency(previousValue)} PO$ para ${formatCurrency(contract.value.finalGoldReward)} PO$ devido ao bônus por não resolução.`);
+    
+    return true;
+  };
+
+  /**
+   * Retorna um contrato quebrado/abandonado para disponível com bônus de recompensa
+   */
+  const returnContractToAvailableWithBonus = (contractId: string) => {
+    const contract = contracts.value.find((c) => c.id === contractId);
+    if (!contract) return false;
+
+    // Aplicar bônus de recompensa (+2 na rolagem)
+    applyRewardBonusToContract(contractId, 2);
+    
+    // Resetar status e dados relacionados
+    contract.status = ContractStatus.DISPONIVEL;
+    contract.acceptedAt = undefined;
+    contract.brokenAt = undefined;
+    contract.penalty = undefined;
+    
+    lastUpdate.value = new Date();
+    saveToStorage();
+    
+    success('Contrato Renovado', 
+           `O contrato foi renovado e retornou para disponível com recompensa aumentada.`);
+    
+    return true;
   };
 
   /**
@@ -1177,6 +1331,8 @@ export const useContractsStore = defineStore("contracts", () => {
     breakContract,
     breakContractWithPenalty,
     cancelContract,
+    applyRewardBonusToContract,
+    returnContractToAvailableWithBonus,
 
     // ===== ACTIONS - CRUD =====
     clearContracts,
