@@ -136,6 +136,7 @@ import { useTimeline } from "@/composables/useTimeline";
 import { useContractsStore } from "@/stores/contracts";
 import { ScheduledEventType } from "@/types/timeline";
 import { ContractStatus } from "@/types/contract";
+import { getDaysDifference } from "@/utils/date-utils";
 import type { GameDate } from "@/types/timeline";
 
 // Emits
@@ -195,23 +196,14 @@ const contractEvents = computed(() => {
 });
 
 // Methods
-function getExpirationText(contract: { expiresAt?: Date }): string {
-  if (!contract.expiresAt) return "Sem prazo";
+function getExpirationText(contract: { deadlineDate?: GameDate }): string {
+  if (!contract.deadlineDate) return "Sem prazo";
 
   const current = currentDate.value;
   if (!current) return "Data não disponível";
 
-  // Usar data do jogo atual em vez de Date.now()
-  const currentGameTime = new Date(
-    current.year,
-    current.month - 1,
-    current.day
-  );
-
-  const daysUntilExpiration = Math.ceil(
-    (contract.expiresAt.getTime() - currentGameTime.getTime()) /
-      (1000 * 60 * 60 * 24)
-  );
+  // Calcular diferença em dias usando GameDate
+  const daysUntilExpiration = getDaysDifference(current, contract.deadlineDate);
 
   if (daysUntilExpiration < 0) return "Expirado";
   if (daysUntilExpiration === 0) return "Expira hoje";
