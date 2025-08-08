@@ -28,7 +28,7 @@
         <div class="text-2xl font-bold text-yellow-400">
           {{ expiringContracts.length }}
         </div>
-        <div class="text-sm text-yellow-300">Expirando Soon</div>
+        <div class="text-sm text-yellow-300">Expirando Em Breve</div>
       </div>
 
       <div
@@ -157,20 +157,24 @@ const canGenerateContracts = computed(
 
 // Contratos expirando em breve (próximos 3 dias)
 const expiringContracts = computed(() => {
-  if (!currentDate.value) return [];
+  const current = currentDate.value;
+  if (!current) return [];
 
   return contractsStore.contracts.filter((contract) => {
-    if (!contract.expiresAt) return false;
+    // Usar deadlineDate (GameDate) em vez de expiresAt (Date JavaScript)
+    if (!contract.deadlineDate) return false;
+    
     if (
       contract.status !== ContractStatus.DISPONIVEL &&
+      contract.status !== ContractStatus.ACEITO &&
       contract.status !== ContractStatus.EM_ANDAMENTO
     )
       return false;
 
-    const daysUntilExpiration = Math.ceil(
-      (contract.expiresAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
-    );
-
+    // Calcular diferença de dias usando as funções de GameDate
+    const daysUntilExpiration = dateUtils.getDaysDifference(current, contract.deadlineDate);
+    
+    // Considerar expirando se for nos próximos 3 dias (incluindo hoje)
     return daysUntilExpiration >= 0 && daysUntilExpiration <= 3;
   });
 });
@@ -190,9 +194,19 @@ const contractEvents = computed(() => {
 // Methods
 function getExpirationText(contract: { expiresAt?: Date }): string {
   if (!contract.expiresAt) return "Sem prazo";
+  
+  const current = currentDate.value;
+  if (!current) return "Data não disponível";
+
+  // Usar data do jogo atual em vez de Date.now()
+  const currentGameTime = new Date(
+    current.year, 
+    current.month - 1, 
+    current.day
+  );
 
   const daysUntilExpiration = Math.ceil(
-    (contract.expiresAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+    (contract.expiresAt.getTime() - currentGameTime.getTime()) / (1000 * 60 * 60 * 24)
   );
 
   if (daysUntilExpiration < 0) return "Expirado";
@@ -202,7 +216,7 @@ function getExpirationText(contract: { expiresAt?: Date }): string {
 }
 
 function formatValue(value: number): string {
-  return value.toFixed(1);
+  return Number(value.toFixed(1)).toString();
 }
 
 function formatEventDate(date: GameDate): string {
