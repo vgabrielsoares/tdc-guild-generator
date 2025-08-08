@@ -535,7 +535,6 @@ function onMouseEnter() {
 function onMouseLeave() {
   isTooltipVisible.value = false;
 }
-
 </script>
 
 <style scoped>

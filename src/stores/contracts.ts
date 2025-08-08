@@ -41,7 +41,12 @@ import {
   rollSignedContractResolutionTime,
   rollUnsignedContractResolutionTime,
 } from "@/utils/generators/contractLifeCycle";
-import { addDays, createGameDate, isDateAfter, getDaysDifference } from "@/utils/date-utils";
+import {
+  addDays,
+  createGameDate,
+  isDateAfter,
+  getDaysDifference,
+} from "@/utils/date-utils";
 
 export const useContractsStore = defineStore("contracts", () => {
   // Store dependencies
@@ -177,10 +182,11 @@ export const useContractsStore = defineStore("contracts", () => {
     total: contracts.value.length,
     available: availableContracts.value.length,
     accepted: acceptedContracts.value.length,
-    inProgress: contracts.value.filter(c => 
-      c.status === ContractStatus.ACEITO || 
-      c.status === ContractStatus.EM_ANDAMENTO ||
-      c.status === ContractStatus.ACEITO_POR_OUTROS
+    inProgress: contracts.value.filter(
+      (c) =>
+        c.status === ContractStatus.ACEITO ||
+        c.status === ContractStatus.EM_ANDAMENTO ||
+        c.status === ContractStatus.ACEITO_POR_OUTROS
     ).length,
     completed: completedContracts.value.length,
     failed: failedContracts.value.length,
@@ -199,13 +205,17 @@ export const useContractsStore = defineStore("contracts", () => {
   const nextActions = computed(() => {
     const timelineStore = useTimelineStore();
     const currentGameDate = timelineStore.currentGameDate;
-    
+
     // Se não há data do jogo, usar a data atual do sistema
     let gameDate: Date | undefined;
     if (currentGameDate) {
-      gameDate = new Date(currentGameDate.year, currentGameDate.month - 1, currentGameDate.day);
+      gameDate = new Date(
+        currentGameDate.year,
+        currentGameDate.month - 1,
+        currentGameDate.day
+      );
     }
-    
+
     return lifecycleManager.getNextActions(gameDate);
   });
 
@@ -318,30 +328,34 @@ export const useContractsStore = defineStore("contracts", () => {
   /**
    * Verifica se já existe um evento ativo de um tipo específico para a guilda atual
    */
-  const hasActiveEvent = (eventType: ScheduledEventType, source?: string): boolean => {
+  const hasActiveEvent = (
+    eventType: ScheduledEventType,
+    source?: string
+  ): boolean => {
     if (!timelineStore.currentGameDate) return false;
 
     const currentEvents = timelineStore.currentEvents;
     const currentDate = timelineStore.currentGameDate;
-    
-    return currentEvents.some(event => {
+
+    return currentEvents.some((event) => {
       // Verificar se é da guilda atual
       if (event.data?.guildId !== currentGuildId.value) return false;
-      
+
       // Verificar se é do tipo correto
       if (event.type !== eventType) return false;
-      
+
       // Verificar source se especificado
       if (source && event.data?.source !== source) return false;
-      
+
       // Verificar se não é um evento para resolução hoje (esses podem ser processados)
       if (eventType === ScheduledEventType.CONTRACT_RESOLUTION) {
-        const isToday = event.date.year === currentDate.year && 
-                       event.date.month === currentDate.month && 
-                       event.date.day === currentDate.day;
+        const isToday =
+          event.date.year === currentDate.year &&
+          event.date.month === currentDate.month &&
+          event.date.day === currentDate.day;
         if (isToday) return false; // Não considerar eventos de hoje como "ativos" para esta verificação
       }
-      
+
       return true;
     });
   };
@@ -355,7 +369,9 @@ export const useContractsStore = defineStore("contracts", () => {
     }
 
     // Verificar se já existe um evento de novos contratos ativo
-    if (!hasActiveEvent(ScheduledEventType.NEW_CONTRACTS, "contract_generation")) {
+    if (
+      !hasActiveEvent(ScheduledEventType.NEW_CONTRACTS, "contract_generation")
+    ) {
       // Agendar próximos novos contratos baseado nas regras
       const daysUntilNewContracts = rollNewContractsTime();
       const newContractsDate = addDays(
@@ -372,7 +388,12 @@ export const useContractsStore = defineStore("contracts", () => {
     }
 
     // Verificar se já existe um evento de resolução de contratos assinados ativo
-    if (!hasActiveEvent(ScheduledEventType.CONTRACT_RESOLUTION, "signed_resolution")) {
+    if (
+      !hasActiveEvent(
+        ScheduledEventType.CONTRACT_RESOLUTION,
+        "signed_resolution"
+      )
+    ) {
       const signedTime = rollSignedContractResolutionTime();
       if (signedTime) {
         const signedResolutionDate = addDays(
@@ -393,7 +414,12 @@ export const useContractsStore = defineStore("contracts", () => {
     }
 
     // Verificar se já existe um evento de resolução de contratos não assinados ativo
-    if (!hasActiveEvent(ScheduledEventType.CONTRACT_RESOLUTION, "unsigned_resolution")) {
+    if (
+      !hasActiveEvent(
+        ScheduledEventType.CONTRACT_RESOLUTION,
+        "unsigned_resolution"
+      )
+    ) {
       const unsignedTime = rollUnsignedContractResolutionTime();
       if (unsignedTime) {
         const unsignedResolutionDate = addDays(
@@ -420,7 +446,7 @@ export const useContractsStore = defineStore("contracts", () => {
    */
   const processSignedContractResolution = () => {
     const signedContracts = contracts.value.filter(
-      c => c.status === ContractStatus.ACEITO_POR_OUTROS
+      (c) => c.status === ContractStatus.ACEITO_POR_OUTROS
     );
 
     if (signedContracts.length === 0) {
@@ -432,8 +458,10 @@ export const useContractsStore = defineStore("contracts", () => {
     lastUpdate.value = new Date();
     saveToStorage();
 
-    success("Resolução de Contratos Aceitos por Outros", 
-           `${signedContracts.length} contrato(s) aceito(s) por outros aventureiros foi(ram) processado(s)`);
+    success(
+      "Resolução de Contratos Aceitos por Outros",
+      `${signedContracts.length} contrato(s) aceito(s) por outros aventureiros foi(ram) processado(s)`
+    );
   };
 
   /**
@@ -443,7 +471,7 @@ export const useContractsStore = defineStore("contracts", () => {
   const processUnsignedContractResolution = () => {
     // Aplicar resolução apenas aos contratos DISPONIVEL (não assinados)
     const unsignedContracts = contracts.value.filter(
-      c => c.status === ContractStatus.DISPONIVEL
+      (c) => c.status === ContractStatus.DISPONIVEL
     );
 
     if (unsignedContracts.length === 0) {
@@ -455,8 +483,10 @@ export const useContractsStore = defineStore("contracts", () => {
     lastUpdate.value = new Date();
     saveToStorage();
 
-    success("Resolução de Contratos Não Assinados", 
-           `${unsignedContracts.length} contrato(s) não assinado(s) foi(ram) processado(s)`);
+    success(
+      "Resolução de Contratos Não Assinados",
+      `${unsignedContracts.length} contrato(s) não assinado(s) foi(ram) processado(s)`
+    );
   };
 
   /**
@@ -484,9 +514,12 @@ export const useContractsStore = defineStore("contracts", () => {
           } else {
             // Fallback: processar todos os contratos
             processContractLifecycle();
-            info("Resolução Processada", "Contratos foram resolvidos automaticamente");
+            info(
+              "Resolução Processada",
+              "Contratos foram resolvidos automaticamente"
+            );
           }
-          
+
           // Reagendar próximas resoluções após processar
           scheduleContractEvents();
           break;
@@ -499,7 +532,10 @@ export const useContractsStore = defineStore("contracts", () => {
             );
             if (contract && contract.status === ContractStatus.DISPONIVEL) {
               updateContractStatus(contract.id, ContractStatus.EXPIRADO);
-              info("Contrato Expirado", `Contrato ${contract.objective?.description} expirou`);
+              info(
+                "Contrato Expirado",
+                `Contrato ${contract.objective?.description} expirou`
+              );
             }
           }
           break;
@@ -586,10 +622,11 @@ export const useContractsStore = defineStore("contracts", () => {
         skipFrequentatorsReduction: false,
       };
 
-      const newContracts = ContractGenerator.generateContractsWithFrequentatorsReduction(
-        config, 
-        timelineStore.currentGameDate!
-      );
+      const newContracts =
+        ContractGenerator.generateContractsWithFrequentatorsReduction(
+          config,
+          timelineStore.currentGameDate!
+        );
 
       // Adicionar novos contratos
       contracts.value.push(...newContracts);
@@ -603,7 +640,10 @@ export const useContractsStore = defineStore("contracts", () => {
       // Agendar próximos eventos de timeline
       scheduleContractEvents();
 
-      success("Contratos Gerados", "Novos contratos foram gerados automaticamente");
+      success(
+        "Contratos Gerados",
+        "Novos contratos foram gerados automaticamente"
+      );
     } catch (error) {
       // Log erro mas não mostrar ao usuário para geração automática
       generationError.value =
@@ -655,10 +695,11 @@ export const useContractsStore = defineStore("contracts", () => {
         skipFrequentatorsReduction: false,
       };
 
-      const newContracts = ContractGenerator.generateContractsWithFrequentatorsReduction(
-        config, 
-        timelineStore.currentGameDate!
-      );
+      const newContracts =
+        ContractGenerator.generateContractsWithFrequentatorsReduction(
+          config,
+          timelineStore.currentGameDate!
+        );
 
       // Adicionar novos contratos
       contracts.value.push(...newContracts);
@@ -783,27 +824,27 @@ export const useContractsStore = defineStore("contracts", () => {
   /**
    * Converte deadline em dias baseado no tipo e valor
    */
-  const convertDeadlineToDays = (deadline: Contract['deadline']): number => {
+  const convertDeadlineToDays = (deadline: Contract["deadline"]): number => {
     if (deadline.type === DeadlineType.SEM_PRAZO) {
       return 0; // Sem prazo
     }
-    
+
     if (!deadline.value) return 7; // Default de 1 semana
-    
+
     const value = deadline.value.toLowerCase();
-    
+
     // Extrair número de dias
-    if (deadline.type === DeadlineType.DIAS && value.includes('dia')) {
+    if (deadline.type === DeadlineType.DIAS && value.includes("dia")) {
       const match = value.match(/(\d+)/);
       return match ? parseInt(match[1]) : 7;
     }
-    
+
     // Extrair número de semanas e converter para dias
-    if (deadline.type === DeadlineType.SEMANAS && value.includes('semana')) {
+    if (deadline.type === DeadlineType.SEMANAS && value.includes("semana")) {
       const match = value.match(/(\d+)/);
       return match ? parseInt(match[1]) * 7 : 7;
     }
-    
+
     return 7; // Default de 1 semana
   };
 
@@ -813,17 +854,23 @@ export const useContractsStore = defineStore("contracts", () => {
   const checkAndBreakOverdueContracts = () => {
     const timelineStore = useTimelineStore();
     const currentDate = timelineStore.currentGameDate;
-    
+
     if (!currentDate) return;
-    
+
     const acceptedContracts = contracts.value.filter(
-      c => c.status === ContractStatus.ACEITO && c.deadlineDate
+      (c) => c.status === ContractStatus.ACEITO && c.deadlineDate
     );
-    
+
     for (const contract of acceptedContracts) {
-      if (contract.deadlineDate && isDateAfter(currentDate, contract.deadlineDate)) {
+      if (
+        contract.deadlineDate &&
+        isDateAfter(currentDate, contract.deadlineDate)
+      ) {
         // Contrato passou do prazo, quebrar automaticamente
-        breakContractWithPenalty(contract.id, `Prazo excedido em ${getDaysDifference(contract.deadlineDate, currentDate)} dias`);
+        breakContractWithPenalty(
+          contract.id,
+          `Prazo excedido em ${getDaysDifference(contract.deadlineDate, currentDate)} dias`
+        );
       }
     }
   };
@@ -831,45 +878,50 @@ export const useContractsStore = defineStore("contracts", () => {
   /**
    * Quebra um contrato específico e aplica penalidade
    */
-  const breakContractWithPenalty = (contractId: string, reason: string = 'Contrato quebrado') => {
+  const breakContractWithPenalty = (
+    contractId: string,
+    reason: string = "Contrato quebrado"
+  ) => {
     const contract = contracts.value.find((c) => c.id === contractId);
     if (contract) {
       const timelineStore = useTimelineStore();
       const currentDate = timelineStore.currentGameDate;
-      
+
       if (currentDate) {
         contract.brokenAt = currentDate;
       }
-      
+
       // Calcular penalidade (10% da recompensa)
       const penaltyAmount = Math.floor(contract.value.finalGoldReward * 0.1);
       contract.penalty = {
         amount: penaltyAmount,
         reason: reason,
-        appliedAt: currentDate || createGameDate(1, 1, 1000)
+        appliedAt: currentDate || createGameDate(1, 1, 1000),
       };
-      
+
       // Aplicar bônus de recompensa para futuros aventureiros (+2 na rolagem)
       // contratos quebrados/abandonados ficam com recompensa maior
       applyRewardBonusToContract(contractId, 2);
-      
+
       // Atualizar status para DISPONIVEL (contrato volta a ficar disponível com bônus)
       contract.status = ContractStatus.DISPONIVEL;
-      
+
       // Resetar dados relacionados ao aceite anterior
       contract.acceptedAt = undefined;
       if (currentDate) {
         contract.brokenAt = currentDate; // Manter registro de quando foi quebrado
       }
-      
+
       lastUpdate.value = new Date();
       saveToStorage();
-      
+
       // Mostrar notificação
-      warning('Contrato Quebrado', 
-             `${contract.objective?.description || 'Contrato'} foi quebrado. Multa: ${formatCurrency(penaltyAmount)} PO$. ` +
-             `O contrato voltou a ficar disponível com recompensa aumentada para ${formatCurrency(contract.value.finalGoldReward)} PO$.`);
-      
+      warning(
+        "Contrato Quebrado",
+        `${contract.objective?.description || "Contrato"} foi quebrado. Multa: ${formatCurrency(penaltyAmount)} PO$. ` +
+          `O contrato voltou a ficar disponível com recompensa aumentada para ${formatCurrency(contract.value.finalGoldReward)} PO$.`
+      );
+
       return penaltyAmount;
     }
     return 0;
@@ -887,12 +939,15 @@ export const useContractsStore = defineStore("contracts", () => {
   /**
    * Aplica bônus de recompensa a um contrato específico
    * Usado quando contratos não são resolvidos no prazo
-   * 
+   *
    * O bônus avança posições na tabela d100
    * e recalcula o valor com todos os modificadores originais aplicados.
    * O bônus sempre resulta em valor maior ou igual ao anterior.
    */
-  const applyRewardBonusToContract = (contractId: string, bonusAmount: number = 2): boolean => {
+  const applyRewardBonusToContract = (
+    contractId: string,
+    bonusAmount: number = 2
+  ): boolean => {
     const contract = contracts.value.find((c) => c.id === contractId);
     if (!contract) return false;
 
@@ -904,44 +959,49 @@ export const useContractsStore = defineStore("contracts", () => {
 
     // Recalcular valor usando progressão na tabela d100
     // O bônus adiciona pontos diretamente à rolagem, avançando posições na tabela
-    const currentBonusTotal = (contract.generationData.rewardRollBonus || 0) + bonusAmount;
-    
+    const currentBonusTotal =
+      (contract.generationData.rewardRollBonus || 0) + bonusAmount;
+
     // Buscar o difficultyEntry usando o difficultyRoll armazenado
     const difficultyEntry = contract.generationData.difficultyRoll
       ? CONTRACT_DIFFICULTY_TABLE.find(
-          (entry) => contract.generationData.difficultyRoll! >= entry.min && contract.generationData.difficultyRoll! <= entry.max
+          (entry) =>
+            contract.generationData.difficultyRoll! >= entry.min &&
+            contract.generationData.difficultyRoll! <= entry.max
         )
       : undefined;
-    
+
     // Recalcular o contrato inteiro com o novo bônus de recompensa
-    const newContractValue = ContractGenerator.calculateContractValueWithRewardBonus(
-      contract.generationData.baseRoll,
-      guild,
-      difficultyEntry,
-      contract.generationData.distanceRoll,
-      currentBonusTotal
-    );
+    const newContractValue =
+      ContractGenerator.calculateContractValueWithRewardBonus(
+        contract.generationData.baseRoll,
+        guild,
+        difficultyEntry,
+        contract.generationData.distanceRoll,
+        currentBonusTotal
+      );
 
     // Se o novo valor for menor que o anterior, aplicar bônus direto
     // Isso pode acontecer devido a modificadores muito negativos ou flutuações nos cálculos
     let finalContractValue = newContractValue.contractValue;
-    
+
     if (finalContractValue.finalGoldReward < previousValue) {
       // Calcular diferença mínima esperada (aproximadamente 5-10% por ponto de bônus)
       const minimumIncrease = previousValue * (bonusAmount * 0.05); // 5% por ponto de bônus como mínimo
       const guaranteedNewValue = previousValue + minimumIncrease;
-      
+
       // Ajustar todos os valores proporcionalmente
-      const scaleFactor = guaranteedNewValue / finalContractValue.finalGoldReward;
-      
+      const scaleFactor =
+        guaranteedNewValue / finalContractValue.finalGoldReward;
+
       finalContractValue = {
         ...finalContractValue,
         rewardValue: Math.floor(finalContractValue.rewardValue * scaleFactor),
         finalGoldReward: Math.round(guaranteedNewValue * 10) / 10, // Arredondar para 1 casa decimal
         modifiers: {
           ...finalContractValue.modifiers,
-          rewardRollBonus: currentBonusTotal
-        }
+          rewardRollBonus: currentBonusTotal,
+        },
       };
     }
 
@@ -951,22 +1011,25 @@ export const useContractsStore = defineStore("contracts", () => {
     // Registrar o bônus aplicado nos dados de geração
     contract.generationData = {
       ...contract.generationData,
-      rewardRollBonus: currentBonusTotal
+      rewardRollBonus: currentBonusTotal,
     };
 
     // Atualizar a descrição do contrato para mostrar o reajuste
-    contract.description = ContractGenerator.updateContractDescriptionWithBonusReward(
-      contract,
-      previousValue,
-      "quebra de contrato"
-    );
+    contract.description =
+      ContractGenerator.updateContractDescriptionWithBonusReward(
+        contract,
+        previousValue,
+        "quebra de contrato"
+      );
 
     lastUpdate.value = new Date();
     saveToStorage();
-    
-    info('Contrato Atualizado', 
-         `O contrato teve sua recompensa aumentada de ${formatCurrency(previousValue)} PO$ para ${formatCurrency(contract.value.finalGoldReward)} PO$ devido ao bônus por não resolução.`);
-    
+
+    info(
+      "Contrato Atualizado",
+      `O contrato teve sua recompensa aumentada de ${formatCurrency(previousValue)} PO$ para ${formatCurrency(contract.value.finalGoldReward)} PO$ devido ao bônus por não resolução.`
+    );
+
     return true;
   };
 
@@ -979,19 +1042,21 @@ export const useContractsStore = defineStore("contracts", () => {
 
     // Aplicar bônus de recompensa (+2 na rolagem)
     applyRewardBonusToContract(contractId, 2);
-    
+
     // Resetar status e dados relacionados
     contract.status = ContractStatus.DISPONIVEL;
     contract.acceptedAt = undefined;
     contract.brokenAt = undefined;
     contract.penalty = undefined;
-    
+
     lastUpdate.value = new Date();
     saveToStorage();
-    
-    success('Contrato Renovado', 
-           `O contrato foi renovado e retornou para disponível com recompensa aumentada.`);
-    
+
+    success(
+      "Contrato Renovado",
+      `O contrato foi renovado e retornou para disponível com recompensa aumentada.`
+    );
+
     return true;
   };
 
@@ -1003,20 +1068,20 @@ export const useContractsStore = defineStore("contracts", () => {
     if (contract) {
       const timelineStore = useTimelineStore();
       const currentDate = timelineStore.currentGameDate;
-      
+
       if (!currentDate) {
         return;
       }
-      
+
       // Define a data de aceitação
       contract.acceptedAt = currentDate;
-      
+
       // Calcula a data limite baseada no prazo do contrato
       const deadlineDays = convertDeadlineToDays(contract.deadline);
       if (deadlineDays > 0) {
         contract.deadlineDate = addDays(currentDate, deadlineDays);
       }
-      
+
       // Atualiza o status
       contract.status = ContractStatus.ACEITO;
       lastUpdate.value = new Date();

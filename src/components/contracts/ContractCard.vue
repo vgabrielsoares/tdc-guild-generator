@@ -4,26 +4,24 @@
     :class="[
       { 'opacity-60': isExpired || isUnavailable },
       { 'border-amber-400/30': isHighValue },
-      { 'border-red-400/30': isDangerous }
+      { 'border-red-400/30': isDangerous },
     ]"
   >
     <!-- Header com status e tipo de contratante -->
     <div class="p-4 border-b border-gray-700">
       <div class="flex items-start justify-between">
         <div class="flex items-center gap-2">
-          <component
-            :is="contractorIcon"
-            class="w-5 h-5 text-amber-400"
-          />
+          <component :is="contractorIcon" class="w-5 h-5 text-amber-400" />
           <h3 class="text-lg font-semibold text-amber-400">
             {{ contract.title || `Contrato ${contract.id.slice(0, 6)}` }}
           </h3>
         </div>
         <ContractStatusComponent :status="contract.status" size="sm" />
       </div>
-      
+
       <p class="text-md text-gray-400 mt-1">
-        {{ contractorTypeLabel }} - {{ contract.contractorName || 'Nome não especificado' }}
+        {{ contractorTypeLabel }} -
+        {{ contract.contractorName || "Nome não especificado" }}
       </p>
     </div>
 
@@ -40,7 +38,10 @@
       </div>
 
       <!-- Localização -->
-      <div v-if="contract.location" class="flex items-center gap-2 text-md text-gray-400">
+      <div
+        v-if="contract.location"
+        class="flex items-center gap-2 text-md text-gray-400"
+      >
         <MapPinIcon class="w-4 h-4 text-amber-400" />
         <span>{{ contract.location.name }}</span>
         <span v-if="contract.location.description" class="text-md">
@@ -55,14 +56,23 @@
           :difficulty="contract.difficulty"
           size="md"
         />
-        
+
         <div v-if="contract.deadline.type !== 'Sem prazo'" class="text-right">
           <p class="text-md font-medium text-gray-300">
             {{ contract.deadline.value }}
           </p>
           <!-- Countdown para contratos aceitos -->
-          <div v-if="daysUntilBreak !== null" class="text-sm mt-1" 
-               :class="daysUntilBreak <= 2 ? 'text-red-400' : daysUntilBreak <= 5 ? 'text-orange-400' : 'text-blue-400'">
+          <div
+            v-if="daysUntilBreak !== null"
+            class="text-sm mt-1"
+            :class="
+              daysUntilBreak <= 2
+                ? 'text-red-400'
+                : daysUntilBreak <= 5
+                  ? 'text-orange-400'
+                  : 'text-blue-400'
+            "
+          >
             <span v-if="daysUntilBreak === 0">Prazo hoje!</span>
             <span v-else-if="daysUntilBreak === 1">1 dia restante</span>
             <span v-else>{{ daysUntilBreak }} dias restantes</span>
@@ -71,51 +81,74 @@
       </div>
 
       <!-- Indicadores especiais -->
-      <div v-if="hasSpecialFeatures" class="flex items-center gap-2 pt-2 border-t border-gray-700">
+      <div
+        v-if="hasSpecialFeatures"
+        class="flex items-center gap-2 pt-2 border-t border-gray-700"
+      >
         <!-- Indicador de contrato aceito por outros -->
-        <div v-if="contract.status === ContractStatus.ACEITO_POR_OUTROS" 
-             class="flex items-center gap-1 bg-orange-900/30 px-2 py-1 rounded-full text-md text-orange-300"
-             :title="getTakenByOthersTooltip()">
+        <div
+          v-if="contract.status === ContractStatus.ACEITO_POR_OUTROS"
+          class="flex items-center gap-1 bg-orange-900/30 px-2 py-1 rounded-full text-md text-orange-300"
+          :title="getTakenByOthersTooltip()"
+        >
           <UsersIcon class="w-3 h-3" />
           <span>Aceito por outros</span>
         </div>
 
         <!-- Indicador de contrato resolvido por outros -->
-        <div v-if="contract.status === ContractStatus.RESOLVIDO_POR_OUTROS" 
-             class="flex items-center gap-1 bg-gray-900/30 px-2 py-1 rounded-full text-md text-gray-400"
-             title="Este contrato já foi resolvido por outros aventureiros">
+        <div
+          v-if="contract.status === ContractStatus.RESOLVIDO_POR_OUTROS"
+          class="flex items-center gap-1 bg-gray-900/30 px-2 py-1 rounded-full text-md text-gray-400"
+          title="Este contrato já foi resolvido por outros aventureiros"
+        >
           <CheckCircleIcon class="w-3 h-3" />
           <span>Resolvido por outros</span>
         </div>
 
         <!-- Indicador de aliados -->
-        <div v-if="contract.allies?.length" 
-             class="flex items-center gap-1 bg-green-900/30 px-2 py-1 rounded-full text-md text-green-300"
-             title="Aliados disponíveis">
+        <div
+          v-if="contract.allies?.length"
+          class="flex items-center gap-1 bg-green-900/30 px-2 py-1 rounded-full text-md text-green-300"
+          title="Aliados disponíveis"
+        >
           <UserPlusIcon class="w-3 h-3" />
-          <span>{{ contract.allies.length }} aliado{{ contract.allies.length > 1 ? 's' : '' }}</span>
+          <span
+            >{{ contract.allies.length }} aliado{{
+              contract.allies.length > 1 ? "s" : ""
+            }}</span
+          >
         </div>
 
         <!-- Indicador de consequências severas -->
-        <div v-if="contract.severeConsequences?.length" 
-             class="flex items-center gap-1 bg-red-900/30 px-2 py-1 rounded-full text-md text-red-300"
-             title="Consequências por falha">
+        <div
+          v-if="contract.severeConsequences?.length"
+          class="flex items-center gap-1 bg-red-900/30 px-2 py-1 rounded-full text-md text-red-300"
+          title="Consequências por falha"
+        >
           <ShieldExclamationIcon class="w-3 h-3" />
           <span>Consequências severas</span>
         </div>
 
         <!-- Indicador de recompensas adicionais -->
-        <div v-if="contract.additionalRewards?.length" 
-             class="flex items-center gap-1 bg-amber-900/30 px-2 py-1 rounded-full text-md text-amber-300"
-             :title="getAdditionalRewardsTooltip(contract.additionalRewards)">
+        <div
+          v-if="contract.additionalRewards?.length"
+          class="flex items-center gap-1 bg-amber-900/30 px-2 py-1 rounded-full text-md text-amber-300"
+          :title="getAdditionalRewardsTooltip(contract.additionalRewards)"
+        >
           <GiftIcon class="w-3 h-3" />
-          <span>{{ contract.additionalRewards.length }} extra{{ contract.additionalRewards.length > 1 ? 's' : '' }}</span>
+          <span
+            >{{ contract.additionalRewards.length }} extra{{
+              contract.additionalRewards.length > 1 ? "s" : ""
+            }}</span
+          >
         </div>
 
         <!-- Indicador de penalidade -->
-        <div v-if="contract.penalty" 
-             class="flex items-center gap-1 bg-red-900/40 px-2 py-1 rounded-full text-md text-red-300"
-             title="Multa aplicada por quebra de contrato">
+        <div
+          v-if="contract.penalty"
+          class="flex items-center gap-1 bg-red-900/40 px-2 py-1 rounded-full text-md text-red-300"
+          title="Multa aplicada por quebra de contrato"
+        >
           <XCircleIcon class="w-3 h-3" />
           <span>Multa: {{ contract.penalty.amount }} PO</span>
         </div>
@@ -132,7 +165,7 @@
         >
           Aceitar
         </button>
-        
+
         <button
           v-if="canComplete"
           @click="$emit('complete', contract)"
@@ -140,14 +173,14 @@
         >
           Concluir
         </button>
-        
+
         <button
           @click="$emit('view-details', contract)"
           class="flex-1 bg-gray-600 hover:bg-gray-700 text-white text-md py-2 px-3 rounded transition-colors"
         >
           Detalhes
         </button>
-        
+
         <button
           v-if="canAbandon"
           @click="$emit('abandon', contract)"
@@ -161,26 +194,29 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import type { Contract } from '@/types/contract';
-import { ContractStatus, ContractorType, ContractDifficulty, DeadlineType } from '@/types/contract';
-import { useTimeline } from '@/composables/useTimeline';
-import ContractStatusComponent from './ContractStatus.vue';
-import ContractValue from './ContractValue.vue';
-import { 
-  UsersIcon, 
-  BuildingOfficeIcon, 
+import { computed } from "vue";
+import type { Contract } from "@/types/contract";
+import {
+  ContractStatus,
+  ContractorType,
+  ContractDifficulty,
+  DeadlineType,
+} from "@/types/contract";
+import { useTimeline } from "@/composables/useTimeline";
+import ContractStatusComponent from "./ContractStatus.vue";
+import ContractValue from "./ContractValue.vue";
+import {
+  UsersIcon,
+  BuildingOfficeIcon,
   QuestionMarkCircleIcon,
   MapPinIcon,
   XMarkIcon,
   UserPlusIcon,
   ShieldExclamationIcon,
   GiftIcon,
-  CheckCircleIcon
-} from '@heroicons/vue/24/outline';
-import {
-  XCircleIcon
-} from '@heroicons/vue/24/solid';
+  CheckCircleIcon,
+} from "@heroicons/vue/24/outline";
+import { XCircleIcon } from "@heroicons/vue/24/solid";
 
 interface Props {
   contract: Contract;
@@ -191,11 +227,11 @@ interface Emits {
   accept: [contract: Contract];
   complete: [contract: Contract];
   abandon: [contract: Contract];
-  'view-details': [contract: Contract];
+  "view-details": [contract: Contract];
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  showActions: true
+  showActions: true,
 });
 
 defineEmits<Emits>();
@@ -228,7 +264,7 @@ const isUnavailable = computed(() => {
     ContractStatus.CONCLUIDO,
     ContractStatus.FALHOU,
     ContractStatus.ANULADO,
-    ContractStatus.RESOLVIDO_POR_OUTROS
+    ContractStatus.RESOLVIDO_POR_OUTROS,
   ].includes(props.contract.status);
 });
 
@@ -243,53 +279,71 @@ const isDangerous = computed(() => {
 });
 
 const hasSpecialFeatures = computed(() => {
-  return (props.contract.allies?.length || 0) > 0 || 
-         (props.contract.severeConsequences?.length || 0) > 0 ||
-         (props.contract.additionalRewards?.length || 0) > 0 ||
-         !!props.contract.penalty ||
-         props.contract.status === ContractStatus.ACEITO_POR_OUTROS ||
-         props.contract.status === ContractStatus.RESOLVIDO_POR_OUTROS;
+  return (
+    (props.contract.allies?.length || 0) > 0 ||
+    (props.contract.severeConsequences?.length || 0) > 0 ||
+    (props.contract.additionalRewards?.length || 0) > 0 ||
+    !!props.contract.penalty ||
+    props.contract.status === ContractStatus.ACEITO_POR_OUTROS ||
+    props.contract.status === ContractStatus.RESOLVIDO_POR_OUTROS
+  );
 });
 
 const canAccept = computed(() => {
-  return props.showActions && props.contract.status === ContractStatus.DISPONIVEL;
+  return (
+    props.showActions && props.contract.status === ContractStatus.DISPONIVEL
+  );
 });
 
 const canComplete = computed(() => {
-  return props.showActions && [
-    ContractStatus.ACEITO,
-    ContractStatus.EM_ANDAMENTO
-  ].includes(props.contract.status);
+  return (
+    props.showActions &&
+    [ContractStatus.ACEITO, ContractStatus.EM_ANDAMENTO].includes(
+      props.contract.status
+    )
+  );
 });
 
 const canAbandon = computed(() => {
-  return props.showActions && [
-    ContractStatus.ACEITO,
-    ContractStatus.EM_ANDAMENTO
-  ].includes(props.contract.status);
+  return (
+    props.showActions &&
+    [ContractStatus.ACEITO, ContractStatus.EM_ANDAMENTO].includes(
+      props.contract.status
+    )
+  );
 });
 
 const daysUntilBreak = computed(() => {
   // Só mostrar para contratos aceitos com prazo
-  if (![ContractStatus.ACEITO, ContractStatus.EM_ANDAMENTO].includes(props.contract.status)) {
+  if (
+    ![ContractStatus.ACEITO, ContractStatus.EM_ANDAMENTO].includes(
+      props.contract.status
+    )
+  ) {
     return null;
   }
-  
-  if (!props.contract.deadlineDate || props.contract.deadline.type === DeadlineType.SEM_PRAZO) {
+
+  if (
+    !props.contract.deadlineDate ||
+    props.contract.deadline.type === DeadlineType.SEM_PRAZO
+  ) {
     return null;
   }
-  
+
   const timeline = useTimeline();
   const currentDate = timeline.currentDate.value;
   const deadlineDate = props.contract.deadlineDate;
-  
+
   // Verificação adicional para garantir que não é null
   if (!currentDate || !deadlineDate) {
     return null;
   }
-  
-  const daysDiff = timeline.dateUtils.getDaysDifference(currentDate, deadlineDate);
-  
+
+  const daysDiff = timeline.dateUtils.getDaysDifference(
+    currentDate,
+    deadlineDate
+  );
+
   // Se já passou do prazo, retornar 0
   return Math.max(0, daysDiff);
 });
@@ -298,38 +352,44 @@ const daysUntilBreak = computed(() => {
 
 function getTakenByOthersTooltip(): string {
   const info = props.contract.takenByOthersInfo;
-  if (!info) return 'Este contrato foi aceito por outros aventureiros';
-  
-  let tooltip = 'Aceito por outros aventureiros';
-  
+  if (!info) return "Este contrato foi aceito por outros aventureiros";
+
+  let tooltip = "Aceito por outros aventureiros";
+
   if (info.resolutionReason) {
     tooltip += ` - ${info.resolutionReason}`;
   }
-  
+
   if (info.canReturnToAvailable) {
-    tooltip += '. Pode voltar a ficar disponível futuramente.';
+    tooltip += ". Pode voltar a ficar disponível futuramente.";
   } else {
-    tooltip += '. Não retornará à disponibilidade.';
+    tooltip += ". Não retornará à disponibilidade.";
   }
-  
+
   return tooltip;
 }
 
-function getAdditionalRewardsTooltip(rewards: { isPositive: boolean }[]): string {
-  if (!rewards || rewards.length === 0) return '';
-  
-  const positiveRewards = rewards.filter(r => r.isPositive);
-  const negativeRewards = rewards.filter(r => r.isPositive === false);
-  
+function getAdditionalRewardsTooltip(
+  rewards: { isPositive: boolean }[]
+): string {
+  if (!rewards || rewards.length === 0) return "";
+
+  const positiveRewards = rewards.filter((r) => r.isPositive);
+  const negativeRewards = rewards.filter((r) => r.isPositive === false);
+
   const parts = [];
   if (positiveRewards.length > 0) {
-    parts.push(`${positiveRewards.length} recompensa${positiveRewards.length > 1 ? 's' : ''} adicional${positiveRewards.length > 1 ? 'is' : ''}`);
+    parts.push(
+      `${positiveRewards.length} recompensa${positiveRewards.length > 1 ? "s" : ""} adicional${positiveRewards.length > 1 ? "is" : ""}`
+    );
   }
   if (negativeRewards.length > 0) {
-    parts.push(`${negativeRewards.length} problema${negativeRewards.length > 1 ? 's' : ''} oculto${negativeRewards.length > 1 ? 's' : ''}`);
+    parts.push(
+      `${negativeRewards.length} problema${negativeRewards.length > 1 ? "s" : ""} oculto${negativeRewards.length > 1 ? "s" : ""}`
+    );
   }
-  
-  return parts.join(' e ');
+
+  return parts.join(" e ");
 }
 </script>
 

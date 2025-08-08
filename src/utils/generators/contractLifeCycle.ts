@@ -1,11 +1,11 @@
 import { rollDice, rollOnTable } from "../dice";
 import type { Contract } from "../../types/contract";
-import { 
-  ContractStatus, 
-  ContractResolution, 
+import {
+  ContractStatus,
+  ContractResolution,
   FailureReason,
   UnsignedResolutionResult,
-  isContractExpired
+  isContractExpired,
 } from "../../types/contract";
 import {
   SIGNED_CONTRACT_RESOLUTION_TIME_TABLE,
@@ -14,7 +14,7 @@ import {
   UNSIGNED_CONTRACT_RESOLUTION_TABLE,
   CONTRACT_FAILURE_REASONS_TABLE,
   NEW_CONTRACTS_TIME_TABLE,
-  UNRESOLVED_CONTRACT_BONUS
+  UNRESOLVED_CONTRACT_BONUS,
 } from "../../data/tables/contract-modifier-tables";
 
 // Tipos específicos para o ciclo de vida dos contratos
@@ -36,7 +36,7 @@ export interface NewContractsTime {
 function convertTimeStringToDays(timeString: string): number {
   // Remove espaços e converte para lowercase
   const cleaned = timeString.toLowerCase().trim();
-  
+
   if (cleaned.includes("dia")) {
     // Extrair e rolar dados para dias
     const diceMatch = cleaned.match(/(\d+d\d+(?:\+\d+)?|\d+)/);
@@ -75,13 +75,13 @@ function convertTimeStringToDays(timeString: string): number {
       return months * 30; // Converter meses para dias (aproximado)
     }
   }
-  
+
   // Fallback - tentar extrair número diretamente
   const numberMatch = cleaned.match(/\d+/);
   if (numberMatch) {
     return parseInt(numberMatch[0]);
   }
-  
+
   return 7; // Default de 1 semana
 }
 
@@ -120,14 +120,14 @@ export function rollSignedContractResolution(): {
     table: SIGNED_CONTRACT_RESOLUTION_TABLE,
     context: "Resolução de contratos assinados",
   });
-  
+
   const response: {
     result: ContractResolution;
     reason?: FailureReason;
   } = {
     result: resolution.result as ContractResolution,
   };
-  
+
   // Se não foi resolvido, rolar motivo
   if (resolution.result === ContractResolution.NAO_RESOLVIDO) {
     const reasonResult = rollOnTable({
@@ -136,7 +136,7 @@ export function rollSignedContractResolution(): {
     });
     response.reason = reasonResult.result as FailureReason;
   }
-  
+
   return response;
 }
 
@@ -151,10 +151,12 @@ export function rollUnsignedContractResolution(): {
     table: UNSIGNED_CONTRACT_RESOLUTION_TABLE,
     context: "Resolução de contratos não assinados",
   });
-  
+
   // Capturar o resultado como objeto ou string
-  const result = resolution.result as { description: string; action: string } | string;
-  
+  const result = resolution.result as
+    | { description: string; action: string }
+    | string;
+
   const response: {
     type: UnsignedResolutionResult;
     count?: number;
@@ -163,9 +165,9 @@ export function rollUnsignedContractResolution(): {
   };
 
   // Se é um objeto com action, usar mapActionToResult
-  if (result && typeof result === 'object' && 'action' in result) {
+  if (result && typeof result === "object" && "action" in result) {
     response.type = mapActionToResult(result.action);
-    
+
     // Calcular count se necessário baseado na ação
     switch (result.action) {
       case "resolve_random_1d6":
@@ -182,11 +184,11 @@ export function rollUnsignedContractResolution(): {
         break;
       // Para outras ações que não precisam de count, não definir
     }
-  } else if (typeof result === 'string') {
+  } else if (typeof result === "string") {
     // Se é uma string direta, mapear diretamente
     response.type = result as UnsignedResolutionResult;
   }
-  
+
   return response;
 }
 
@@ -242,19 +244,20 @@ export function generateResolutionTimes(): ContractResolutionTime {
 /**
  * Aplicar resolução automática a contratos assinados
  */
-export function applySignedContractResolution(contracts: Contract[]): Contract[] {
+export function applySignedContractResolution(
+  contracts: Contract[]
+): Contract[] {
   const signedContracts = contracts.filter(
-    (contract) => 
-      contract.status === ContractStatus.ACEITO_POR_OUTROS
+    (contract) => contract.status === ContractStatus.ACEITO_POR_OUTROS
   );
-  
+
   return contracts.map((contract) => {
     if (!signedContracts.includes(contract)) {
       return contract;
     }
-    
+
     const resolution = rollSignedContractResolution();
-    
+
     switch (resolution.result) {
       case ContractResolution.RESOLVIDO:
         return {
@@ -262,7 +265,7 @@ export function applySignedContractResolution(contracts: Contract[]): Contract[]
           status: ContractStatus.RESOLVIDO_POR_OUTROS,
           completedAt: new Date(),
         };
-        
+
       case ContractResolution.RESOLVIDO_COM_RESSALVAS:
         return {
           ...contract,
@@ -270,10 +273,12 @@ export function applySignedContractResolution(contracts: Contract[]): Contract[]
           completedAt: new Date(),
           // Poderia adicionar flag para ressalvas
         };
-        
+
       case ContractResolution.NAO_RESOLVIDO:
-        if (resolution.reason === FailureReason.PICARETAGEM ||
-            resolution.reason === FailureReason.CONTRATANTE_MORTO) {
+        if (
+          resolution.reason === FailureReason.PICARETAGEM ||
+          resolution.reason === FailureReason.CONTRATANTE_MORTO
+        ) {
           return {
             ...contract,
             status: ContractStatus.ANULADO,
@@ -286,16 +291,18 @@ export function applySignedContractResolution(contracts: Contract[]): Contract[]
             takenByOthersInfo: undefined, // Remover informação de aceito por outros
             value: {
               ...contract.value,
-              rewardValue: contract.value.rewardValue + UNRESOLVED_CONTRACT_BONUS, // Aumenta recompensa
-              finalGoldReward: (contract.value.rewardValue + UNRESOLVED_CONTRACT_BONUS) * 0.1,
+              rewardValue:
+                contract.value.rewardValue + UNRESOLVED_CONTRACT_BONUS, // Aumenta recompensa
+              finalGoldReward:
+                (contract.value.rewardValue + UNRESOLVED_CONTRACT_BONUS) * 0.1,
             },
           };
         }
-        
+
       case ContractResolution.AINDA_NAO_SE_SABE:
         // Manter status ACEITO_POR_OUTROS, será resolvido na próxima vez
         return contract;
-        
+
       default:
         return contract;
     }
@@ -305,74 +312,96 @@ export function applySignedContractResolution(contracts: Contract[]): Contract[]
 /**
  * Aplicar resolução automática a contratos não assinados
  */
-export function applyUnsignedContractResolution(contracts: Contract[]): Contract[] {
+export function applyUnsignedContractResolution(
+  contracts: Contract[]
+): Contract[] {
   const unsignedContracts = contracts.filter(
     (contract) => contract.status === ContractStatus.DISPONIVEL
   );
-  
+
   if (unsignedContracts.length === 0) {
     return contracts;
   }
-  
+
   const resolution = rollUnsignedContractResolution();
-  
+
   switch (resolution.type) {
     case UnsignedResolutionResult.TODOS_CONTINUAM:
       // Nenhuma mudança
       return contracts;
-      
+
     case UnsignedResolutionResult.TODOS_RESOLVIDOS:
       return contracts.map((contract) =>
         unsignedContracts.includes(contract)
-          ? { ...contract, status: ContractStatus.RESOLVIDO_POR_OUTROS, completedAt: new Date() }
+          ? {
+              ...contract,
+              status: ContractStatus.RESOLVIDO_POR_OUTROS,
+              completedAt: new Date(),
+            }
           : contract
       );
-      
+
     case UnsignedResolutionResult.MENORES_XP_RESOLVIDOS: {
       // Ordenar por XP e pegar os menores
-      const sortedByXP = [...unsignedContracts].sort((a, b) => a.value.experienceValue - b.value.experienceValue);
+      const sortedByXP = [...unsignedContracts].sort(
+        (a, b) => a.value.experienceValue - b.value.experienceValue
+      );
       const halfCount = Math.ceil(sortedByXP.length / 2);
       const toResolve = sortedByXP.slice(0, halfCount);
-      
+
       return contracts.map((contract) =>
         toResolve.includes(contract)
-          ? { ...contract, status: ContractStatus.RESOLVIDO_POR_OUTROS, completedAt: new Date() }
+          ? {
+              ...contract,
+              status: ContractStatus.RESOLVIDO_POR_OUTROS,
+              completedAt: new Date(),
+            }
           : contract
       );
     }
-    
+
     case UnsignedResolutionResult.MELHORES_RECOMPENSAS_RESOLVIDOS: {
       // Ordenar por recompensa e pegar os melhores
-      const sortedByReward = [...unsignedContracts].sort((a, b) => b.value.finalGoldReward - a.value.finalGoldReward);
+      const sortedByReward = [...unsignedContracts].sort(
+        (a, b) => b.value.finalGoldReward - a.value.finalGoldReward
+      );
       const halfCount = Math.ceil(sortedByReward.length / 2);
       const toResolve = sortedByReward.slice(0, halfCount);
-      
+
       return contracts.map((contract) =>
         toResolve.includes(contract)
-          ? { ...contract, status: ContractStatus.RESOLVIDO_POR_OUTROS, completedAt: new Date() }
+          ? {
+              ...contract,
+              status: ContractStatus.RESOLVIDO_POR_OUTROS,
+              completedAt: new Date(),
+            }
           : contract
       );
     }
-    
+
     case UnsignedResolutionResult.ALEATORIOS_RESOLVIDOS: {
       // Resolver quantidade aleatória
       const count = Math.min(resolution.count || 1, unsignedContracts.length);
       const shuffled = [...unsignedContracts].sort(() => Math.random() - 0.5);
       const toResolve = shuffled.slice(0, count);
-      
+
       return contracts.map((contract) =>
         toResolve.includes(contract)
-          ? { ...contract, status: ContractStatus.RESOLVIDO_POR_OUTROS, completedAt: new Date() }
+          ? {
+              ...contract,
+              status: ContractStatus.RESOLVIDO_POR_OUTROS,
+              completedAt: new Date(),
+            }
           : contract
       );
     }
-    
+
     case UnsignedResolutionResult.ASSINADOS_NAO_RESOLVIDOS: {
       // Marcar como aceitos mas não resolvidos
       const count = Math.min(resolution.count || 1, unsignedContracts.length);
       const shuffled = [...unsignedContracts].sort(() => Math.random() - 0.5);
       const toSign = shuffled.slice(0, count);
-      
+
       return contracts.map((contract) => {
         if (toSign.includes(contract)) {
           // Rolar motivo de não resolução
@@ -380,9 +409,13 @@ export function applyUnsignedContractResolution(contracts: Contract[]): Contract
             table: CONTRACT_FAILURE_REASONS_TABLE,
             context: "Motivo para não resolução de contrato assinado",
           });
-          
-          if ((reasonResult.result as FailureReason) === FailureReason.PICARETAGEM ||
-              (reasonResult.result as FailureReason) === FailureReason.CONTRATANTE_MORTO) {
+
+          if (
+            (reasonResult.result as FailureReason) ===
+              FailureReason.PICARETAGEM ||
+            (reasonResult.result as FailureReason) ===
+              FailureReason.CONTRATANTE_MORTO
+          ) {
             return { ...contract, status: ContractStatus.ANULADO };
           } else {
             return {
@@ -390,8 +423,11 @@ export function applyUnsignedContractResolution(contracts: Contract[]): Contract
               status: ContractStatus.DISPONIVEL,
               value: {
                 ...contract.value,
-                rewardValue: contract.value.rewardValue + UNRESOLVED_CONTRACT_BONUS, // Aumentar recompensa
-                finalGoldReward: (contract.value.rewardValue + UNRESOLVED_CONTRACT_BONUS) * 0.1,
+                rewardValue:
+                  contract.value.rewardValue + UNRESOLVED_CONTRACT_BONUS, // Aumentar recompensa
+                finalGoldReward:
+                  (contract.value.rewardValue + UNRESOLVED_CONTRACT_BONUS) *
+                  0.1,
               },
             };
           }
@@ -399,11 +435,11 @@ export function applyUnsignedContractResolution(contracts: Contract[]): Contract
         return contract;
       });
     }
-    
+
     case UnsignedResolutionResult.MOTIVO_ESTRANHO:
       // Nenhuma mudança, mas poderia adicionar flag para motivo estranho
       return contracts;
-      
+
     default:
       return contracts;
   }
@@ -412,17 +448,23 @@ export function applyUnsignedContractResolution(contracts: Contract[]): Contract
 /**
  * Aumenta recompensa de contratos não resolvidos
  */
-export function increaseUnresolvedContractRewards(contracts: Contract[]): Contract[] {
+export function increaseUnresolvedContractRewards(
+  contracts: Contract[]
+): Contract[] {
   return contracts.map((contract) => {
     // Contratos que voltaram a ficar disponíveis após não serem resolvidos
-    if (contract.status === ContractStatus.DISPONIVEL && 
-        contract.value.rewardValue > 0) { // Assumindo que houve aumento anterior
+    if (
+      contract.status === ContractStatus.DISPONIVEL &&
+      contract.value.rewardValue > 0
+    ) {
+      // Assumindo que houve aumento anterior
       return {
         ...contract,
         value: {
           ...contract.value,
           rewardValue: contract.value.rewardValue + UNRESOLVED_CONTRACT_BONUS,
-          finalGoldReward: (contract.value.rewardValue + UNRESOLVED_CONTRACT_BONUS) * 0.1,
+          finalGoldReward:
+            (contract.value.rewardValue + UNRESOLVED_CONTRACT_BONUS) * 0.1,
         },
       };
     }
@@ -471,10 +513,14 @@ export class ContractLifecycleManager {
 
     const now = new Date();
     const daysPassed = Math.floor(
-      (now.getTime() - this.lastResolutionDate.getTime()) / (1000 * 60 * 60 * 24)
+      (now.getTime() - this.lastResolutionDate.getTime()) /
+        (1000 * 60 * 60 * 24)
     );
 
-    return daysPassed >= Math.min(this.resolutionTimes.signed, this.resolutionTimes.unsigned);
+    return (
+      daysPassed >=
+      Math.min(this.resolutionTimes.signed, this.resolutionTimes.unsigned)
+    );
   }
 
   /**
@@ -487,7 +533,8 @@ export class ContractLifecycleManager {
 
     const now = new Date();
     const daysPassed = Math.floor(
-      (now.getTime() - this.lastNewContractsDate.getTime()) / (1000 * 60 * 60 * 24)
+      (now.getTime() - this.lastNewContractsDate.getTime()) /
+        (1000 * 60 * 60 * 24)
     );
 
     return daysPassed >= this.nextNewContractsTime;
@@ -528,22 +575,30 @@ export class ContractLifecycleManager {
     daysUntilNewContracts: number | null;
   } {
     const now = currentGameDate || new Date();
-    
+
     let daysUntilResolution: number | null = null;
     if (this.resolutionTimes && this.lastResolutionDate) {
       const daysPassed = Math.floor(
-        (now.getTime() - this.lastResolutionDate.getTime()) / (1000 * 60 * 60 * 24)
+        (now.getTime() - this.lastResolutionDate.getTime()) /
+          (1000 * 60 * 60 * 24)
       );
-      const minResolutionTime = Math.min(this.resolutionTimes.signed, this.resolutionTimes.unsigned);
+      const minResolutionTime = Math.min(
+        this.resolutionTimes.signed,
+        this.resolutionTimes.unsigned
+      );
       daysUntilResolution = Math.max(0, minResolutionTime - daysPassed);
     }
 
     let daysUntilNewContracts: number | null = null;
     if (this.nextNewContractsTime && this.lastNewContractsDate) {
       const daysPassed = Math.floor(
-        (now.getTime() - this.lastNewContractsDate.getTime()) / (1000 * 60 * 60 * 24)
+        (now.getTime() - this.lastNewContractsDate.getTime()) /
+          (1000 * 60 * 60 * 24)
       );
-      daysUntilNewContracts = Math.max(0, this.nextNewContractsTime - daysPassed);
+      daysUntilNewContracts = Math.max(
+        0,
+        this.nextNewContractsTime - daysPassed
+      );
     }
 
     return {
@@ -570,8 +625,12 @@ export class ContractLifecycleManager {
   importState(state: ContractLifecycleState): void {
     this.resolutionTimes = state.resolutionTimes;
     this.nextNewContractsTime = state.nextNewContractsTime;
-    this.lastResolutionDate = state.lastResolutionDate ? new Date(state.lastResolutionDate) : null;
-    this.lastNewContractsDate = state.lastNewContractsDate ? new Date(state.lastNewContractsDate) : null;
+    this.lastResolutionDate = state.lastResolutionDate
+      ? new Date(state.lastResolutionDate)
+      : null;
+    this.lastNewContractsDate = state.lastNewContractsDate
+      ? new Date(state.lastNewContractsDate)
+      : null;
   }
 
   /**
@@ -590,11 +649,14 @@ export class ContractLifecycleManager {
  * Marca contratos expirados
  */
 export function markExpiredContracts(contracts: Contract[]): Contract[] {
-  return contracts.map(contract => {
-    if (contract.status === ContractStatus.DISPONIVEL && isContractExpired(contract)) {
+  return contracts.map((contract) => {
+    if (
+      contract.status === ContractStatus.DISPONIVEL &&
+      isContractExpired(contract)
+    ) {
       return {
         ...contract,
-        status: ContractStatus.EXPIRADO
+        status: ContractStatus.EXPIRADO,
       };
     }
     return contract;
@@ -614,22 +676,29 @@ export function getContractResolutionStats(contracts: Contract[]): {
   resolutionRate: number;
 } {
   const total = contracts.length;
-  const resolved = contracts.filter(c => 
-    c.status === ContractStatus.CONCLUIDO || 
-    c.status === ContractStatus.RESOLVIDO_POR_OUTROS
+  const resolved = contracts.filter(
+    (c) =>
+      c.status === ContractStatus.CONCLUIDO ||
+      c.status === ContractStatus.RESOLVIDO_POR_OUTROS
   ).length;
-  const failed = contracts.filter(c => 
-    c.status === ContractStatus.FALHOU || 
-    c.status === ContractStatus.QUEBRADO ||
-    c.status === ContractStatus.ANULADO
+  const failed = contracts.filter(
+    (c) =>
+      c.status === ContractStatus.FALHOU ||
+      c.status === ContractStatus.QUEBRADO ||
+      c.status === ContractStatus.ANULADO
   ).length;
-  const expired = contracts.filter(c => c.status === ContractStatus.EXPIRADO).length;
-  const active = contracts.filter(c => 
-    c.status === ContractStatus.ACEITO || 
-    c.status === ContractStatus.EM_ANDAMENTO
+  const expired = contracts.filter(
+    (c) => c.status === ContractStatus.EXPIRADO
   ).length;
-  const available = contracts.filter(c => c.status === ContractStatus.DISPONIVEL).length;
-  
+  const active = contracts.filter(
+    (c) =>
+      c.status === ContractStatus.ACEITO ||
+      c.status === ContractStatus.EM_ANDAMENTO
+  ).length;
+  const available = contracts.filter(
+    (c) => c.status === ContractStatus.DISPONIVEL
+  ).length;
+
   const resolutionRate = total > 0 ? (resolved / total) * 100 : 0;
 
   return {
@@ -639,7 +708,7 @@ export function getContractResolutionStats(contracts: Contract[]): {
     expired,
     active,
     available,
-    resolutionRate
+    resolutionRate,
   };
 }
 
@@ -652,7 +721,8 @@ export function applyUnresolvedBonus(contract: Contract): Contract {
     value: {
       ...contract.value,
       rewardValue: contract.value.rewardValue + UNRESOLVED_CONTRACT_BONUS,
-      finalGoldReward: (contract.value.rewardValue + UNRESOLVED_CONTRACT_BONUS) * 0.1,
+      finalGoldReward:
+        (contract.value.rewardValue + UNRESOLVED_CONTRACT_BONUS) * 0.1,
     },
   };
 }
@@ -660,24 +730,35 @@ export function applyUnresolvedBonus(contract: Contract): Contract {
 /**
  * Processa expiração de prazos de contratos
  */
-export function processContractDeadlines(contracts: Contract[], currentDate: Date = new Date()): Contract[] {
-  return contracts.map(contract => {
+export function processContractDeadlines(
+  contracts: Contract[],
+  currentDate: Date = new Date()
+): Contract[] {
+  return contracts.map((contract) => {
     // Verificar se o prazo expirou para contratos em andamento
-    if (contract.status === ContractStatus.EM_ANDAMENTO && contract.expiresAt && currentDate > contract.expiresAt) {
+    if (
+      contract.status === ContractStatus.EM_ANDAMENTO &&
+      contract.expiresAt &&
+      currentDate > contract.expiresAt
+    ) {
       return {
         ...contract,
-        status: ContractStatus.FALHOU
+        status: ContractStatus.FALHOU,
       };
     }
-    
+
     // Verificar se contratos disponíveis expiraram
-    if (contract.status === ContractStatus.DISPONIVEL && contract.expiresAt && currentDate > contract.expiresAt) {
+    if (
+      contract.status === ContractStatus.DISPONIVEL &&
+      contract.expiresAt &&
+      currentDate > contract.expiresAt
+    ) {
       return {
         ...contract,
-        status: ContractStatus.EXPIRADO
+        status: ContractStatus.EXPIRADO,
       };
     }
-    
+
     return contract;
   });
 }

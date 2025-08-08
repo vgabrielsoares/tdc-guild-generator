@@ -357,7 +357,10 @@ async function handleCompleteContract(contract: Contract) {
 
 async function handleAbandonContract(contract: Contract) {
   try {
-    const penalty = contractsStore.breakContractWithPenalty(contract.id, 'Abandonado pelos aventureiros');
+    const penalty = contractsStore.breakContractWithPenalty(
+      contract.id,
+      "Abandonado pelos aventureiros"
+    );
     if (penalty > 0) {
       showToast(`Contrato abandonado. Multa: ${penalty} PO$`);
     } else {
