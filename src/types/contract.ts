@@ -11,6 +11,7 @@ export enum ContractStatus {
   EXPIRADO = "Expirado",
   ANULADO = "Anulado",
   RESOLVIDO_POR_OUTROS = "Resolvido por outros",
+  ACEITO_POR_OUTROS = "Aceito por outros aventureiros",
   QUEBRADO = "Quebrado",
 }
 
@@ -136,6 +137,9 @@ export interface ContractModifiers {
 
   // Modificadores por pré-requisitos e cláusulas (+5 cada)
   requirementsAndClauses: number;
+
+  // Bônus adicional na rolagem de recompensa (contratos não resolvidos)
+  rewardRollBonus?: number;
 }
 
 // ===== INTERFACES PRINCIPAIS =====
@@ -206,6 +210,14 @@ export interface Contract {
   deadlineDate?: GameDate;
   brokenAt?: GameDate;
 
+  // Informações específicas para contratos aceitos por outros aventureiros
+  takenByOthersInfo?: {
+    takenAt: GameDate;
+    estimatedResolutionDate?: GameDate;
+    resolutionReason?: string;
+    canReturnToAvailable?: boolean;
+  };
+
   // Informações de multa por quebra de contrato
   penalty?: {
     amount: number;
@@ -222,6 +234,7 @@ export interface Contract {
     prerequisiteRolls?: number[];
     clauseRolls?: number[];
     antagonistRoll?: number;
+    rewardRollBonus?: number; // Bônus aplicado à rolagem de recompensa
   };
 }
 
@@ -238,6 +251,7 @@ export const ContractModifiersSchema = z.object({
     rewardMultiplier: z.number().positive(),
   }),
   requirementsAndClauses: z.number().int().nonnegative(),
+  rewardRollBonus: z.number().int().optional(),
 });
 
 // Schema para valores do contrato
@@ -264,6 +278,7 @@ export const GenerationDataSchema = z.object({
   prerequisiteRolls: z.array(z.number().int()).optional(),
   clauseRolls: z.array(z.number().int()).optional(),
   antagonistRoll: z.number().int().optional(),
+  rewardRollBonus: z.number().int().optional(),
 });
 
 // Schema principal do contrato
