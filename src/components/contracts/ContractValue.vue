@@ -324,17 +324,17 @@ const enableTooltip = computed(() => {
 const formattedGoldValue = computed(() => {
   const value = props.value.finalGoldReward;
   if (value >= 1000) {
-    return `${(value / 1000).toFixed(1)}k`;
+    return `${Number((value / 1000).toFixed(1))}k`;
   }
-  return value.toString();
+  return Number(value.toFixed(1)).toString();
 });
 
 const formattedExperienceValue = computed(() => {
   const value = props.value.experienceValue;
   if (value >= 1000) {
-    return `${(value / 1000).toFixed(1)}k`;
+    return `${Number((value / 1000).toFixed(1))}k`;
   }
-  return value.toString();
+  return Number(value.toFixed(1)).toString();
 });
 
 const sizeClasses = computed(() => {
