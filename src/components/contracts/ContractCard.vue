@@ -19,7 +19,7 @@
             {{ contract.title || `Contrato ${contract.id.slice(0, 6)}` }}
           </h3>
         </div>
-        <ContractStatus :status="contract.status" size="sm" />
+        <ContractStatusComponent :status="contract.status" size="sm" />
       </div>
       
       <p class="text-md text-gray-400 mt-1">
@@ -60,11 +60,34 @@
           <p class="text-md font-medium text-gray-300">
             {{ contract.deadline.value }}
           </p>
+          <!-- Countdown para contratos aceitos -->
+          <div v-if="daysUntilBreak !== null" class="text-sm mt-1" 
+               :class="daysUntilBreak <= 2 ? 'text-red-400' : daysUntilBreak <= 5 ? 'text-orange-400' : 'text-blue-400'">
+            <span v-if="daysUntilBreak === 0">Prazo hoje!</span>
+            <span v-else-if="daysUntilBreak === 1">1 dia restante</span>
+            <span v-else>{{ daysUntilBreak }} dias restantes</span>
+          </div>
         </div>
       </div>
 
       <!-- Indicadores especiais -->
       <div v-if="hasSpecialFeatures" class="flex items-center gap-2 pt-2 border-t border-gray-700">
+        <!-- Indicador de contrato aceito por outros -->
+        <div v-if="contract.status === ContractStatus.ACEITO_POR_OUTROS" 
+             class="flex items-center gap-1 bg-orange-900/30 px-2 py-1 rounded-full text-md text-orange-300"
+             :title="getTakenByOthersTooltip()">
+          <UsersIcon class="w-3 h-3" />
+          <span>Aceito por outros</span>
+        </div>
+
+        <!-- Indicador de contrato resolvido por outros -->
+        <div v-if="contract.status === ContractStatus.RESOLVIDO_POR_OUTROS" 
+             class="flex items-center gap-1 bg-gray-900/30 px-2 py-1 rounded-full text-md text-gray-400"
+             title="Este contrato já foi resolvido por outros aventureiros">
+          <CheckCircleIcon class="w-3 h-3" />
+          <span>Resolvido por outros</span>
+        </div>
+
         <!-- Indicador de aliados -->
         <div v-if="contract.allies?.length" 
              class="flex items-center gap-1 bg-green-900/30 px-2 py-1 rounded-full text-md text-green-300"
@@ -140,8 +163,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { Contract } from '@/types/contract';
-import { ContractStatus as Status, ContractorType, ContractDifficulty } from '@/types/contract';
-import ContractStatus from './ContractStatus.vue';
+import { ContractStatus, ContractorType, ContractDifficulty, DeadlineType } from '@/types/contract';
+import { useTimeline } from '@/composables/useTimeline';
+import ContractStatusComponent from './ContractStatus.vue';
 import ContractValue from './ContractValue.vue';
 import { 
   UsersIcon, 
@@ -151,7 +175,8 @@ import {
   XMarkIcon,
   UserPlusIcon,
   ShieldExclamationIcon,
-  GiftIcon
+  GiftIcon,
+  CheckCircleIcon
 } from '@heroicons/vue/24/outline';
 import {
   XCircleIcon
@@ -195,15 +220,15 @@ const contractorTypeLabel = computed(() => {
 });
 
 const isExpired = computed(() => {
-  return props.contract.status === Status.EXPIRADO;
+  return props.contract.status === ContractStatus.EXPIRADO;
 });
 
 const isUnavailable = computed(() => {
   return [
-    Status.CONCLUIDO,
-    Status.FALHOU,
-    Status.ANULADO,
-    Status.RESOLVIDO_POR_OUTROS
+    ContractStatus.CONCLUIDO,
+    ContractStatus.FALHOU,
+    ContractStatus.ANULADO,
+    ContractStatus.RESOLVIDO_POR_OUTROS
   ].includes(props.contract.status);
 });
 
@@ -221,28 +246,74 @@ const hasSpecialFeatures = computed(() => {
   return (props.contract.allies?.length || 0) > 0 || 
          (props.contract.severeConsequences?.length || 0) > 0 ||
          (props.contract.additionalRewards?.length || 0) > 0 ||
-         !!props.contract.penalty;
+         !!props.contract.penalty ||
+         props.contract.status === ContractStatus.ACEITO_POR_OUTROS ||
+         props.contract.status === ContractStatus.RESOLVIDO_POR_OUTROS;
 });
 
 const canAccept = computed(() => {
-  return props.showActions && props.contract.status === Status.DISPONIVEL;
+  return props.showActions && props.contract.status === ContractStatus.DISPONIVEL;
 });
 
 const canComplete = computed(() => {
   return props.showActions && [
-    Status.ACEITO,
-    Status.EM_ANDAMENTO
+    ContractStatus.ACEITO,
+    ContractStatus.EM_ANDAMENTO
   ].includes(props.contract.status);
 });
 
 const canAbandon = computed(() => {
   return props.showActions && [
-    Status.ACEITO,
-    Status.EM_ANDAMENTO
+    ContractStatus.ACEITO,
+    ContractStatus.EM_ANDAMENTO
   ].includes(props.contract.status);
 });
 
+const daysUntilBreak = computed(() => {
+  // Só mostrar para contratos aceitos com prazo
+  if (![ContractStatus.ACEITO, ContractStatus.EM_ANDAMENTO].includes(props.contract.status)) {
+    return null;
+  }
+  
+  if (!props.contract.deadlineDate || props.contract.deadline.type === DeadlineType.SEM_PRAZO) {
+    return null;
+  }
+  
+  const timeline = useTimeline();
+  const currentDate = timeline.currentDate.value;
+  const deadlineDate = props.contract.deadlineDate;
+  
+  // Verificação adicional para garantir que não é null
+  if (!currentDate || !deadlineDate) {
+    return null;
+  }
+  
+  const daysDiff = timeline.dateUtils.getDaysDifference(currentDate, deadlineDate);
+  
+  // Se já passou do prazo, retornar 0
+  return Math.max(0, daysDiff);
+});
+
 // ===== FUNCTIONS =====
+
+function getTakenByOthersTooltip(): string {
+  const info = props.contract.takenByOthersInfo;
+  if (!info) return 'Este contrato foi aceito por outros aventureiros';
+  
+  let tooltip = 'Aceito por outros aventureiros';
+  
+  if (info.resolutionReason) {
+    tooltip += ` - ${info.resolutionReason}`;
+  }
+  
+  if (info.canReturnToAvailable) {
+    tooltip += '. Pode voltar a ficar disponível futuramente.';
+  } else {
+    tooltip += '. Não retornará à disponibilidade.';
+  }
+  
+  return tooltip;
+}
 
 function getAdditionalRewardsTooltip(rewards: { isPositive: boolean }[]): string {
   if (!rewards || rewards.length === 0) return '';
