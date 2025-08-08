@@ -747,14 +747,11 @@ export class ContractGenerator {
     // Incluindo bônus de pré-requisitos e cláusulas
     const experienceRoll = Math.max(
       1,
-      Math.min(100, baseRoll + rollModifiers.experienceModifier)
+      baseRoll + rollModifiers.experienceModifier
     );
     const rewardRoll = Math.max(
       1,
-      Math.min(
-        100,
-        baseRoll + rollModifiers.rewardModifier + requirementsBonusToRoll
-      )
+      baseRoll + rollModifiers.rewardModifier + requirementsBonusToRoll
     );
 
     // 6. Consultar a tabela novamente com as rolagens modificadas
@@ -870,17 +867,14 @@ export class ContractGenerator {
     // Incluindo bônus de pré-requisitos e cláusulas + bônus adicional de recompensa
     const experienceRoll = Math.max(
       1,
-      Math.min(100, baseRoll + rollModifiers.experienceModifier)
+      baseRoll + rollModifiers.experienceModifier
     );
     const rewardRoll = Math.max(
       1,
-      Math.min(
-        100,
-        baseRoll +
-          rollModifiers.rewardModifier +
-          requirementsBonusToRoll +
-          rewardRollBonus
-      )
+      baseRoll +
+        rollModifiers.rewardModifier +
+        requirementsBonusToRoll +
+        rewardRollBonus
     );
 
     // 6. Consultar a tabela novamente com as rolagens modificadas
