@@ -88,6 +88,7 @@
         <button
           @click="handleGenerateContracts"
           :disabled="!currentDate || !canGenerateContracts"
+          :title="canGenerateContracts ? 'Gerar contratos iniciais para esta guilda' : 'Esta guilda já teve contratos gerados. Use o sistema de timeline para novos contratos.'"
           class="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors text-sm font-medium"
         >
           Gerar Novos Contratos
