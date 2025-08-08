@@ -107,11 +107,26 @@
     <div class="border-t border-gray-700 pt-6">
       <h4 class="text-lg font-medium text-white mb-3">Ações Rápidas</h4>
 
+      <!-- Explicação quando geração está bloqueada -->
+      <div 
+        v-if="!canGenerateContracts" 
+        class="mb-4 p-3 bg-amber-900/30 border border-amber-600/50 rounded-lg"
+      >
+        <div class="flex items-start space-x-2">
+          <ExclamationTriangleIcon class="w-5 h-5 text-amber-400 mt-0.5 flex-shrink-0" />
+          <div class="text-sm text-amber-200">
+            <strong>Geração Bloqueada:</strong> Esta guilda já teve contratos gerados inicialmente. 
+            Novos contratos surgem automaticamente através do sistema de timeline ao passar os dias.
+          </div>
+        </div>
+      </div>
+
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
         <button
           @click="$emit('generate-contracts')"
           :disabled="!canGenerateContracts"
           class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+          :title="canGenerateContracts ? 'Gerar contratos iniciais para esta guilda' : 'Esta guilda já teve contratos gerados. Use o sistema de timeline para novos contratos.'"
         >
           Gerar Novos Contratos
         </button>
@@ -138,6 +153,7 @@ import { ScheduledEventType } from "@/types/timeline";
 import { ContractStatus } from "@/types/contract";
 import { getDaysDifference } from "@/utils/date-utils";
 import type { GameDate } from "@/types/timeline";
+import { ExclamationTriangleIcon } from "@heroicons/vue/24/outline";
 
 // Emits
 defineEmits<{
