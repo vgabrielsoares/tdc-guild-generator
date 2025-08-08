@@ -27,7 +27,8 @@ import {
   NoSymbolIcon,
   UserIcon,
   ExclamationTriangleIcon,
-  QuestionMarkCircleIcon
+  QuestionMarkCircleIcon,
+  UsersIcon
 } from '@heroicons/vue/24/outline';
 
 interface Props {
@@ -61,6 +62,8 @@ const statusIcon = computed(() => {
       return NoSymbolIcon;
     case ContractStatus.RESOLVIDO_POR_OUTROS:
       return UserIcon;
+    case ContractStatus.ACEITO_POR_OUTROS:
+      return UsersIcon;
     case ContractStatus.QUEBRADO:
       return ExclamationTriangleIcon;
     default:
@@ -90,6 +93,8 @@ const statusClasses = computed(() => {
       return 'bg-gray-900/30 text-gray-400 border border-gray-500/30';
     case ContractStatus.RESOLVIDO_POR_OUTROS:
       return 'bg-purple-900/30 text-purple-300 border border-purple-500/30';
+    case ContractStatus.ACEITO_POR_OUTROS:
+      return 'bg-orange-900/40 text-orange-200 border border-orange-400/40';
     case ContractStatus.QUEBRADO:
       return 'bg-red-900/50 text-red-200 border border-red-400/50';
     default:
