@@ -981,29 +981,41 @@ export const useContractsStore = defineStore("contracts", () => {
         currentBonusTotal
       );
 
-    // Se o novo valor for menor que o anterior, aplicar bônus direto
-    // Isso pode acontecer devido a modificadores muito negativos ou flutuações nos cálculos
+    // Garantir que o bônus sempre resulte em valor adequado
     let finalContractValue = newContractValue.contractValue;
-
-    if (finalContractValue.finalGoldReward < previousValue) {
-      // Calcular diferença mínima esperada (aproximadamente 5-10% por ponto de bônus)
-      const minimumIncrease = previousValue * (bonusAmount * 0.05); // 5% por ponto de bônus como mínimo
-      const guaranteedNewValue = previousValue + minimumIncrease;
-
-      // Ajustar todos os valores proporcionalmente
-      const scaleFactor =
-        guaranteedNewValue / finalContractValue.finalGoldReward;
-
+    
+    // Calcular incremento mínimo e máximo razoáveis
+    const guaranteedMinimum = Math.ceil(previousValue * 1.1); // +10% mínimo
+    const maximumReasonable = previousValue * 2.0; // Máximo 2x para evitar valores absurdos
+    
+    // CASO 1: Valor muito baixo - aplicar garantia mínima
+    if (finalContractValue.finalGoldReward <= previousValue) {
       finalContractValue = {
         ...finalContractValue,
-        rewardValue: Math.floor(finalContractValue.rewardValue * scaleFactor),
-        finalGoldReward: Math.round(guaranteedNewValue * 10) / 10, // Arredondar para 1 casa decimal
+        rewardValue: Math.floor(guaranteedMinimum * 10), // Manter proporção 10:1
+        finalGoldReward: guaranteedMinimum,
         modifiers: {
           ...finalContractValue.modifiers,
           rewardRollBonus: currentBonusTotal,
         },
       };
     }
+    // CASO 2: Valor excessivamente alto - corrigir para máximo razoável
+    else if (finalContractValue.finalGoldReward > maximumReasonable) {
+      // Detectar valores absurdos e aplicar correção
+      const correctedValue = Math.max(guaranteedMinimum, Math.min(maximumReasonable, previousValue * 1.5));
+      
+      finalContractValue = {
+        ...finalContractValue,
+        rewardValue: Math.floor(correctedValue * 10), // Manter proporção 10:1
+        finalGoldReward: correctedValue,
+        modifiers: {
+          ...finalContractValue.modifiers,
+          rewardRollBonus: currentBonusTotal,
+        },
+      };
+    }
+    // CASO 3: Valor dentro do esperado - manter o cálculo normal
 
     // Atualizar o valor do contrato com os novos cálculos
     contract.value = finalContractValue;
@@ -1025,9 +1037,17 @@ export const useContractsStore = defineStore("contracts", () => {
     lastUpdate.value = new Date();
     saveToStorage();
 
+    // Determinar tipo de correção aplicada para a mensagem
+    let mensagemTipo = "bônus padrão";
+    if (finalContractValue.finalGoldReward === guaranteedMinimum) {
+      mensagemTipo = "garantia mínima (+10%)";
+    } else if (finalContractValue.finalGoldReward <= maximumReasonable) {
+      mensagemTipo = "correção de valor excessivo";
+    }
+
     info(
       "Contrato Atualizado",
-      `O contrato teve sua recompensa aumentada de ${formatCurrency(previousValue)} PO$ para ${formatCurrency(contract.value.finalGoldReward)} PO$ devido ao bônus por não resolução.`
+      `O contrato teve sua recompensa ajustada de ${formatCurrency(previousValue)} PO$ para ${formatCurrency(contract.value.finalGoldReward)} PO$ (${mensagemTipo}) devido ao bônus por não resolução.`
     );
 
     return true;
