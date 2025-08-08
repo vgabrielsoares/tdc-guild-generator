@@ -710,6 +710,13 @@ export const useContractsStore = defineStore("contracts", () => {
         guildData.generationCount += 1;
       }
 
+      // Bloquear a guilda automaticamente após primeira geração de contratos
+      // (impede regeneração de estrutura, mantendo consistência)
+      if (!currentGuild.locked) {
+        const guildStore = useGuildStore();
+        guildStore.toggleGuildLock(currentGuild.id);
+      }
+
       lifecycleManager.markNewContractsGenerated();
       lastUpdate.value = new Date();
       saveToStorage();
