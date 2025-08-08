@@ -244,7 +244,8 @@ export function generateResolutionTimes(): ContractResolutionTime {
  */
 export function applySignedContractResolution(contracts: Contract[]): Contract[] {
   const signedContracts = contracts.filter(
-    (contract) => contract.status === ContractStatus.ACEITO || contract.status === ContractStatus.EM_ANDAMENTO
+    (contract) => 
+      contract.status === ContractStatus.ACEITO_POR_OUTROS
   );
   
   return contracts.map((contract) => {
@@ -278,19 +279,21 @@ export function applySignedContractResolution(contracts: Contract[]): Contract[]
             status: ContractStatus.ANULADO,
           };
         } else {
+          // Contrato não foi resolvido, volta a ficar disponível com recompensa aumentada
           return {
             ...contract,
             status: ContractStatus.DISPONIVEL,
+            takenByOthersInfo: undefined, // Remover informação de aceito por outros
             value: {
               ...contract.value,
-              rewardValue: contract.value.rewardValue + UNRESOLVED_CONTRACT_BONUS, // Aumentar recompensa conforme regras
+              rewardValue: contract.value.rewardValue + UNRESOLVED_CONTRACT_BONUS, // Aumenta recompensa
               finalGoldReward: (contract.value.rewardValue + UNRESOLVED_CONTRACT_BONUS) * 0.1,
             },
           };
         }
         
       case ContractResolution.AINDA_NAO_SE_SABE:
-        // Manter status atual, será resolvido na próxima vez
+        // Manter status ACEITO_POR_OUTROS, será resolvido na próxima vez
         return contract;
         
       default:
@@ -520,11 +523,11 @@ export class ContractLifecycleManager {
   /**
    * Obter informações sobre próximas ações
    */
-  getNextActions(): {
+  getNextActions(currentGameDate?: Date): {
     daysUntilResolution: number | null;
     daysUntilNewContracts: number | null;
   } {
-    const now = new Date();
+    const now = currentGameDate || new Date();
     
     let daysUntilResolution: number | null = null;
     if (this.resolutionTimes && this.lastResolutionDate) {
