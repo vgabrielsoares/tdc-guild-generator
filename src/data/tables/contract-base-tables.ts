@@ -472,13 +472,31 @@ export function getStaffModifier(condition: string): number {
 }
 
 /**
- * Calcula valor para rolagem 101+ (valor anterior * 1.1)
+ * Calcula valor para rolagem 101+
+ * 
+ * A regra "101+ | Valor anterior * 1,1" significa que devemos:
+ * 1. Encontrar o valor da rolagem 100 na tabela (considerando modificadores)
+ * 2. Para cada ponto acima de 100, multiplicar por 1,1
+ * 
+ * Por exemplo:
+ * - Rolagem 101: valor da rolagem 100 * 1,1
+ * - Rolagem 102: (valor da rolagem 100 * 1,1) * 1,1
+ * - E assim por diante...
  */
 export function calculateExtendedValue(roll: number, baseValue: number): number {
   if (roll <= 100) return baseValue;
   
-  // Para 101+, multiplica por 1.1
-  return Math.floor(baseValue * 1.1);
+  // Encontrar o valor correto da rolagem 100 na tabela
+  const value100Entry = CONTRACT_VALUE_TABLE.find(entry => entry.min === 100 && entry.max === 100);
+  let currentValue = value100Entry?.result || 50000;
+  
+  // Aplicar multiplicação por 1.1 para cada ponto acima de 100
+  const multiplications = roll - 100;
+  for (let i = 0; i < multiplications; i++) {
+    currentValue = Math.floor(currentValue * 1.1);
+  }
+  
+  return currentValue;
 }
 
 /**
