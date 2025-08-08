@@ -5,17 +5,41 @@ import {
   ContractorType,
   DeadlineType,
   PaymentType,
+  ContractResolution,
 } from "@/types/contract";
 import { applySignedContractResolution } from "@/utils/generators/contractLifeCycle";
 import type { Contract } from "@/types/contract";
 
+// Mock the rollSignedContractResolution function directly
+vi.mock("@/utils/generators/contractLifeCycle", async () => {
+  const actual = await vi.importActual("@/utils/generators/contractLifeCycle");
+  const actualModule = actual as Record<string, unknown>;
+  return {
+    ...actualModule,
+    rollSignedContractResolution: vi.fn(() => ({
+      result: ContractResolution.RESOLVIDO,
+    })),
+    applySignedContractResolution: actualModule.applySignedContractResolution,
+  };
+});
+
 // Mock para funções de dados
-vi.mock("@/utils/dice", () => ({
-  rollDice: vi.fn(() => ({ result: 10 })),
-}));
+vi.mock("@/utils/dice", async () => {
+  const actual = await vi.importActual("@/utils/dice");
+  return {
+    ...(actual as object),
+    rollDice: vi.fn(() => ({ result: 10 })),
+    rollOnTable: vi.fn(({ context }) => {
+      if (context === "Resolução de contratos assinados") {
+        return { result: ContractResolution.RESOLVIDO };
+      }
+      return { result: ContractResolution.RESOLVIDO };
+    }),
+  };
+});
 
 vi.mock("@/utils/tableRoller", () => ({
-  rollOnTable: vi.fn(() => ({ result: "RESOLVIDO" })),
+  rollOnTable: vi.fn(() => ({ result: ContractResolution.RESOLVIDO })),
 }));
 
 describe("Proteção de Contratos dos Jogadores", () => {
