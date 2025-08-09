@@ -70,7 +70,7 @@
               'btn btn-sm lock-button',
               guild.locked ? 'btn-locked' : 'btn-unlocked'
             ]"
-            :title="guild.locked ? 'Desbloquear Guilda - Permitir remoção' : 'Bloquear Guilda - Proteger de remoção'"
+            :title="guild.locked ? 'Desbloquear Guilda - Permitir remoção e regeneração' : 'Bloquear Guilda - Proteger de remoção e regeneração'"
           >
             <LockClosedIcon 
               v-if="guild.locked"
@@ -193,16 +193,50 @@ const loadGuild = (guildId: string) => {
 };
 
 const toggleLock = (guildId: string) => {
+  const guild = guildStore.guildHistory.find(g => g.id === guildId);
+    // Se a guilda está tentando ser desbloqueada, verificar se tem contratos
+  if (guild?.locked) {
+    // Verificar se existe dados de contratos para esta guilda diretamente no localStorage
+    const contractsStorageKey = 'contracts-store-v2';
+    const contractsData = localStorage.getItem(contractsStorageKey);
+    
+    if (contractsData) {
+      try {
+        const parsedData = JSON.parse(contractsData);
+        const guildContracts = parsedData.guildContracts?.[guildId];
+        
+        if (guildContracts && guildContracts.generationCount > 0) {
+          toast.warning(
+            'Esta guilda já está em uso e não pode ser desbloqueada.',
+            'Desbloqueio não permitido'
+          );
+          return;
+        }
+      } catch (error) {        
+        // eslint-disable-next-line no-console
+        console.warn('Erro ao verificar contratos da guilda:', error);
+      }
+    }
+  }
+
   const success = guildStore.toggleGuildLock(guildId);
   if (success) {
-    const guild = guildStore.guildHistory.find(g => g.id === guildId);
-    if (guild?.locked) {
-      toast.success('Guilda bloqueada - não será removida ao limpar histórico');
+    const updatedGuild = guildStore.guildHistory.find(g => g.id === guildId);
+    if (updatedGuild?.locked) {
+      toast.success('Guilda bloqueada');
     } else {
-      toast.warning('Guilda desbloqueada - pode ser removida ao limpar histórico');
+      toast.success('Guilda desbloqueada');
     }
   } else {
-    toast.error('Erro ao alterar bloqueio da guilda');
+    // Se o toggle falhou, mostrar mensagem específica dependendo do estado
+    if (guild?.locked) {
+      toast.warning(
+        'Esta guilda já está em uso e não pode ser desbloqueada.',
+        'Desbloqueio não permitido'
+      );
+    } else {
+      toast.error('Erro ao alterar bloqueio da guilda');
+    }
   }
 };
 
