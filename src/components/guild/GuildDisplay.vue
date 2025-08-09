@@ -14,6 +14,11 @@
           <!-- Nome Editável da Guilda -->
           <div class="flex-1 mr-4">
             <div v-if="!isEditingName" class="flex items-center group">
+              <button @click="regenerateGuildName"
+                class="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-green-400 p-1 ml-1"
+                :disabled="guild.locked" title="Regenerar nome da guilda">
+                <ArrowPathIcon class="w-4 h-4" />
+              </button>
               <h1 class="text-3xl font-bold text-amber-400 mr-2">{{ guild.name }}</h1>
               <button @click="startEditingName"
                 class="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-amber-400 p-1"
@@ -364,6 +369,20 @@ const regenerateVisitors = async () => {
     await guildStore.regenerateVisitors()
   } catch (error) {
     // Erro será tratado pelo store
+  }
+}
+
+const regenerateGuildName = async () => {
+  if (guild.value?.locked) {
+    toast.warning('Esta guilda está bloqueada. Desbloqueie no histórico para permitir regeneração do nome.');
+    return;
+  }
+
+  try {
+    await guildStore.regenerateGuildName()
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Erro desconhecido'
+    toast.error('Erro ao regenerar nome da guilda', message)
   }
 }
 

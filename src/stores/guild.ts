@@ -400,6 +400,40 @@ export const useGuildStore = defineStore("guild", () => {
     }
   }
 
+  // Regenerar apenas o nome da guilda
+  async function regenerateGuildName(): Promise<void> {
+    if (!currentGuild.value) {
+      throw new Error("Cannot regenerate: no current guild");
+    }
+
+    // Verificar se a guilda está bloqueada
+    if (currentGuild.value.locked) {
+      throw new Error("Cannot regenerate guild name: guild is locked");
+    }
+
+    const originalGuild = currentGuild.value;
+
+    // Gerar novo nome usando o gerador de nomes
+    const newName = generateRandomGuildName();
+
+    // Criar guilda com novo nome mas mantendo todo o resto igual
+    const regeneratedGuild: Guild = {
+      ...originalGuild,
+      name: newName,
+      updatedAt: new Date(),
+    };
+
+    currentGuild.value = regeneratedGuild;
+
+    // Atualizar no histórico se existir - modificar o storage diretamente
+    const historyIndex = storage.data.value.guildHistory.findIndex(
+      (g) => g.id === originalGuild.id
+    );
+    if (historyIndex !== -1) {
+      storage.data.value.guildHistory[historyIndex] = regeneratedGuild;
+    }
+  }
+
   // CRUD do histórico
   function addToHistory(guild: Guild): void {
     if (!isGuild(guild)) {
@@ -776,6 +810,7 @@ export const useGuildStore = defineStore("guild", () => {
     regenerateStructure,
     regenerateRelations,
     regenerateVisitors,
+    regenerateGuildName,
     addToHistory,
     removeFromHistory,
     clearHistory,
