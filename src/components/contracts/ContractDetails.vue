@@ -803,13 +803,13 @@ function getTimingDisplayName(timing: string): string {
 function getDifficultyDescription(difficulty: ContractDifficulty): string {
   switch (difficulty) {
     case ContractDifficulty.FACIL:
-      return 'Contrato de dificuldade fácil - adequado para aventureiros iniciantes';
+      return 'Contrato de dificuldade fácil - Dificuldade e recompensa equilibradas';
     case ContractDifficulty.MEDIO:
-      return 'Contrato de dificuldade média - requer experiência moderada';
+      return 'Contrato de dificuldade média - Dificuldade e recompensa levemente elevadas';
     case ContractDifficulty.DIFICIL:
-      return 'Contrato difícil - recomendado para aventureiros experientes';
+      return 'Contrato de dificuldade difícil - Dificuldade elevada e recompensa compensada';
     case ContractDifficulty.MORTAL:
-      return 'Contrato mortal - extremamente perigoso, apenas para veteranos';
+      return 'Contrato de dificuldade mortal - Dificuldade mortal e recompensa triplicada';
     default:
       return 'Dificuldade não especificada';
   }
