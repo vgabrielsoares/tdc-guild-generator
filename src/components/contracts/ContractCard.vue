@@ -105,6 +105,16 @@
           <span>Resolvido por outros</span>
         </div>
 
+        <!-- Indicador de contrato anulado -->
+        <div
+          v-if="contract.status === ContractStatus.ANULADO"
+          class="flex items-center gap-1 bg-gray-900/30 px-2 py-1 rounded-full text-md text-gray-400"
+          title="Este contrato foi anulado"
+        >
+          <CheckCircleIcon class="w-3 h-3" />
+          <span>Anulado</span>
+        </div>
+
         <!-- Indicador de aliados -->
         <div
           v-if="contract.allies?.length"
