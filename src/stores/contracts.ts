@@ -710,6 +710,21 @@ export const useContractsStore = defineStore("contracts", () => {
         guildData.generationCount += 1;
       }
 
+      // Salvar a guilda no histórico se ainda não estiver salva
+      const guildStore = useGuildStore();
+      const isInHistory = guildStore.guildHistory.some(
+        (g) => g.id === currentGuild.id
+      );
+      if (!isInHistory) {
+        guildStore.addToHistory(currentGuild);
+      }
+
+      // Bloquear a guilda automaticamente após primeira geração de contratos
+      // (impede regeneração de estrutura, mantendo consistência)
+      if (!currentGuild.locked) {
+        guildStore.toggleGuildLock(currentGuild.id);
+      }
+
       lifecycleManager.markNewContractsGenerated();
       lastUpdate.value = new Date();
       saveToStorage();
@@ -983,11 +998,11 @@ export const useContractsStore = defineStore("contracts", () => {
 
     // Garantir que o bônus sempre resulte em valor adequado
     let finalContractValue = newContractValue.contractValue;
-    
+
     // Calcular incremento mínimo e máximo razoáveis
     const guaranteedMinimum = Math.ceil(previousValue * 1.1); // +10% mínimo
     const maximumReasonable = previousValue * 2.0; // Máximo 2x para evitar valores absurdos
-    
+
     // CASO 1: Valor muito baixo - aplicar garantia mínima
     if (finalContractValue.finalGoldReward <= previousValue) {
       finalContractValue = {
@@ -1003,8 +1018,11 @@ export const useContractsStore = defineStore("contracts", () => {
     // CASO 2: Valor excessivamente alto - corrigir para máximo razoável
     else if (finalContractValue.finalGoldReward > maximumReasonable) {
       // Detectar valores absurdos e aplicar correção
-      const correctedValue = Math.max(guaranteedMinimum, Math.min(maximumReasonable, previousValue * 1.5));
-      
+      const correctedValue = Math.max(
+        guaranteedMinimum,
+        Math.min(maximumReasonable, previousValue * 1.5)
+      );
+
       finalContractValue = {
         ...finalContractValue,
         rewardValue: Math.floor(correctedValue * 10), // Manter proporção 10:1

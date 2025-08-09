@@ -7,14 +7,10 @@
         Histórico de Guildas
         <span class="history-count">({{ guildStore.historyCount }})</span>
       </h3>
-      
+
       <div class="history-actions">
-        <button
-          @click="showConfirmClear = true"
-          :disabled="guildStore.historyCount === 0"
-          class="btn btn-danger btn-sm flex items-center gap-2"
-          title="Limpar Histórico"
-        >
+        <button @click="showConfirmClear = true" :disabled="guildStore.historyCount === 0"
+          class="btn btn-danger btn-sm flex items-center gap-2" title="Limpar Histórico">
           <TrashIcon class="w-4 h-4" />
           Limpar Histórico
         </button>
@@ -31,28 +27,20 @@
     </div>
 
     <div v-else class="history-list">
-      <div
-        v-for="guild in guildStore.guildHistory"
-        :key="guild.id"
-        :class="[
-          'history-item',
-          { 'history-item-active': guild.id === guildStore.currentGuild?.id }
-        ]"
-      >
+      <div v-for="guild in guildStore.guildHistory" :key="guild.id" :class="[
+        'history-item',
+        { 'history-item-active': guild.id === guildStore.currentGuild?.id }
+      ]">
         <!-- Informações da Guilda -->
         <div class="guild-info" @click="loadGuild(guild.id)">
           <div class="guild-main-info">
             <h4 class="guild-name flex items-center gap-2">
               {{ guild.name }}
-              <StarIcon 
-                v-if="guild.structure.isHeadquarters"
-                class="w-4 h-4 text-amber-400"
-                title="Sede Matriz"
-              />
+              <StarIcon v-if="guild.structure.isHeadquarters" class="w-4 h-4 text-amber-400" title="Sede Matriz" />
             </h4>
             <span class="guild-settlement">{{ guild.settlementType }}</span>
           </div>
-          
+
           <div class="guild-details">
             <span class="guild-size">{{ guild.structure.size }}</span>
             <span class="guild-resources">{{ guild.resources.level }}</span>
@@ -64,30 +52,17 @@
 
         <!-- Ações da Guilda -->
         <div class="guild-actions">
-          <button
-            @click.stop="toggleLock(guild.id)"
-            :class="[
-              'btn btn-sm lock-button',
-              guild.locked ? 'btn-locked' : 'btn-unlocked'
-            ]"
-            :title="guild.locked ? 'Desbloquear Guilda - Permitir remoção' : 'Bloquear Guilda - Proteger de remoção'"
-          >
-            <LockClosedIcon 
-              v-if="guild.locked"
-              class="w-4 h-4 text-yellow-300"
-            />
-            <LockOpenIcon 
-              v-else
-              class="w-4 h-4 text-gray-400"
-            />
+          <button @click.stop="toggleLock(guild.id)" :class="[
+            'btn btn-sm lock-button',
+            guild.locked ? 'btn-locked' : 'btn-unlocked'
+          ]"
+            :title="guild.locked ? 'Desbloquear Guilda - Permitir remoção e regeneração' : 'Bloquear Guilda - Proteger de remoção e regeneração'">
+            <LockClosedIcon v-if="guild.locked" class="w-4 h-4 text-yellow-300" />
+            <LockOpenIcon v-else class="w-4 h-4 text-gray-400" />
           </button>
-          
-          <button
-            @click.stop="removeGuild(guild.id)"
-            :disabled="guild.locked"
-            class="btn btn-danger btn-sm"
-            :title="guild.locked ? 'Guilda bloqueada - não pode ser removida' : 'Remover do Histórico'"
-          >
+
+          <button @click.stop="removeGuild(guild.id)" :disabled="guild.locked" class="btn btn-danger btn-sm"
+            :title="guild.locked ? 'Guilda bloqueada - não pode ser removida' : 'Remover do Histórico'">
             <XMarkIcon class="w-4 h-4" />
           </button>
         </div>
@@ -100,7 +75,7 @@
         <div class="modal-header">
           <h4>Confirmar Limpeza</h4>
         </div>
-        
+
         <div class="modal-body">
           <p>Tem certeza que deseja limpar o histórico?</p>
           <p class="warning-text">
@@ -112,18 +87,12 @@
             {{ lockedCount }} guilda(s) bloqueada(s) será(ão) mantida(s).
           </p>
         </div>
-        
+
         <div class="modal-actions">
-          <button
-            @click="showConfirmClear = false"
-            class="btn btn-outline"
-          >
+          <button @click="showConfirmClear = false" class="btn btn-outline">
             Cancelar
           </button>
-          <button
-            @click="confirmClearHistory"
-            class="btn btn-danger flex items-center gap-2"
-          >
+          <button @click="confirmClearHistory" class="btn btn-danger flex items-center gap-2">
             <TrashIcon class="w-4 h-4" />
             Limpar Histórico
           </button>
@@ -135,7 +104,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { 
+import {
   ClockIcon,
   TrashIcon,
   FolderOpenIcon,
@@ -160,15 +129,15 @@ const lockedCount = computed(() => {
 const formatDate = (date: Date | string | null | undefined): string => {
   try {
     if (!date) return 'Data inválida';
-    
+
     // Converter para Date se for string
     const dateObj = date instanceof Date ? date : new Date(date);
-    
+
     // Verificar se a data é válida
     if (isNaN(dateObj.getTime())) {
       return 'Data inválida';
     }
-    
+
     return new Intl.DateTimeFormat('pt-BR', {
       day: '2-digit',
       month: '2-digit',
@@ -193,27 +162,61 @@ const loadGuild = (guildId: string) => {
 };
 
 const toggleLock = (guildId: string) => {
+  const guild = guildStore.guildHistory.find(g => g.id === guildId);
+  // Se a guilda está tentando ser desbloqueada, verificar se tem contratos
+  if (guild?.locked) {
+    // Verificar se existe dados de contratos para esta guilda diretamente no localStorage
+    const contractsStorageKey = 'contracts-store-v2';
+    const contractsData = localStorage.getItem(contractsStorageKey);
+
+    if (contractsData) {
+      try {
+        const parsedData = JSON.parse(contractsData);
+        const guildContracts = parsedData.guildContracts?.[guildId];
+
+        if (guildContracts && guildContracts.generationCount > 0) {
+          toast.warning(
+            'Esta guilda já está em uso e não pode ser desbloqueada.',
+            'Desbloqueio não permitido'
+          );
+          return;
+        }
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.warn('Erro ao verificar contratos da guilda:', error);
+      }
+    }
+  }
+
   const success = guildStore.toggleGuildLock(guildId);
   if (success) {
-    const guild = guildStore.guildHistory.find(g => g.id === guildId);
-    if (guild?.locked) {
-      toast.success('Guilda bloqueada - não será removida ao limpar histórico');
+    const updatedGuild = guildStore.guildHistory.find(g => g.id === guildId);
+    if (updatedGuild?.locked) {
+      toast.success('Guilda bloqueada');
     } else {
-      toast.warning('Guilda desbloqueada - pode ser removida ao limpar histórico');
+      toast.success('Guilda desbloqueada');
     }
   } else {
-    toast.error('Erro ao alterar bloqueio da guilda');
+    // Se o toggle falhou, mostrar mensagem específica dependendo do estado
+    if (guild?.locked) {
+      toast.warning(
+        'Esta guilda já está em uso e não pode ser desbloqueada.',
+        'Desbloqueio não permitido'
+      );
+    } else {
+      toast.error('Erro ao alterar bloqueio da guilda');
+    }
   }
 };
 
 const removeGuild = (guildId: string) => {
   const guild = guildStore.guildHistory.find(g => g.id === guildId);
-  
+
   if (guild?.locked) {
     toast.warning('Esta guilda está bloqueada e não pode ser removida');
     return;
   }
-  
+
   const success = guildStore.removeFromHistory(guildId);
   if (success) {
     toast.success('Guilda removida do histórico');
@@ -225,7 +228,7 @@ const removeGuild = (guildId: string) => {
 const confirmClearHistory = () => {
   guildStore.clearHistory();
   showConfirmClear.value = false;
-  
+
   if (lockedCount.value > 0) {
     toast.success(`Histórico limpo. ${lockedCount.value} guilda(s) bloqueada(s) mantida(s).`);
   } else {

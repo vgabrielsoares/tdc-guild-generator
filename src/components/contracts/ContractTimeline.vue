@@ -4,36 +4,28 @@
 
     <!-- Resumo temporal -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-      <div
-        class="bg-blue-900/30 p-4 rounded-lg text-center border border-blue-800/30"
-      >
+      <div class="bg-blue-900/30 p-4 rounded-lg text-center border border-blue-800/30">
         <div class="text-2xl font-bold text-blue-400">
           {{ contractStats.available }}
         </div>
         <div class="text-sm text-blue-300">Disponíveis</div>
       </div>
 
-      <div
-        class="bg-green-900/30 p-4 rounded-lg text-center border border-green-800/30"
-      >
+      <div class="bg-green-900/30 p-4 rounded-lg text-center border border-green-800/30">
         <div class="text-2xl font-bold text-green-400">
           {{ contractStats.inProgress }}
         </div>
         <div class="text-sm text-green-300">Em Andamento</div>
       </div>
 
-      <div
-        class="bg-yellow-900/30 p-4 rounded-lg text-center border border-yellow-800/30"
-      >
+      <div class="bg-yellow-900/30 p-4 rounded-lg text-center border border-yellow-800/30">
         <div class="text-2xl font-bold text-yellow-400">
           {{ expiringContracts.length }}
         </div>
         <div class="text-sm text-yellow-300">Expirando Em Breve</div>
       </div>
 
-      <div
-        class="bg-purple-900/30 p-4 rounded-lg text-center border border-purple-800/30"
-      >
+      <div class="bg-purple-900/30 p-4 rounded-lg text-center border border-purple-800/30">
         <div class="text-2xl font-bold text-purple-400">
           {{ contractStats.completed }}
         </div>
@@ -48,11 +40,8 @@
       </h4>
 
       <div class="space-y-2">
-        <div
-          v-for="contract in expiringContracts"
-          :key="contract.id"
-          class="flex items-center justify-between p-3 bg-yellow-900/30 border border-yellow-800/30 rounded-lg"
-        >
+        <div v-for="contract in expiringContracts" :key="contract.id"
+          class="flex items-center justify-between p-3 bg-yellow-900/30 border border-yellow-800/30 rounded-lg">
           <div class="flex-1">
             <div class="font-medium text-white">
               {{ contract.contractorType || "Contratante não definido" }}
@@ -81,11 +70,8 @@
       </h4>
 
       <div class="space-y-2">
-        <div
-          v-for="event in contractEvents"
-          :key="event.id"
-          class="flex items-center justify-between p-3 bg-blue-900/30 border border-blue-800/30 rounded-lg"
-        >
+        <div v-for="event in contractEvents" :key="event.id"
+          class="flex items-center justify-between p-3 bg-blue-900/30 border border-blue-800/30 rounded-lg">
           <div class="flex items-center space-x-3">
             <div class="w-2 h-2 bg-blue-400 rounded-full"></div>
             <div>
@@ -100,31 +86,6 @@
             {{ getDaysUntilEvent(event.date) }}
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- Ações rápidas -->
-    <div class="border-t border-gray-700 pt-6">
-      <h4 class="text-lg font-medium text-white mb-3">Ações Rápidas</h4>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <button
-          @click="$emit('generate-contracts')"
-          :disabled="!canGenerateContracts"
-          class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors text-sm font-medium"
-        >
-          Gerar Novos Contratos
-        </button>
-
-        <button
-          @click="$emit('force-resolution')"
-          :disabled="
-            contractStats.available === 0 && contractStats.inProgress === 0
-          "
-          class="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors text-sm font-medium"
-        >
-          Forçar Resolução
-        </button>
       </div>
     </div>
   </div>
@@ -152,9 +113,6 @@ const { currentDate, events, dateUtils } = useTimeline();
 
 // Computed
 const contractStats = computed(() => contractsStore.contractStats);
-const canGenerateContracts = computed(
-  () => contractsStore.canGenerateContracts
-);
 
 // Contratos expirando em breve (próximos 3 dias)
 const expiringContracts = computed(() => {

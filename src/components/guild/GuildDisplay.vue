@@ -133,9 +133,9 @@
           ]" :disabled="!guild || guildStore.isGenerating || !isGuildInHistory">
             <LockClosedIcon v-if="guild?.locked" class="w-4 h-4" />
             <LockOpenIcon v-else class="w-4 h-4" />
-            <span>{{ 
-              guild?.locked ? 'Desbloquear' : 
-              isGuildInHistory ? 'Bloquear' : 'Salvar p/ Bloquear'
+            <span>{{
+              guild?.locked ? 'Desbloquear' :
+                isGuildInHistory ? 'Bloquear' : 'Salvar p/ Bloquear'
             }}</span>
           </button>
           <button @click="saveToHistory" :class="[
@@ -223,6 +223,7 @@ import {
 } from '@heroicons/vue/24/solid'
 import { BuildingStorefrontIcon } from '@heroicons/vue/24/outline'
 import { useGuildStore } from '@/stores/guild'
+import { useContractsStore } from '@/stores/contracts'
 import { SettlementType, type Guild } from '@/types/guild'
 import { useToast } from '@/composables/useToast'
 import GuildStructure from './GuildStructure.vue'
@@ -232,6 +233,7 @@ import InfoButton from '@/components/common/InfoButton.vue'
 import HelpModal from '@/components/common/HelpModal.vue'
 
 const guildStore = useGuildStore()
+const contractsStore = useContractsStore()
 const toast = useToast()
 
 const guild = computed(() => guildStore.currentGuild)
@@ -444,7 +446,7 @@ const cancelEditingName = () => {
 // Função de toggle do lock
 const toggleLock = () => {
   if (!guild.value) return
-  
+
   // Verificar se a guilda está salva no histórico
   if (!isGuildInHistory.value) {
     toast.warning(
@@ -453,7 +455,16 @@ const toggleLock = () => {
     )
     return
   }
-  
+
+  // Verificar se estamos tentando desbloquear uma guilda que já está em uso
+  if (guild.value.locked && !contractsStore.canGenerateContracts) {
+    toast.warning(
+      'Esta guilda já está em. O desbloqueio não é permitido para manter a consistência dos dados.',
+      'Guilda em uso'
+    )
+    return
+  }
+
   try {
     const success = guildStore.toggleGuildLock(guild.value.id)
     if (success) {
@@ -461,7 +472,15 @@ const toggleLock = () => {
       const message = isNowLocked ? 'Guilda bloqueada com sucesso!' : 'Guilda desbloqueada com sucesso!'
       toast.success(message)
     } else {
-      toast.error('Erro ao alterar status de bloqueio da guilda')
+      // Se o toggle falhou, mostrar mensagem específica dependendo do estado
+      if (guild.value.locked) {
+        toast.warning(
+          'Esta guilda já está em uso e não pode ser desbloqueada.',
+          'Desbloqueio não permitido'
+        )
+      } else {
+        toast.error('Erro ao alterar status de bloqueio da guilda')
+      }
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erro desconhecido'

@@ -528,7 +528,6 @@ export const useGuildStore = defineStore("guild", () => {
         // Erro silencioso na limpeza de contratos
       });
   }
-
   function toggleGuildLock(guildId: string): boolean {
     const guildIndex = storage.data.value.guildHistory.findIndex(
       (g) => g.id === guildId
@@ -538,6 +537,25 @@ export const useGuildStore = defineStore("guild", () => {
     }
 
     const guild = storage.data.value.guildHistory[guildIndex];
+
+    if (guild.locked) {
+      // Verificar se existe dados de contratos para esta guilda diretamente no localStorage
+      const contractsStorageKey = "contracts-store-v2";
+      const contractsData = localStorage.getItem(contractsStorageKey);
+      if (contractsData) {
+        try {
+          const parsedData = JSON.parse(contractsData);
+          const guildContracts = parsedData.guildContracts?.[guildId];
+          if (guildContracts && guildContracts.generationCount > 0) {
+            // Guilda tem contratos gerados - não permitir desbloqueio
+            return false;
+          }
+        } catch (error) {
+          // Em caso de erro no parse, permitir o toggle por segurança
+        }
+      }
+    }
+
     const newGuild = { ...guild, locked: !guild.locked };
     // Modificar o storage diretamente
     storage.data.value.guildHistory[guildIndex] = newGuild;
