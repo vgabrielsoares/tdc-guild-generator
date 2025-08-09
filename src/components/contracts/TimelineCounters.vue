@@ -93,14 +93,6 @@
         >
           Gerar Novos Contratos
         </button>
-
-        <button
-          @click="handlePassTime"
-          :disabled="!currentDate"
-          class="w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors text-sm font-medium"
-        >
-          Passagem de Tempo
-        </button>
       </div>
     </div>
   </div>
@@ -168,16 +160,5 @@ function initializeTimeline() {
 
 function handleGenerateContracts() {
   contractsStore.generateContracts();
-}
-
-function handlePassTime() {
-  // Implementar passagem de tempo customizada
-  const days = prompt("Quantos dias passar?", "1");
-  if (days && !isNaN(Number(days))) {
-    const numDays = parseInt(days);
-    for (let i = 0; i < numDays; i++) {
-      passDay();
-    }
-  }
 }
 </script>
