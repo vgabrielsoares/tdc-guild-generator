@@ -7,9 +7,7 @@
     <!-- Data atual -->
     <div class="mb-4 p-3 bg-blue-900/30 rounded-lg border border-blue-800/30">
       <div class="flex items-center justify-between">
-        <span class="text-sm font-medium text-blue-300"
-          >Data Atual do Jogo</span
-        >
+        <span class="text-sm font-medium text-blue-300">Data Atual do Jogo</span>
         <span class="text-lg font-bold text-blue-100">
           {{ formattedDate || "Timeline inativa" }}
         </span>
@@ -19,27 +17,14 @@
     <!-- Contadores de contratos -->
     <div v-if="contractCounters" class="space-y-3">
       <!-- Próximo evento geral -->
-      <div
-        v-if="nextEvent"
-        class="flex items-center justify-between p-3 bg-purple-900/30 rounded-lg border border-purple-800/30"
-      >
+      <div v-if="nextEvent"
+        class="flex items-center justify-between p-3 bg-purple-900/30 rounded-lg border border-purple-800/30">
         <div class="flex items-center space-x-2">
-          <svg
-            class="w-5 h-5 text-purple-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-            ></path>
+          <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
           </svg>
-          <span class="text-sm font-medium text-purple-300"
-            >Próximo Evento</span
-          >
+          <span class="text-sm font-medium text-purple-300">Próximo Evento</span>
         </div>
         <span class="text-sm font-bold text-purple-100">
           {{ formatDaysCounter(daysUntilNext) }}
@@ -48,10 +33,7 @@
     </div>
 
     <!-- Estado sem dados -->
-    <div
-      v-if="!contractCounters && !nextEvent"
-      class="text-center py-4 text-gray-400 text-sm"
-    >
+    <div v-if="!contractCounters && !nextEvent" class="text-center py-4 text-gray-400 text-sm">
       <p>Nenhum evento agendado</p>
       <p class="text-xs mt-1 text-gray-500">
         Gere contratos para ver contadores
@@ -61,36 +43,25 @@
     <!-- Controle de tempo -->
     <div class="mt-4 pt-4 border-t border-gray-700">
       <!-- Status da timeline -->
-      <div
-        v-if="!currentDate"
-        class="mb-3 p-3 bg-red-900/30 border border-red-800/30 rounded-lg"
-      >
+      <div v-if="!currentDate" class="mb-3 p-3 bg-red-900/30 border border-red-800/30 rounded-lg">
         <div class="flex items-center justify-between">
           <span class="text-sm text-red-300">Timeline não inicializada</span>
-          <button
-            @click="initializeTimeline"
-            class="text-xs bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 transition-colors"
-          >
+          <button @click="initializeTimeline"
+            class="text-xs bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 transition-colors">
             Inicializar
           </button>
         </div>
       </div>
 
       <div class="space-y-2">
-        <button
-          @click="handlePassDay"
-          :disabled="!currentDate"
-          class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors text-sm font-medium"
-        >
+        <button @click="handlePassDay" :disabled="!currentDate"
+          class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors text-sm font-medium">
           Passar 1 Dia
         </button>
 
-        <button
-          @click="handleGenerateContracts"
-          :disabled="!currentDate || !canGenerateContracts"
+        <button @click="handleGenerateContracts" :disabled="!currentDate || !canGenerateContracts"
           :title="canGenerateContracts ? 'Gerar contratos iniciais para esta guilda' : 'Esta guilda já teve contratos gerados. Use o sistema de timeline para novos contratos.'"
-          class="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors text-sm font-medium"
-        >
+          class="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors text-sm font-medium">
           Gerar Novos Contratos
         </button>
       </div>
