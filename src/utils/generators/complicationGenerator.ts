@@ -7,12 +7,20 @@
  * - Sistema de múltiplas rolagens que permite recursão infinita mas evita repetir opções
  */
 
-import { rollOnTable } from "@/utils/dice";
+import { rollOnTable } from "@/utils/tableRoller";
 import {
   rollMultipleWithCombining,
   createTextBasedRollAgainChecker,
 } from "@/utils/multiRollHandler";
-import type { Complication, Twist } from "@/types/contract";
+import type { 
+  Complication, 
+  Twist,
+  TwistWho,
+  TwistWhat,
+  TwistBut,
+  TwistAndFirst,
+  TwistAndSecond
+} from "@/types/contract";
 import {
   COMPLICATION_TYPES_TABLE,
   COMPLICATION_DETAIL_TABLES,
@@ -38,10 +46,7 @@ import {
  */
 export function generateComplication(): Complication {
   // 1. Rolar o tipo de complicação (1d20)
-  const categoryResult = rollOnTable({
-    table: COMPLICATION_TYPES_TABLE,
-    context: "Tipo de Complicação",
-  });
+  const categoryResult = rollOnTable(COMPLICATION_TYPES_TABLE);
   const category = categoryResult.result;
 
   // 2. Usar sistema de múltiplas rolagens no detalhamento
@@ -73,10 +78,7 @@ export function generateComplication(): Complication {
  */
 export function generateTwist(): Twist {
   // 1. Verificar se haverá reviravolta (1d20, apenas 19-20 = Sim)
-  const chanceResult = rollOnTable({
-    table: TWIST_CHANCE_TABLE,
-    context: "Chance de Reviravolta",
-  });
+  const chanceResult = rollOnTable(TWIST_CHANCE_TABLE);
   const hasTwist = chanceResult.result;
 
   if (!hasTwist) {
@@ -87,46 +89,31 @@ export function generateTwist(): Twist {
   }
 
   // 2. Gerar elementos da reviravolta conforme tabelas do arquivo base
-  const whoResult = rollOnTable({
-    table: TWIST_WHO_TABLE,
-    context: "Quem na Reviravolta",
-  });
-  const whatResult = rollOnTable({
-    table: TWIST_WHAT_TABLE,
-    context: "Na verdade...",
-  });
-  const butResult = rollOnTable({
-    table: TWIST_BUT_TABLE,
-    context: "Mas...",
-  });
+  const whoResult = rollOnTable(TWIST_WHO_TABLE);
+  const whatResult = rollOnTable(TWIST_WHAT_TABLE);
+  const butResult = rollOnTable(TWIST_BUT_TABLE);
 
   const who = whoResult.result;
   const what = whatResult.result;
   const but = butResult.result;
 
   // 3. Gerar elementos "E..."
-  const andFirstResult = rollOnTable({
-    table: TWIST_AND_FIRST_TABLE,
-    context: "E... (primeira tabela)",
-  });
+  const andFirstResult = rollOnTable(TWIST_AND_FIRST_TABLE);
   const andFirst = andFirstResult.result;
 
-  const andSecondResult = rollOnTable({
-    table: TWIST_AND_SECOND_TABLE,
-    context: "E... (segunda tabela)",
-  });
+  const andSecondResult = rollOnTable(TWIST_AND_SECOND_TABLE);
   const andSecond = andSecondResult.result;
 
   // 4. Montar descrição completa com todos os elementos
-  const description = `REVIRAVOLTA: ${who} ${what.toLowerCase()}, mas ${but.toLowerCase()}. E ${andFirst.toLowerCase()}. E ${andSecond.toLowerCase()}.`;
+  const description = `REVIRAVOLTA: ${who} ${(what as string).toLowerCase()}, mas ${(but as string).toLowerCase()}. E ${(andFirst as string).toLowerCase()}. E ${(andSecond as string).toLowerCase()}.`;
 
   return {
     hasTwist: true,
-    who,
-    what,
-    but,
-    andFirst,
-    andSecond,
+    who: who as TwistWho,
+    what: what as TwistWhat,
+    but: but as TwistBut,
+    andFirst: andFirst as TwistAndFirst,
+    andSecond: andSecond as TwistAndSecond,
     description,
   };
 }
