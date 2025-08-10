@@ -195,20 +195,21 @@ export class ContractGenerator {
     const difficulty =
       difficultyEntry?.result.difficulty || ContractDifficulty.MEDIO;
 
-    // 4. Calcular valor aplicando todos os modificadores, incluindo dificuldade
+    // 4. Gerar contratante primeiro para saber que tipo de modificadores aplicar
+    const contractor = this.generateContractor(guild);
+
+    // 5. Calcular valor aplicando modificadores baseados no tipo de contratante
     const valueCalculationResult = this.calculateContractValue(
       baseRoll,
       guild,
+      contractor.type,
       difficultyEntry,
       distanceRoll
     );
     const { contractValue, prerequisites, clauses } = valueCalculationResult;
 
-    // 5. Gerar deadline usando a tabela
+    // 6. Gerar deadline usando a tabela
     const deadline = this.generateDeadline();
-
-    // 6. Gerar contratante seguindo as regras do markdown
-    const contractor = this.generateContractor(guild);
 
     // 7. Gerar objetivo conforme tabela do markdown
     const objective = this.generateObjective();
@@ -316,21 +317,22 @@ export class ContractGenerator {
     const difficulty =
       difficultyEntry?.result.difficulty || ContractDifficulty.MEDIO;
 
-    // 4. Calcular valor aplicando o bônus de rolagem de recompensa
+    // 4. Gerar contratante primeiro para saber que tipo de modificadores aplicar
+    const contractor = this.generateContractor(guild);
+
+    // 5. Calcular valor aplicando o bônus de rolagem de recompensa
     const valueCalculationResult = this.calculateContractValueWithRewardBonus(
       baseRoll,
       guild,
+      contractor.type,
       difficultyEntry,
       distanceRoll,
       rewardRollBonus
     );
     const { contractValue, prerequisites, clauses } = valueCalculationResult;
 
-    // 5. Gerar deadline usando a tabela
+    // 6. Gerar deadline usando a tabela
     const deadline = this.generateDeadline();
-
-    // 6. Gerar contratante seguindo as regras do markdown
-    const contractor = this.generateContractor(guild);
 
     // 7. Gerar objetivo conforme tabela do markdown
     const objective = this.generateObjective();
@@ -696,15 +698,17 @@ export class ContractGenerator {
   /**
    * Calcula o valor do contrato
    * 1. Rola 1d100 para valor base na tabela
-   * 2. Calcula modificadores que afetam a rolagem
-   * 3. Gera pré-requisitos e cláusulas baseados no valor preliminar
-   * 4. Aplica modificadores à rolagem
-   * 5. Consulta a tabela novamente com as rolagens modificadas
-   * 6. Aplica multiplicadores de dificuldade
+   * 2. Gera contratante para saber que tipo de modificadores aplicar
+   * 3. Calcula modificadores que afetam a rolagem baseado no contratante
+   * 4. Gera pré-requisitos e cláusulas baseados no valor preliminar
+   * 5. Aplica modificadores à rolagem
+   * 6. Consulta a tabela novamente com as rolagens modificadas
+   * 7. Aplica multiplicadores de dificuldade
    */
   private static calculateContractValue(
     baseRoll: number,
     guild: Guild,
+    contractorType: ContractorType,
     difficultyEntry?: TableEntry<{
       difficulty: ContractDifficulty;
       experienceMultiplier: number;
@@ -727,8 +731,8 @@ export class ContractGenerator {
       baseValue = calculateExtendedValue(baseRoll, baseValue);
     }
 
-    // 2. Calcular todos os modificadores que afetam a rolagem
-    const rollModifiers = this.calculateRollModifiers(guild, distanceRoll);
+    // 2. Calcular todos os modificadores que afetam a rolagem baseado no tipo de contratante
+    const rollModifiers = this.calculateRollModifiers(guild, contractorType, distanceRoll);
 
     // 3. Gerar pré-requisitos e cláusulas baseados no valor base preliminar
     // Isso nos permite calcular o bônus que será aplicado à rolagem
@@ -824,6 +828,7 @@ export class ContractGenerator {
   static calculateContractValueWithRewardBonus(
     baseRoll: number,
     guild: Guild,
+    contractorType: ContractorType,
     difficultyEntry?: TableEntry<{
       difficulty: ContractDifficulty;
       experienceMultiplier: number;
@@ -847,8 +852,8 @@ export class ContractGenerator {
       baseValue = calculateExtendedValue(baseRoll, baseValue);
     }
 
-    // 2. Calcular todos os modificadores que afetam a rolagem
-    const rollModifiers = this.calculateRollModifiers(guild, distanceRoll);
+    // 2. Calcular todos os modificadores que afetam a rolagem baseado no tipo de contratante
+    const rollModifiers = this.calculateRollModifiers(guild, contractorType, distanceRoll);
 
     // 3. Gerar pré-requisitos e cláusulas baseados no valor base preliminar
     // Isso nos permite calcular o bônus que será aplicado à rolagem
@@ -946,6 +951,7 @@ export class ContractGenerator {
    */
   private static calculateRollModifiers(
     guild: Guild,
+    contractorType: ContractorType,
     distanceRoll?: number
   ): {
     experienceModifier: number;
@@ -971,31 +977,44 @@ export class ContractGenerator {
     experienceModifier += distanceModifier;
     rewardModifier += distanceModifier;
 
-    // 2. Modificadores por relação com população
-    const populationRelation = this.mapRelationLevelToString(
-      guild.relations.population
-    );
-    const populationMods = POPULATION_RELATION_MODIFIERS[
-      populationRelation
-    ] || {
-      valueModifier: 0,
-      rewardModifier: 0,
-    };
-    experienceModifier += populationMods.valueModifier;
-    rewardModifier += populationMods.rewardModifier;
+    // 2. Modificadores por relação com população (APENAS para contratos do tipo POVO)
+    let populationValueModifier = 0;
+    let populationRewardModifier = 0;
+    if (contractorType === ContractorType.POVO) {
+      const populationRelation = this.mapRelationLevelToString(
+        guild.relations.population
+      );
+      const populationMods = POPULATION_RELATION_MODIFIERS[
+        populationRelation
+      ] || {
+        valueModifier: 0,
+        rewardModifier: 0,
+      };
+      populationValueModifier = populationMods.valueModifier;
+      populationRewardModifier = populationMods.rewardModifier;
+      experienceModifier += populationMods.valueModifier;
+      rewardModifier += populationMods.rewardModifier;
+    }
 
-    // 3. Modificadores por relação com governo
-    const governmentRelation = this.mapRelationLevelToString(
-      guild.relations.government
-    );
-    const governmentMods = GOVERNMENT_RELATION_MODIFIERS[
-      governmentRelation
-    ] || {
-      valueModifier: 0,
-      rewardModifier: 0,
-    };
-    experienceModifier += governmentMods.valueModifier;
-    rewardModifier += governmentMods.rewardModifier;
+    // 3. Modificadores por relação com governo (APENAS para contratos do tipo GOVERNO)
+    let governmentValueModifier = 0;
+    let governmentRewardModifier = 0;
+    if (contractorType === ContractorType.GOVERNO) {
+      const governmentRelation = this.mapRelationLevelToString(
+        guild.relations.government
+      );
+      const governmentMods = GOVERNMENT_RELATION_MODIFIERS[
+        governmentRelation
+      ] || {
+        valueModifier: 0,
+        rewardModifier: 0,
+      };
+      governmentValueModifier = governmentMods.valueModifier;
+      governmentRewardModifier = governmentMods.rewardModifier;
+      experienceModifier += governmentMods.valueModifier;
+      rewardModifier += governmentMods.rewardModifier;
+    }
+    // Nota: Instituições de Ofício são neutras (sem modificadores de relação)
 
     // 4. Modificadores de funcionários (aplicados apenas à rolagem de recompensa)
     let staffPreparation = 0;
@@ -1012,10 +1031,10 @@ export class ContractGenerator {
       experienceModifier,
       rewardModifier,
       distance: distanceModifier,
-      populationRelationValue: populationMods.valueModifier,
-      populationRelationReward: populationMods.rewardModifier,
-      governmentRelationValue: governmentMods.valueModifier,
-      governmentRelationReward: governmentMods.rewardModifier,
+      populationRelationValue: populationValueModifier,
+      populationRelationReward: populationRewardModifier,
+      governmentRelationValue: governmentValueModifier,
+      governmentRelationReward: governmentRewardModifier,
       staffPreparation,
     };
   }
