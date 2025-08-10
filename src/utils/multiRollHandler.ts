@@ -42,46 +42,38 @@ export interface MultiRollResult<T> {
 }
 
 /**
- * Executa múltiplas rolagens permitindo recursão teórica infinita,
- * mas coletando apenas resultados únicos (não-repeat)
+ * Executa múltiplas rolagens quando "Role duas vezes e use ambos" é obtido
  * 
  * Lógica:
  * 1. Rola na tabela
- * 2. Se não for "rolar duas vezes", adiciona aos resultados (se único)
- * 3. Se for "rolar duas vezes", incrementa contador e rola novamente
- * 4. Continua até coletar todos os resultados únicos possíveis ou atingir limite
+ * 2. Se for "rolar duas vezes": incrementa contador e faz UMA rolagem adicional 
+ * 3. Se não for "rolar duas vezes": adiciona aos resultados únicos
+ * 4. Para quando não há mais rolagens pendentes
  * 
  * @param config Configuração da rolagem múltipla
  * @returns Resultado com todos os valores únicos coletados
  */
 export function handleMultipleRolls<T>(config: MultiRollConfig<T>): MultiRollResult<T> {
-  const { table, shouldRollAgain, context = 'Multi-roll', maxUniqueResults } = config;
-  
-  // Calcular quantos resultados únicos são possíveis (excluindo "rolar duas vezes")
-  const uniqueNonRollAgainResults = table
-    .map(entry => entry.result)
-    .filter((result, index, array) => 
-      !shouldRollAgain(result) && array.indexOf(result) === index
-    );
-  
-  const maxPossibleUnique = maxUniqueResults || uniqueNonRollAgainResults.length;
+  const { table, shouldRollAgain, context = 'Multi-roll', maxUniqueResults = 19 } = config;
   
   const collectedResults = new Set<T>();
   let rollAgainCount = 0;
   let totalRolls = 0;
+  let pendingRolls = 1; // Começa com uma rolagem para fazer
   
-  // Continua rolando até coletar todos os resultados únicos possíveis
-  while (collectedResults.size < maxPossibleUnique) {
+  while (pendingRolls > 0 && collectedResults.size < maxUniqueResults) {
     totalRolls++;
+    pendingRolls--; // Consome uma rolagem pendente
     
     const rollResult = rollOnTable(table, [], `${context} - Rolagem ${totalRolls}`);
     
     if (shouldRollAgain(rollResult.result)) {
-      // É "rolar duas vezes" - incrementa contador e continua
+      // É "rolar duas vezes" - incrementa contador e agenda DUAS novas rolagens
       rollAgainCount++;
+      pendingRolls += 2;
       
-      // Proteção contra loop infinito teórico (caso extremamente raro)
-      if (rollAgainCount > 1000) {
+      // Proteção contra loop infinito teórico
+      if (rollAgainCount > 50) {
         // eslint-disable-next-line no-console
         console.warn(`[MultiRollHandler] Limite de segurança atingido após ${rollAgainCount} rolagens "rolar duas vezes"`);
         break;
