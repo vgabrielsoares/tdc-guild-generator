@@ -371,6 +371,7 @@
                   <ContractValue
                     :value="contract.value"
                     :difficulty="contract.difficulty"
+                    :contractor-type="contract.contractorType"
                     :payment-type="contract.paymentType"
                     size="lg"
                   />
