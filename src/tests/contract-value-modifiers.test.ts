@@ -35,8 +35,8 @@ describe("Contract Value Modifiers - Fixed Roll Logic", () => {
         frequency: VisitorLevel.NEM_MUITO_NEM_POUCO,
       },
       relations: {
-        population: RelationLevel.BOA,
-        government: RelationLevel.PESSIMA,
+        population: RelationLevel.PESSIMA, // +4 para governo
+        government: RelationLevel.EXCELENTE, // +5 para governo
       },
       resources: {
         level: ResourceLevel.SUFICIENTES,
@@ -86,16 +86,16 @@ describe("Contract Value Modifiers - Fixed Roll Logic", () => {
       });
 
       // Verificar modificadores individualmente
-      expect(contract.value.modifiers.populationRelationValue).toBe(1); // BOA = +1
-      expect(contract.value.modifiers.governmentRelationValue).toBe(-25); // PÉSSIMA = -25
+      expect(contract.value.modifiers.populationRelationValue).toBe(0); // Não aplicado para contrato do governo
+      expect(contract.value.modifiers.governmentRelationValue).toBe(5); // EXCELENTE = +5
       expect(contract.value.modifiers.distance).toBe(0); // Rolagem 12 = 0
 
       // Com os modificadores calculados:
-      // XP: 40 + 1(população) + (-25)(governo) + 0(distância) = 16 → valor 125
-      expect(contract.value.experienceValue).toBe(125);
+      // XP: 40 + 0(população) + 5(governo) + 0(distância) = 45 → valor 600
+      expect(contract.value.experienceValue).toBe(600);
 
-      // Recompensa: 40 + (-5)(população) + (-25)(governo) + (-2)(funcionários) + 0(distância) + 10(bônus) = 18 → valor 125
-      expect(contract.value.rewardValue).toBe(125);
+      // Recompensa: 40 + 0(população) + 5(governo) + (-2)(funcionários) + 0(distância) + 10(bônus) = 53 → valor 1300
+      expect(contract.value.rewardValue).toBe(1300);
       expect(contract.value.modifiers.requirementsAndClauses).toBe(10);
 
       // Verificar que temos os pré-requisitos e cláusulas esperados
