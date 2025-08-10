@@ -991,6 +991,7 @@ export const useContractsStore = defineStore("contracts", () => {
       ContractGenerator.calculateContractValueWithRewardBonus(
         contract.generationData.baseRoll,
         guild,
+        contract.contractorType,
         difficultyEntry,
         contract.generationData.distanceRoll,
         currentBonusTotal
