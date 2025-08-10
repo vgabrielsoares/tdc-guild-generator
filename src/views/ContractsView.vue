@@ -204,7 +204,7 @@ import { ref, computed, onMounted } from "vue";
 import { useContractsStore } from "@/stores/contracts";
 import { useGuildStore } from "@/stores/guild";
 import { useTimelineIntegration } from "@/composables/useTimelineIntegration";
-import type { Contract } from "@/types/contract";
+import type { Contract, ContractStatus, ContractDifficulty, ContractorType } from "@/types/contract";
 import ContractList from "@/components/contracts/ContractList.vue";
 import ContractFilters from "@/components/contracts/ContractFilters.vue";
 import ContractDetails from "@/components/contracts/ContractDetails.vue";
@@ -266,61 +266,16 @@ const guild = computed(() => guildStore.currentGuild);
 
 // Contratos filtrados com base nos filtros locais
 const filteredContracts = computed(() => {
-  let result = contracts.value;
+  // Sincronizar filtros locais com o store (com conversão de tipos adequada)
+  contractsStore.setFilter("status", currentFilters.value.status as ContractStatus | null || null);
+  contractsStore.setFilter("difficulty", currentFilters.value.difficulty as ContractDifficulty | null || null);
+  contractsStore.setFilter("contractor", currentFilters.value.contractor as ContractorType | null || null);
+  contractsStore.setFilter("searchText", currentFilters.value.searchText);
+  contractsStore.setFilter("minValue", currentFilters.value.minValue);
+  contractsStore.setFilter("maxValue", currentFilters.value.maxValue);
+  contractsStore.setFilter("hasDeadline", currentFilters.value.hasDeadline);
 
-  // Filtro por status
-  if (currentFilters.value.status) {
-    result = result.filter((c) => c.status === currentFilters.value.status);
-  }
-
-  // Filtro por dificuldade
-  if (currentFilters.value.difficulty) {
-    result = result.filter(
-      (c) => c.difficulty === currentFilters.value.difficulty
-    );
-  }
-
-  // Filtro por contratante
-  if (currentFilters.value.contractor) {
-    result = result.filter(
-      (c) => c.contractorType === currentFilters.value.contractor
-    );
-  }
-
-  // Filtro por texto de busca
-  if (currentFilters.value.searchText) {
-    const searchLower = currentFilters.value.searchText.toLowerCase().trim();
-    result = result.filter(
-      (c) =>
-        c.title.toLowerCase().includes(searchLower) ||
-        c.description.toLowerCase().includes(searchLower) ||
-        c.objective?.description.toLowerCase().includes(searchLower) ||
-        c.contractorName?.toLowerCase().includes(searchLower)
-    );
-  }
-
-  // Filtro por valor mínimo
-  if (currentFilters.value.minValue !== null) {
-    result = result.filter(
-      (c) => c.value.finalGoldReward >= currentFilters.value.minValue!
-    );
-  }
-
-  // Filtro por valor máximo
-  if (currentFilters.value.maxValue !== null) {
-    result = result.filter(
-      (c) => c.value.finalGoldReward <= currentFilters.value.maxValue!
-    );
-  }
-
-  // Filtro por prazo
-  if (currentFilters.value.hasDeadline !== null) {
-    if (currentFilters.value.hasDeadline) {
-      result = result.filter((c) => c.deadline.type !== "Sem prazo");
-    } else {
-      result = result.filter((c) => c.deadline.type === "Sem prazo");
-    }
-  }
+  const result = contractsStore.filteredContracts;
 
   // Ordenar por data de criação (mais recente primeiro)
   const sortedResult = [...result].sort((a, b) => {
