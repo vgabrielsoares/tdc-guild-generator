@@ -1,5 +1,6 @@
 import { rollDice } from "../dice";
 import { rollOnTable } from "../tableRoller";
+import { handleMultipleRolls } from "../multiRollHandler";
 import type { TableEntry } from "@/types/tables";
 import { addDays } from "../date-utils";
 import {
@@ -1282,62 +1283,25 @@ export class ContractGenerator {
   }
 
   /**
-   * Gera objetivo principal e especificações
+   * Gera objetivo principal e especificações usando multiRollHandler para tratar "role duas vezes"
    */
   private static generateObjective(): ContractObjective {
-    // 1. Primeira rolagem para objetivo principal
-    const firstRoll = rollOnTable(
-      MAIN_OBJECTIVE_TABLE,
-      [],
-      "Objetivos Principais"
-    );
+    // Usar o sistema multiRollHandler para tratar "role duas vezes" corretamente
+    const objectiveResult = handleMultipleRolls({
+      table: MAIN_OBJECTIVE_TABLE,
+      shouldRollAgain: (result: { category: ObjectiveCategory; name: string; description: string }) => shouldRollTwiceForObjective(result),
+      context: "Objetivos Principais",
+      maxUniqueResults: 5 // Máximo de 5 objetivos para evitar complexidade excessiva
+    });
 
-    // 2. Verificar se é "Role duas vezes e use ambos"
-    if (shouldRollTwiceForObjective(firstRoll.result)) {
-      // Rolar duas vezes para obter dois objetivos diferentes
-      let firstObjectiveRoll = rollOnTable(
-        MAIN_OBJECTIVE_TABLE,
-        [],
-        "Objetivos Principais"
-      );
-      let secondObjectiveRoll = rollOnTable(
-        MAIN_OBJECTIVE_TABLE,
-        [],
-        "Objetivos Principais"
-      );
-
-      // Garantir que não são iguais e que não são "Role duas vezes" novamente
-      let attempts = 0;
-      while (
-        (firstObjectiveRoll.result.description ===
-          secondObjectiveRoll.result.description ||
-          shouldRollTwiceForObjective(firstObjectiveRoll.result) ||
-          shouldRollTwiceForObjective(secondObjectiveRoll.result)) &&
-        attempts < 20
-      ) {
-        firstObjectiveRoll = rollOnTable(
-          MAIN_OBJECTIVE_TABLE,
-          [],
-          "Objetivos Principais"
-        );
-        secondObjectiveRoll = rollOnTable(
-          MAIN_OBJECTIVE_TABLE,
-          [],
-          "Objetivos Principais"
-        );
-        attempts++;
-      }
-
-      const firstObjective = firstObjectiveRoll.result;
-      const secondObjective = secondObjectiveRoll.result;
+    // Se temos múltiplos objetivos (resultado de "role duas vezes")
+    if (objectiveResult.results.length > 1) {
+      const firstObjective = objectiveResult.results[0];
+      const secondObjective = objectiveResult.results[1];
 
       // Gerar especificações para ambos os objetivos
-      const firstSpec = this.generateObjectiveSpecification(
-        firstObjective.category
-      );
-      const secondSpec = this.generateObjectiveSpecification(
-        secondObjective.category
-      );
+      const firstSpec = this.generateObjectiveSpecification(firstObjective.category);
+      const secondSpec = this.generateObjectiveSpecification(secondObjective.category);
 
       return {
         category: firstObjective.category,
@@ -1346,13 +1310,11 @@ export class ContractGenerator {
       };
     }
 
-    // 3. Objetivo único - usar o resultado da primeira rolagem
-    const objectiveEntry = firstRoll.result;
+    // Objetivo único
+    const objectiveEntry = objectiveResult.results[0];
 
-    // 4. Gerar especificação baseada na categoria
-    const specification = this.generateObjectiveSpecification(
-      objectiveEntry.category
-    );
+    // Gerar especificação baseada na categoria
+    const specification = this.generateObjectiveSpecification(objectiveEntry.category);
 
     return {
       category: objectiveEntry.category,
@@ -1362,20 +1324,27 @@ export class ContractGenerator {
   }
 
   /**
-   * Gera especificação do objetivo baseado na categoria usando as tabelas implementadas
+   * Gera especificação do objetivo baseado na categoria usando multiRollHandler
    */
   private static generateObjectiveSpecification(category: ObjectiveCategory): {
     target: string;
     description: string;
   } {
     const specTable = getObjectiveSpecificationTable(category);
-    const specResult = rollOnTable(specTable, [], "Especificação do Objetivo");
+    
+    // Usar multiRollHandler para tratar "role duas vezes" nas especificações
+    const specResult = handleMultipleRolls({
+      table: specTable,
+      shouldRollAgain: (result: { target: string; description: string; rollTwice?: boolean }) => 
+        shouldRollTwiceForSpecification(result),
+      context: `Especificação ${category}`,
+      maxUniqueResults: 5 // Máximo de 5 especificações
+    });
 
-    // Verificar se deve rolar duas vezes para a especificação
-    if (shouldRollTwiceForSpecification(specResult.result)) {
-      // Gerar duas especificações da mesma categoria
-      const firstSpec = this.generateSingleSpecification(category);
-      const secondSpec = this.generateSingleSpecification(category);
+    // Se temos múltiplas especificações (resultado de "role duas vezes")
+    if (specResult.results.length > 1) {
+      const firstSpec = specResult.results[0];
+      const secondSpec = specResult.results[1];
 
       return {
         target: `${firstSpec.target}, além disso ${secondSpec.target.toLowerCase()}`,
@@ -1383,25 +1352,8 @@ export class ContractGenerator {
       };
     }
 
-    return specResult.result;
-  }
-
-  /**
-   * Gera uma especificação individual para casos de "role duas vezes"
-   */
-  private static generateSingleSpecification(category: ObjectiveCategory): {
-    target: string;
-    description: string;
-  } {
-    const specTable = getObjectiveSpecificationTable(category);
-    let specResult;
-
-    do {
-      specResult = rollOnTable(specTable, [], "Especificação Individual");
-      // Evitar recursão infinita - se der "role duas vezes", rolar novamente
-    } while (specResult.result.rollTwice === true);
-
-    return specResult.result;
+    // Especificação única
+    return specResult.results[0];
   }
 
   /**
@@ -1700,210 +1652,19 @@ export class ContractGenerator {
   }
 
   /**
-   * Gera antagonista
+   * Gera antagonista usando multiRollHandler
    */
   private static generateAntagonist(): Antagonist {
-    // Rolar na tabela principal de tipos de antagonistas (1d20)
-    const antagonistTypeResult = rollOnTable(ANTAGONIST_TYPES_TABLE);
-
-    let antagonistTypes: string[] = [];
-
-    // Verificar se deve rolar duas vezes
-    if (shouldRollTwice(antagonistTypeResult.result)) {
-      // Rolar duas vezes e usar ambos
-      const firstRoll = rollOnTable(ANTAGONIST_TYPES_TABLE);
-      const secondRoll = rollOnTable(ANTAGONIST_TYPES_TABLE);
-      antagonistTypes = [firstRoll.result, secondRoll.result];
-    } else {
-      antagonistTypes = [antagonistTypeResult.result];
-    }
-
-    // Para simplicidade, usar apenas o primeiro tipo se houver múltiplos
-    const primaryType = antagonistTypes[0];
-
-    // Obter a tabela de detalhamento para este tipo
-    const detailTable = ANTAGONIST_DETAIL_TABLE_MAP[primaryType];
-    if (!detailTable) {
-      // Fallback para humanoide poderoso se a tabela não existir
-      return this.generateFallbackAntagonist();
-    }
-
-    // Rolar na tabela de detalhamento
-    const specificResult = rollOnTable(detailTable);
-
-    let specificTypes: string[] = [];
-
-    // Verificar se deve rolar duas vezes na tabela específica
-    if (shouldRollTwice(specificResult.result)) {
-      // Rolar duas vezes na tabela específica
-      const firstSpecific = rollOnTable(detailTable);
-      const secondSpecific = rollOnTable(detailTable);
-      specificTypes = [firstSpecific.result, secondSpecific.result];
-    } else {
-      specificTypes = [specificResult.result];
-    }
-
-    // Usar o primeiro tipo específico para criar o antagonista
-    const specificType = specificTypes[0];
-    const category = mapAntagonistTypeToCategory(primaryType);
-
-    return {
-      category,
-      specificType,
-      name: specificType,
-      description: this.generateAntagonistDescription(category, specificType),
-    };
+    return AntagonistGenerator.generateAntagonist();
   }
 
   /**
-   * Gera um antagonista fallback caso não encontre a tabela
-   */
-  private static generateFallbackAntagonist(): Antagonist {
-    return {
-      category: AntagonistCategory.HUMANOIDE_PODEROSO,
-      specificType: "Nobre",
-      name: "Nobre Corrupto",
-      description:
-        "Um membro da nobreza local tem interesse em impedir esta missão.",
-    };
-  }
-
-  /**
-   * Gera descrição para o antagonista baseado no tipo
-   */
-  private static generateAntagonistDescription(
-    category: AntagonistCategory,
-    specificType: string
-  ): string {
-    const descriptions: Record<AntagonistCategory, string> = {
-      [AntagonistCategory.HUMANOIDE_PODEROSO]: `Um ${specificType.toLowerCase()} poderoso que se opõe diretamente aos objetivos da missão.`,
-      [AntagonistCategory.ARTEFATO_MAGICO]: `Um ${specificType.toLowerCase()} que está causando problemas na região e precisa ser lidado.`,
-      [AntagonistCategory.ORGANIZACAO]: `Uma ${specificType.toLowerCase()} que tem interesses conflitantes com a missão.`,
-      [AntagonistCategory.PERIGO_IMINENTE]: `${specificType} representam uma ameaça direta que deve ser enfrentada.`,
-      [AntagonistCategory.ENTIDADE_SOBRENATURAL]: `Um ${specificType.toLowerCase()} sobrenatural está interferindo na missão.`,
-      [AntagonistCategory.ANOMALIA]: `Uma ${specificType.toLowerCase()} está causando distúrbios na área.`,
-      [AntagonistCategory.DESASTRE_ACIDENTE]: `Um ${specificType.toLowerCase()} complica drasticamente a execução da missão.`,
-      [AntagonistCategory.CRISE]: `Uma ${specificType.toLowerCase()} está em andamento e afeta diretamente o contrato.`,
-      [AntagonistCategory.MISTERIO]: `Um ${specificType.toLowerCase()} envolve a missão e precisa ser desvendado.`,
-    };
-
-    return (
-      descriptions[category] ||
-      `Um antagonista do tipo ${specificType} está envolvido na missão.`
-    );
-  }
-
-  /**
-   * Gera complicações
+   * Gera complicações usando o complicationGenerator
    */
   private static generateComplications(): Complication[] {
-    const complications: Complication[] = [];
-
-    // Rolar na tabela de tipos de complicações (1d20)
-    const complicationTypeResult = rollOnTable(COMPLICATION_TYPES_TABLE);
-    const category = complicationTypeResult.result;
-
-    // Gerar descrição baseada na categoria
-    const specificDetail = this.generateComplicationDetail(category);
-    const description = this.generateComplicationDescription(
-      category,
-      specificDetail
-    );
-
-    complications.push({
-      category,
-      specificDetail,
-      description,
-    });
-
-    return complications;
-  }
-
-  /**
-   * Gera detalhe específico para uma complicação
-   */
-  private static generateComplicationDetail(
-    category: ComplicationCategory
-  ): string {
-    // Usar as tabelas de detalhamento implementadas
-    const detailTable = COMPLICATION_DETAIL_TABLES[category];
-
-    if (!detailTable) {
-      return "Complicação geral";
-    }
-
-    // Rolar na tabela de detalhes específicos (1d20)
-    const detailResult = rollOnTable(detailTable);
-    const details: string[] = [];
-
-    // Verificar se deve rolar duas vezes
-    if (detailResult.result === "Role duas vezes e use ambos") {
-      // Gerar dois detalhes separados
-      const firstDetail = this.generateSingleComplicationDetail(category);
-      const secondDetail = this.generateSingleComplicationDetail(category);
-
-      if (firstDetail) details.push(firstDetail);
-      if (secondDetail) details.push(secondDetail);
-
-      return details.length > 0 ? details.join(" e ") : "Complicação geral";
-    }
-
-    return detailResult.result;
-  }
-
-  /**
-   * Gera um único detalhe de complicação (para casos de "role duas vezes")
-   */
-  private static generateSingleComplicationDetail(
-    category: ComplicationCategory
-  ): string | null {
-    const detailTable = COMPLICATION_DETAIL_TABLES[category];
-
-    if (!detailTable) {
-      return null;
-    }
-
-    let detailResult;
-    do {
-      detailResult = rollOnTable(detailTable);
-    } while (detailResult.result === "Role duas vezes e use ambos");
-
-    return detailResult.result;
-  }
-
-  /**
-   * Gera descrição para uma complicação
-   */
-  private static generateComplicationDescription(
-    category: ComplicationCategory,
-    specificDetail: string
-  ): string {
-    const categoryDescriptions: Record<ComplicationCategory, string> = {
-      [ComplicationCategory.RECURSOS]:
-        "Uma complicação relacionada a recursos disponíveis afeta a missão",
-      [ComplicationCategory.VITIMAS]:
-        "Há vítimas ou pessoas inocentes envolvidas que precisam ser protegidas",
-      [ComplicationCategory.ORGANIZACAO]:
-        "Problemas organizacionais complicam a execução da missão",
-      [ComplicationCategory.MIRACULOSO]:
-        "Um evento miraculoso ou sobrenatural afeta a situação",
-      [ComplicationCategory.AMBIENTE_HOSTIL]:
-        "O ambiente se torna hostil e perigoso para a execução da missão",
-      [ComplicationCategory.INUSITADO]:
-        "Uma situação inusitada e inesperada surge durante a missão",
-      [ComplicationCategory.PROBLEMAS_DIPLOMATICOS]:
-        "Problemas diplomáticos complicam as negociações",
-      [ComplicationCategory.PROTECAO]:
-        "Algum tipo de proteção inesperada interfere na missão",
-      [ComplicationCategory.CONTRA_TEMPO_AMISTOSO]:
-        "Um contra-tempo aparentemente amistoso causa problemas",
-      [ComplicationCategory.ENCONTRO_HOSTIL]:
-        "Um encontro hostil inesperado complica a situação",
-    };
-
-    const baseDescription =
-      categoryDescriptions[category] || "Uma complicação afeta a missão";
-    return `${baseDescription}: ${specificDetail}`;
+    // Usar o complicationGenerator que já implementa corretamente o multiRollHandler
+    const complication = generateComplication();
+    return [complication];
   }
 
   /**
@@ -2343,90 +2104,46 @@ export class ContractGenerator {
       return allies; // Nenhum aliado aparecerá
     }
 
-    // 2. Determinar o tipo de aliado (1d20)
-    const allyTypeResult = rollOnTable(ALLY_TYPES_TABLE, [], "Tipo de Aliado");
-    const allyCategory = this.mapStringToAllyCategory(
-      allyTypeResult.result as string
-    );
+    // 2. Gerar tipos de aliados usando multiRollHandler
+    const allyTypesResult = handleMultipleRolls({
+      table: ALLY_TYPES_TABLE,
+      shouldRollAgain: (result) => String(result).includes("Role duas vezes"),
+      context: "Tipos de Aliados"
+    });
 
-    // 3. Determinar quando/como o aliado surgirá (1d20)
-    const timingResult = rollOnTable(
-      ALLY_APPEARANCE_TIMING_TABLE,
-      [],
-      "Tempo de Aparição"
-    );
-    const allyTiming = this.mapStringToAllyTiming(
-      timingResult.result as string
-    );
+    // 3. Gerar timing usando multiRollHandler
+    const timingResult = handleMultipleRolls({
+      table: ALLY_APPEARANCE_TIMING_TABLE,
+      shouldRollAgain: (result) => String(result).includes("Role duas vezes"),
+      context: "Timing de Aparição"
+    });
 
-    // 4. Gerar detalhes específicos do aliado
-    const allyDetails = this.generateAllyDetails(allyCategory);
+    // 4. Criar aliados para cada combinação de tipo e timing
+    for (let i = 0; i < Math.max(allyTypesResult.results.length, timingResult.results.length); i++) {
+      const allyTypeString = String(allyTypesResult.results[i % allyTypesResult.results.length]);
+      const timingString = String(timingResult.results[i % timingResult.results.length]);
+      
+      const allyCategory = this.mapStringToAllyCategory(allyTypeString);
+      const allyTiming = this.mapStringToAllyTiming(timingString);
 
-    // 5. Criar o objeto do aliado
-    const ally: Ally = {
-      category: allyCategory,
-      specificType: allyDetails.specificType,
-      name: allyDetails.name,
-      description: allyDetails.description,
-      timing: allyTiming,
-      powerLevel: allyDetails.powerLevel,
-      characteristics: allyDetails.characteristics,
-    };
+      // 5. Gerar detalhes específicos do aliado
+      const allyDetails = this.generateAllyDetails(allyCategory);
 
-    allies.push(ally);
+      // 6. Criar o objeto do aliado
+      const ally: Ally = {
+        category: allyCategory,
+        specificType: allyDetails.specificType,
+        name: allyDetails.name,
+        description: allyDetails.description,
+        timing: allyTiming,
+        powerLevel: allyDetails.powerLevel,
+        characteristics: allyDetails.characteristics,
+      };
 
-    // Verificar se precisa rolar duas vezes (resultado 20 nas tabelas)
-    if (
-      allyTypeResult.result === "Role duas vezes e use ambos" ||
-      timingResult.result === "Role duas vezes e use ambos"
-    ) {
-      // Gerar segundo aliado
-      const secondAlly = this.generateSingleAlly();
-      if (secondAlly) {
-        allies.push(secondAlly);
-      }
+      allies.push(ally);
     }
 
     return allies;
-  }
-
-  /**
-   * Gera um único aliado (usado para rolagens duplas)
-   */
-  private static generateSingleAlly(): Ally | null {
-    const allyTypeResult = rollOnTable(
-      ALLY_TYPES_TABLE,
-      [],
-      "Tipo de Aliado Individual"
-    );
-
-    // Evitar loops infinitos em rolagens duplas
-    if (allyTypeResult.result === "Role duas vezes e use ambos") {
-      return null;
-    }
-
-    const allyCategory = this.mapStringToAllyCategory(
-      allyTypeResult.result as string
-    );
-    const timingResult = rollOnTable(
-      ALLY_APPEARANCE_TIMING_TABLE,
-      [],
-      "Tempo de Aparição Individual"
-    );
-    const allyTiming = this.mapStringToAllyTiming(
-      timingResult.result as string
-    );
-    const allyDetails = this.generateAllyDetails(allyCategory);
-
-    return {
-      category: allyCategory,
-      specificType: allyDetails.specificType,
-      name: allyDetails.name,
-      description: allyDetails.description,
-      timing: allyTiming,
-      powerLevel: allyDetails.powerLevel,
-      characteristics: allyDetails.characteristics,
-    };
   }
 
   /**
@@ -2681,79 +2398,33 @@ export class ContractGenerator {
     // 3. Gerar detalhes específicos da consequência
     const detailTable = SEVERE_CONSEQUENCE_DETAIL_TABLES[consequenceCategory];
     if (detailTable) {
-      const detailResult = rollOnTable(
-        detailTable,
-        [],
-        "Detalhamento da Consequência"
-      );
-      const specificConsequence = detailResult.result as string;
+      // Usar multiRollHandler para tratar "Role duas vezes e use ambos"
+      const multiRollResult = handleMultipleRolls({
+        table: detailTable,
+        shouldRollAgain: (result) => String(result).includes("Role duas vezes"),
+        context: `Detalhamento da Consequência ${consequenceCategory}`
+      });
 
-      // 4. Criar o objeto da consequência
-      const consequence: SevereConsequence = {
-        category: consequenceCategory,
-        specificConsequence,
-        description: this.generateConsequenceDescription(
-          consequenceCategory,
-          specificConsequence
-        ),
-        affectsContractors: this.generateContractorConsequenceDescription(
-          consequenceCategory,
-          specificConsequence
-        ),
-      };
+      // 4. Criar as consequências
+      for (const specificConsequence of multiRollResult.results) {
+        const consequence: SevereConsequence = {
+          category: consequenceCategory,
+          specificConsequence: String(specificConsequence),
+          description: this.generateConsequenceDescription(
+            consequenceCategory,
+            String(specificConsequence)
+          ),
+          affectsContractors: this.generateContractorConsequenceDescription(
+            consequenceCategory,
+            String(specificConsequence)
+          ),
+        };
 
-      consequences.push(consequence);
-
-      // Verificar se precisa rolar duas vezes (resultado "Role duas vezes e use ambos")
-      if (specificConsequence === "Role duas vezes e use ambos") {
-        const secondConsequence = this.generateSingleSevereConsequence();
-        if (secondConsequence) {
-          consequences.push(secondConsequence);
-        }
+        consequences.push(consequence);
       }
     }
 
     return consequences;
-  }
-
-  /**
-   * Gera uma única consequência severa (usado para rolagens duplas)
-   */
-  private static generateSingleSevereConsequence(): SevereConsequence | null {
-    const typeResult = rollOnTable(
-      SEVERE_CONSEQUENCES_TYPES_TABLE,
-      [],
-      "Tipo de Consequência Severa"
-    );
-    const consequenceCategory = typeResult.result as SevereConsequenceCategory;
-
-    const detailTable = SEVERE_CONSEQUENCE_DETAIL_TABLES[consequenceCategory];
-    if (!detailTable) return null;
-
-    const detailResult = rollOnTable(
-      detailTable,
-      [],
-      "Detalhamento da Consequência"
-    );
-    const specificConsequence = detailResult.result as string;
-
-    // Evitar loops infinitos
-    if (specificConsequence === "Role duas vezes e use ambos") {
-      return null;
-    }
-
-    return {
-      category: consequenceCategory,
-      specificConsequence,
-      description: this.generateConsequenceDescription(
-        consequenceCategory,
-        specificConsequence
-      ),
-      affectsContractors: this.generateContractorConsequenceDescription(
-        consequenceCategory,
-        specificConsequence
-      ),
-    };
   }
 
   /**
@@ -2818,54 +2489,23 @@ export class ContractGenerator {
     // 3. Gerar detalhes específicos da recompensa
     const rewardDetail = this.generateRewardDetail(rewardType);
     if (rewardDetail) {
-      // Verificar se precisa rolar duas vezes antes de adicionar
-      if (rewardDetail.specificReward === "Role duas vezes e use ambos") {
-        // Substituir pela geração de duas recompensas reais
-        const firstReward = this.generateSingleAdditionalReward();
-        const secondReward = this.generateSingleAdditionalReward();
-
-        if (firstReward) rewards.push(firstReward);
-        if (secondReward) rewards.push(secondReward);
-      } else {
-        // Recompensa normal, adicionar diretamente
-        rewards.push(rewardDetail);
+      rewards.push(rewardDetail);
+      
+      // Se há resultados adicionais de rolagem múltipla, criar recompensas extras
+      if ('additionalResults' in rewardDetail) {
+        const additionalResults = (rewardDetail as AdditionalReward & { additionalResults: string[] }).additionalResults;
+        for (const additionalResult of additionalResults) {
+          rewards.push({
+            category: rewardDetail.category,
+            specificReward: additionalResult,
+            description: this.generateRewardDescription(rewardDetail.category, additionalResult),
+            isPositive: rewardDetail.isPositive,
+          });
+        }
       }
     }
 
     return rewards;
-  }
-
-  /**
-   * Gera uma única recompensa adicional (usado para rolagens duplas)
-   */
-  private static generateSingleAdditionalReward(): AdditionalReward | null {
-    // Tenta até 3 vezes para evitar loops infinitos
-    for (let attempts = 0; attempts < 3; attempts++) {
-      const typeResult = rollOnTable(
-        REWARD_TYPES_TABLE,
-        [],
-        "Tipo de Recompensa Adicional"
-      );
-      const rewardType = typeResult.result as string;
-
-      const rewardDetail = this.generateRewardDetail(rewardType);
-
-      // Se não é "Role duas vezes e use ambos", retorna a recompensa
-      if (
-        rewardDetail &&
-        rewardDetail.specificReward !== "Role duas vezes e use ambos"
-      ) {
-        return rewardDetail;
-      }
-    }
-
-    // Se ainda não conseguiu uma recompensa válida, força uma recompensa padrão
-    return {
-      category: RewardCategory.MORAL,
-      specificReward: "Satisfação pessoal",
-      description: "Benefício para a comunidade: Satisfação pessoal",
-      isPositive: true,
-    };
   }
 
   /**
@@ -2927,18 +2567,28 @@ export class ContractGenerator {
 
     if (!detailTable) return null;
 
-    const detailResult = rollOnTable(
-      detailTable,
-      [],
-      `Detalhamento ${rewardType}`
-    );
-    const specificReward = detailResult.result as string;
+    // Usar multiRollHandler para tratar "Role duas vezes e use ambos"
+    const multiRollResult = handleMultipleRolls({
+      table: detailTable,
+      shouldRollAgain: (result) => String(result).includes("Role duas vezes"),
+      context: `Detalhamento ${rewardType}`
+    });
+
+    // Se temos múltiplos resultados, retornar apenas o primeiro
+    // O sistema de recompensas tratará múltiplos resultados no nível superior
+    const specificReward = multiRollResult.results.length > 0 
+      ? String(multiRollResult.results[0])
+      : "Recompensa padrão";
 
     return {
       category,
       specificReward,
       description: this.generateRewardDescription(category, specificReward),
       isPositive,
+      // Se houve rolagem múltipla, guardar os resultados extras para processamento posterior
+      ...(multiRollResult.results.length > 1 && { 
+        additionalResults: multiRollResult.results.slice(1).map(String) 
+      })
     };
   }
 
