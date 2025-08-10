@@ -158,6 +158,13 @@ export interface Contract {
   contractorType: ContractorType;
   contractorName?: string;
 
+  // Contratante inusitado (se aplicável)
+  unusualContractor?: {
+    isUnusual: boolean;
+    description: string;
+    themeKeywords: ThemeKeyword[];
+  };
+
   // Objetivo e localização do contrato
   objective?: ContractObjective;
   location?: ContractLocation;
@@ -201,6 +208,9 @@ export interface Contract {
 
   // Recompensas adicionais
   additionalRewards?: AdditionalReward[];
+
+  // Palavras-chave temáticas para criatividade
+  themeKeywords?: ThemeKeyword[];
 
   // Datas importantes
   createdAt: Date;
@@ -303,6 +313,7 @@ export const ContractSchema = z.object({
   allies: z.array(z.lazy(() => AllySchema)),
   severeConsequences: z.array(z.lazy(() => SevereConsequenceSchema)),
   additionalRewards: z.array(z.lazy(() => AdditionalRewardSchema)).optional(),
+  themeKeywords: z.array(z.lazy(() => ThemeKeywordSchema)).optional(),
   createdAt: z.date(),
   expiresAt: z.date().optional(),
   completedAt: z.date().optional(),
