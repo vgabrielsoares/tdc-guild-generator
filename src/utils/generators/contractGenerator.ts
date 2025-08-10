@@ -419,6 +419,7 @@ export class ContractGenerator {
 
   /**
    * Calcula a quantidade de contratos gerados baseado no tamanho da sede
+   * usa o dado da sede + modificadores para consultar a tabela de quantidade
    */
   static calculateContractQuantity(
     config: ContractGenerationConfig
@@ -434,45 +435,50 @@ export class ContractGenerator {
       throw new Error(`Tamanho de estrutura não suportado: ${structureSize}`);
     }
 
-    // 2. Rolagem base usando o dado da sede
+    // 2. Rolagem base usando o dado da sede (para consultar a tabela de quantidade)
     const baseRoll = rollDice({ notation: diceExpression }).result;
-    let totalGenerated = baseRoll;
+    let tableRoll = baseRoll;
     details.push(`Base (${diceExpression}): ${baseRoll}`);
 
-    // 3. Aplicar modificadores por condição dos funcionários
+    // 3. Aplicar modificadores por condição dos funcionários ao resultado da rolagem
     let staffModifier = 0;
     const staffDescription = guild.staff.employees || "";
 
     if (staffDescription.toLowerCase().includes("experientes")) {
       staffModifier = STAFF_CONDITION_MODIFIERS["experientes"] || 1;
-      totalGenerated += staffModifier;
+      tableRoll += staffModifier;
       details.push(`Funcionários experientes: +${staffModifier}`);
     } else if (staffDescription.toLowerCase().includes("despreparados")) {
       staffModifier = STAFF_CONDITION_MODIFIERS["despreparados"] || -1;
-      totalGenerated += staffModifier;
+      tableRoll += staffModifier;
       details.push(`Funcionários despreparados: ${staffModifier}`);
     }
 
-    // 4. Rolar na tabela de quantidade disponível (1d20)
-    const quantityRoll = rollDice({ notation: "1d20" }).result;
+    details.push(`Rolagem final para tabela: ${tableRoll}`);
+
+    // 4. Usar essa rolagem modificada para consultar a tabela de quantidade disponível
     const quantityEntry = CONTRACT_QUANTITY_TABLE.find(
-      (entry) => quantityRoll >= entry.min && quantityRoll <= entry.max
+      (entry) => tableRoll >= entry.min && tableRoll <= entry.max
     );
 
+    let totalGenerated = 0;
     if (quantityEntry) {
       // Extrair apenas o dado da descrição (ex: "1d4 contratos" -> "1d4")
       const diceMatch = quantityEntry.result.match(/(\d+d\d+(?:\+\d+)?)/);
       if (diceMatch) {
         const quantityDice = diceMatch[1];
-        const additionalContracts = rollDice({ notation: quantityDice }).result;
-        totalGenerated += additionalContracts;
+        totalGenerated = rollDice({ notation: quantityDice }).result;
         details.push(
-          `Quantidade adicional (${quantityRoll}/20 = ${quantityDice}): +${additionalContracts}`
+          `Quantidade (${tableRoll}/20 = ${quantityDice}): ${totalGenerated}`
         );
       } else if (quantityEntry.result.includes("1 contrato")) {
-        totalGenerated += 1;
-        details.push(`Quantidade adicional (${quantityRoll}/20): +1 contrato`);
+        totalGenerated = 1;
+        details.push(`Quantidade (${tableRoll}/20): 1 contrato`);
       }
+    } else {
+      // Fallback se não encontrar entrada na tabela
+      totalGenerated = 1;
+      details.push(`Quantidade (fallback): 1 contrato`);
     }
 
     // 5. Aplicar redução por frequentadores
