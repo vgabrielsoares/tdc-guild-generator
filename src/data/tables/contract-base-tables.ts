@@ -10,7 +10,7 @@ import { ContractDifficulty } from "@/types/contract";
 // Mapeia o tamanho da sede para o dado usado em quantidade e prazos
 export const CONTRACT_DICE_BY_SIZE: Record<string, string> = {
   "Minúsculo (3m x 1,5m)": "1d4",
-  "Muito pequeno (4,5m x 3m)": "1d6", 
+  "Muito pequeno (4,5m x 3m)": "1d6",
   "Pequeno e modesto (6m x 6m)": "1d6+1",
   "Pequeno e confortável (7,5m x 6m, +1 andar)": "1d6+1",
   "Mediano e comum (9m x 9m)": "1d8+2",
@@ -27,8 +27,8 @@ export const CONTRACT_DICE_BY_SIZE: Record<string, string> = {
 
 // Modificadores aplicados ao resultado final da rolagem
 export const STAFF_CONDITION_MODIFIERS: Record<string, number> = {
-  "despreparados": -1,
-  "experientes": 1,
+  despreparados: -1,
+  experientes: 1,
 };
 
 // ===== QUANTIDADE DISPONÍVEL (1d20) =====
@@ -51,55 +51,65 @@ export const CONTRACT_QUANTITY_TABLE: TableEntry<string>[] = [
 // ===== REDUÇÃO POR FREQUENTADORES =====
 
 // Redução na quantidade de contratos baseada no nível de frequentadores
-export const CROWD_REDUCTION_TABLE: TableEntry<{ description: string; reduction: string }>[] = [
-  { 
-    min: 1, max: 1, 
-    result: { 
-      description: "Vazia", 
-      reduction: "Todos os contratos estão disponíveis" 
-    } 
+export const CROWD_REDUCTION_TABLE: TableEntry<{
+  description: string;
+  reduction: string;
+}>[] = [
+  {
+    min: 1,
+    max: 1,
+    result: {
+      description: "Vazia",
+      reduction: "Todos os contratos estão disponíveis",
+    },
   },
-  { 
-    min: 2, max: 2, 
-    result: { 
-      description: "Quase deserta", 
-      reduction: "-1 contrato" 
-    } 
+  {
+    min: 2,
+    max: 2,
+    result: {
+      description: "Quase deserta",
+      reduction: "-1 contrato",
+    },
   },
-  { 
-    min: 3, max: 3, 
-    result: { 
-      description: "Pouco movimentada", 
-      reduction: "-1d4 contratos" 
-    } 
+  {
+    min: 3,
+    max: 3,
+    result: {
+      description: "Pouco movimentada",
+      reduction: "-1d4 contratos",
+    },
   },
-  { 
-    min: 4, max: 4, 
-    result: { 
-      description: "Nem muito nem pouco", 
-      reduction: "-1d6+1 contratos" 
-    } 
+  {
+    min: 4,
+    max: 4,
+    result: {
+      description: "Nem muito nem pouco",
+      reduction: "-1d6+1 contratos",
+    },
   },
-  { 
-    min: 5, max: 5, 
-    result: { 
-      description: "Muito frequentada", 
-      reduction: "-2d6 contratos" 
-    } 
+  {
+    min: 5,
+    max: 5,
+    result: {
+      description: "Muito frequentada",
+      reduction: "-2d6 contratos",
+    },
   },
-  { 
-    min: 6, max: 6, 
-    result: { 
-      description: "Abarrotada", 
-      reduction: "-3d6 contratos" 
-    } 
+  {
+    min: 6,
+    max: 6,
+    result: {
+      description: "Abarrotada",
+      reduction: "-3d6 contratos",
+    },
   },
-  { 
-    min: 7, max: 7, 
-    result: { 
-      description: "Lotada", 
-      reduction: "-4d6 contratos" 
-    } 
+  {
+    min: 7,
+    max: 7,
+    result: {
+      description: "Lotada",
+      reduction: "-4d6 contratos",
+    },
   },
 ];
 
@@ -112,65 +122,75 @@ interface DeadlineResult {
 
 // Tabela de prazos para conclusão de contratos
 export const CONTRACT_DEADLINE_TABLE: TableEntry<DeadlineResult>[] = [
-  { 
-    min: 1, max: 1, 
-    result: { 
-      deadline: "1d4 dias"
-    } 
+  {
+    min: 1,
+    max: 1,
+    result: {
+      deadline: "1d4 dias",
+    },
   },
-  { 
-    min: 2, max: 2, 
-    result: { 
-      deadline: "3 dias"
-    } 
+  {
+    min: 2,
+    max: 2,
+    result: {
+      deadline: "3 dias",
+    },
   },
-  { 
-    min: 3, max: 3, 
-    result: { 
-      deadline: "1d4+2 dias"
-    } 
+  {
+    min: 3,
+    max: 3,
+    result: {
+      deadline: "1d4+2 dias",
+    },
   },
-  { 
-    min: 4, max: 4, 
-    result: { 
-      deadline: "1d6+1 dias"
-    } 
+  {
+    min: 4,
+    max: 4,
+    result: {
+      deadline: "1d6+1 dias",
+    },
   },
-  { 
-    min: 5, max: 5, 
-    result: { 
-      deadline: "1d8+2 dias"
-    } 
+  {
+    min: 5,
+    max: 5,
+    result: {
+      deadline: "1d8+2 dias",
+    },
   },
-  { 
-    min: 6, max: 6, 
-    result: { 
-      deadline: "1d12+2 dias"
-    } 
+  {
+    min: 6,
+    max: 6,
+    result: {
+      deadline: "1d12+2 dias",
+    },
   },
-  { 
-    min: 7, max: 8, 
-    result: { 
-      deadline: "1 semana"
-    } 
+  {
+    min: 7,
+    max: 8,
+    result: {
+      deadline: "1 semana",
+    },
   },
-  { 
-    min: 9, max: 9, 
-    result: { 
-      deadline: "1d4+1 semanas"
-    } 
+  {
+    min: 9,
+    max: 9,
+    result: {
+      deadline: "1d4+1 semanas",
+    },
   },
-  { 
-    min: 10, max: 10, 
-    result: { 
-      deadline: "1d20+2 dias"
-    } 
+  {
+    min: 10,
+    max: 10,
+    result: {
+      deadline: "1d20+2 dias",
+    },
   },
-  { 
-    min: 11, max: 999, 
-    result: { 
-      deadline: "Sem prazo"
-    } 
+  {
+    min: 11,
+    max: 999,
+    result: {
+      deadline: "Sem prazo",
+    },
   },
 ];
 
@@ -249,37 +269,41 @@ interface DifficultyResult {
 
 // Tabela de dificuldade
 export const CONTRACT_DIFFICULTY_TABLE: TableEntry<DifficultyResult>[] = [
-  { 
-    min: 1, max: 10, 
-    result: { 
+  {
+    min: 1,
+    max: 10,
+    result: {
       difficulty: ContractDifficulty.FACIL,
       experienceMultiplier: 1,
-      rewardMultiplier: 1
-    } 
+      rewardMultiplier: 1,
+    },
   },
-  { 
-    min: 11, max: 16, 
-    result: { 
+  {
+    min: 11,
+    max: 16,
+    result: {
       difficulty: ContractDifficulty.MEDIO,
       experienceMultiplier: 2,
-      rewardMultiplier: 1.3
-    } 
+      rewardMultiplier: 1.3,
+    },
   },
-  { 
-    min: 17, max: 19, 
-    result: { 
+  {
+    min: 17,
+    max: 19,
+    result: {
       difficulty: ContractDifficulty.DIFICIL,
       experienceMultiplier: 4,
-      rewardMultiplier: 2
-    } 
+      rewardMultiplier: 2,
+    },
   },
-  { 
-    min: 20, max: 20, 
-    result: { 
+  {
+    min: 20,
+    max: 20,
+    result: {
       difficulty: ContractDifficulty.MORTAL,
       experienceMultiplier: 8,
-      rewardMultiplier: 3
-    } 
+      rewardMultiplier: 3,
+    },
   },
 ];
 
@@ -294,85 +318,95 @@ interface DistanceResult {
 
 // Tabela de distância
 export const CONTRACT_DISTANCE_TABLE: TableEntry<DistanceResult>[] = [
-  { 
-    min: 1, max: 4, 
-    result: { 
+  {
+    min: 1,
+    max: 4,
+    result: {
       description: "Um hexágono ou menos",
       valueModifier: -20,
-      rewardModifier: -20
-    } 
+      rewardModifier: -20,
+    },
   },
-  { 
-    min: 5, max: 6, 
-    result: { 
+  {
+    min: 5,
+    max: 6,
+    result: {
       description: "Dois hexágonos ou menos",
       valueModifier: -15,
-      rewardModifier: -15
-    } 
+      rewardModifier: -15,
+    },
   },
-  { 
-    min: 7, max: 8, 
-    result: { 
+  {
+    min: 7,
+    max: 8,
+    result: {
       description: "Três hexágonos ou menos",
       valueModifier: -10,
-      rewardModifier: -10
-    } 
+      rewardModifier: -10,
+    },
   },
-  { 
-    min: 9, max: 10, 
-    result: { 
+  {
+    min: 9,
+    max: 10,
+    result: {
       description: "Dois hexágonos ou mais",
       valueModifier: -5,
-      rewardModifier: -5
-    } 
+      rewardModifier: -5,
+    },
   },
-  { 
-    min: 11, max: 12, 
-    result: { 
+  {
+    min: 11,
+    max: 12,
+    result: {
       description: "Três hexágonos ou mais",
       valueModifier: 0,
-      rewardModifier: 0
-    } 
+      rewardModifier: 0,
+    },
   },
-  { 
-    min: 13, max: 15, 
-    result: { 
+  {
+    min: 13,
+    max: 15,
+    result: {
       description: "Quatro hexágonos ou mais",
       valueModifier: 5,
-      rewardModifier: 5
-    } 
+      rewardModifier: 5,
+    },
   },
-  { 
-    min: 16, max: 17, 
-    result: { 
+  {
+    min: 16,
+    max: 17,
+    result: {
       description: "Cinco hexágonos ou mais",
       valueModifier: 10,
-      rewardModifier: 10
-    } 
+      rewardModifier: 10,
+    },
   },
-  { 
-    min: 18, max: 18, 
-    result: { 
+  {
+    min: 18,
+    max: 18,
+    result: {
       description: "Seis hexágonos ou mais",
       valueModifier: 12,
-      rewardModifier: 12
-    } 
+      rewardModifier: 12,
+    },
   },
-  { 
-    min: 19, max: 19, 
-    result: { 
+  {
+    min: 19,
+    max: 19,
+    result: {
       description: "Sete hexágonos ou mais",
       valueModifier: 14,
-      rewardModifier: 14
-    } 
+      rewardModifier: 14,
+    },
   },
-  { 
-    min: 20, max: 20, 
-    result: { 
+  {
+    min: 20,
+    max: 20,
+    result: {
       description: "Oito hexágonos ou mais",
       valueModifier: 20,
-      rewardModifier: 20
-    } 
+      rewardModifier: 20,
+    },
   },
 ];
 
@@ -385,31 +419,33 @@ interface RelationModifiers {
 }
 
 // Modificadores por relação com a população local
-export const POPULATION_RELATION_MODIFIERS: Record<string, RelationModifiers> = {
-  "Péssima": { valueModifier: 5, rewardModifier: -20 },
-  "Ruim": { valueModifier: -10, rewardModifier: -15 },
-  "Dividida": { valueModifier: -5, rewardModifier: -10 },
-  "Boa": { valueModifier: 1, rewardModifier: -5 },
-  "Muito boa": { valueModifier: 0, rewardModifier: 0 },
-  "Excelente": { valueModifier: 0, rewardModifier: 5 },
-};
+export const POPULATION_RELATION_MODIFIERS: Record<string, RelationModifiers> =
+  {
+    Péssima: { valueModifier: 5, rewardModifier: -20 },
+    Ruim: { valueModifier: -10, rewardModifier: -15 },
+    Dividida: { valueModifier: -5, rewardModifier: -10 },
+    Boa: { valueModifier: 1, rewardModifier: -5 },
+    "Muito boa": { valueModifier: 0, rewardModifier: 0 },
+    Excelente: { valueModifier: 0, rewardModifier: 5 },
+  };
 
 // Modificadores por relação com o governo local
-export const GOVERNMENT_RELATION_MODIFIERS: Record<string, RelationModifiers> = {
-  "Péssima": { valueModifier: -25, rewardModifier: -25 },
-  "Ruim": { valueModifier: -15, rewardModifier: -20 },
-  "Diplomática": { valueModifier: -10, rewardModifier: -15 },
-  "Boa": { valueModifier: -5, rewardModifier: -5 },
-  "Muito boa": { valueModifier: 5, rewardModifier: 5 },
-  "Excelente": { valueModifier: 5, rewardModifier: 10 },
-};
+export const GOVERNMENT_RELATION_MODIFIERS: Record<string, RelationModifiers> =
+  {
+    Péssima: { valueModifier: -25, rewardModifier: -25 },
+    Ruim: { valueModifier: -15, rewardModifier: -20 },
+    Diplomática: { valueModifier: -10, rewardModifier: -15 },
+    Boa: { valueModifier: -5, rewardModifier: -5 },
+    "Muito boa": { valueModifier: 5, rewardModifier: 5 },
+    Excelente: { valueModifier: 5, rewardModifier: 10 },
+  };
 
 // ===== MODIFICADORES POR PREPARAÇÃO DOS FUNCIONÁRIOS =====
 
 // Modificadores aplicados à rolagem d100 de recompensa (não ao valor final)
 export const STAFF_PREPARATION_ROLL_MODIFIERS: Record<string, number> = {
-  "despreparados": -2,
-  "experientes": 2,
+  despreparados: -2,
+  experientes: 2,
 };
 
 // ===== FUNCIONÁRIOS DIVERSOS - BÔNUS EM CONTRATOS =====
@@ -473,44 +509,63 @@ export function getStaffModifier(condition: string): number {
 
 /**
  * Calcula valor para rolagem 101+
- * 
+ *
  * A regra "101+ | Valor anterior * 1,1" significa que devemos:
  * 1. Encontrar o valor da rolagem 100 na tabela (considerando modificadores)
  * 2. Para cada ponto acima de 100, multiplicar por 1,1
- * 
+ *
  * Por exemplo:
  * - Rolagem 101: valor da rolagem 100 * 1,1
  * - Rolagem 102: (valor da rolagem 100 * 1,1) * 1,1
  * - E assim por diante...
  */
-export function calculateExtendedValue(roll: number, baseValue: number): number {
+export function calculateExtendedValue(
+  roll: number,
+  baseValue: number
+): number {
   if (roll <= 100) return baseValue;
-  
+
   // Encontrar o valor correto da rolagem 100 na tabela
-  const value100Entry = CONTRACT_VALUE_TABLE.find(entry => entry.min === 100 && entry.max === 100);
+  const value100Entry = CONTRACT_VALUE_TABLE.find(
+    (entry) => entry.min === 100 && entry.max === 100
+  );
   let currentValue = value100Entry?.result || 50000;
-  
+
   // Aplicar multiplicação por 1.1 para cada ponto acima de 100
   const multiplications = roll - 100;
   for (let i = 0; i < multiplications; i++) {
     currentValue = Math.floor(currentValue * 1.1);
   }
-  
+
   return currentValue;
 }
 
 /**
  * Obtém modificadores de relação com a população
  */
-export function getPopulationRelationModifiers(relation: string): RelationModifiers {
-  return POPULATION_RELATION_MODIFIERS[relation] || { valueModifier: 0, rewardModifier: 0 };
+export function getPopulationRelationModifiers(
+  relation: string
+): RelationModifiers {
+  return (
+    POPULATION_RELATION_MODIFIERS[relation] || {
+      valueModifier: 0,
+      rewardModifier: 0,
+    }
+  );
 }
 
 /**
  * Obtém modificadores de relação com o governo
  */
-export function getGovernmentRelationModifiers(relation: string): RelationModifiers {
-  return GOVERNMENT_RELATION_MODIFIERS[relation] || { valueModifier: 0, rewardModifier: 0 };
+export function getGovernmentRelationModifiers(
+  relation: string
+): RelationModifiers {
+  return (
+    GOVERNMENT_RELATION_MODIFIERS[relation] || {
+      valueModifier: 0,
+      rewardModifier: 0,
+    }
+  );
 }
 
 /**

@@ -377,18 +377,18 @@ const highRewardCount = computed(() => {
       return contractHasDeadline === hasDeadline;
     });
   }
-  
+
   const filtered = contracts.filter(c => c.value.finalGoldReward >= 100).length;
   return { total, filtered };
 });
 
 const dangerousCount = computed(() => {
-  const total = props.contracts.filter(c => 
+  const total = props.contracts.filter(c =>
     [ContractDifficulty.DIFICIL, ContractDifficulty.MORTAL].includes(c.difficulty)
   ).length;
   // Se filtro de dificuldade conflita
-  if (props.filters.difficulty && 
-      ![ContractDifficulty.DIFICIL, ContractDifficulty.MORTAL].includes(props.filters.difficulty as ContractDifficulty)) {
+  if (props.filters.difficulty &&
+    ![ContractDifficulty.DIFICIL, ContractDifficulty.MORTAL].includes(props.filters.difficulty as ContractDifficulty)) {
     return { total, filtered: 0 };
   }
   // Aplicar outros filtros
@@ -405,11 +405,11 @@ const formatQuickFilterCount = (countObj: { total: number; filtered: number }): 
   return `(${countObj.filtered}/${countObj.total})`;
 };
 
-const contractsWithDeadline = computed(() => 
+const contractsWithDeadline = computed(() =>
   props.contracts.filter(c => c.deadline.type !== DeadlineType.SEM_PRAZO).length
 );
 
-const contractsWithoutDeadline = computed(() => 
+const contractsWithoutDeadline = computed(() =>
   props.contracts.filter(c => c.deadline.type === DeadlineType.SEM_PRAZO).length
 );
 
@@ -435,34 +435,34 @@ const hasActiveFilters = computed(() => {
 
 const activeFilters = computed(() => {
   const filters = [];
-  
+
   if (props.filters.status) {
     filters.push({ key: 'status', label: `Status: ${props.filters.status}` });
   }
-  
+
   if (props.filters.difficulty) {
     filters.push({ key: 'difficulty', label: `Dificuldade: ${props.filters.difficulty}` });
   }
-  
+
   if (props.filters.contractor) {
     filters.push({ key: 'contractor', label: `Contratante: ${props.filters.contractor}` });
   }
-  
+
   if (props.filters.searchText) {
     filters.push({ key: 'searchText', label: `Busca: "${props.filters.searchText}"` });
   }
-  
+
   if (props.filters.minValue !== null || props.filters.maxValue !== null) {
     const min = props.filters.minValue ?? 0;
     const max = props.filters.maxValue ?? '∞';
     filters.push({ key: 'valueRange', label: `Valor: ${min} - ${max} PO$` });
   }
-  
+
   if (props.filters.hasDeadline !== null) {
     const label = props.filters.hasDeadline ? 'Com prazo' : 'Sem prazo';
     filters.push({ key: 'hasDeadline', label: `Prazo: ${label}` });
   }
-  
+
   return filters;
 });
 
@@ -515,7 +515,7 @@ function clearAllFilters() {
 function applyQuickFilter(filterType: string) {
   // Limpar filtros primeiro
   emit('clear-filters');
-  
+
   // Aplicar filtro específico
   switch (filterType) {
     case 'available':
@@ -538,10 +538,10 @@ function applyQuickFilter(filterType: string) {
 
 function quickFilterClasses(filterType: string): string {
   const baseClasses = 'px-3 py-1 rounded-full text-sm font-medium transition-colors';
-  
+
   // Verificar se o filtro está ativo
   let isActive = false;
-  
+
   switch (filterType) {
     case 'available':
       isActive = props.filters.status === ContractStatus.DISPONIVEL;
@@ -559,7 +559,7 @@ function quickFilterClasses(filterType: string): string {
       isActive = props.filters.hasDeadline === false;
       break;
   }
-  
+
   return isActive
     ? `${baseClasses} bg-amber-600 text-white`
     : `${baseClasses} bg-gray-700 text-gray-300 hover:bg-gray-600`;
@@ -646,7 +646,6 @@ function removeFilter(filterKey: string) {
   border-color: rgb(107, 114, 128);
 }
 
-.filter-input::placeholder {
-  color: rgb(156, 163, 175);
+.filter-input::placeholder { color: rgb(156, 163, 175);
 }
 </style>

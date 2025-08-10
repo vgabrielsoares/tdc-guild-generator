@@ -36,7 +36,10 @@ import {
 
 import { AntagonistGenerator } from "./antagonistGenerator";
 import { generateComplication } from "./complicationGenerator";
-import { generateUnusualContractor, generateThemeKeywords } from "./narrativeElementsGenerator";
+import {
+  generateUnusualContractor,
+  generateThemeKeywords,
+} from "./narrativeElementsGenerator";
 
 import {
   ALLY_APPEARANCE_CHANCE_TABLE,
@@ -742,7 +745,11 @@ export class ContractGenerator {
     }
 
     // 2. Calcular todos os modificadores que afetam a rolagem baseado no tipo de contratante
-    const rollModifiers = this.calculateRollModifiers(guild, contractorType, distanceRoll);
+    const rollModifiers = this.calculateRollModifiers(
+      guild,
+      contractorType,
+      distanceRoll
+    );
 
     // 3. Gerar pré-requisitos e cláusulas baseados no valor base preliminar
     // Isso nos permite calcular o bônus que será aplicado à rolagem
@@ -863,7 +870,11 @@ export class ContractGenerator {
     }
 
     // 2. Calcular todos os modificadores que afetam a rolagem baseado no tipo de contratante
-    const rollModifiers = this.calculateRollModifiers(guild, contractorType, distanceRoll);
+    const rollModifiers = this.calculateRollModifiers(
+      guild,
+      contractorType,
+      distanceRoll
+    );
 
     // 3. Gerar pré-requisitos e cláusulas baseados no valor base preliminar
     // Isso nos permite calcular o bônus que será aplicado à rolagem
@@ -1170,7 +1181,7 @@ export class ContractGenerator {
   } {
     // 1. Verificar se será um contratante inusitado
     const unusualContractor = generateUnusualContractor();
-    
+
     if (unusualContractor.isUnusual) {
       // Contratante inusitado - usar descrição especial
       return {
@@ -1182,7 +1193,7 @@ export class ContractGenerator {
     }
 
     // 2. Contratante normal - seguir lógica padrão
-    
+
     // Rolagem base 1d20
     let contractorRoll = rollDice({ notation: "1d20" }).result;
 
@@ -1314,23 +1325,31 @@ export class ContractGenerator {
     // Usar o sistema multiRollHandler para tratar "role duas vezes" corretamente
     const objectiveResult = handleMultipleRolls({
       table: MAIN_OBJECTIVE_TABLE,
-      shouldRollAgain: (result: { category: ObjectiveCategory; name: string; description: string }) => shouldRollTwiceForObjective(result),
-      context: "Objetivos Principais"
+      shouldRollAgain: (result: {
+        category: ObjectiveCategory;
+        name: string;
+        description: string;
+      }) => shouldRollTwiceForObjective(result),
+      context: "Objetivos Principais",
     });
 
     // Se temos múltiplos objetivos (resultado de "role duas vezes")
     if (objectiveResult.results.length > 1) {
       // Processar todos os objetivos retornados
       const objectives = objectiveResult.results;
-      const specifications = objectives.map(obj => this.generateObjectiveSpecification(obj.category));
+      const specifications = objectives.map((obj) =>
+        this.generateObjectiveSpecification(obj.category)
+      );
 
       // Combinar descrições e especificações
       const combinedDescription = objectives
-        .map((obj, index) => index === 0 ? obj.description : obj.description.toLowerCase())
+        .map((obj, index) =>
+          index === 0 ? obj.description : obj.description.toLowerCase()
+        )
         .join(". Além disso, ");
 
       const combinedTargets = specifications
-        .map(spec => spec.target)
+        .map((spec) => spec.target)
         .join(" e ");
 
       return {
@@ -1344,7 +1363,9 @@ export class ContractGenerator {
     const objectiveEntry = objectiveResult.results[0];
 
     // Gerar especificação baseada na categoria
-    const specification = this.generateObjectiveSpecification(objectiveEntry.category);
+    const specification = this.generateObjectiveSpecification(
+      objectiveEntry.category
+    );
 
     return {
       category: objectiveEntry.category,
@@ -1361,13 +1382,16 @@ export class ContractGenerator {
     description: string;
   } {
     const specTable = getObjectiveSpecificationTable(category);
-    
+
     // Usar multiRollHandler para tratar "role duas vezes" nas especificações
     const specResult = handleMultipleRolls({
       table: specTable,
-      shouldRollAgain: (result: { target: string; description: string; rollTwice?: boolean }) => 
-        shouldRollTwiceForSpecification(result),
-      context: `Especificação ${category}`
+      shouldRollAgain: (result: {
+        target: string;
+        description: string;
+        rollTwice?: boolean;
+      }) => shouldRollTwiceForSpecification(result),
+      context: `Especificação ${category}`,
     });
 
     // Se temos múltiplas especificações (resultado de "role duas vezes")
@@ -1377,11 +1401,15 @@ export class ContractGenerator {
 
       // Combinar targets e descrições
       const combinedTarget = specifications
-        .map((spec, index) => index === 0 ? spec.target : spec.target.toLowerCase())
+        .map((spec, index) =>
+          index === 0 ? spec.target : spec.target.toLowerCase()
+        )
         .join(", além disso ");
 
       const combinedDescription = specifications
-        .map((spec, index) => index === 0 ? spec.description : spec.description.toLowerCase())
+        .map((spec, index) =>
+          index === 0 ? spec.description : spec.description.toLowerCase()
+        )
         .join(". Além disso, ");
 
       return {
@@ -1915,10 +1943,10 @@ export class ContractGenerator {
   private static generateFullContractDescription(params: {
     objective: ContractObjective;
     location: ContractLocation;
-    contractor: { 
-      type: ContractorType; 
-      name: string; 
-      description: string; 
+    contractor: {
+      type: ContractorType;
+      name: string;
+      description: string;
       unusualContractor?: {
         isUnusual: boolean;
         description: string;
@@ -1965,20 +1993,23 @@ export class ContractGenerator {
 
     // 1. Contratante
     let contractorText = `**Contratante:** ${contractor.name} (${contractor.description})`;
-    
+
     // Adicionar informações de contratante inusitado se aplicável
     if (contractor.unusualContractor?.isUnusual) {
       contractorText += `\n→ **Contratante Inusitado**: ${contractor.unusualContractor.description}`;
     }
-    
+
     // Adicionar palavras-chave temáticas se existirem
-    if (contractor.unusualContractor?.themeKeywords && contractor.unusualContractor.themeKeywords.length > 0) {
+    if (
+      contractor.unusualContractor?.themeKeywords &&
+      contractor.unusualContractor.themeKeywords.length > 0
+    ) {
       const keywordsList = contractor.unusualContractor.themeKeywords
-        .map(kw => kw.keyword)
+        .map((kw) => kw.keyword)
         .join(", ");
       contractorText += `\n→ Palavras-chave para criatividade do contratante: ${keywordsList}`;
     }
-    
+
     sections.push(contractorText);
 
     // 2. Objetivo
@@ -2123,9 +2154,7 @@ export class ContractGenerator {
 
     // 17. Palavras-chave temáticas para criatividade
     if (themeKeywords && themeKeywords.length > 0) {
-      const keywordsList = themeKeywords
-        .map(kw => kw.keyword)
-        .join(", ");
+      const keywordsList = themeKeywords.map((kw) => kw.keyword).join(", ");
       sections.push(`**Palavras-chave para o contrato:** ${keywordsList}`);
     }
 
@@ -2178,21 +2207,29 @@ export class ContractGenerator {
     const allyTypesResult = handleMultipleRolls({
       table: ALLY_TYPES_TABLE,
       shouldRollAgain: (result) => String(result).includes("Role duas vezes"),
-      context: "Tipos de Aliados"
+      context: "Tipos de Aliados",
     });
 
     // 3. Gerar timing usando multiRollHandler
     const timingResult = handleMultipleRolls({
       table: ALLY_APPEARANCE_TIMING_TABLE,
       shouldRollAgain: (result) => String(result).includes("Role duas vezes"),
-      context: "Timing de Aparição"
+      context: "Timing de Aparição",
     });
 
     // 4. Criar aliados para cada combinação de tipo e timing
-    for (let i = 0; i < Math.max(allyTypesResult.results.length, timingResult.results.length); i++) {
-      const allyTypeString = String(allyTypesResult.results[i % allyTypesResult.results.length]);
-      const timingString = String(timingResult.results[i % timingResult.results.length]);
-      
+    for (
+      let i = 0;
+      i < Math.max(allyTypesResult.results.length, timingResult.results.length);
+      i++
+    ) {
+      const allyTypeString = String(
+        allyTypesResult.results[i % allyTypesResult.results.length]
+      );
+      const timingString = String(
+        timingResult.results[i % timingResult.results.length]
+      );
+
       const allyCategory = this.mapStringToAllyCategory(allyTypeString);
       const allyTiming = this.mapStringToAllyTiming(timingString);
 
@@ -2472,7 +2509,7 @@ export class ContractGenerator {
       const multiRollResult = handleMultipleRolls({
         table: detailTable,
         shouldRollAgain: (result) => String(result).includes("Role duas vezes"),
-        context: `Detalhamento da Consequência ${consequenceCategory}`
+        context: `Detalhamento da Consequência ${consequenceCategory}`,
       });
 
       // 4. Criar as consequências
@@ -2560,15 +2597,20 @@ export class ContractGenerator {
     const rewardDetail = this.generateRewardDetail(rewardType);
     if (rewardDetail) {
       rewards.push(rewardDetail);
-      
+
       // Se há resultados adicionais de rolagem múltipla, criar recompensas extras
-      if ('additionalResults' in rewardDetail) {
-        const additionalResults = (rewardDetail as AdditionalReward & { additionalResults: string[] }).additionalResults;
+      if ("additionalResults" in rewardDetail) {
+        const additionalResults = (
+          rewardDetail as AdditionalReward & { additionalResults: string[] }
+        ).additionalResults;
         for (const additionalResult of additionalResults) {
           rewards.push({
             category: rewardDetail.category,
             specificReward: additionalResult,
-            description: this.generateRewardDescription(rewardDetail.category, additionalResult),
+            description: this.generateRewardDescription(
+              rewardDetail.category,
+              additionalResult
+            ),
             isPositive: rewardDetail.isPositive,
           });
         }
@@ -2641,14 +2683,15 @@ export class ContractGenerator {
     const multiRollResult = handleMultipleRolls({
       table: detailTable,
       shouldRollAgain: (result) => String(result).includes("Role duas vezes"),
-      context: `Detalhamento ${rewardType}`
+      context: `Detalhamento ${rewardType}`,
     });
 
     // Se temos múltiplos resultados, retornar apenas o primeiro
     // O sistema de recompensas tratará múltiplos resultados no nível superior
-    const specificReward = multiRollResult.results.length > 0 
-      ? String(multiRollResult.results[0])
-      : "Recompensa padrão";
+    const specificReward =
+      multiRollResult.results.length > 0
+        ? String(multiRollResult.results[0])
+        : "Recompensa padrão";
 
     return {
       category,
@@ -2656,9 +2699,9 @@ export class ContractGenerator {
       description: this.generateRewardDescription(category, specificReward),
       isPositive,
       // Se houve rolagem múltipla, guardar os resultados extras para processamento posterior
-      ...(multiRollResult.results.length > 1 && { 
-        additionalResults: multiRollResult.results.slice(1).map(String) 
-      })
+      ...(multiRollResult.results.length > 1 && {
+        additionalResults: multiRollResult.results.slice(1).map(String),
+      }),
     };
   }
 

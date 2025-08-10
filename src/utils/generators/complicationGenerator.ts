@@ -12,14 +12,14 @@ import {
   rollMultipleWithCombining,
   createTextBasedRollAgainChecker,
 } from "@/utils/multiRollHandler";
-import type { 
-  Complication, 
+import type {
+  Complication,
   Twist,
   TwistWho,
   TwistWhat,
   TwistBut,
   TwistAndFirst,
-  TwistAndSecond
+  TwistAndSecond,
 } from "@/types/contract";
 import {
   COMPLICATION_TYPES_TABLE,
