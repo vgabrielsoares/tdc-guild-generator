@@ -54,6 +54,7 @@
         <ContractValue
           :value="contract.value"
           :difficulty="contract.difficulty"
+          :contractor-type="contract.contractorType"
           size="md"
         />
 

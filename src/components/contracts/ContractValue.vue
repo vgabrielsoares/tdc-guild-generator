@@ -289,11 +289,12 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import type { ContractValue } from "@/types/contract";
-import { ContractDifficulty, PaymentType } from "@/types/contract";
+import { ContractDifficulty, PaymentType, ContractorType } from "@/types/contract";
 
 interface Props {
   value: ContractValue;
   difficulty?: ContractDifficulty;
+  contractorType?: ContractorType;
   size?: "xs" | "sm" | "md" | "lg";
   showDifficulty?: boolean;
   showDetails?: boolean;
@@ -402,8 +403,8 @@ const xpModifiers = computed(() => {
     });
   }
 
-  // Relação com população afeta valor de XP
-  if (modifiers.populationRelationValue !== 0) {
+  // Relação com população afeta valor de XP (APENAS se contratante for do Povo)
+  if (modifiers.populationRelationValue !== 0 && props.contractorType === ContractorType.POVO) {
     result.push({
       key: "populationValue",
       label: "Relação Pop.",
@@ -411,8 +412,8 @@ const xpModifiers = computed(() => {
     });
   }
 
-  // Relação com governo afeta valor de XP
-  if (modifiers.governmentRelationValue !== 0) {
+  // Relação com governo afeta valor de XP (APENAS se contratante for do Governo)
+  if (modifiers.governmentRelationValue !== 0 && props.contractorType === ContractorType.GOVERNO) {
     result.push({
       key: "governmentValue",
       label: "Relação Gov.",
@@ -438,8 +439,8 @@ const rewardModifiers = computed(() => {
     });
   }
 
-  // Relação com população afeta recompensa
-  if (modifiers.populationRelationReward !== 0) {
+  // Relação com população afeta recompensa (APENAS se contratante for do Povo)
+  if (modifiers.populationRelationReward !== 0 && props.contractorType === ContractorType.POVO) {
     result.push({
       key: "populationReward",
       label: "Relação Pop.",
@@ -447,8 +448,8 @@ const rewardModifiers = computed(() => {
     });
   }
 
-  // Relação com governo afeta recompensa
-  if (modifiers.governmentRelationReward !== 0) {
+  // Relação com governo afeta recompensa (APENAS se contratante for do Governo)
+  if (modifiers.governmentRelationReward !== 0 && props.contractorType === ContractorType.GOVERNO) {
     result.push({
       key: "governmentReward",
       label: "Relação Gov.",
@@ -481,26 +482,36 @@ const totalXpModifiers = computed(() => {
   if (!props.value?.modifiers) return 0;
 
   const modifiers = props.value.modifiers;
-  // Para XP: distância + relações de população/governo + pré-requisitos
-  return (
-    modifiers.distance +
-    modifiers.populationRelationValue +
-    modifiers.governmentRelationValue
-  );
+  let total = modifiers.distance;
+  
+  // Adicionar modificadores de relação apenas se aplicáveis ao tipo de contratante
+  if (props.contractorType === ContractorType.POVO) {
+    total += modifiers.populationRelationValue;
+  }
+  if (props.contractorType === ContractorType.GOVERNO) {
+    total += modifiers.governmentRelationValue;
+  }
+  // Instituições de Ofício são neutras (sem modificadores de relação)
+  
+  return total;
 });
 
 const totalRewardModifiers = computed(() => {
   if (!props.value?.modifiers) return 0;
 
   const modifiers = props.value.modifiers;
-  // Para Recompensa: distância + relações + funcionários + pré-requisitos
-  return (
-    modifiers.distance +
-    modifiers.populationRelationReward +
-    modifiers.governmentRelationReward +
-    modifiers.staffPreparation +
-    modifiers.requirementsAndClauses
-  );
+  let total = modifiers.distance + modifiers.staffPreparation + modifiers.requirementsAndClauses;
+  
+  // Adicionar modificadores de relação apenas se aplicáveis ao tipo de contratante
+  if (props.contractorType === ContractorType.POVO) {
+    total += modifiers.populationRelationReward;
+  }
+  if (props.contractorType === ContractorType.GOVERNO) {
+    total += modifiers.governmentRelationReward;
+  }
+  // Instituições de Ofício são neutras (sem modificadores de relação)
+  
+  return total;
 });
 
 const paymentTypeShort = computed(() => {
