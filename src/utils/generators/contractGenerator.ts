@@ -1315,23 +1315,28 @@ export class ContractGenerator {
     const objectiveResult = handleMultipleRolls({
       table: MAIN_OBJECTIVE_TABLE,
       shouldRollAgain: (result: { category: ObjectiveCategory; name: string; description: string }) => shouldRollTwiceForObjective(result),
-      context: "Objetivos Principais",
-      maxUniqueResults: 5 // Máximo de 5 objetivos para evitar complexidade excessiva
+      context: "Objetivos Principais"
     });
 
     // Se temos múltiplos objetivos (resultado de "role duas vezes")
     if (objectiveResult.results.length > 1) {
-      const firstObjective = objectiveResult.results[0];
-      const secondObjective = objectiveResult.results[1];
+      // Processar todos os objetivos retornados
+      const objectives = objectiveResult.results;
+      const specifications = objectives.map(obj => this.generateObjectiveSpecification(obj.category));
 
-      // Gerar especificações para ambos os objetivos
-      const firstSpec = this.generateObjectiveSpecification(firstObjective.category);
-      const secondSpec = this.generateObjectiveSpecification(secondObjective.category);
+      // Combinar descrições e especificações
+      const combinedDescription = objectives
+        .map((obj, index) => index === 0 ? obj.description : obj.description.toLowerCase())
+        .join(". Além disso, ");
+
+      const combinedTargets = specifications
+        .map(spec => spec.target)
+        .join(" e ");
 
       return {
-        category: firstObjective.category,
-        description: `${firstObjective.description}. Além disso, ${secondObjective.description.toLowerCase()}`,
-        specificObjective: `${firstSpec.target} e ${secondSpec.target}`,
+        category: objectives[0].category, // Usar categoria do primeiro objetivo
+        description: combinedDescription,
+        specificObjective: combinedTargets,
       };
     }
 
@@ -1362,18 +1367,26 @@ export class ContractGenerator {
       table: specTable,
       shouldRollAgain: (result: { target: string; description: string; rollTwice?: boolean }) => 
         shouldRollTwiceForSpecification(result),
-      context: `Especificação ${category}`,
-      maxUniqueResults: 5 // Máximo de 5 especificações
+      context: `Especificação ${category}`
     });
 
     // Se temos múltiplas especificações (resultado de "role duas vezes")
     if (specResult.results.length > 1) {
-      const firstSpec = specResult.results[0];
-      const secondSpec = specResult.results[1];
+      // Processar todas as especificações retornadas
+      const specifications = specResult.results;
+
+      // Combinar targets e descrições
+      const combinedTarget = specifications
+        .map((spec, index) => index === 0 ? spec.target : spec.target.toLowerCase())
+        .join(", além disso ");
+
+      const combinedDescription = specifications
+        .map((spec, index) => index === 0 ? spec.description : spec.description.toLowerCase())
+        .join(". Além disso, ");
 
       return {
-        target: `${firstSpec.target}, além disso ${secondSpec.target.toLowerCase()}`,
-        description: `${firstSpec.description}. Além disso, ${secondSpec.description.toLowerCase()}`,
+        target: combinedTarget,
+        description: combinedDescription,
       };
     }
 
