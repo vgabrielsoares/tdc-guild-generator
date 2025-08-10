@@ -79,6 +79,40 @@
                   </div>
                 </section>
 
+                <!-- 1.5. Contratante Inusitado -->
+                <section v-if="contract.unusualContractor?.isUnusual">
+                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Contratante Inusitado</h4>
+                  <div class="bg-purple-900/20 rounded-lg p-4 border border-purple-500/30">
+                    <div class="flex items-center gap-2 mb-2">
+                      <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      <span class="font-medium text-white">Figura Excêntrica</span>
+                    </div>
+                    <p class="text-gray-300 mb-3">{{ contract.unusualContractor.description }}</p>
+                    
+                    <!-- Palavras-chave temáticas -->
+                    <div v-if="contract.unusualContractor.themeKeywords && contract.unusualContractor.themeKeywords.length > 0" class="mt-3 p-3 bg-purple-800/20 rounded border border-purple-500/20">
+                      <div class="text-sm text-purple-300 mb-2">
+                        <strong>Palavras-chave para criatividade:</strong>
+                      </div>
+                      <div class="flex flex-wrap gap-2">
+                        <span 
+                          v-for="keyword in contract.unusualContractor.themeKeywords" 
+                          :key="`${keyword.set}-${keyword.keyword}`"
+                          class="inline-block bg-purple-700/30 text-purple-200 px-2 py-1 rounded text-sm border border-purple-500/20"
+                        >
+                          {{ keyword.keyword }}
+                        </span>
+                      </div>
+                      <div class="text-xs text-purple-400 mt-2">
+                        <InformationCircleIcon class="w-3 h-3 inline mr-1" />
+                        Use essas palavras-chave para inspirar características únicas, motivações, aparência ou maneirismos do contratante.
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
                 <!-- 2. Localidade -->
                 <section v-if="contract.location">
                   <h4 class="text-lg font-semibold text-amber-400 mb-2">Localidade</h4>
@@ -502,6 +536,34 @@
                           <span>{{ clause }}</span>
                         </li>
                       </ul>
+                    </div>
+                  </div>
+                </section>
+                
+                <!-- Palavras-chave temáticas do contrato -->
+                <section v-if="contract.themeKeywords && contract.themeKeywords.length > 0">
+                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Palavras-chave Temáticas</h4>
+                  <div class="bg-indigo-900/20 rounded-lg p-4 border border-indigo-500/30">
+                    <div class="flex items-center gap-2 mb-3">
+                      <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                      </svg>
+                      <span class="font-medium text-white">Inspiração Criativa</span>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-2 mb-3">
+                      <span 
+                        v-for="keyword in contract.themeKeywords" 
+                        :key="`contract-${keyword.set}-${keyword.keyword}`"
+                        class="inline-block bg-indigo-700/30 text-indigo-200 px-3 py-1 rounded-full text-sm border border-indigo-500/20"
+                      >
+                        {{ keyword.keyword }}
+                      </span>
+                    </div>
+                    
+                    <div class="text-xs text-indigo-400">
+                      <InformationCircleIcon class="w-3 h-3 inline mr-1" />
+                      Use essas palavras-chave para inspirar elementos criativos, atmosfera, temas e desenvolvimento do contrato como um todo.
                     </div>
                   </div>
                 </section>
