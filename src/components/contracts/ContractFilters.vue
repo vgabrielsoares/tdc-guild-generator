@@ -5,31 +5,21 @@
         <FunnelIcon class="w-5 h-5" />
         Filtros Avançados
       </h3>
-      <button
-        @click="clearAllFilters"
-        class="text-sm text-gray-400 hover:text-white transition-colors underline"
-      >
+      <button @click="clearAllFilters" class="text-sm text-gray-400 hover:text-white transition-colors underline">
         Limpar Filtros
       </button>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-      
+
       <!-- Filtro por Status -->
       <div class="filter-group">
         <label class="filter-label">Status</label>
-        <select
-          :value="filters.status"
-          @change="updateStatusFilter(($event.target as HTMLSelectElement).value)"
-          class="filter-select"
-        >
+        <select :value="filters.status" @change="updateStatusFilter(($event.target as HTMLSelectElement).value)"
+          class="filter-select">
           <option value="">Todos os status</option>
-          <option
-            v-for="status in statusOptions"
-            :key="status.value"
-            :value="status.value"
-          >
-            {{ status.label }} ({{ status.count }})
+          <option v-for="status in statusOptions" :key="status.value" :value="status.value">
+            {{ status.label }} {{ formatCount(status.totalCount, status.filteredCount) }}
           </option>
         </select>
       </div>
@@ -37,18 +27,11 @@
       <!-- Filtro por Dificuldade -->
       <div class="filter-group">
         <label class="filter-label">Dificuldade</label>
-        <select
-          :value="filters.difficulty"
-          @change="updateDifficultyFilter(($event.target as HTMLSelectElement).value)"
-          class="filter-select"
-        >
+        <select :value="filters.difficulty" @change="updateDifficultyFilter(($event.target as HTMLSelectElement).value)"
+          class="filter-select">
           <option value="">Todas as dificuldades</option>
-          <option
-            v-for="difficulty in difficultyOptions"
-            :key="difficulty.value"
-            :value="difficulty.value"
-          >
-            {{ difficulty.label }} ({{ difficulty.count }})
+          <option v-for="difficulty in difficultyOptions" :key="difficulty.value" :value="difficulty.value">
+            {{ difficulty.label }} {{ formatCount(difficulty.totalCount, difficulty.filteredCount) }}
           </option>
         </select>
       </div>
@@ -56,18 +39,11 @@
       <!-- Filtro por Contratante -->
       <div class="filter-group">
         <label class="filter-label">Contratante</label>
-        <select
-          :value="filters.contractor"
-          @change="updateContractorFilter(($event.target as HTMLSelectElement).value)"
-          class="filter-select"
-        >
+        <select :value="filters.contractor" @change="updateContractorFilter(($event.target as HTMLSelectElement).value)"
+          class="filter-select">
           <option value="">Todos os contratantes</option>
-          <option
-            v-for="contractor in contractorOptions"
-            :key="contractor.value"
-            :value="contractor.value"
-          >
-            {{ contractor.label }} ({{ contractor.count }})
+          <option v-for="contractor in contractorOptions" :key="contractor.value" :value="contractor.value">
+            {{ contractor.label }} {{ formatCount(contractor.totalCount, contractor.filteredCount) }}
           </option>
         </select>
       </div>
@@ -75,11 +51,8 @@
       <!-- Filtro por Prazo -->
       <div class="filter-group">
         <label class="filter-label">Prazo</label>
-        <select
-          :value="deadlineFilterValue"
-          @change="updateDeadlineFilter(($event.target as HTMLSelectElement).value)"
-          class="filter-select"
-        >
+        <select :value="deadlineFilterValue" @change="updateDeadlineFilter(($event.target as HTMLSelectElement).value)"
+          class="filter-select">
           <option value="">Todos os prazos</option>
           <option value="with-deadline">Com prazo ({{ contractsWithDeadline }})</option>
           <option value="no-deadline">Sem prazo ({{ contractsWithoutDeadline }})</option>
@@ -90,26 +63,17 @@
 
     <!-- Segunda linha de filtros -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      
+
       <!-- Busca por texto -->
       <div class="filter-group md:col-span-2">
         <label class="filter-label">Buscar</label>
         <div class="relative">
-          <input
-            :value="filters.searchText"
-            @input="updateSearchFilter(($event.target as HTMLInputElement).value)"
-            type="text"
-            placeholder="Buscar por título, descrição, objetivo ou contratante..."
-            class="filter-input pl-10"
-          />
-          <MagnifyingGlassIcon
-            class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
-          />
-          <button
-            v-if="filters.searchText"
-            @click="clearSearchFilter"
-            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
-          >
+          <input :value="filters.searchText" @input="updateSearchFilter(($event.target as HTMLInputElement).value)"
+            type="text" placeholder="Buscar por título, descrição, objetivo ou contratante..."
+            class="filter-input pl-10" />
+          <MagnifyingGlassIcon class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <button v-if="filters.searchText" @click="clearSearchFilter"
+            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white">
             <XMarkIcon class="w-4 h-4" />
           </button>
         </div>
@@ -119,23 +83,11 @@
       <div class="filter-group">
         <label class="filter-label">Recompensa (PO$)</label>
         <div class="flex gap-2">
-          <input
-            :value="filters.minValue || ''"
-            @input="updateMinValue(($event.target as HTMLInputElement).value)"
-            type="number"
-            placeholder="Min"
-            class="filter-input text-sm"
-            min="0"
-          />
+          <input :value="filters.minValue || ''" @input="updateMinValue(($event.target as HTMLInputElement).value)"
+            type="number" placeholder="Min" class="filter-input text-sm" min="0" />
           <span class="text-gray-400 self-center">-</span>
-          <input
-            :value="filters.maxValue || ''"
-            @input="updateMaxValue(($event.target as HTMLInputElement).value)"
-            type="number"
-            placeholder="Max"
-            class="filter-input text-sm"
-            min="0"
-          />
+          <input :value="filters.maxValue || ''" @input="updateMaxValue(($event.target as HTMLInputElement).value)"
+            type="number" placeholder="Max" class="filter-input text-sm" min="0" />
         </div>
       </div>
 
@@ -143,44 +95,32 @@
 
     <!-- Filtros rápidos (botões) -->
     <div class="border-t border-gray-600 pt-4">
-      <h4 class="text-sm font-medium text-gray-300 mb-2">Filtros Rápidos</h4>
+      <div class="flex items-center justify-between mb-2">
+        <h4 class="text-sm font-medium text-gray-300">Filtros Rápidos</h4>
+      </div>
+
       <div class="flex flex-wrap gap-2">
-        <button
-          @click="applyQuickFilter('available')"
-          :class="quickFilterClasses('available')"
-        >
+        <button @click="applyQuickFilter('available')" :class="quickFilterClasses('available')">
           <ClockIcon class="w-4 h-4 mr-1" />
-          Disponíveis ({{ availableCount }})
+          Disponíveis {{ formatQuickFilterCount(availableCount) }}
         </button>
-        
-        <button
-          @click="applyQuickFilter('accepted')"
-          :class="quickFilterClasses('accepted')"
-        >
+
+        <button @click="applyQuickFilter('accepted')" :class="quickFilterClasses('accepted')">
           <HandRaisedIcon class="w-4 h-4 mr-1" />
-          Aceitos ({{ acceptedCount }})
+          Aceitos {{ formatQuickFilterCount(acceptedCount) }}
         </button>
-        
-        <button
-          @click="applyQuickFilter('high-reward')"
-          :class="quickFilterClasses('high-reward')"
-        >
+
+        <button @click="applyQuickFilter('high-reward')" :class="quickFilterClasses('high-reward')">
           <CurrencyDollarIcon class="w-4 h-4 mr-1" />
-          Alta Recompensa ({{ highRewardCount }})
+          Alta Recompensa {{ formatQuickFilterCount(highRewardCount) }}
         </button>
-        
-        <button
-          @click="applyQuickFilter('dangerous')"
-          :class="quickFilterClasses('dangerous')"
-        >
+
+        <button @click="applyQuickFilter('dangerous')" :class="quickFilterClasses('dangerous')">
           <XCircleIcon class="w-4 h-4 mr-1" />
-          Perigosos ({{ dangerousCount }})
+          Perigosos {{ formatQuickFilterCount(dangerousCount) }}
         </button>
-        
-        <button
-          @click="applyQuickFilter('no-deadline')"
-          :class="quickFilterClasses('no-deadline')"
-        >
+
+        <button @click="applyQuickFilter('no-deadline')" :class="quickFilterClasses('no-deadline')">
           <XCircleIcon class="w-4 h-4 mr-1" />
           Sem Prazo ({{ contractsWithoutDeadline }})
         </button>
@@ -191,16 +131,10 @@
     <div v-if="hasActiveFilters" class="border-t border-gray-600 pt-4">
       <h4 class="text-sm font-medium text-gray-300 mb-2">Filtros Ativos</h4>
       <div class="flex flex-wrap gap-2">
-        <span
-          v-for="activeFilter in activeFilters"
-          :key="activeFilter.key"
-          class="inline-flex items-center gap-1 px-2 py-1 bg-amber-600/20 border border-amber-600/50 rounded text-sm text-amber-200"
-        >
+        <span v-for="activeFilter in activeFilters" :key="activeFilter.key"
+          class="inline-flex items-center gap-1 px-2 py-1 bg-amber-600/20 border border-amber-600/50 rounded text-sm text-amber-200">
           {{ activeFilter.label }}
-          <button
-            @click="removeFilter(activeFilter.key)"
-            class="text-amber-300 hover:text-white"
-          >
+          <button @click="removeFilter(activeFilter.key)" class="text-amber-300 hover:text-white">
             <XMarkIcon class="w-3 h-3" />
           </button>
         </span>
@@ -211,7 +145,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import type { Contract } from '@/types/contract';
 import { ContractStatus, ContractDifficulty, ContractorType, DeadlineType } from '@/types/contract';
 import {
@@ -221,7 +155,7 @@ import {
   ClockIcon,
   HandRaisedIcon,
   CurrencyDollarIcon,
-  XCircleIcon
+  XCircleIcon,
 } from '@heroicons/vue/24/outline';
 
 interface ContractFilters {
@@ -255,62 +189,221 @@ const emit = defineEmits<Emits>();
 
 // ===== COMPUTED =====
 
-// Contagens por categoria
+// Função auxiliar para criar contratos filtrados excluindo um filtro específico
+const getFilteredContractsExcluding = (excludeFilter: keyof ContractFilters) => {
+  let result = props.contracts;
+
+  // Aplicar todos os filtros exceto o especificado
+  if (excludeFilter !== 'status' && props.filters.status) {
+    result = result.filter((c) => c.status === props.filters.status);
+  }
+
+  if (excludeFilter !== 'difficulty' && props.filters.difficulty) {
+    result = result.filter((c) => c.difficulty === props.filters.difficulty);
+  }
+
+  if (excludeFilter !== 'contractor' && props.filters.contractor) {
+    result = result.filter((c) => c.contractorType === props.filters.contractor);
+  }
+
+  if (excludeFilter !== 'searchText' && props.filters.searchText.trim()) {
+    const searchLower = props.filters.searchText.toLowerCase();
+    result = result.filter(
+      (c) =>
+        c.description.toLowerCase().includes(searchLower) ||
+        c.title.toLowerCase().includes(searchLower) ||
+        c.objective?.description?.toLowerCase().includes(searchLower) ||
+        c.contractorName?.toLowerCase().includes(searchLower) ||
+        c.location?.name?.toLowerCase().includes(searchLower)
+    );
+  }
+
+  if (excludeFilter !== 'minValue' && props.filters.minValue !== null) {
+    result = result.filter((c) => c.value.finalGoldReward >= props.filters.minValue!);
+  }
+
+  if (excludeFilter !== 'maxValue' && props.filters.maxValue !== null) {
+    result = result.filter((c) => c.value.finalGoldReward <= props.filters.maxValue!);
+  }
+
+  if (excludeFilter !== 'hasDeadline' && props.filters.hasDeadline !== null) {
+    const hasDeadline = props.filters.hasDeadline;
+    result = result.filter((c) => {
+      const contractHasDeadline = c.deadline.type !== DeadlineType.SEM_PRAZO;
+      return contractHasDeadline === hasDeadline;
+    });
+  }
+
+  return result;
+};
+
+// Contagens por categoria (com filtros aplicados quando relevante)
 const statusOptions = computed(() => {
-  const counts: Record<string, number> = {};
+  const totalCounts: Record<string, number> = {};
+  const filteredCounts: Record<string, number> = {};
+
+  // Contar totais
   props.contracts.forEach(contract => {
-    counts[contract.status] = (counts[contract.status] || 0) + 1;
+    totalCounts[contract.status] = (totalCounts[contract.status] || 0) + 1;
+  });
+
+  // Contar com outros filtros aplicados (exceto status)
+  const contractsExcludingStatus = getFilteredContractsExcluding('status');
+  contractsExcludingStatus.forEach(contract => {
+    filteredCounts[contract.status] = (filteredCounts[contract.status] || 0) + 1;
   });
 
   return Object.values(ContractStatus).map(status => ({
     value: status,
     label: status,
-    count: counts[status] || 0
-  })).filter(option => option.count > 0);
+    totalCount: totalCounts[status] || 0,
+    filteredCount: filteredCounts[status] || 0
+  })).filter(option => option.totalCount > 0);
 });
 
 const difficultyOptions = computed(() => {
-  const counts: Record<string, number> = {};
+  const totalCounts: Record<string, number> = {};
+  const filteredCounts: Record<string, number> = {};
+
+  // Contar totais
   props.contracts.forEach(contract => {
-    counts[contract.difficulty] = (counts[contract.difficulty] || 0) + 1;
+    totalCounts[contract.difficulty] = (totalCounts[contract.difficulty] || 0) + 1;
+  });
+
+  // Contar com outros filtros aplicados (exceto difficulty)
+  const contractsExcludingDifficulty = getFilteredContractsExcluding('difficulty');
+  contractsExcludingDifficulty.forEach(contract => {
+    filteredCounts[contract.difficulty] = (filteredCounts[contract.difficulty] || 0) + 1;
   });
 
   return Object.values(ContractDifficulty).map(difficulty => ({
     value: difficulty,
     label: difficulty,
-    count: counts[difficulty] || 0
-  })).filter(option => option.count > 0);
+    totalCount: totalCounts[difficulty] || 0,
+    filteredCount: filteredCounts[difficulty] || 0
+  })).filter(option => option.totalCount > 0);
 });
 
 const contractorOptions = computed(() => {
-  const counts: Record<string, number> = {};
+  const totalCounts: Record<string, number> = {};
+  const filteredCounts: Record<string, number> = {};
+
+  // Contar totais
   props.contracts.forEach(contract => {
-    counts[contract.contractorType] = (counts[contract.contractorType] || 0) + 1;
+    totalCounts[contract.contractorType] = (totalCounts[contract.contractorType] || 0) + 1;
+  });
+
+  // Contar com outros filtros aplicados (exceto contractor)
+  const contractsExcludingContractor = getFilteredContractsExcluding('contractor');
+  contractsExcludingContractor.forEach(contract => {
+    filteredCounts[contract.contractorType] = (filteredCounts[contract.contractorType] || 0) + 1;
   });
 
   return Object.values(ContractorType).map(contractor => ({
     value: contractor,
     label: contractor,
-    count: counts[contractor] || 0
-  })).filter(option => option.count > 0);
+    totalCount: totalCounts[contractor] || 0,
+    filteredCount: filteredCounts[contractor] || 0
+  })).filter(option => option.totalCount > 0);
 });
 
-// Contagens para filtros rápidos
-const availableCount = computed(() => 
-  props.contracts.filter(c => c.status === ContractStatus.DISPONIVEL).length
-);
+// Função auxiliar para formatar contadores (total) ou (filtrado/total) se diferentes
+const formatCount = (totalCount: number, filteredCount: number): string => {
+  if (totalCount === filteredCount) {
+    return `(${totalCount})`;
+  }
+  return `(${filteredCount}/${totalCount})`;
+};
 
-const acceptedCount = computed(() => 
-  props.contracts.filter(c => c.status === ContractStatus.ACEITO || c.status === ContractStatus.EM_ANDAMENTO).length
-);
+// Contagens para filtros rápidos (considerando filtros ativos quando não conflitam)
+// Contagens para filtros rápidos (considerando filtros ativos quando não conflitam)
+const availableCount = computed(() => {
+  const total = props.contracts.filter(c => c.status === ContractStatus.DISPONIVEL).length;
+  // Se filtro de status está ativo e não é "disponível", mostrar count com filtros
+  if (props.filters.status && props.filters.status !== ContractStatus.DISPONIVEL) {
+    return { total, filtered: 0 }; // Não há disponíveis se outro status está selecionado
+  }
+  // Se status não está filtrado, aplicar outros filtros
+  const filtered = getFilteredContractsExcluding('status')
+    .filter(c => c.status === ContractStatus.DISPONIVEL).length;
+  return { total, filtered };
+});
 
-const highRewardCount = computed(() => 
-  props.contracts.filter(c => c.value.finalGoldReward >= 100).length // 1000+ pontos = 100+ PO$
-);
+const acceptedCount = computed(() => {
+  const total = props.contracts.filter(c =>
+    c.status === ContractStatus.ACEITO || c.status === ContractStatus.EM_ANDAMENTO
+  ).length;
+  // Se filtro de status conflita, retornar 0
+  if (props.filters.status &&
+    props.filters.status !== ContractStatus.ACEITO &&
+    props.filters.status !== ContractStatus.EM_ANDAMENTO) {
+    return { total, filtered: 0 };
+  }
+  // Aplicar outros filtros
+  const filtered = getFilteredContractsExcluding('status')
+    .filter(c => c.status === ContractStatus.ACEITO || c.status === ContractStatus.EM_ANDAMENTO).length;
+  return { total, filtered };
+});
 
-const dangerousCount = computed(() => 
-  props.contracts.filter(c => [ContractDifficulty.DIFICIL, ContractDifficulty.MORTAL].includes(c.difficulty)).length
-);
+const highRewardCount = computed(() => {
+  const total = props.contracts.filter(c => c.value.finalGoldReward >= 100).length;
+  // Se filtros de valor conflitam, calcular apropriadamente
+  let contracts = props.contracts;
+
+  // Aplicar todos os filtros exceto os de valor para não criar conflito
+  if (props.filters.status) {
+    contracts = contracts.filter(c => c.status === props.filters.status);
+  }
+  if (props.filters.difficulty) {
+    contracts = contracts.filter(c => c.difficulty === props.filters.difficulty);
+  }
+  if (props.filters.contractor) {
+    contracts = contracts.filter(c => c.contractorType === props.filters.contractor);
+  }
+  if (props.filters.searchText.trim()) {
+    const searchLower = props.filters.searchText.toLowerCase();
+    contracts = contracts.filter(c =>
+      c.description.toLowerCase().includes(searchLower) ||
+      c.title.toLowerCase().includes(searchLower) ||
+      c.objective?.description?.toLowerCase().includes(searchLower) ||
+      c.contractorName?.toLowerCase().includes(searchLower) ||
+      c.location?.name?.toLowerCase().includes(searchLower)
+    );
+  }
+  if (props.filters.hasDeadline !== null) {
+    const hasDeadline = props.filters.hasDeadline;
+    contracts = contracts.filter(c => {
+      const contractHasDeadline = c.deadline.type !== DeadlineType.SEM_PRAZO;
+      return contractHasDeadline === hasDeadline;
+    });
+  }
+  
+  const filtered = contracts.filter(c => c.value.finalGoldReward >= 100).length;
+  return { total, filtered };
+});
+
+const dangerousCount = computed(() => {
+  const total = props.contracts.filter(c => 
+    [ContractDifficulty.DIFICIL, ContractDifficulty.MORTAL].includes(c.difficulty)
+  ).length;
+  // Se filtro de dificuldade conflita
+  if (props.filters.difficulty && 
+      ![ContractDifficulty.DIFICIL, ContractDifficulty.MORTAL].includes(props.filters.difficulty as ContractDifficulty)) {
+    return { total, filtered: 0 };
+  }
+  // Aplicar outros filtros
+  const filtered = getFilteredContractsExcluding('difficulty')
+    .filter(c => [ContractDifficulty.DIFICIL, ContractDifficulty.MORTAL].includes(c.difficulty)).length;
+  return { total, filtered };
+});
+
+// Função para formatar contadores de filtros rápidos
+const formatQuickFilterCount = (countObj: { total: number; filtered: number }): string => {
+  if (countObj.total === countObj.filtered) {
+    return `(${countObj.total})`;
+  }
+  return `(${countObj.filtered}/${countObj.total})`;
+};
 
 const contractsWithDeadline = computed(() => 
   props.contracts.filter(c => c.deadline.type !== DeadlineType.SEM_PRAZO).length
