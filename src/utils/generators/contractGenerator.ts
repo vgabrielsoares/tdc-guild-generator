@@ -2,6 +2,7 @@ import { rollDice } from "../dice";
 import { rollOnTable } from "../tableRoller";
 import { handleMultipleRolls } from "../multiRollHandler";
 import type { TableEntry } from "@/types/tables";
+import type { ThemeKeyword } from "@/types/contract";
 import { addDays } from "../date-utils";
 import {
   CONTRACT_DICE_BY_SIZE,
@@ -33,17 +34,9 @@ import {
   shouldRollTwiceForSpecification,
 } from "../../data/tables/contract-content-tables";
 
-import {
-  ANTAGONIST_TYPES_TABLE,
-  ANTAGONIST_DETAIL_TABLE_MAP,
-  mapAntagonistTypeToCategory,
-  shouldRollTwice,
-} from "../../data/tables/contract-antagonist-tables";
-
-import {
-  COMPLICATION_TYPES_TABLE,
-  COMPLICATION_DETAIL_TABLES,
-} from "../../data/tables/contract-complications-tables";
+import { AntagonistGenerator } from "./antagonistGenerator";
+import { generateComplication } from "./complicationGenerator";
+import { generateUnusualContractor, generateThemeKeywords } from "./narrativeElementsGenerator";
 
 import {
   ALLY_APPEARANCE_CHANCE_TABLE,
@@ -111,8 +104,6 @@ import {
   ContractResolution,
   FailureReason,
   ObjectiveCategory,
-  AntagonistCategory,
-  ComplicationCategory,
   TwistWho,
   TwistWhat,
   AllyCategory,
@@ -239,7 +230,10 @@ export class ContractGenerator {
     // 15. Gerar recompensas adicionais
     const additionalRewards = this.generateAdditionalRewards();
 
-    // 16. Gerar descrição completa do contrato
+    // 16. Gerar palavras-chave temáticas para criatividade
+    const themeKeywords = generateThemeKeywords();
+
+    // 17. Gerar descrição completa do contrato
     const fullDescription = this.generateFullContractDescription({
       objective,
       location,
@@ -256,9 +250,10 @@ export class ContractGenerator {
       deadline,
       paymentType,
       distanceRoll,
+      themeKeywords,
     });
 
-    // 17. Estrutura básica do contrato
+    // 18. Estrutura básica do contrato
     const contract: Contract = {
       id: this.generateId(),
       title: `Contrato #${Math.floor(Math.random() * 10000)
@@ -269,6 +264,7 @@ export class ContractGenerator {
       difficulty,
       contractorType: contractor.type,
       contractorName: contractor.name,
+      unusualContractor: contractor.unusualContractor,
       objective,
       location,
       prerequisites,
@@ -288,6 +284,7 @@ export class ContractGenerator {
         difficultyRoll,
         settlementType: guild.settlementType,
       },
+      themeKeywords,
       createdAt: new Date(),
     };
 
@@ -362,7 +359,10 @@ export class ContractGenerator {
     // 15. Gerar recompensas adicionais
     const additionalRewards = this.generateAdditionalRewards();
 
-    // 16. Gerar descrição completa do contrato
+    // 16. Gerar palavras-chave temáticas para criatividade
+    const themeKeywords = generateThemeKeywords();
+
+    // 17. Gerar descrição completa do contrato
     const fullDescription = this.generateFullContractDescription({
       objective,
       location,
@@ -379,9 +379,10 @@ export class ContractGenerator {
       deadline,
       paymentType,
       distanceRoll,
+      themeKeywords,
     });
 
-    // 17. Estrutura básica do contrato
+    // 18. Estrutura básica do contrato
     const contract: Contract = {
       id: this.generateId(),
       title: `Contrato #${Math.floor(Math.random() * 10000)
@@ -392,6 +393,7 @@ export class ContractGenerator {
       difficulty,
       contractorType: contractor.type,
       contractorName: contractor.name,
+      unusualContractor: contractor.unusualContractor,
       objective,
       location,
       prerequisites,
@@ -412,6 +414,7 @@ export class ContractGenerator {
         settlementType: guild.settlementType,
         rewardRollBonus: rewardRollBonus > 0 ? rewardRollBonus : undefined,
       },
+      themeKeywords,
       createdAt: new Date(),
     };
 
@@ -1150,19 +1153,40 @@ export class ContractGenerator {
 
   /**
    * Gera o contratante
-   * 1. Rola 1d20 para determinar tipo (Povo/Instituição/Governo)
-   * 2. Aplica modificadores por relação com população e governo
-   * 3. Se for governo, gera contratante específico
+   * 1. Verifica se será um contratante inusitado (1d20, apenas 1 = Sim)
+   * 2. Se não for inusitado, usa sistema padrão com modificadores
+   * 3. Aplica modificadores por relação com população e governo
+   * 4. Se for governo, gera contratante específico
    */
   private static generateContractor(guild: Guild): {
     type: ContractorType;
     name: string;
     description: string;
+    unusualContractor?: {
+      isUnusual: boolean;
+      description: string;
+      themeKeywords: ThemeKeyword[];
+    };
   } {
-    // 1. Rolagem base 1d20
+    // 1. Verificar se será um contratante inusitado
+    const unusualContractor = generateUnusualContractor();
+    
+    if (unusualContractor.isUnusual) {
+      // Contratante inusitado - usar descrição especial
+      return {
+        type: ContractorType.POVO, // Por padrão, contratantes inusitados são classificados como "povo"
+        name: "Contratante Especial",
+        description: unusualContractor.description,
+        unusualContractor,
+      };
+    }
+
+    // 2. Contratante normal - seguir lógica padrão
+    
+    // Rolagem base 1d20
     let contractorRoll = rollDice({ notation: "1d20" }).result;
 
-    // 2. Aplicar modificadores por relação com população
+    // Aplicar modificadores por relação com população
     const populationRelation = this.mapRelationLevelToString(
       guild.relations.population
     );
@@ -1187,7 +1211,7 @@ export class ContractGenerator {
         break;
     }
 
-    // 3. Aplicar modificadores por relação com governo
+    // Aplicar modificadores por relação com governo
     const governmentRelation = this.mapRelationLevelToString(
       guild.relations.government
     );
@@ -1212,7 +1236,7 @@ export class ContractGenerator {
         break;
     }
 
-    // 4. Determinar tipo de contratante baseado no resultado modificado
+    // Determinar tipo de contratante baseado no resultado modificado
     let contractorType: ContractorType;
     let description = "";
 
@@ -1227,10 +1251,10 @@ export class ContractGenerator {
       description = "Representante do governo local";
     }
 
-    // 5. Gerar nome básico do contratante
+    // Gerar nome básico do contratante
     let contractorName = this.generateBasicContractorName(contractorType);
 
-    // 6. Se for governo, determinar contratante específico
+    // Se for governo, determinar contratante específico
     if (contractorType === ContractorType.GOVERNO) {
       const governmentDetail = this.generateGovernmentContractor();
       contractorName = governmentDetail.name;
@@ -1241,6 +1265,7 @@ export class ContractGenerator {
       type: contractorType,
       name: contractorName,
       description,
+      unusualContractor, // Incluir sempre, mesmo para contratantes normais (para as palavras-chave)
     };
   }
 
@@ -1877,7 +1902,16 @@ export class ContractGenerator {
   private static generateFullContractDescription(params: {
     objective: ContractObjective;
     location: ContractLocation;
-    contractor: { type: ContractorType; name: string; description: string };
+    contractor: { 
+      type: ContractorType; 
+      name: string; 
+      description: string; 
+      unusualContractor?: {
+        isUnusual: boolean;
+        description: string;
+        themeKeywords: ThemeKeyword[];
+      };
+    };
     antagonist: Antagonist;
     complications: Complication[];
     twists: Twist[];
@@ -1893,6 +1927,7 @@ export class ContractGenerator {
     };
     paymentType: PaymentType;
     distanceRoll?: number;
+    themeKeywords?: ThemeKeyword[];
   }): string {
     const {
       objective,
@@ -1910,14 +1945,28 @@ export class ContractGenerator {
       deadline,
       paymentType,
       distanceRoll,
+      themeKeywords,
     } = params;
 
     const sections: string[] = [];
 
     // 1. Contratante
-    sections.push(
-      `**Contratante:** ${contractor.name} (${contractor.description})`
-    );
+    let contractorText = `**Contratante:** ${contractor.name} (${contractor.description})`;
+    
+    // Adicionar informações de contratante inusitado se aplicável
+    if (contractor.unusualContractor?.isUnusual) {
+      contractorText += `\n→ **Contratante Inusitado**: ${contractor.unusualContractor.description}`;
+    }
+    
+    // Adicionar palavras-chave temáticas se existirem
+    if (contractor.unusualContractor?.themeKeywords && contractor.unusualContractor.themeKeywords.length > 0) {
+      const keywordsList = contractor.unusualContractor.themeKeywords
+        .map(kw => kw.keyword)
+        .join(", ");
+      contractorText += `\n→ Palavras-chave para criatividade do contratante: ${keywordsList}`;
+    }
+    
+    sections.push(contractorText);
 
     // 2. Objetivo
     const objectiveText = `**Objetivo:** ${objective.description} (${objective.specificObjective})`;
@@ -2058,6 +2107,14 @@ export class ContractGenerator {
     // 16. Tipo de pagamento
     const paymentText = this.getPaymentTypeDescription(paymentType);
     sections.push(`**Forma de pagamento:** ${paymentText}`);
+
+    // 17. Palavras-chave temáticas para criatividade
+    if (themeKeywords && themeKeywords.length > 0) {
+      const keywordsList = themeKeywords
+        .map(kw => kw.keyword)
+        .join(", ");
+      sections.push(`**Palavras-chave para o contrato:** ${keywordsList}`);
+    }
 
     return sections.join("\n");
   }
