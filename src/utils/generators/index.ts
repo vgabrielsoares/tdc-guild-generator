@@ -16,5 +16,6 @@ export * from './contractGenerator'
 export * from './serviceGenerator'
 export * from './memberGenerator'
 export * from './noticeGenerator'
+export * from './complicationGenerator'
 
 export { generateQuickGuild as createGuild } from './guild-generator';

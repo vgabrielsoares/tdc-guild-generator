@@ -7,6 +7,8 @@ import { convertToGuild } from './utils/test-helpers';
 describe('Guild Improvements', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+    // Limpar localStorage para isolar os testes
+    localStorage.clear();
   });
 
   describe('Guild Name Update', () => {
@@ -101,6 +103,9 @@ describe('Guild Improvements', () => {
     it('should prevent removal of locked guilds', async () => {
       const guildStore = useGuildStore();
       
+      // Limpar histórico para garantir estado limpo
+      guildStore.clearHistory();
+      
       await guildStore.generateGuild({
         settlementType: SettlementType.POVOADO,
         saveToHistory: false
@@ -108,6 +113,9 @@ describe('Guild Improvements', () => {
       
       const guild = convertToGuild(guildStore.currentGuild!);
       guildStore.addToHistory(guild);
+      
+      // Verificar que temos apenas 1 guilda
+      expect(guildStore.guildHistory).toHaveLength(1);
       
       // Bloquear a guilda
       guildStore.toggleGuildLock(guild.id);
@@ -120,6 +128,9 @@ describe('Guild Improvements', () => {
 
     it('should keep locked guilds when clearing history', async () => {
       const guildStore = useGuildStore();
+      
+      // Limpar histórico para garantir estado limpo
+      guildStore.clearHistory();
       
       // Gerar múltiplas guildas
       await guildStore.generateGuild({
@@ -138,12 +149,12 @@ describe('Guild Improvements', () => {
       
       // Bloquear apenas a primeira
       guildStore.toggleGuildLock(guild1.id);
-      
+
       expect(guildStore.guildHistory).toHaveLength(2);
-      
+
       // Limpar histórico
       guildStore.clearHistory();
-      
+
       // Apenas a guilda bloqueada deve permanecer
       expect(guildStore.guildHistory).toHaveLength(1);
       expect(guildStore.guildHistory[0].id).toBe(guild1.id);
