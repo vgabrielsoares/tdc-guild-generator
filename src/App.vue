@@ -54,8 +54,12 @@ import { useRoute } from 'vue-router'
 import { SparklesIcon } from '@heroicons/vue/24/outline'
 import PWAManager from '@/components/common/PWAManager.vue'
 import Toast from '@/components/common/Toast.vue'
+import { useTimelineIntegration } from '@/composables/useTimelineIntegration'
 
 const route = useRoute()
+
+// Inicializar integração automática entre timeline e contratos
+useTimelineIntegration()
 
 const navigation = [
   { name: 'Início', href: '/' },

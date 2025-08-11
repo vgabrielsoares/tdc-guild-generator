@@ -1,15 +1,64 @@
 <template>
   <div class="space-y-8">
-    <!-- Hero Section -->
     <div class="text-center bg-gradient-to-r from-guild-800 to-guild-900 rounded-lg p-8 mb-8">
-      <h1 class="text-4xl font-medieval font-bold text-gold-400 mb-4 flex items-center justify-center gap-3">
-        <SparklesIcon class="w-10 h-10 text-gold-400" />
-        Gerador de Guildas
-      </h1>
-      <p class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+      <div class="flex items-center justify-center mb-6">
+        <img src="/guild-logo.svg" alt="Logo da Guilda" class="w-20 h-20 mr-4" />
+        <div>
+          <h1 class="text-4xl font-medieval font-bold text-gold-400 mb-2">
+            A Guilda
+          </h1>
+          <p class="text-lg text-blue-300 italic">"A lâmina que desbrava; a mão que une."</p>
+        </div>
+      </div>
+      <p class="text-xl text-gray-300 mb-6 max-w-3xl mx-auto">
         Sistema completo para geração procedural de guildas de aventureiros para RPG de mesa.
-        Baseado nas regras e tabelas tradicionais de guildas medievais.
+        Em um mundo onde a magia pulsa nas veias da realidade, A Guilda surgiu da mais pragmática das necessidades: resolver problemas que ninguém mais ousa enfrentar.
       </p>
+      
+      <!-- Botão das Regras da Guilda -->
+      <div class="flex justify-center space-x-4">
+        <button
+          @click="openRulesModal"
+          class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium flex items-center space-x-2"
+        >
+          <BookOpenIcon class="w-5 h-5" />
+          <span>Regras da Guilda</span>
+        </button>
+        <button
+          @click="navigateTo('/guild')"
+          class="px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors duration-200 font-medium flex items-center space-x-2"
+        >
+          <HomeIcon class="w-5 h-5" />
+          <span>Começar Agora</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Sobre a Guilda -->
+    <div class="bg-gray-800 rounded-lg p-8 border border-gray-700">
+      <h2 class="text-2xl font-semibold text-amber-400 mb-4 flex items-center space-x-2">
+        <InformationCircleIcon class="w-6 h-6" />
+        <span>O que é a Guilda?</span>
+      </h2>
+      <div class="text-gray-300 space-y-4">
+        <p>
+          <strong class="text-white">A Guilda</strong> não é uma família, caridade ou governo. É uma ponte entre quem precisa e quem pode resolver. 
+          Seu papel é garantir que contratos sejam justos, pagamentos honrados e riscos calculados.
+        </p>
+        <p>
+          Por trás de cada missão há uma história, uma necessidade: um camponês oferecendo suas economias para salvar a filha raptada; 
+          um anão trocando sua herança por vingança; um mago pagando fortunas por conhecimento proibido. 
+          <strong class="text-amber-400">A Guilda não julga motivos — apenas garante que o acordo seja cumprido.</strong>
+        </p>
+        <div class="bg-blue-900 bg-opacity-20 rounded-lg p-4 border border-blue-700">
+          <h3 class="font-semibold text-blue-300 mb-2">Para Mestres de RPG</h3>
+          <p class="text-blue-200 text-sm">
+            Este sistema permite criar rapidamente sedes da Guilda com características únicas, 
+            relações políticas complexas e recursos variados. Use os resultados gerados como 
+            base para aventuras, mas sinta-se livre para adaptar tudo à sua campanha.
+          </p>
+        </div>
+      </div>
     </div>
 
     <!-- Quick Start Cards -->
@@ -55,22 +104,33 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal das Regras da Guilda -->
+    <HelpModal
+      :is-open="showRulesModal"
+      help-key="guild-rules"
+      @close="showRulesModal = false"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import {
-  SparklesIcon,
   HomeIcon,
   DocumentTextIcon,
   WrenchScrewdriverIcon,
   UserGroupIcon,
   ClipboardDocumentListIcon,
-  TrophyIcon
+  TrophyIcon,
+  BookOpenIcon,
+  InformationCircleIcon
 } from '@heroicons/vue/24/solid'
+import HelpModal from '@/components/common/HelpModal.vue'
 
 const router = useRouter()
+const showRulesModal = ref(false)
 
 const features = [
   {
@@ -113,5 +173,9 @@ const features = [
 
 const navigateTo = (path: string) => {
   router.push(path)
+}
+
+const openRulesModal = () => {
+  showRulesModal.value = true
 }
 </script>

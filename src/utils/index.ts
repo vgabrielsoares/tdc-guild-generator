@@ -14,3 +14,6 @@ export { rollOnTable as rollOnTableUtil } from "./tableRoller";
 export * from "./storage";
 export * from "./csvExport";
 export * from "./csvImport";
+
+// Generators
+export * from "./generators/complicationGenerator";

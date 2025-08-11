@@ -121,7 +121,7 @@ describe("Issue 3.4 - Guild Store Complete", () => {
       });
 
       expect(store.historyCount).toBe(1);
-      expect(store.guildHistory[0]).toBe(store.currentGuild);
+      expect(store.guildHistory[0]).toStrictEqual(store.currentGuild);
     });
 
     it("should not add guild to history when saveToHistory is false", async () => {
@@ -411,10 +411,8 @@ describe("Issue 3.4 - Guild Store Complete", () => {
         settlementType: SettlementType.ALDEIA,
       });
 
-      await store.saveToStorage();
-
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
-        "generator-guild-store",
+        "guild-store",
         expect.any(String)
       );
     });
@@ -426,25 +424,26 @@ describe("Issue 3.4 - Guild Store Complete", () => {
         settlementType: SettlementType.ALDEIA,
       });
 
-      await store1.saveToStorage();
+      // Simular que os dados estão no localStorage
+      localStorageMock.getItem.mockReturnValue(JSON.stringify({
+        currentGuild: store1.currentGuild,
+        guildHistory: store1.guildHistory,
+        lastConfig: null
+      }));
 
-      // Create new store instance to test loading
+      // Create new store instance to test loading (automaticamente carrega do storage)
       const store2 = useGuildStore();
-      await store2.loadFromStorage();
 
       expect(store2.hasCurrentGuild).toBe(true);
       expect(store2.currentGuild?.settlementType).toBe(SettlementType.ALDEIA);
     });
 
     it("should handle corrupted localStorage data gracefully", async () => {
-      localStorageMock.setItem("generator-guild-store", "invalid json");
+      localStorageMock.getItem.mockReturnValue("invalid json");
 
+      // Com storage automático, dados corrompidos são ignorados
       const store = useGuildStore();
-      await store.loadFromStorage();
 
-      expect(localStorageMock.removeItem).toHaveBeenCalledWith(
-        "generator-guild-store"
-      );
       expect(store.hasCurrentGuild).toBe(false);
     });
   });

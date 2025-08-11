@@ -12,7 +12,7 @@ export default defineConfig({
       devOptions: {
         enabled: true
       },
-      includeAssets: ['favicon.ico', 'guild-logo.png', 'robots.txt'],
+      includeAssets: ['guild-logo.svg', 'robots.txt'],
       manifest: {
         name: 'Gerador de Guildas - Tabuleiro do Caos RPG',
         short_name: 'Guild Generator',
@@ -40,9 +40,9 @@ export default defineConfig({
             purpose: 'any maskable'
           },
           {
-            src: '/guild-logo.png',
+            src: '/guild-logo.svg',
             sizes: '100x100',
-            type: 'image/png'
+            type: 'image/svg+xml'
           }
         ],
         shortcuts: [
@@ -51,14 +51,14 @@ export default defineConfig({
             short_name: 'Nova Guilda',
             description: 'Gera uma nova guilda completa',
             url: '/guild?action=generate',
-            icons: [{ src: '/guild-logo.png', sizes: '96x96' }]
+            icons: [{ src: '/guild-logo.svg', sizes: '96x96' }]
           },
           {
             name: 'Ver Contratos',
             short_name: 'Contratos',
             description: 'Visualiza contratos disponíveis',
             url: '/contracts',
-            icons: [{ src: '/guild-logo.png', sizes: '96x96' }]
+            icons: [{ src: '/guild-logo.svg', sizes: '96x96' }]
           }
         ]
       },
