@@ -15,17 +15,13 @@
 
     <!-- Filtros rápidos -->
     <div v-if="showFilters" class="flex flex-wrap gap-2">
-      <button
-        v-for="(status, index) in statusFilters"
-        :key="status.value || `all-${index}`"
-        @click="$emit('filter-status', status.value)"
-        :class="[
+      <button v-for="(status, index) in statusFilters" :key="status.value || `all-${index}`"
+        @click="$emit('filter-status', status.value)" :class="[
           'px-3 py-1 rounded-full text-xs font-medium transition-colors',
           activeStatusFilter === status.value
             ? 'bg-amber-600 text-white'
             : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-        ]"
-      >
+        ]">
         {{ status.label }}
         <span v-if="status.count > 0" class="ml-1">
           ({{ status.count }})
@@ -35,19 +31,9 @@
 
     <!-- Lista de contratos -->
     <div v-if="filteredContracts.length > 0" class="space-y-3">
-      <div
-        v-for="contract in paginatedContracts"
-        :key="contract.id"
-        class="transition-all duration-200"
-      >
-        <ContractCard
-          :contract="contract"
-          :show-actions="showActions"
-          @accept="handleAccept"
-          @complete="handleComplete"
-          @abandon="handleAbandon"
-          @view-details="handleViewDetails"
-        />
+      <div v-for="contract in paginatedContracts" :key="contract.id" class="transition-all duration-200">
+        <ContractCard :contract="contract" :show-actions="showActions" @accept="handleAccept" @complete="handleComplete"
+          @abandon="handleAbandon" @view-details="handleViewDetails" @open-help="$emit('open-help', $event)" />
       </div>
     </div>
 
@@ -60,13 +46,12 @@
       <p class="text-gray-500 mb-4">
         {{ emptyStateMessage }}
       </p>
-      <button
-        v-if="canGenerate"
-        @click="$emit('generate')"
-        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition-colors"
-      >
-        Gerar Contratos
-      </button>
+      <div class="flex items-center justify-center gap-2">
+        <button v-if="canGenerate" @click="$emit('generate')"
+          class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition-colors">
+          Gerar Contratos
+        </button>
+      </div>
     </div>
 
     <!-- Loading state -->
@@ -78,27 +63,18 @@
     </div>
 
     <!-- Paginação -->
-    <div
-      v-if="totalPages > 1"
-      class="flex items-center justify-center gap-2 mt-6"
-    >
-      <button
-        @click="goToPage(currentPage - 1)"
-        :disabled="currentPage <= 1"
-        class="px-3 py-1 bg-gray-700 text-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600 transition-colors"
-      >
+    <div v-if="totalPages > 1" class="flex items-center justify-center gap-2 mt-6">
+      <button @click="goToPage(currentPage - 1)" :disabled="currentPage <= 1"
+        class="px-3 py-1 bg-gray-700 text-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600 transition-colors">
         Anterior
       </button>
-      
+
       <span class="px-3 py-1 text-gray-400">
         {{ currentPage }} de {{ totalPages }}
       </span>
-      
-      <button
-        @click="goToPage(currentPage + 1)"
-        :disabled="currentPage >= totalPages"
-        class="px-3 py-1 bg-gray-700 text-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600 transition-colors"
-      >
+
+      <button @click="goToPage(currentPage + 1)" :disabled="currentPage >= totalPages"
+        class="px-3 py-1 bg-gray-700 text-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600 transition-colors">
         Próxima
       </button>
     </div>
@@ -132,6 +108,7 @@ interface Emits {
   generate: [];
   'filter-status': [status: ContractStatus | null];
   'page-change': [page: number];
+  'open-help': [helpKey: string];
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -167,7 +144,7 @@ const paginatedContracts = computed(() => {
 
 const statusFilters = computed(() => {
   const statusCounts: Record<string, number> = {};
-  
+
   // Contar contratos por status
   props.contracts.forEach(contract => {
     statusCounts[contract.status] = (statusCounts[contract.status] || 0) + 1;

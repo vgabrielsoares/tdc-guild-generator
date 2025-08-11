@@ -1,9 +1,14 @@
 <template>
   <div class="space-y-6">
     <div class="text-center">
-      <h1 class="text-3xl font-medieval font-bold text-gold-400 mb-4">
-        <DocumentTextIcon class="w-8 h-8 inline mr-2" />
+      <h1 class="text-3xl font-medieval font-bold text-gold-400 mb-4 flex items-center justify-center gap-3">
+        <DocumentTextIcon class="w-7 h-7 text-gold-400" />
         Contratos da Guilda
+        <Tooltip
+          content="Sistema completo de geração e gerenciamento de contratos para aventureiros com valores dinâmicos baseados na sede da guilda."
+          title="Sistema de Contratos" position="auto">
+          <InfoButton help-key="contract-overview" @open-help="handleOpenHelp" button-class="ml-2" />
+        </Tooltip>
       </h1>
       <p class="text-lg text-gray-300 mb-8">
         Gerencie contratos da sede da guilda atual
@@ -23,30 +28,42 @@
         </span>
       </div>
 
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
         <div class="flex flex-col">
           <span class="text-gray-400 uppercase tracking-wide text-lg">Sede</span>
           <span class="text-white font-medium text-base">{{
             guild.structure.size
-            }}</span>
+          }}</span>
         </div>
         <div class="flex flex-col">
           <span class="text-gray-400 uppercase tracking-wide text-lg">Recursos</span>
           <span class="text-white font-medium text-base">{{
             guild.resources.level
-            }}</span>
+          }}</span>
         </div>
         <div class="flex flex-col">
           <span class="text-gray-400 uppercase tracking-wide text-lg">Rel. Governo</span>
           <span class="text-white font-medium text-base">{{
             guild.relations.government
-            }}</span>
+          }}</span>
         </div>
         <div class="flex flex-col">
           <span class="text-gray-400 uppercase tracking-wide text-lg">Rel. População</span>
           <span class="text-white font-medium text-base">{{
             guild.relations.population
             }}</span>
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-center gap-2">
+            <span class="text-gray-400 uppercase tracking-wide text-lg">Sistema de Contratos</span>
+            <Tooltip
+              content="Sistema de quantidade baseado no tamanho da sede, funcionários e frequentadores da guilda."
+              title="Como funciona a geração" position="auto">
+              <InfoButton help-key="contract-quantity" @open-help="handleOpenHelp"
+                button-class="text-gray-400 hover:text-amber-400" />
+            </Tooltip>
+          </div>
+          <span class="text-white font-medium text-base">Automático</span>
         </div>
       </div>
 
@@ -96,7 +113,8 @@
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <!-- Contadores de Timeline (coluna principal) -->
         <div class="lg:col-span-2">
-          <ContractTimeline @generate-contracts="handleGenerateContracts" @force-resolution="handleForceResolution" />
+          <ContractTimeline @generate-contracts="handleGenerateContracts" @force-resolution="handleForceResolution"
+            @open-help="handleOpenHelp" />
         </div>
 
         <!-- Controles de Timeline (sidebar) -->
@@ -133,8 +151,12 @@
       <ContractList :contracts="filteredContracts as Contract[]" :is-loading="isLoading" :show-actions="true"
         :show-filters="false" :can-generate="false" :active-status-filter="null" :current-page="currentPage"
         :page-size="pageSize" @accept="handleAcceptContract" @complete="handleCompleteContract"
-        @abandon="handleAbandonContract" @view-details="handleViewContractDetails" @page-change="handlePageChange" />
+        @abandon="handleAbandonContract" @view-details="handleViewContractDetails" @page-change="handlePageChange"
+        @open-help="handleOpenHelp" />
     </template>
+
+    <!-- Modal de Ajuda -->
+    <HelpModal :is-open="showHelpModal" :help-key="currentHelpKey" @close="handleCloseHelp" />
 
     <!-- Modal de Detalhes do Contrato -->
     <ContractDetails :is-open="showContractDetails" :contract="selectedContract" :show-debug-info="false"
@@ -160,6 +182,9 @@ import ContractDetails from "@/components/contracts/ContractDetails.vue";
 import ContractTimeline from "@/components/contracts/ContractTimeline.vue";
 import TimelineCounters from "@/components/contracts/TimelineCounters.vue";
 import TimelineControl from "@/components/common/TimelineControl.vue";
+import HelpModal from "@/components/common/HelpModal.vue";
+import InfoButton from "@/components/common/InfoButton.vue";
+import Tooltip from "@/components/common/Tooltip.vue";
 import {
   DocumentTextIcon,
   BuildingOfficeIcon,
@@ -196,6 +221,10 @@ const toastMessage = ref<string>("");
 // Modal de detalhes
 const showContractDetails = ref(false);
 const selectedContract = ref<Contract | null>(null);
+
+// Modal de ajuda
+const showHelpModal = ref(false);
+const currentHelpKey = ref<string>("");
 
 // Filtros locais
 const currentFilters = ref<ContractFilterState>({
@@ -355,6 +384,17 @@ function showToast(message: string) {
   setTimeout(() => {
     toastMessage.value = "";
   }, 3000);
+}
+
+// ===== MANIPULAÇÃO DO MODAL DE AJUDA =====
+function handleOpenHelp(helpKey: string) {
+  currentHelpKey.value = helpKey;
+  showHelpModal.value = true;
+}
+
+function handleCloseHelp() {
+  showHelpModal.value = false;
+  currentHelpKey.value = "";
 }
 
 // Utility para formatação de data

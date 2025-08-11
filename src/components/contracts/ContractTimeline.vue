@@ -1,6 +1,13 @@
 <template>
   <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
-    <h3 class="text-xl font-semibold text-white mb-6">Timeline de Contratos</h3>
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-xl font-semibold text-white">Timeline de Contratos</h3>
+      <Tooltip
+        content="Sistema de evolução temporal dos contratos: resolução automática, competição com NPCs e mudanças de status."
+        title="Ciclo de Vida dos Contratos" position="auto">
+        <InfoButton help-key="contract-lifecycle" @open-help="$emit('open-help', 'contract-lifecycle')" />
+      </Tooltip>
+    </div>
 
     <!-- Resumo temporal -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -95,6 +102,8 @@
 import { computed } from "vue";
 import { useTimeline } from "@/composables/useTimeline";
 import { useContractsStore } from "@/stores/contracts";
+import InfoButton from "@/components/common/InfoButton.vue";
+import Tooltip from "@/components/common/Tooltip.vue";
 import { ScheduledEventType } from "@/types/timeline";
 import { ContractStatus } from "@/types/contract";
 import { getDaysDifference } from "@/utils/date-utils";
@@ -105,6 +114,7 @@ defineEmits<{
   "generate-contracts": [];
   "force-resolution": [];
   "pass-time": [];
+  "open-help": [key: string];
 }>();
 
 // Stores e composables
