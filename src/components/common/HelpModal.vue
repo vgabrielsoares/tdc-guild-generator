@@ -1,37 +1,21 @@
 <template>
   <Teleport to="body">
-    <Transition
-      enter-active-class="transition-opacity duration-300"
-      leave-active-class="transition-opacity duration-300"
-      enter-from-class="opacity-0"
-      leave-to-class="opacity-0"
-    >
-      <div
-        v-if="isOpen"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75"
-        @click="closeModal"
-      >
-        <Transition
-          enter-active-class="transition-all duration-300"
-          leave-active-class="transition-all duration-300"
-          enter-from-class="opacity-0 transform scale-95"
-          leave-to-class="opacity-0 transform scale-95"
-        >
-          <div
-            v-if="isOpen"
-            @click.stop
-            class="relative bg-gray-800 rounded-lg shadow-xl border border-gray-600 max-w-2xl w-full max-h-[80vh] overflow-hidden"
-          >
+    <Transition enter-active-class="transition-opacity duration-300"
+      leave-active-class="transition-opacity duration-300" enter-from-class="opacity-0" leave-to-class="opacity-0">
+      <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75"
+        @click="closeModal">
+        <Transition enter-active-class="transition-all duration-300" leave-active-class="transition-all duration-300"
+          enter-from-class="opacity-0 transform scale-95" leave-to-class="opacity-0 transform scale-95">
+          <div v-if="isOpen" @click.stop
+            class="relative bg-gray-800 rounded-lg shadow-xl border border-gray-600 max-w-2xl w-full max-h-[80vh] overflow-hidden">
             <!-- Header -->
             <div class="flex items-center justify-between p-6 border-b border-gray-600">
               <h3 class="text-xl font-semibold text-amber-400 flex items-center space-x-2">
                 <InformationCircleIcon class="w-6 h-6" />
                 <span>{{ helpData?.title || 'Ajuda' }}</span>
               </h3>
-              <button
-                @click="closeModal"
-                class="text-gray-400 hover:text-white transition-colors duration-200 p-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
+              <button @click="closeModal"
+                class="text-gray-400 hover:text-white transition-colors duration-200 p-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <XMarkIcon class="w-6 h-6" />
               </button>
             </div>
@@ -46,11 +30,8 @@
 
                 <!-- Seções de explicação -->
                 <div v-if="helpData.sections" class="space-y-4">
-                  <div
-                    v-for="section in helpData.sections"
-                    :key="section.title"
-                    class="border-l-4 border-blue-500 pl-4"
-                  >
+                  <div v-for="section in helpData.sections" :key="section.title"
+                    class="border-l-4 border-blue-500 pl-4">
                     <h4 class="font-semibold text-blue-400 mb-2">{{ section.title }}</h4>
                     <div class="text-gray-300 text-sm space-y-2">
                       <p v-for="paragraph in section.content" :key="paragraph">
@@ -61,7 +42,8 @@
                 </div>
 
                 <!-- Dicas -->
-                <div v-if="helpData.tips" class="mt-6 bg-amber-900 bg-opacity-20 rounded-lg p-4 border border-amber-700">
+                <div v-if="helpData.tips"
+                  class="mt-6 bg-amber-900 bg-opacity-20 rounded-lg p-4 border border-amber-700">
                   <h4 class="font-semibold text-amber-400 mb-2 flex items-center space-x-2">
                     <LightBulbIcon class="w-5 h-5" />
                     <span>Dicas para Mestres</span>
@@ -75,7 +57,8 @@
                 </div>
 
                 <!-- Exemplos -->
-                <div v-if="helpData.examples" class="mt-6 bg-green-900 bg-opacity-20 rounded-lg p-4 border border-green-700">
+                <div v-if="helpData.examples"
+                  class="mt-6 bg-green-900 bg-opacity-20 rounded-lg p-4 border border-green-700">
                   <h4 class="font-semibold text-green-400 mb-2 flex items-center space-x-2">
                     <DocumentTextIcon class="w-5 h-5" />
                     <span>Exemplos</span>
@@ -98,10 +81,8 @@
 
             <!-- Footer -->
             <div class="flex justify-end p-6 border-t border-gray-600">
-              <button
-                @click="closeModal"
-                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
+              <button @click="closeModal"
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
                 Entendi
               </button>
             </div>
@@ -114,13 +95,14 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { 
-  XMarkIcon, 
-  InformationCircleIcon, 
-  LightBulbIcon, 
-  DocumentTextIcon 
+import {
+  XMarkIcon,
+  InformationCircleIcon,
+  LightBulbIcon,
+  DocumentTextIcon
 } from '@heroicons/vue/24/outline'
 import { guildHelpData } from '@/data/help/guild-help'
+import { contractHelpData } from '@/data/help/contract-help'
 
 interface HelpSection {
   title: string
@@ -157,12 +139,14 @@ const helpData = ref<HelpData | null>(null)
 watch(() => [props.helpKey, props.isOpen] as const, async ([newKey, isOpen]) => {
   if (newKey && isOpen) {
     helpData.value = null
-    
+
     // Pequeno delay para simular carregamento
     await new Promise(resolve => setTimeout(resolve, 150))
-    
-    // Carregar dados reais da ajuda
-    if (newKey in guildHelpData) {
+
+    // Carregar dados reais da ajuda (primeiro tentar contratos, depois guildas)
+    if (newKey in contractHelpData) {
+      helpData.value = contractHelpData[newKey]
+    } else if (newKey in guildHelpData) {
       helpData.value = guildHelpData[newKey]
     } else {
       // Fallback para chaves não encontradas
