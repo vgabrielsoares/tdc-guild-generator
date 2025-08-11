@@ -5,7 +5,7 @@
         <HomeIcon class="w-7 h-7 text-gold-400" />
         Estrutura da Guilda
         <Tooltip content="Sistema completo de geração de sedes da Guilda com estrutura, relações e recursos dinâmicos."
-          title="Gerador de Guildas">
+          title="Gerador de Guildas" position="auto">
           <InfoButton help-key="guild-overview" @open-help="openHelpModal" button-class="ml-2" />
         </Tooltip>
       </h1>

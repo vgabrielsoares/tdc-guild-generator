@@ -30,6 +30,11 @@
               </div>
             </div>
 
+            <!-- Painel de Ajuda -->
+            <div class="px-6">
+              <ContractHelpPanel :is-open="showHelpPanel" :help-key="currentHelpKey" @close="handleCloseHelp" />
+            </div>
+
             <!-- Content -->
             <div class="p-6 overflow-y-auto max-h-[calc(90vh-180px)]">
               <div class="space-y-6">
@@ -43,10 +48,17 @@
 
                 <!-- 1. Objetivo -->
                 <section v-if="contract.objective">
-                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Objetivo</h4>
+                  <div class="flex items-center gap-2 mb-2">
+                    <h4 class="text-lg font-semibold text-amber-400">Objetivo</h4>
+                    <InfoButton help-key="contract-objectives" @open-help="handleOpenHelp('contract-objectives')"
+                      button-class="text-xs" />
+                  </div>
                   <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
                     <div class="flex items-center gap-2 mb-2">
-                      <XCircleIcon class="w-5 h-5 text-amber-400" />
+                      <ContractTooltip :content="getObjectiveTooltip(contract.objective.category)"
+                        :title="'Categoria do Objetivo'">
+                        <XCircleIcon class="w-5 h-5 text-amber-400" />
+                      </ContractTooltip>
                       <span class="font-medium text-white">{{ getCategoryDisplayName(contract.objective.category)
                       }}</span>
                     </div>
@@ -101,10 +113,16 @@
 
                 <!-- 2. Localidade -->
                 <section v-if="contract.location">
-                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Localidade</h4>
+                  <div class="flex items-center gap-2 mb-2">
+                    <h4 class="text-lg font-semibold text-amber-400">Localidade</h4>
+                    <InfoButton help-key="contract-locations" @open-help="handleOpenHelp('contract-locations')"
+                      button-class="text-xs" />
+                  </div>
                   <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
                     <div class="flex items-center gap-2 mb-2">
-                      <MapPinIcon class="w-5 h-5 text-amber-400" />
+                      <ContractTooltip :content="getLocationTooltip()" :title="'Local da Missão'">
+                        <MapPinIcon class="w-5 h-5 text-amber-400" />
+                      </ContractTooltip>
                       <span class="font-medium text-white">{{ contract.location.name }}</span>
                     </div>
 
@@ -228,10 +246,16 @@
 
                 <!-- 4. Antagonista -->
                 <section>
-                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Antagonista</h4>
+                  <div class="flex items-center gap-2 mb-2">
+                    <h4 class="text-lg font-semibold text-amber-400">Antagonista</h4>
+                    <InfoButton help-key="contract-antagonists" @open-help="handleOpenHelp('contract-antagonists')"
+                      button-class="text-xs" />
+                  </div>
                   <div class="bg-red-900/20 rounded-lg p-4 border border-red-500/30">
                     <div class="flex items-center gap-2 mb-2">
-                      <UserMinusIcon class="w-5 h-5 text-red-400" />
+                      <ContractTooltip :content="getAntagonistTooltip()" :title="'Oposição do Contrato'">
+                        <UserMinusIcon class="w-5 h-5 text-red-400" />
+                      </ContractTooltip>
                       <span class="font-medium text-white">{{ contract.antagonist.specificType }}</span>
                       <span class="text-sm text-red-300 bg-red-800/50 px-2 py-1 rounded">
                         {{ getCategoryDisplayName(contract.antagonist.category) }}
@@ -243,12 +267,18 @@
 
                 <!-- 5. Complicações -->
                 <section v-if="contract.complications?.length">
-                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Complicações</h4>
+                  <div class="flex items-center gap-2 mb-2">
+                    <h4 class="text-lg font-semibold text-amber-400">Complicações</h4>
+                    <InfoButton help-key="contract-complications" @open-help="handleOpenHelp('contract-complications')"
+                      button-class="text-xs" />
+                  </div>
                   <div class="space-y-3">
                     <div v-for="complication in contract.complications" :key="complication.category"
                       class="bg-orange-900/20 rounded-lg p-4 border border-orange-500/30">
                       <div class="flex items-center gap-2 mb-2">
-                        <ExclamationCircleIcon class="w-5 h-5 text-orange-400" />
+                        <ContractTooltip :content="getComplicationTooltip()" :title="'Complicação da Missão'">
+                          <ExclamationCircleIcon class="w-5 h-5 text-orange-400" />
+                        </ContractTooltip>
                         <span class="font-medium text-white">{{ complication.specificDetail }}</span>
                         <span class="text-sm text-orange-300 bg-orange-800/50 px-2 py-1 rounded">
                           {{ getCategoryDisplayName(complication.category) }}
@@ -261,12 +291,18 @@
 
                 <!-- 6. Aliados -->
                 <section v-if="contract.allies?.length">
-                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Aliados Potenciais</h4>
+                  <div class="flex items-center gap-2 mb-2">
+                    <h4 class="text-lg font-semibold text-amber-400">Aliados Potenciais</h4>
+                    <InfoButton help-key="contract-allies" @open-help="handleOpenHelp('contract-allies')"
+                      button-class="text-xs" />
+                  </div>
                   <div class="space-y-3">
                     <div v-for="ally in contract.allies" :key="ally.name"
                       class="bg-green-900/20 rounded-lg p-4 border border-green-500/30">
                       <div class="flex items-center gap-2 mb-2">
-                        <UserPlusIcon class="w-5 h-5 text-green-400" />
+                        <ContractTooltip :content="getAllyTooltip()" :title="'Aliado Potencial'">
+                          <UserPlusIcon class="w-5 h-5 text-green-400" />
+                        </ContractTooltip>
                         <span class="font-medium text-white">{{ ally.name }}</span>
                         <span class="text-sm text-green-300 bg-green-800/50 px-2 py-1 rounded">
                           {{ getCategoryDisplayName(ally.category) }}
@@ -385,7 +421,11 @@
 
                 <!-- 9. Pagamento -->
                 <section>
-                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Pagamento</h4>
+                  <div class="flex items-center gap-2 mb-2">
+                    <h4 class="text-lg font-semibold text-amber-400">Pagamento</h4>
+                    <InfoButton help-key="contract-payment" @open-help="handleOpenHelp('contract-payment')"
+                      button-class="text-xs" />
+                  </div>
                   <ContractValue :value="contract.value" :difficulty="contract.difficulty"
                     :contractor-type="contract.contractorType" :payment-type="contract.paymentType" size="lg" />
 
@@ -489,12 +529,18 @@
 
                 <!-- Pré-requisitos e Cláusulas -->
                 <section v-if="contract.prerequisites?.length || contract.clauses?.length">
-                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Requisitos e Condições</h4>
+                  <div class="flex items-center gap-2 mb-2">
+                    <h4 class="text-lg font-semibold text-amber-400">Requisitos e Condições</h4>
+                    <InfoButton help-key="contract-requirements" @open-help="handleOpenHelp('contract-requirements')"
+                      button-class="text-xs" />
+                  </div>
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div v-if="contract.prerequisites?.length"
                       class="bg-gray-700 rounded-lg p-4 border border-gray-600">
                       <h5 class="font-medium text-white mb-2 flex items-center gap-2">
-                        <ExclamationTriangleIcon class="w-5 h-5 text-yellow-400" />
+                        <ContractTooltip :content="getPrerequisiteTooltip()" :title="'Pré-requisitos do Contrato'">
+                          <ExclamationTriangleIcon class="w-5 h-5 text-yellow-400" />
+                        </ContractTooltip>
                         Pré-requisitos
                       </h5>
                       <ul class="text-md text-gray-300 space-y-1">
@@ -508,7 +554,9 @@
 
                     <div v-if="contract.clauses?.length" class="bg-gray-700 rounded-lg p-4 border border-gray-600">
                       <h5 class="font-medium text-white mb-2 flex items-center gap-2">
-                        <DocumentTextIcon class="w-5 h-5 text-blue-400" />
+                        <ContractTooltip :content="getClauseTooltip()" :title="'Cláusulas Especiais'">
+                          <DocumentTextIcon class="w-5 h-5 text-blue-400" />
+                        </ContractTooltip>
                         Cláusulas Especiais
                       </h5>
                       <ul class="text-md text-gray-300 space-y-1">
@@ -610,12 +658,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import type { Contract } from '@/types/contract';
 import { ContractorType, ContractDifficulty, PaymentType } from '@/types/contract';
 import { ContractGenerator } from '@/utils/generators/contractGenerator';
 import ContractStatus from './ContractStatus.vue';
 import ContractValue from './ContractValue.vue';
+import ContractTooltip from './ContractTooltip.vue';
+import ContractHelpPanel from './ContractHelpPanel.vue';
+import InfoButton from '@/components/common/InfoButton.vue';
 import {
   UsersIcon,
   BuildingOfficeIcon,
@@ -657,6 +708,10 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<Emits>();
+
+// ===== STATE =====
+const showHelpPanel = ref(false);
+const currentHelpKey = ref('');
 
 // ===== COMPUTED =====
 
@@ -872,6 +927,74 @@ function formatMarkdown(text: string): string {
     .replace(/\*\*(.*?)\*\*/g, '<strong class="text-amber-300">$1</strong>')
     // Preservar quebras de linha
     .replace(/\n/g, '<br>');
+}
+
+function getObjectiveTooltip(category: string): string {
+  const tooltips: Record<string, string> = {
+    "Eliminação": "Derrotar criaturas, bandidos ou ameaças específicas. Use o valor XP para balancear encontros.",
+    "Escolta": "Proteger pessoas ou caravanas durante viagens. Considere perigos da jornada e valor da carga.",
+    "Investigação": "Descobrir informações e resolver mistérios. Desafios sociais e de conhecimento.",
+    "Recuperação": "Encontrar objetos, pessoas ou locais perdidos. Pode envolver exploração e busca.",
+    "Diplomacia": "Negociar acordos e resolver conflitos pacificamente. Foco em interpretação e persuasão."
+  };
+
+  return tooltips[category] || `Categoria: ${category}. Use criatividade para desenvolver os desafios.`;
+}
+
+function getLocationTooltip(): string {
+  if (!props.contract?.location) return "Localização não especificada.";
+
+  let tooltip = `Local da missão: ${props.contract.location.name}.`;
+
+  if (props.contract.distance) {
+    tooltip += ` Distância: ${props.contract.distance.result}.`;
+  }
+
+  tooltip += " A distância afeta o valor do contrato e pode requerer preparação especial para viagem.";
+
+  return tooltip;
+}
+
+function getAntagonistTooltip(): string {
+  if (!props.contract?.antagonist) return "Antagonista não especificado.";
+
+  const category = props.contract.antagonist.category;
+  const tooltips: Record<string, string> = {
+    "Humanoides": "Bandidos, cultistas, mercenários ou espiões. Use o valor XP para balancear encontros e motivações.",
+    "Monstros": "Bestas selvagens, aberrações ou mortos-vivos. Considere habitat natural e comportamento.",
+    "Naturais": "Desastres, pragas ou fenômenos climáticos. Desafios ambientais e de sobrevivência.",
+    "Políticos": "Corrupção, burocracia ou conflitos de interesse. Foco em interpretação e investigação.",
+    "Arcanos": "Magia descontrolada, entidades planares ou maldições. Mistério e elementos sobrenaturais."
+  };
+
+  return tooltips[category] || `Categoria: ${category}. Adapte o antagonista ao valor XP e atmosfera do contrato.`;
+}
+
+function getComplicationTooltip(): string {
+  return "Elementos que tornam o contrato mais interessante e desafiador. Use para aprofundar a narrativa, não apenas para dificultar. Reviravoltas devem fazer sentido em retrospecto.";
+}
+
+function getAllyTooltip(): string {
+  return "NPCs que podem auxiliar durante a missão. Use para compensar fraquezas do grupo ou criar dinâmicas interessantes. Considere como podem retornar em aventuras futuras.";
+}
+
+function getPrerequisiteTooltip(): string {
+  return "Exigências que devem ser atendidas antes de aceitar o contrato. Baseadas no valor do contrato - missões mais valiosas têm mais exigências. Cada pré-requisito adiciona +5 à recompensa.";
+}
+
+function getClauseTooltip(): string {
+  return "Condições especiais que devem ser seguidas durante a missão. Podem criar reviravoltas interessantes na narrativa. Cada cláusula adiciona +5 à recompensa e podem ter consequências se quebradas.";
+}
+
+// ===== HELP PANEL FUNCTIONS =====
+function handleOpenHelp(helpKey: string) {
+  currentHelpKey.value = helpKey;
+  showHelpPanel.value = true;
+}
+
+function handleCloseHelp() {
+  showHelpPanel.value = false;
+  currentHelpKey.value = '';
 }
 </script>
 
