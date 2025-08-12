@@ -591,33 +591,53 @@ Use a tabela para determinar a origem e inspire-se para criar motivações e obs
 
 #### Origem do Problema
 
-| 1d20  | Raiz do problema                      |
-| ----- | ------------------------------------- |
-| 1-2   | Tradição/conflito familiar            |
-| 3-5   | Corrupção no governo local            |
-| 6     | Aproveitador/charlatão                |
-| 7-12  | Algo mundano, corriqueiro ou natural  |
-| 13-14 | O local/ambiente é desagradável       |
-| 15    | Sociedade Secreta buscando um tesouro |
-| 16-17 | Criaturas de fora do assentamento     |
-| 18    | Seres de outro plano                  |
-| 19    | Ordem religiosa com boas intenções    |
-| 20    | A morte de um humanoide importante    |
+| d20 | Raiz do problema                          |
+| --- | ----------------------------------------- |
+| 1   | Tradição/conflito familiar                |
+| 2   | Corrupção no governo local                |
+| 3   | Aproveitador/charlatão                    |
+| 4   | Algo mundano, corriqueiro ou natural      |
+| 5   | Antiga promessa não cumprida              |
+| 6   | Falta de comunicação entre grupos         |
+| 7   | Criaturas de fora do assentamento         |
+| 8   | Desinformação ou boatos espalhados        |
+| 9   | Ordem religiosa com boas intenções        |
+| 10  | Escassez de recursos essenciais           |
+| 11  | Peste ou doença contagiosa                |
+| 12  | Profecia (possivelmente mal interpretada) |
+| 13  | Falta de mão-de-obra                      |
+| 14  | Interferência de feiticeiro/eremita       |
+| 15  | Fenômeno natural incomum                  |
+| 16  | Espionagem política                       |
+| 17  | Mudança repentina de liderança local      |
+| 18  | Disputa por território ou recursos        |
+| 19  | Evento sazonal inesperado                 |
+| 20  | A morte de um humanoide importante        |
 
 #### Complicador Adicional
 
-| 1d20  | E...                               |
-| ----- | ---------------------------------- |
-| 1-5   | Um pouco de azar                   |
-| 6     | Um mal entendido                   |
-| 7     | Intervenção divina                 |
-| 8-11  | Ganância                           |
-| 12-13 | A quebra de uma maldição           |
-| 14    | Um romance interrompido            |
-| 15-16 | Traição/chantagem/dívida           |
-| 17    | O sumiço de um importante artefato |
-| 18-19 | Conflito entre facções             |
-| 20    | Evento climático/desastre natural  |
+| d20 | E...                               |
+| --- | ---------------------------------- |
+| 1   | Um pouco de azar                   |
+| 2   | Um mal entendido                   |
+| 3   | Intervenção divina                 |
+| 4   | Ganância                           |
+| 5   | A quebra de uma maldição           |
+| 6   | Um romance interrompido            |
+| 7   | Traição                            |
+| 8   | O sumiço de um importante artefato |
+| 9   | Conflito entre facções             |
+| 10  | Chantagem                          |
+| 11  | Dívida                             |
+| 12  | Um atraso inesperado               |
+| 13  | Pressão do tempo                   |
+| 14  | Uma visita surpresa                |
+| 15  | Incompetência                      |
+| 16  | Acidente inesperado                |
+| 17  | Excesso de burocracia              |
+| 18  | Interferência externa              |
+| 19  | Mudança de planos                  |
+| 20  | Evento climático/desastre natural  |
 
 ### Complicações do Serviço
 
