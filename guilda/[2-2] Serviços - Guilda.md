@@ -527,7 +527,7 @@ Como as tabelas possuem três colunas, role um dado para cada coluna e una os re
 | 19  | Supervisionar transporte de carga      | Um grupo de crianças           | Exige uso de uniforme específico                     |
 | 20  | Cuidar de mascote                      | Um grupo de jovens aprendizes  | Há uma criatura hiperativa                           |
 
-###### Trabalho Rural (d6)
+###### Trabalho Rural (d20)
 
 Quando o resultado for 'Trabalho rural', role na seguinte tabela:
 
@@ -541,7 +541,7 @@ Quando o resultado for 'Trabalho rural', role na seguinte tabela:
 | 6   | Extrativismo                  |
 | 7   | Avicultura                    |
 | 8   | Irrigação                     |
-| 9   | Compostagem                   |
+| 9   | Cuidar do Esterco/Adubo       |
 | 10  | Plantio de mudas              |
 | 11  | Colheita                      |
 | 12  | Manutenção de cercas          |
@@ -562,26 +562,26 @@ Quando o resultado for 'Trabalho rural', role na seguinte tabela:
 
 | d20 | Religioso                     | O que/quem?          | Mas...                             |
 | --- | ----------------------------- | -------------------- | ---------------------------------- |
-| 1   | Ressuscitar                   | Um herói ancestral   | Envolve um ritual macabro          |
-| 2   | Converter/purificar           | Toda uma vila/culto  | Lendas locais preveem uma tragédia |
+| 1   | Pregar em praça pública       | Um herói ancestral   | Envolve um ritual macabro          |
+| 2   | Converter/purificar           | Toda uma vila/culto  | Rumores preveem uma tragédia       |
 | 3   | Retirar maldição              | Um condenado         | Há uma maldição                    |
 | 4   | Ministrar um evento religioso | Artefato mágico vivo | O líder local desaprova            |
 | 5   | Fazer um exorcismo            | Nobre poderoso       | Cultistas te observam              |
 | 6   | Administrar um templo         | Outros aventureiros  | Um charlatão tenta se aproveitar   |
 | 7   | Organizar procissão           | Comunidade local     | O clima está ruim                  |
-| 8   | Preparar oferenda             | Divindade menor      | Ingredientes são raros             |
-| 9   | Ensinar cânticos              | Crianças do vilarejo | Ninguém sabe a melodia             |
+| 8   | Preparar oferenda             | Divindade menor      | Um falso profeta surge             |
+| 9   | Ensinar cânticos              | Crianças do vilarejo | Símbolos religiosos foram roubados |
 | 10  | Restaurar altar               | Templo antigo        | O local é de difícil acesso        |
-| 11  | Abençoar colheita             | Agricultores         | Pragas ameaçam a plantação         |
-| 12  | Realizar batismo              | Grupo de jovens      | O rio está poluído                 |
-| 13  | Preparar festival             | Cidade vizinha       | O tempo é curto                    |
-| 14  | Mediar disputa religiosa      | Dois líderes locais  | O conflito é antigo                |
-| 15  | Escrever sermão               | Sacerdote            | O sacerdote está doente            |
-| 16  | Traduzir texto sagrado        | Estudioso            | O texto está incompleto            |
-| 17  | Cuidar de relíquia            | Ordem religiosa      | A relíquia é cobiçada por ladrões  |
+| 11  | Abençoar colheita             | Agricultores         | Recursos são considerados impuros  |
+| 12  | Realizar batismo              | Grupo de jovens      | Ofende outra religião/divindade    |
+| 13  | Preparar festival             | Besta Sagrada        | O evento coincide com outro        |
+| 14  | Mediar disputa religiosa      | Nobres menores       | O contratante esconde informações  |
+| 15  | Escrever sermão               | Sacerdote            | O ritual exige silêncio absoluto   |
+| 16  | Traduzir texto sagrado        | Estudioso            | Há divisão por rivalidade          |
+| 17  | Cuidar de relíquia            | Ordem religiosa      | O evento é alvo de sabotagem       |
 | 18  | Organizar retiro espiritual   | Grupo de fiéis       | O local é afastado                 |
-| 19  | Preparar casamento            | Casal de outra fé    | As famílias não se entendem        |
-| 20  | Ajudar em enterro             | Família enlutada     | O cemitério está lotado            |
+| 19  | Preparar casamento            | Líder Religioso      | O evento precisa ser secreto       |
+| 20  | Ajudar em enterro             | Festival Tradicional | Atrai curiosos indesejados         |
 
 ### A Raiz do Problema
 
