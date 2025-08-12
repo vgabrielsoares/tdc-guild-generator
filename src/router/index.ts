@@ -38,6 +38,11 @@ const router = createRouter({
       path: '/renown',
       name: 'renown',
       component: () => import('@/views/RenownView.vue')
+    },
+    {
+      path: '/timeline',
+      name: 'timeline',
+      component: () => import('@/views/GuildTimelineView.vue')
     }
   ]
 })
