@@ -6,11 +6,11 @@
     <!-- Navigation Header -->
     <nav class="bg-guild-800 shadow-lg">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
+        <div class="flex justify-center h-16">
           <div class="flex items-center">
             <div class="flex-shrink-0">
               <h1 class="text-xl font-medieval font-bold text-gold-400 flex items-center gap-2">
-                <SparklesIcon class="w-5 h-5 text-gold-400" />
+                <img src="/guild-logo.svg" alt="Guild Logo" class="w-5 h-5" />
                 Gerador de Guildas
               </h1>
             </div>
@@ -51,7 +51,6 @@
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
-import { SparklesIcon } from '@heroicons/vue/24/outline'
 import PWAManager from '@/components/common/PWAManager.vue'
 import Toast from '@/components/common/Toast.vue'
 import { useTimelineIntegration } from '@/composables/useTimelineIntegration'
