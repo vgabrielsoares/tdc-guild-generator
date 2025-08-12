@@ -654,18 +654,32 @@ Utilize as tabelas para determinar se haverá complicações, quais serão e sua
 
 #### Tipos de Complicações
 
-| 1d6 | Complicações                           |
-| --- | -------------------------------------- |
-| 1   | Governo local desaprova                |
-| 2   | Facção criminosa quer se aproveitar    |
-| 3   | Ordem religiosa/arcana interessada     |
-| 4   | Um rival do contratante fica enciumado |
-| 5   | Instituição de ofício afetada          |
-| 6   | Humanoides hostis                      |
+| d20 | Complicações                            |
+| --- | --------------------------------------- |
+| 1   | Governo local desaprova                 |
+| 2   | Facção criminosa quer se aproveitar     |
+| 3   | Ordem religiosa/arcana interessada      |
+| 4   | Um rival do contratante fica enciumado  |
+| 5   | Instituição de ofício afetada           |
+| 6   | Humanoides hostis                       |
+| 7   | Evento local interfere no cronograma    |
+| 8   | Animal ou mascote atrapalha             |
+| 9   | Grupo de moradores se opõe              |
+| 10  | Aliado do contratante discorda          |
+| 11  | Autoridade exige supervisão extra       |
+| 12  | Erro burocrático atrasa o andamento     |
+| 13  | Grupo rival tenta sabotar discretamente |
+| 14  | Acidente causa danos leves              |
+| 15  | Boato negativo se espalha               |
+| 16  | Fiscal inesperado aparece               |
+| 17  | Competidor oferece serviço mais barato  |
+| 18  | Terceiros ocupam o local                |
+| 19  | Pedido de alteração de última hora      |
+| 20  | Role duas vezes e use ambos             |
 
 #### Consequências das Complicações
 
-| 1d6 | E...                                           |
+| d20 | E...                                           |
 | --- | ---------------------------------------------- |
 | 1   | Entrará com medidas legais                     |
 | 2   | Manipulará as coisas por baixo dos panos       |
@@ -673,6 +687,20 @@ Utilize as tabelas para determinar se haverá complicações, quais serão e sua
 | 4   | Complicará sua vida caso seja bem-sucedido     |
 | 5   | Abusará de seu poder para conseguir o que quer |
 | 6   | Usarão de violência para te impedir            |
+| 7   | Contratante exigirá retrabalho                 |
+| 8   | Terá que negociar uma solução alternativa      |
+| 9   | Dará ordens contraditórias                     |
+| 10  | Reclamações de terceiros                       |
+| 11  | Sumirá com documentos essenciais               |
+| 12  | Fiscalização extra                             |
+| 13  | Vazará informações confidenciais               |
+| 14  | Exigirá compensação simbólica                  |
+| 15  | Contratará concorrentes para atrapalhar        |
+| 16  | Tentará atrasar o pagamento indefinidamente    |
+| 17  | Espalhará fofocas sobre sua competência        |
+| 18  | Fará exigências fora do escopo original        |
+| 19  | Contratante exige garantia adicional           |
+| 20  | Role duas vezes e use ambos                    |
 
 ### Rivais
 
@@ -704,18 +732,25 @@ Role nas tabelas para definir se há rivais envolvidos, suas ações e motivaç�
 
 #### Motivação do Rival
 
-| 1d20 | Mas...                              |
-| ---- | ----------------------------------- |
-| 1-2  | Faz isso por amor                   |
-| 3-5  | Se atrapalha todo                   |
-| 6-13 | Faz isso porque precisa             |
-| 14   | Faz isso pelas crianças             |
-| 15   | Se arrepende                        |
-| 16   | Desaparece depois disso             |
-| 17   | No fundo gosta, e faz isso por você |
-| 18   | Faz isso porque te odeia            |
-| 19   | Faz isso contra a vontade dele      |
-| 20   | Na verdade é o contratante          |
+| 1d20 | Mas...                                 |
+| ---- | -------------------------------------- |
+| 1    | Faz isso por amor                      |
+| 2    | Se atrapalha todo                      |
+| 3-5  | Faz isso porque precisa                |
+| 6    | Busca reconhecimento                   |
+| 7-8  | Busca uma recompensa pessoal           |
+| 9    | Está seguindo ordens de terceiros      |
+| 10   | Faz isso por pura diversão             |
+| 11   | Faz isso por vingança                  |
+| 12   | Está sob influência mágica ou mental   |
+| 13   | Está tentando evitar um desastre maior |
+| 14   | Faz isso pelas crianças                |
+| 15   | Se arrepende                           |
+| 16   | Desaparece depois disso                |
+| 17   | No fundo gosta, e faz isso por você    |
+| 18   | Faz isso porque te odeia               |
+| 19   | Faz isso contra a vontade dele         |
+| 20   | Na verdade é o contratante             |
 
 ### Desafio Adicional
 
@@ -839,9 +874,9 @@ Use-os para surpreender os jogadores e enriquecer a narrativa, adaptando-os ao c
 
 Eventualmente os desafios ficarão repetitivos já que essa tabela será muito usada. Pensando nisso role 1d6 palavras aleatórias de diferentes tabelas e tente incorporá-las criativamente ao desafio ou serviço.
 
-##### Conjunto 7 (d10)
+##### Conjunto 7 (d20)
 
-| d10 | Palavra-chave |
+| d20 | Palavra-chave |
 | --- | ------------- |
 | 1   | Bêbado        |
 | 2   | Dragão        |
@@ -853,10 +888,20 @@ Eventualmente os desafios ficarão repetitivos já que essa tabela será muito u
 | 8   | Monge         |
 | 9   | Ladino        |
 | 10  | Cavalo        |
+| 11  | Sereia        |
+| 12  | Chave         |
+| 13  | Armadura      |
+| 14  | Taverna       |
+| 15  | Gato          |
+| 16  | Poço          |
+| 17  | Cego          |
+| 18  | Corda         |
+| 19  | Sombra        |
+| 20  | Relógio       |
 
-##### Conjunto 8 (d10)
+##### Conjunto 8 (d20)
 
-| d10 | Palavra-chave |
+| d20 | Palavra-chave |
 | --- | ------------- |
 | 1   | Amor          |
 | 2   | Raiva         |
@@ -868,10 +913,20 @@ Eventualmente os desafios ficarão repetitivos já que essa tabela será muito u
 | 8   | Frio          |
 | 9   | Avareza       |
 | 10  | Medo          |
+| 11  | Esperança     |
+| 12  | Orgulho       |
+| 13  | Ciúme         |
+| 14  | Coragem       |
+| 15  | Saudade       |
+| 16  | Paciência     |
+| 17  | Culpa         |
+| 18  | Surpresa      |
+| 19  | Tédio         |
+| 20  | Ansiedade     |
 
-##### Conjunto 9 (d10)
+##### Conjunto 9 (d20)
 
-| d10 | Palavra-chave |
+| d20 | Palavra-chave |
 | --- | ------------- |
 | 1   | Sujo          |
 | 2   | Esqueleto     |
@@ -883,10 +938,20 @@ Eventualmente os desafios ficarão repetitivos já que essa tabela será muito u
 | 8   | Pedra         |
 | 9   | Armadilha     |
 | 10  | Ponte         |
+| 11  | Poeira        |
+| 12  | Corrente      |
+| 13  | Ossos         |
+| 14  | Lama          |
+| 15  | Túnel         |
+| 16  | Grito         |
+| 17  | Fenda         |
+| 18  | Mofo          |
+| 19  | Areia         |
+| 20  | Caverna       |
 
-##### Conjunto 10 (d10)
+##### Conjunto 10 (d20)
 
-| d10 | Palavra-chave |
+| d20 | Palavra-chave |
 | --- | ------------- |
 | 1   | Prato         |
 | 2   | Fogo          |
@@ -898,10 +963,20 @@ Eventualmente os desafios ficarão repetitivos já que essa tabela será muito u
 | 8   | Poção         |
 | 9   | Cajado        |
 | 10  | Buraco        |
+| 11  | Véu           |
+| 12  | Máscara       |
+| 13  | Espelho       |
+| 14  | Selo          |
+| 15  | Círculo       |
+| 16  | Medalhão      |
+| 17  | Sino          |
+| 18  | Tinta         |
+| 19  | Relíquia      |
+| 20  | Escada        |
 
-##### Conjunto 11 (d10)
+##### Conjunto 11 (d20)
 
-| d10 | Palavra-chave |
+| d20 | Palavra-chave |
 | --- | ------------- |
 | 1   | Esposa        |
 | 2   | Garrafa       |
@@ -913,10 +988,20 @@ Eventualmente os desafios ficarão repetitivos já que essa tabela será muito u
 | 8   | Álcool        |
 | 9   | Espada        |
 | 10  | Chão          |
+| 11  | Sapato        |
+| 12  | Chapéu        |
+| 13  | Cinto         |
+| 14  | Tapete        |
+| 15  | Vela          |
+| 16  | Balde         |
+| 17  | Porta         |
+| 18  | Toalha        |
+| 19  | Banco         |
+| 20  | Escada        |
 
-##### Conjunto 12 (d10)
+##### Conjunto 12 (d20)
 
-| d10 | Palavra-chave |
+| d20 | Palavra-chave |
 | --- | ------------- |
 | 1   | Morte         |
 | 2   | Bosque        |
@@ -928,6 +1013,16 @@ Eventualmente os desafios ficarão repetitivos já que essa tabela será muito u
 | 8   | Masmorra      |
 | 9   | Viagem        |
 | 10  | Exploração    |
+| 11  | Segredo       |
+| 12  | Portal        |
+| 13  | Relíquia      |
+| 14  | Caminho       |
+| 15  | Estrela       |
+| 16  | Véu           |
+| 17  | Névoa         |
+| 18  | Ilha          |
+| 19  | Caverna       |
+| 20  | Horizonte     |
 
 ### Dificuldade e Recompensa
 
@@ -935,61 +1030,99 @@ A ideia dos serviços é que eles sejam resolvidos com perícias ou com a criati
 
 ### Tabela de Dificuldade e Recompensas
 
-<!-- TODO: ajustar a dificuldade e as recompensas abaixo -->
+| 1d20  | Dificuldade           | Recompensa     | Taxa de recorrência |
+| ----- | --------------------- | -------------- | ------------------- |
+| 1     | Muito Fácil (ND 10)   | 1d6 C$         | +0,5 C$             |
+| 2-3   | Fácil (ND 14)         | 3d4 C$         | +1 C$               |
+| 4-6   | Fácil (ND 15)         | 3d6 C$         | +2 C$               |
+| 7     | Fácil (ND 16)         | 3d8 C$         | +3 C$               |
+| 8-12  | Média (ND 17)         | 5d6 C$         | +5 C$               |
+| 13    | Média (ND 18)         | (1d3+1)\*10 C$ | +6 C$               |
+| 14    | Média (ND 19)         | (1d4+1)\*10 C$ | +7 C$               |
+| 15-16 | Difícil (ND 20)       | 3d4\*10 C$     | +10 C$              |
+| 17    | Difícil (ND 21)       | 4d4\*10 C$     | +12 C$              |
+| 18    | Desafiador (ND 22)    | 4d6\*10 C$     | +15 C$              |
+| 19    | Desafiador (ND 23)    | 4d8\*10 C$     | +17 C$              |
+| 20    | Muito Difícil (ND 25) | 2d4+1 PO$      | +25 C$              |
 
-| 1d20  | Dificuldade | Recompensa   | Taxa de recorrência |
-| ----- | ----------- | ------------ | ------------------- |
-| 1-2   | ND 10       | 2d4+2 PC     | +4 Peças de cobre   |
-| 3-4   | ND 11       | 3d4+3 PC     | +6 Peças de cobre   |
-| 5     | ND 12       | 1d4\*2 PP    | +2 Peças de prata   |
-| 6     | ND 13       | 2d4+2 PP     | +4 Peças de prata   |
-| 7-9   | ND 14       | 3d4+2 PP     | +4 Peças de prata   |
-| 10-13 | ND 15       | 1d4\*2 PO    | +6 Peças de prata   |
-| 14-15 | ND 16       | 2d4\*2 PO    | +2 Peças de ouro    |
-| 16-17 | ND 17       | 1d6+2 \*3 PO | +4 Peças de ouro    |
-| 18    | ND 18       | 2d6+2 \*4 PO | +6 Peças de ouro    |
-| 19    | ND 19       | 3d6+3 \*5 PO | +7 Peças de ouro    |
-| 20    | ND 20       | 4d6+4 \*6 PO | +8 Peças de ouro    |
+> **Lembrete:** 100 C$ = 1 PO$
 
 ### Nível de Complexidade
 
-| 1d20  | Nível                 |
-| ----- | --------------------- |
-| 1-10  | Simples               |
-| 11-15 | Complicada            |
-| 16-18 | Complexa              |
-| 19-20 | Extremamente complexa |
+O nível de complexidade de um serviço é determinado pela quantidade de testes necessários e pela dificuldade de cada um deles. Serviços mais complexos abrem margem para vários possíveis resultados e formas de abordagem, enquanto serviços mais simples tendem a ser mais previsíveis.
+
+| 1d20  | Nível de Complexidade          |
+| ----- | ------------------------------ |
+| 1-10  | Simples                        |
+| 11-12 | Moderada e Direta              |
+| 13-15 | Moderada                       |
+| 16    | Complexa e Direta              |
+| 17-18 | Complexa                       |
+| 19    | Extremamente complexa e Direta |
+| 20    | Extremamente complexa          |
 
 #### Simples
 
-Um único teste de perícia.
+Apenas um único teste de perícia com a ND padrão é necessário. Uma falha resulta em um serviço mal feito. Um sucesso resulta em um serviço bem feito.
 
-#### Complicada
+#### Moderada e Direta
 
-Dois testes com a mesma ND. Os testes têm que ser da mesma perícia.
+São necessários dois testes com a mesma ND. Os testes são da mesma perícia.
 
 - **0 Sucessos**: Fracasso total, -1 de renome adicional
 - **1 Sucesso**: Serviço mal feito porém ainda recebe a recompensa
 - **2 Sucessos**: O serviço foi concluído com êxito
 
-#### Complexa
+#### Moderada
 
-Três testes, um com a ND padrão, um com -1 de ND e outro com +1 de ND. Use três perícias diferentes.
+São necessários dois testes com a mesma ND. Os testes têm que ser de perícias diferentes.
 
-- **0 Sucessos**: Fracasso total, -1 de renome adicional, -2 nos testes do próximo serviço
-- **1 Sucesso**: Fracasso parcial, -1 de renome adicional, -1 nos testes do próximo serviço, receba metade da recompensa
+- **0 Sucessos**: Fracasso total, -1 de renome adicional
+- **1 Sucesso**: Serviço mal feito porém ainda recebe a recompensa
+- **2 Sucessos**: O serviço foi concluído com êxito
+
+#### Complexa e Direta
+
+Três testes, um com a ND padrão, um com -1 de ND e outro com +1 de ND. Os testes são de duas perícias diferentes ou menos.
+
+- **0 Sucessos**: Fracasso total, -1 de renome adicional
+- **1 Sucesso**: Fracasso parcial, -1 de renome adicional, receba metade da recompensa
 - **2 Sucessos**: Serviço mal feito porém ainda recebe a recompensa
 - **3 Sucessos**: O serviço foi concluído com êxito
 
-#### Extremamente Complexa
+#### Complexa
 
-Cinco testes, dois com a ND padrão, dois com +1 de ND e outro com +2 de ND. As perícias podem se repetir ou não.
+Três testes, um com a ND padrão, um com -1 de ND e outro com +1 de ND. Os testes têm que ser de perícias diferentes.
 
-- **0 Sucessos**: Fracasso total, -5 de renome adicional, desvantagem e -5 nos testes do próximo serviço
-- **1 Sucesso**: Fracasso parcial, -3 de renome adicional, -5 nos testes do próximo serviço
-- **2 Sucessos**: Serviço mal feito, receba metade da recompensa, -2 nos testes do próximo serviço
+- **0 Sucessos**: Fracasso total, -1 de renome adicional
+- **1 Sucesso**: Fracasso parcial, -1 de renome adicional, receba metade da recompensa
+- **2 Sucessos**: Serviço mal feito porém ainda recebe a recompensa
+- **3 Sucessos**: O serviço foi concluído com êxito
+
+#### Extremamente Complexa e Direta
+
+Cinco testes, um com a ND padrão, um com +1 de ND, um com +2 de ND, um com -1 de ND e um com -2 de ND. Os testes são de três perícias diferentes ou menos.
+
+- **0 Sucessos**: Fracasso total, -3 de renome adicional
+- **1 Sucesso**: Fracasso parcial, -2 de renome adicional
+- **2 Sucessos**: Serviço mal feito, receba metade da recompensa
 - **3 Sucessos**: Serviço mal feito porém ainda recebe a recompensa
 - **4 Sucessos**: O serviço foi concluído com êxito
-- **5 Sucessos**: Trabalho primoroso, +1 de renome adicional, +1 nos testes do próximo serviço, role novamente a recompensa e some à recompensa inicial
+- **5 Sucessos**: Trabalho primoroso, +1 de renome adicional, role novamente a recompensa e some à recompensa inicial
+
+#### Extremamente Complexa
+
+Cinco testes, um com a ND padrão, um com +1 de ND, um com +2 de ND, um com -1 de ND e um com -2 de ND. Os testes têm que ser de perícias diferentes.
+
+- **0 Sucessos**: Fracasso total, -5 de renome adicional
+- **1 Sucesso**: Fracasso parcial, -3 de renome adicional
+- **2 Sucessos**: Serviço mal feito, receba metade da recompensa
+- **3 Sucessos**: Serviço mal feito porém ainda recebe a recompensa
+- **4 Sucessos**: O serviço foi concluído com êxito
+- **5 Sucessos**: Trabalho primoroso, +1 de renome adicional, role novamente a recompensa e some à recompensa inicial
+
+> **Lembrete:** Todo serviço mal feito incide em uma penalidade de -1 de renome ao jogador
+>
+> **Dica:** Trabalhe com o jogador para decidir quais habilidades e perícias se encaixam melhor nos testes do serviço
 
 ---
