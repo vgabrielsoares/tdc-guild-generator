@@ -3,12 +3,12 @@
 
 export interface Service {
   id: string
-  // To be implemented in Issue 5.1
+  // To be implemented in Issue 5.7
 }
 
 export interface ServiceObjective {
-  // To be implemented in Issue 5.1
+  // To be implemented in Issue 5.8
 }
 
-// Placeholder - to be expanded in Issue 5.1
+// Placeholder - to be expanded in Issue 5.7
 export type ServiceData = any

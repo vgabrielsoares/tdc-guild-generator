@@ -6,7 +6,7 @@
         Lista de Serviços
       </h3>
       <p class="text-gray-300">
-        Componente será implementado na Issue 5.5
+        Componente será implementado na Issue 5.24
       </p>
     </div>
   </div>
@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
 // ServiceList component
-// Will be implemented in Issue 5.5
+// Will be implemented in Issue 5.24
 import { CogIcon } from '@heroicons/vue/24/outline'
 
 console.log('[SERVICE LIST] ServiceList component loaded')

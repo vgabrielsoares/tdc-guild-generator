@@ -13,7 +13,7 @@ export const useServicesStore = defineStore("services", () => {
   const generateServices = async () => {
     isLoading.value = true;
     try {
-      // Implementation in Issue 5.3
+      // Implementation in Issue 5.22
       console.log("[SERVICES STORE] Generate services - to be implemented");
     } finally {
       isLoading.value = false;

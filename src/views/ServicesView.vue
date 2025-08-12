@@ -20,5 +20,5 @@
 import { WrenchScrewdriverIcon } from '@heroicons/vue/24/outline'
 import ServiceList from '@/components/services/ServiceList.vue'
 
-// Services view implementation will be added in Phase 5
+// Services view implementation will be added in Issues 5.24-5.26
 </script>

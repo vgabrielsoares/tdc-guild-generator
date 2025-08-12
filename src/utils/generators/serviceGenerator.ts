@@ -1,10 +1,10 @@
 // Service Generator
-// Will be implemented in Issue 5.3
+// Will be implemented in Issue 5.19-5.21
 import type { Service } from "@/types/service";
 
 /**
  * Generate services
- * To be implemented in Issue 5.3
+ * To be implemented in Issues 5.19-5.21
  */
 export class ServiceGenerator {
   static generate(): Service {
