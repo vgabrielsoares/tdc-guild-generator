@@ -101,7 +101,7 @@
         class="p-6 text-center text-gray-400"
       >
         <div class="text-4xl mb-2">
-          <!-- TODO: ícone calendário heroicons  -->
+          <CalendarIcon class="w-6 h-6 mx-auto text-gray-500" />
         </div>
         <p class="text-lg mb-1">Nenhum evento encontrado</p>
         <p class="text-sm text-gray-500">
@@ -200,6 +200,7 @@ import { useTimeline } from "@/composables/useTimeline";
 import InfoButton from "@/components/common/InfoButton.vue";
 import Tooltip from "@/components/common/Tooltip.vue";
 import { ScheduledEventType, type GameDate } from "@/types/timeline";
+import { CalendarIcon } from "@heroicons/vue/24/solid";
 
 // Types
 type FilterType = "all" | "contracts" | "services" | "members" | "notices";

@@ -108,7 +108,7 @@
         v-if="hasEventsToday()"
         class="p-2 bg-yellow-900/30 border border-yellow-800/30 rounded text-xs text-yellow-300"
       >
-        <!-- TODO: ícone de aviso heroicons  -->
+        <ExclamationTriangleIcon class="w-6 h-6 mx-auto text-gray-500" />
         Existem eventos hoje que serão processados
       </div>
     </div>
@@ -225,6 +225,7 @@ import { computed, ref, watch } from "vue";
 import { useTimeline } from "@/composables/useTimeline";
 import InfoButton from "@/components/common/InfoButton.vue";
 import Tooltip from "@/components/common/Tooltip.vue";
+import { ExclamationTriangleIcon } from "@heroicons/vue/24/solid";
 
 // Types
 type TimeFilter = "today" | "week" | "month" | "all";

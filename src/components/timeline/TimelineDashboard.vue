@@ -125,7 +125,7 @@
     <!-- Sem eventos próximos -->
     <div v-else class="text-center py-6 text-gray-400">
       <div class="text-lg mb-2">
-        <!-- TODO: ícone calendário heroicons  -->
+        <CalendarIcon class="w-6 h-6 mx-auto text-gray-500" />
       </div>
       <p class="text-sm">Nenhum evento nos próximos 7 dias</p>
       <p class="text-xs mt-1 text-gray-500">
@@ -151,6 +151,7 @@ import InfoButton from "@/components/common/InfoButton.vue";
 import Tooltip from "@/components/common/Tooltip.vue";
 import ContractTimelineWidget from "@/components/timeline/ContractTimelineWidget.vue";
 import { ScheduledEventType, type GameDate } from "@/types/timeline";
+import { CalendarIcon } from "@heroicons/vue/24/solid";
 
 // Emits
 defineEmits<{
