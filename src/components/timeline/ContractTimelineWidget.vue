@@ -247,9 +247,14 @@ function getEventIconColor(type: ScheduledEventType): string {
     [ScheduledEventType.NEW_CONTRACTS]: "bg-emerald-400",
     [ScheduledEventType.CONTRACT_EXPIRATION]: "bg-yellow-400",
     [ScheduledEventType.CONTRACT_RESOLUTION]: "bg-red-400",
+    [ScheduledEventType.NEW_SERVICES]: "bg-indigo-400",
+    [ScheduledEventType.SERVICE_RESOLUTION]: "bg-orange-400",
     [ScheduledEventType.NEW_NOTICES]: "bg-blue-400",
-    [ScheduledEventType.MEMBER_AVAILABILITY]: "bg-purple-400",
-  };
+    [ScheduledEventType.NOTICE_EXPIRATION]: "bg-cyan-400",
+    [ScheduledEventType.MEMBER_REGISTRY_UPDATE]: "bg-purple-400",
+    [ScheduledEventType.RENOWN_AUTHORIZATION]: "bg-pink-400",
+    [ScheduledEventType.RESOURCE_AVAILABILITY]: "bg-teal-400",
+  } as const;
 
   return colors[type] || "bg-gray-400";
 }

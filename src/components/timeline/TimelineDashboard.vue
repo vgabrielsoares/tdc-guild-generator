@@ -252,9 +252,14 @@ function getEventTypeLabel(type: ScheduledEventType): string {
     [ScheduledEventType.NEW_CONTRACTS]: "Contratos",
     [ScheduledEventType.CONTRACT_EXPIRATION]: "Contrato",
     [ScheduledEventType.CONTRACT_RESOLUTION]: "Contrato",
+    [ScheduledEventType.NEW_SERVICES]: "Serviços",
+    [ScheduledEventType.SERVICE_RESOLUTION]: "Serviço",
     [ScheduledEventType.NEW_NOTICES]: "Mural",
-    [ScheduledEventType.MEMBER_AVAILABILITY]: "Membro",
-  };
+    [ScheduledEventType.NOTICE_EXPIRATION]: "Mural",
+    [ScheduledEventType.MEMBER_REGISTRY_UPDATE]: "Membro",
+    [ScheduledEventType.RENOWN_AUTHORIZATION]: "Renome",
+    [ScheduledEventType.RESOURCE_AVAILABILITY]: "Recursos",
+  } as const;
 
   return labels[type] || "Evento";
 }
@@ -266,10 +271,15 @@ function getEventStyles(type: ScheduledEventType): string {
     [ScheduledEventType.CONTRACT_EXPIRATION]:
       "bg-yellow-900/30 border-yellow-800/30",
     [ScheduledEventType.CONTRACT_RESOLUTION]: "bg-red-900/30 border-red-800/30",
+    [ScheduledEventType.NEW_SERVICES]: "bg-indigo-900/30 border-indigo-800/30",
+    [ScheduledEventType.SERVICE_RESOLUTION]: "bg-orange-900/30 border-orange-800/30",
     [ScheduledEventType.NEW_NOTICES]: "bg-blue-900/30 border-blue-800/30",
-    [ScheduledEventType.MEMBER_AVAILABILITY]:
+    [ScheduledEventType.NOTICE_EXPIRATION]: "bg-cyan-900/30 border-cyan-800/30",
+    [ScheduledEventType.MEMBER_REGISTRY_UPDATE]:
       "bg-purple-900/30 border-purple-800/30",
-  };
+    [ScheduledEventType.RENOWN_AUTHORIZATION]: "bg-pink-900/30 border-pink-800/30",
+    [ScheduledEventType.RESOURCE_AVAILABILITY]: "bg-teal-900/30 border-teal-800/30",
+  } as const;
 
   return styles[type] || "bg-gray-900/30 border-gray-800/30";
 }
@@ -279,9 +289,14 @@ function getEventIconColor(type: ScheduledEventType): string {
     [ScheduledEventType.NEW_CONTRACTS]: "bg-emerald-400",
     [ScheduledEventType.CONTRACT_EXPIRATION]: "bg-yellow-400",
     [ScheduledEventType.CONTRACT_RESOLUTION]: "bg-red-400",
+    [ScheduledEventType.NEW_SERVICES]: "bg-indigo-400",
+    [ScheduledEventType.SERVICE_RESOLUTION]: "bg-orange-400",
     [ScheduledEventType.NEW_NOTICES]: "bg-blue-400",
-    [ScheduledEventType.MEMBER_AVAILABILITY]: "bg-purple-400",
-  };
+    [ScheduledEventType.NOTICE_EXPIRATION]: "bg-cyan-400",
+    [ScheduledEventType.MEMBER_REGISTRY_UPDATE]: "bg-purple-400",
+    [ScheduledEventType.RENOWN_AUTHORIZATION]: "bg-pink-400",
+    [ScheduledEventType.RESOURCE_AVAILABILITY]: "bg-teal-400",
+  } as const;
 
   return colors[type] || "bg-gray-400";
 }
@@ -291,9 +306,14 @@ function getEventTextColor(type: ScheduledEventType): string {
     [ScheduledEventType.NEW_CONTRACTS]: "text-emerald-300",
     [ScheduledEventType.CONTRACT_EXPIRATION]: "text-yellow-300",
     [ScheduledEventType.CONTRACT_RESOLUTION]: "text-red-300",
+    [ScheduledEventType.NEW_SERVICES]: "text-indigo-300",
+    [ScheduledEventType.SERVICE_RESOLUTION]: "text-orange-300",
     [ScheduledEventType.NEW_NOTICES]: "text-blue-300",
-    [ScheduledEventType.MEMBER_AVAILABILITY]: "text-purple-300",
-  };
+    [ScheduledEventType.NOTICE_EXPIRATION]: "text-cyan-300",
+    [ScheduledEventType.MEMBER_REGISTRY_UPDATE]: "text-purple-300",
+    [ScheduledEventType.RENOWN_AUTHORIZATION]: "text-pink-300",
+    [ScheduledEventType.RESOURCE_AVAILABILITY]: "text-teal-300",
+  } as const;
 
   return colors[type] || "text-gray-300";
 }
