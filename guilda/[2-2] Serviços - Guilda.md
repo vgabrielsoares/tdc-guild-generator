@@ -1028,7 +1028,7 @@ Eventualmente os desafios ficarão repetitivos já que essa tabela será muito u
 
 A ideia dos serviços é que eles sejam resolvidos com perícias ou com a criatividade do jogador. Em todo caso, a dificuldade pautaria o ND das perícias, mas caso não tenha nenhuma, use a dificuldade como base para criar os rivais ou a raiz do problema. Tenha bom-senso e boa sorte.
 
-### Tabela de Dificuldade e Recompensas
+#### Tabela de Dificuldade e Recompensas
 
 | 1d20  | Dificuldade           | Recompensa     | Taxa de recorrência |
 | ----- | --------------------- | -------------- | ------------------- |
