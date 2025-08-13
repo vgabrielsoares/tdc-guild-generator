@@ -1,13 +1,21 @@
 <template>
   <div class="space-y-6">
     <div class="text-center">
-      <h1 class="text-3xl font-medieval font-bold text-gold-400 mb-4 flex items-center justify-center gap-3">
+      <h1
+        class="text-3xl font-medieval font-bold text-gold-400 mb-4 flex items-center justify-center gap-3"
+      >
         <DocumentTextIcon class="w-7 h-7 text-gold-400" />
         Contratos da Guilda
         <Tooltip
           content="Sistema completo de geração e gerenciamento de contratos para aventureiros com valores dinâmicos baseados na sede da guilda."
-          title="Sistema de Contratos" position="auto">
-          <InfoButton help-key="contract-overview" @open-help="handleOpenHelp" button-class="ml-2" />
+          title="Sistema de Contratos"
+          position="auto"
+        >
+          <InfoButton
+            help-key="contract-overview"
+            @open-help="handleOpenHelp"
+            button-class="ml-2"
+          />
         </Tooltip>
       </h1>
       <p class="text-lg text-gray-300 mb-8">
@@ -16,51 +24,70 @@
     </div>
 
     <!-- Info da Guilda Atual -->
-    <div v-if="guild"
-      class="bg-gradient-to-r from-amber-900/20 to-yellow-900/20 border border-amber-600/50 rounded-lg p-6">
+    <div
+      v-if="guild"
+      class="bg-gradient-to-r from-amber-900/20 to-yellow-900/20 border border-amber-600/50 rounded-lg p-6"
+    >
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-xl font-semibold text-amber-400 flex items-center">
           <BuildingOfficeIcon class="w-5 h-5 mr-2" />
           {{ guild.name }}
         </h3>
-        <span class="text-sm px-3 py-1 bg-amber-600 text-amber-100 rounded-full">
+        <span
+          class="text-sm px-3 py-1 bg-amber-600 text-amber-100 rounded-full"
+        >
           {{ guild.settlementType }}
         </span>
       </div>
 
       <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
         <div class="flex flex-col">
-          <span class="text-gray-400 uppercase tracking-wide text-lg">Sede</span>
+          <span class="text-gray-400 uppercase tracking-wide text-lg"
+            >Sede</span
+          >
           <span class="text-white font-medium text-base">{{
             guild.structure.size
           }}</span>
         </div>
         <div class="flex flex-col">
-          <span class="text-gray-400 uppercase tracking-wide text-lg">Recursos</span>
+          <span class="text-gray-400 uppercase tracking-wide text-lg"
+            >Recursos</span
+          >
           <span class="text-white font-medium text-base">{{
             guild.resources.level
           }}</span>
         </div>
         <div class="flex flex-col">
-          <span class="text-gray-400 uppercase tracking-wide text-lg">Rel. Governo</span>
+          <span class="text-gray-400 uppercase tracking-wide text-lg"
+            >Rel. Governo</span
+          >
           <span class="text-white font-medium text-base">{{
             guild.relations.government
           }}</span>
         </div>
         <div class="flex flex-col">
-          <span class="text-gray-400 uppercase tracking-wide text-lg">Rel. População</span>
+          <span class="text-gray-400 uppercase tracking-wide text-lg"
+            >Rel. População</span
+          >
           <span class="text-white font-medium text-base">{{
             guild.relations.population
-            }}</span>
+          }}</span>
         </div>
         <div class="flex flex-col">
           <div class="flex items-center gap-2">
-            <span class="text-gray-400 uppercase tracking-wide text-lg">Sistema de Contratos</span>
+            <span class="text-gray-400 uppercase tracking-wide text-lg"
+              >Sistema de Contratos</span
+            >
             <Tooltip
               content="Sistema de quantidade baseado no tamanho da sede, funcionários e frequentadores da guilda."
-              title="Como funciona a geração" position="auto">
-              <InfoButton help-key="contract-quantity" @open-help="handleOpenHelp"
-                button-class="text-gray-400 hover:text-amber-400" />
+              title="Como funciona a geração"
+              position="auto"
+            >
+              <InfoButton
+                help-key="contract-quantity"
+                @open-help="handleOpenHelp"
+                button-class="text-gray-400 hover:text-amber-400"
+              />
             </Tooltip>
           </div>
           <span class="text-white font-medium text-base">Automático</span>
@@ -82,7 +109,10 @@
     </div>
 
     <!-- Aviso quando não há guilda -->
-    <div v-else class="bg-red-900/20 border border-red-600/50 rounded-lg p-8 text-center">
+    <div
+      v-else
+      class="bg-red-900/20 border border-red-600/50 rounded-lg p-8 text-center"
+    >
       <ExclamationTriangleIcon class="w-16 h-16 text-red-400 mx-auto mb-4" />
       <h2 class="text-xl font-semibold text-red-400 mb-2">
         Nenhuma Guilda Encontrada
@@ -91,8 +121,10 @@
         Para gerar contratos, você precisa primeiro ter uma guilda ativa. Acesse
         a página de Guildas para gerar uma nova sede.
       </p>
-      <router-link to="/guild"
-        class="inline-flex items-center px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-lg transition-colors">
+      <router-link
+        to="/guild"
+        class="inline-flex items-center px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-lg transition-colors"
+      >
         <PlusIcon class="w-4 h-4 mr-2" />
         Gerar Nova Guilda
       </router-link>
@@ -101,70 +133,100 @@
     <!-- Contratos (só mostra se há guilda) -->
     <template v-if="guild">
       <!-- Filtros Avançados -->
-      <ContractFilters v-if="contracts.length > 0" :contracts="contracts as Contract[]" :filters="currentFilters"
+      <ContractFilters
+        v-if="contracts.length > 0"
+        :contracts="contracts as Contract[]"
+        :filters="currentFilters"
         @update-status="handleFilterUpdate('status', $event)"
         @update-difficulty="handleFilterUpdate('difficulty', $event)"
         @update-contractor="handleFilterUpdate('contractor', $event)"
         @update-search="handleFilterUpdate('searchText', $event)"
         @update-min-value="handleFilterUpdate('minValue', $event)"
         @update-max-value="handleFilterUpdate('maxValue', $event)"
-        @update-deadline="handleFilterUpdate('hasDeadline', $event)" @clear-filters="handleClearFilters" />
+        @update-deadline="handleFilterUpdate('hasDeadline', $event)"
+        @clear-filters="handleClearFilters"
+      />
       <!-- Timeline e Contadores -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <!-- Contadores de Timeline (coluna principal) -->
-        <div class="lg:col-span-2">
-          <ContractTimeline @generate-contracts="handleGenerateContracts" @force-resolution="handleForceResolution"
-            @open-help="handleOpenHelp" />
-        </div>
-
-        <!-- Controles de Timeline (sidebar) -->
-        <div class="space-y-6">
-          <!-- Abas -->
-          <div class="bg-gray-800 rounded-lg border border-gray-700">
-            <div class="flex border-b border-gray-700">
-              <button @click="activeTab = 'counters'" :class="[
-                'flex-1 px-4 py-3 text-sm font-medium transition-colors rounded-tl-lg rounded-bl-lg',
-                activeTab === 'counters'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-800 text-gray-300 hover:text-white hover:bg-gray-700',
-              ]">
-                Contadores
-              </button>
-              <button @click="activeTab = 'control'" :class="[
-                'flex-1 px-4 py-3 text-sm font-medium transition-colors rounded-tr-lg rounded-br-lg',
-                activeTab === 'control'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-800 text-gray-300 hover:text-white hover:bg-gray-700',
-              ]">
-                Controles
-              </button>
-            </div>
+      <div class="grid grid-cols-1 gap-6 mb-6">
+        <!-- Contadores de Timeline e Navegação -->
+        <div
+          class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700"
+        >
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-semibold text-white">
+              Timeline dos Contratos
+            </h3>
+            <router-link
+              to="/timeline"
+              class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+            >
+              <svg
+                class="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+              Gerenciar Tempo
+            </router-link>
           </div>
 
-          <!-- Conteúdo das abas -->
-          <TimelineCounters v-if="activeTab === 'counters'" />
-          <TimelineControl v-if="activeTab === 'control'" />
+          <ContractTimeline
+            @generate-contracts="handleGenerateContracts"
+            @force-resolution="handleForceResolution"
+            @open-help="handleOpenHelp"
+          />
         </div>
       </div>
 
       <!-- Lista de Contratos -->
-      <ContractList :contracts="filteredContracts as Contract[]" :is-loading="isLoading" :show-actions="true"
-        :show-filters="false" :can-generate="false" :active-status-filter="null" :current-page="currentPage"
-        :page-size="pageSize" @accept="handleAcceptContract" @complete="handleCompleteContract"
-        @abandon="handleAbandonContract" @view-details="handleViewContractDetails" @page-change="handlePageChange"
-        @open-help="handleOpenHelp" />
+      <ContractList
+        :contracts="filteredContracts as Contract[]"
+        :is-loading="isLoading"
+        :show-actions="true"
+        :show-filters="false"
+        :can-generate="false"
+        :active-status-filter="null"
+        :current-page="currentPage"
+        :page-size="pageSize"
+        @accept="handleAcceptContract"
+        @complete="handleCompleteContract"
+        @abandon="handleAbandonContract"
+        @view-details="handleViewContractDetails"
+        @page-change="handlePageChange"
+        @open-help="handleOpenHelp"
+      />
     </template>
 
     <!-- Modal de Ajuda -->
-    <HelpModal :is-open="showHelpModal" :help-key="currentHelpKey" @close="handleCloseHelp" />
+    <HelpModal
+      :is-open="showHelpModal"
+      :help-key="currentHelpKey"
+      @close="handleCloseHelp"
+    />
 
     <!-- Modal de Detalhes do Contrato -->
-    <ContractDetails :is-open="showContractDetails" :contract="selectedContract" :show-debug-info="false"
-      @close="handleCloseDetails" @accept="handleAcceptContractFromDetails"
-      @complete="handleCompleteContractFromDetails" @abandon="handleAbandonContractFromDetails" />
+    <ContractDetails
+      :is-open="showContractDetails"
+      :contract="selectedContract"
+      :show-debug-info="false"
+      @close="handleCloseDetails"
+      @accept="handleAcceptContractFromDetails"
+      @complete="handleCompleteContractFromDetails"
+      @abandon="handleAbandonContractFromDetails"
+    />
 
     <!-- Toast para feedback -->
-    <div v-if="toastMessage" class="fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg z-50">
+    <div
+      v-if="toastMessage"
+      class="fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg z-50"
+    >
       {{ toastMessage }}
     </div>
   </div>
@@ -175,13 +237,16 @@ import { ref, computed, onMounted } from "vue";
 import { useContractsStore } from "@/stores/contracts";
 import { useGuildStore } from "@/stores/guild";
 import { useTimelineIntegration } from "@/composables/useTimelineIntegration";
-import type { Contract, ContractStatus, ContractDifficulty, ContractorType } from "@/types/contract";
+import type {
+  Contract,
+  ContractStatus,
+  ContractDifficulty,
+  ContractorType,
+} from "@/types/contract";
 import ContractList from "@/components/contracts/ContractList.vue";
 import ContractFilters from "@/components/contracts/ContractFilters.vue";
 import ContractDetails from "@/components/contracts/ContractDetails.vue";
 import ContractTimeline from "@/components/contracts/ContractTimeline.vue";
-import TimelineCounters from "@/components/contracts/TimelineCounters.vue";
-import TimelineControl from "@/components/common/TimelineControl.vue";
 import HelpModal from "@/components/common/HelpModal.vue";
 import InfoButton from "@/components/common/InfoButton.vue";
 import Tooltip from "@/components/common/Tooltip.vue";
@@ -215,7 +280,6 @@ useTimelineIntegration();
 // ===== STATE =====
 const currentPage = ref(1);
 const pageSize = ref(5);
-const activeTab = ref<"counters" | "control">("counters");
 const toastMessage = ref<string>("");
 
 // Modal de detalhes
@@ -245,9 +309,18 @@ const guild = computed(() => guildStore.currentGuild);
 // Contratos filtrados com base nos filtros locais
 const filteredContracts = computed(() => {
   // Sincronizar filtros locais com o store (com conversão de tipos adequada)
-  contractsStore.setFilter("status", currentFilters.value.status as ContractStatus | null || null);
-  contractsStore.setFilter("difficulty", currentFilters.value.difficulty as ContractDifficulty | null || null);
-  contractsStore.setFilter("contractor", currentFilters.value.contractor as ContractorType | null || null);
+  contractsStore.setFilter(
+    "status",
+    (currentFilters.value.status as ContractStatus | null) || null
+  );
+  contractsStore.setFilter(
+    "difficulty",
+    (currentFilters.value.difficulty as ContractDifficulty | null) || null
+  );
+  contractsStore.setFilter(
+    "contractor",
+    (currentFilters.value.contractor as ContractorType | null) || null
+  );
   contractsStore.setFilter("searchText", currentFilters.value.searchText);
   contractsStore.setFilter("minValue", currentFilters.value.minValue);
   contractsStore.setFilter("maxValue", currentFilters.value.maxValue);
