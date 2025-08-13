@@ -12,8 +12,21 @@ export enum ScheduledEventType {
   NEW_CONTRACTS = "new_contracts",
   CONTRACT_EXPIRATION = "contract_expiration", 
   CONTRACT_RESOLUTION = "contract_resolution",
+  
+  // Serviços (preparação para Fase 5)
+  NEW_SERVICES = "new_services",
+  SERVICE_RESOLUTION = "service_resolution",
+  
+  // Mural de Avisos (preparação para Fase 7)
   NEW_NOTICES = "new_notices",
-  MEMBER_AVAILABILITY = "member_availability",
+  NOTICE_EXPIRATION = "notice_expiration",
+  
+  // Membros (preparação para Fase 6)
+  MEMBER_REGISTRY_UPDATE = "member_registry_update",
+  
+  // Renome (preparação para Fase 8)
+  RENOWN_AUTHORIZATION = "renown_authorization",
+  RESOURCE_AVAILABILITY = "resource_availability",
 }
 
 // Evento agendado na timeline
