@@ -272,13 +272,16 @@ function getEventStyles(type: ScheduledEventType): string {
       "bg-yellow-900/30 border-yellow-800/30",
     [ScheduledEventType.CONTRACT_RESOLUTION]: "bg-red-900/30 border-red-800/30",
     [ScheduledEventType.NEW_SERVICES]: "bg-indigo-900/30 border-indigo-800/30",
-    [ScheduledEventType.SERVICE_RESOLUTION]: "bg-orange-900/30 border-orange-800/30",
+    [ScheduledEventType.SERVICE_RESOLUTION]:
+      "bg-orange-900/30 border-orange-800/30",
     [ScheduledEventType.NEW_NOTICES]: "bg-blue-900/30 border-blue-800/30",
     [ScheduledEventType.NOTICE_EXPIRATION]: "bg-cyan-900/30 border-cyan-800/30",
     [ScheduledEventType.MEMBER_REGISTRY_UPDATE]:
       "bg-purple-900/30 border-purple-800/30",
-    [ScheduledEventType.RENOWN_AUTHORIZATION]: "bg-pink-900/30 border-pink-800/30",
-    [ScheduledEventType.RESOURCE_AVAILABILITY]: "bg-teal-900/30 border-teal-800/30",
+    [ScheduledEventType.RENOWN_AUTHORIZATION]:
+      "bg-pink-900/30 border-pink-800/30",
+    [ScheduledEventType.RESOURCE_AVAILABILITY]:
+      "bg-teal-900/30 border-teal-800/30",
   } as const;
 
   return styles[type] || "bg-gray-900/30 border-gray-800/30";
