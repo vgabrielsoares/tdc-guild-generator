@@ -205,6 +205,12 @@ export interface Service {
   // Objetivo do serviço
   objective?: ServiceObjective;
 
+  // Elementos narrativos específicos
+  complication?: ServiceComplication;
+  rival?: ServiceRival;
+  origin?: ServiceOrigin;
+  additionalChallenge?: ServiceAdditionalChallenge;
+
   // Valores e recompensas
   value: ServiceValue;
 
@@ -228,17 +234,224 @@ export interface Service {
   isExpired: boolean; // Se passou do prazo
 }
 
-// ===== INTERFACE PARA OBJETIVO (PLACEHOLDER) =====
+// ===== INTERFACES PARA ELEMENTOS NARRATIVOS =====
 
 /**
- * Interface básica para objetivo do serviço
+ * Tipos de objetivo dos serviços
  */
-export interface ServiceObjective {
-  // To be implemented in Issue 5.8
-  type: string;
-  description: string;
+export enum ServiceObjectiveType {
+  TREINAR_OU_ENSINAR = "Treinar ou ensinar",
+  RECRUTAR = "Recrutar",
+  CURAR_OU_RECUPERAR = "Curar ou recuperar",
+  NEGOCIAR_OU_COAGIR = "Negociar ou coagir",
+  AUXILIAR_OU_CUIDAR = "Auxiliar ou cuidar",
+  EXTRAIR_RECURSOS = "Extrair recursos",
+  CONSTRUIR_CRIAR_OU_REPARAR = "Construir, criar ou reparar",
+  SERVICOS_ESPECIFICOS = "Serviços específicos",
+  RELIGIOSO = "Religioso",
+  MULTIPLO = "Role duas vezes e use ambos", // Resultado 20 na tabela
 }
 
+/**
+ * Interface completa para objetivos de serviços
+ * Baseada nas tabelas específicas de cada tipo de objetivo
+ */
+export interface ServiceObjective {
+  type: ServiceObjectiveType;
+  description: string;
+
+  // Especificações (três colunas)
+  action: string; // Primeira coluna: o que fazer
+  target: string; // Segunda coluna: para quem/que
+  complication: string; // Terceira coluna: mas... (complicação)
+
+  // Para objetivos múltiplos (resultado 20)
+  secondaryObjective?: ServiceObjective;
+}
+
+/**
+ * Interface para complicações de serviços
+ * Baseada nas tabelas "Tipos de Complicações" e "Consequências das Complicações"
+ */
+export interface ServiceComplication {
+  type: ServiceComplicationType;
+  consequence: ServiceComplicationConsequence;
+  description: string; // Descrição narrativa gerada
+}
+
+/**
+ * Tipos de complicações conforme tabela "Tipos de Complicações"
+ */
+export enum ServiceComplicationType {
+  GOVERNO_LOCAL_DESAPROVA = "Governo local desaprova",
+  FACCAO_CRIMINOSA_APROVEITA = "Facção criminosa quer se aproveitar",
+  ORDEM_RELIGIOSA_INTERESSADA = "Ordem religiosa/arcana interessada",
+  RIVAL_CONTRATANTE_ENCIUMADO = "Um rival do contratante fica enciumado",
+  INSTITUICAO_OFICIO_AFETADA = "Instituição de ofício afetada",
+  HUMANOIDES_HOSTIS = "Humanoides hostis",
+  EVENTO_LOCAL_INTERFERE = "Evento local interfere no cronograma",
+  ANIMAL_ATRAPALHA = "Animal ou mascote atrapalha",
+  MORADORES_SE_OPOEM = "Grupo de moradores se opõe",
+  ALIADO_CONTRATANTE_DISCORDA = "Aliado do contratante discorda",
+  AUTORIDADE_EXIGE_SUPERVISAO = "Autoridade exige supervisão extra",
+  ERRO_BUROCRATICO = "Erro burocrático atrasa o andamento",
+  GRUPO_RIVAL_SABOTA = "Grupo rival tenta sabotar discretamente",
+  ACIDENTE_DANOS_LEVES = "Acidente causa danos leves",
+  BOATO_NEGATIVO = "Boato negativo se espalha",
+  FISCAL_INESPERADO = "Fiscal inesperado aparece",
+  COMPETIDOR_MAIS_BARATO = "Competidor oferece serviço mais barato",
+  TERCEIROS_OCUPAM_LOCAL = "Terceiros ocupam o local",
+  ALTERACAO_ULTIMA_HORA = "Pedido de alteração de última hora",
+  MULTIPLAS_COMPLICACOES = "Role duas vezes e use ambos",
+}
+
+/**
+ * Consequências das complicações conforme tabela "Consequências das Complicações"
+ */
+export enum ServiceComplicationConsequence {
+  MEDIDAS_LEGAIS = "Entrará com medidas legais",
+  MANIPULACAO_BAIXO_PANOS = "Manipulará as coisas por baixo dos panos",
+  TENTATIVA_CONVENCER_DESISTIR = "Tentará te convencer a desistir",
+  COMPLICARA_VIDA_SUCESSO = "Complicará sua vida caso seja bem-sucedido",
+  ABUSO_PODER = "Abusará de seu poder para conseguir o que quer",
+  VIOLENCIA_IMPEDIR = "Usarão de violência para te impedir",
+  CONTRATANTE_EXIGE_RETRABALHO = "Contratante exigirá retrabalho",
+  NEGOCIAR_SOLUCAO_ALTERNATIVA = "Terá que negociar uma solução alternativa",
+  ORDENS_CONTRADITORIAS = "Dará ordens contraditórias",
+  RECLAMACOES_TERCEIROS = "Reclamações de terceiros",
+  SUMIRA_DOCUMENTOS = "Sumirá com documentos essenciais",
+  FISCALIZACAO_EXTRA = "Fiscalização extra",
+  VAZARA_INFORMACOES = "Vazará informações confidenciais",
+  COMPENSACAO_SIMBOLICA = "Exigirá compensação simbólica",
+  CONTRATAR_CONCORRENTES = "Contratará concorrentes para atrapalhar",
+  ATRASAR_PAGAMENTO = "Tentará atrasar o pagamento indefinidamente",
+  FOFOCAS_COMPETENCIA = "Espalhará fofocas sobre sua competência",
+  EXIGENCIAS_FORA_ESCOPO = "Fará exigências fora do escopo original",
+  GARANTIA_ADICIONAL = "Contratante exige garantia adicional",
+  MULTIPLAS_CONSEQUENCIAS = "Role duas vezes e use ambos",
+}
+
+/**
+ * Interface para rivais em serviços
+ * Baseada nas tabelas "Ações do Rival" e "Motivação do Rival"
+ */
+export interface ServiceRival {
+  action: ServiceRivalAction;
+  motivation: ServiceRivalMotivation;
+  description: string; // Descrição narrativa gerada
+}
+
+/**
+ * Ações do rival conforme tabela "Ações do Rival"
+ */
+export enum ServiceRivalAction {
+  IRA_CONTRA_OBJETIVO = "Irá contra seu objetivo",
+  FARA_MESMA_COISA = "Fará a mesma coisa que você",
+  SABOTA_ARMADILHAS = "Sabota/Implanta armadilhas",
+  ROUBARA_RECURSOS = "Roubará recursos importantes",
+  TENTARA_FICAR_CREDITOS = "Tentará ficar com os créditos",
+  ESPALHA_RUMORES = "Espalha rumores maldosos",
+  FINGIRA_SER_CONTRATADO = "Fingirá ser o contratado",
+  DARA_DICAS_FALSAS = "Dará dicas falsas sobre o serviço",
+  OFERECERA_INFORMACOES = "Oferecerá valiosas informações",
+  TENTARA_SUBORNAR_AMEACAR = "Tentará te subornar ou ameaçar",
+}
+
+/**
+ * Motivação do rival conforme tabela "Motivação do Rival"
+ */
+export enum ServiceRivalMotivation {
+  FAZ_POR_AMOR = "Faz isso por amor",
+  SE_ATRAPALHA_TODO = "Se atrapalha todo",
+  FAZ_PORQUE_PRECISA = "Faz isso porque precisa",
+  BUSCA_RECONHECIMENTO = "Busca reconhecimento",
+  BUSCA_RECOMPENSA_PESSOAL = "Busca uma recompensa pessoal",
+  SEGUINDO_ORDENS_TERCEIROS = "Está seguindo ordens de terceiros",
+  FAZ_POR_DIVERSAO = "Faz isso por pura diversão",
+  FAZ_POR_VINGANCA = "Faz isso por vingança",
+  SOB_INFLUENCIA_MAGICA = "Está sob influência mágica ou mental",
+  EVITAR_DESASTRE_MAIOR = "Está tentando evitar um desastre maior",
+  FAZ_PELAS_CRIANCAS = "Faz isso pelas crianças",
+  SE_ARREPENDE = "Se arrepende",
+  DESAPARECE_DEPOIS = "Desaparece depois disso",
+  NO_FUNDO_GOSTA = "No fundo gosta, e faz isso por você",
+  FAZ_PORQUE_TE_ODEIA = "Faz isso porque te odeia",
+  FAZ_CONTRA_VONTADE = "Faz isso contra a vontade dele",
+  NA_VERDADE_E_CONTRATANTE = "Na verdade é o contratante",
+}
+
+/**
+ * Interface para a origem do problema
+ * Baseada nas tabelas "Origem do Problema" e "Complicador Adicional"
+ */
+export interface ServiceOrigin {
+  rootCause: ServiceOriginCause;
+  additionalComplicator: ServiceAdditionalComplicator;
+  description: string; // Descrição narrativa gerada
+}
+
+/**
+ * Causas raiz conforme tabela "Origem do Problema"
+ */
+export enum ServiceOriginCause {
+  TRADICAO_CONFLITO_FAMILIAR = "Tradição/conflito familiar",
+  CORRUPCAO_GOVERNO = "Corrupção no governo local",
+  APROVEITADOR_CHARLATAO = "Aproveitador/charlatão",
+  ALGO_MUNDANO_NATURAL = "Algo mundano, corriqueiro ou natural",
+  ANTIGA_PROMESSA_NAO_CUMPRIDA = "Antiga promessa não cumprida",
+  FALTA_COMUNICACAO = "Falta de comunicação entre grupos",
+  CRIATURAS_FORA_ASSENTAMENTO = "Criaturas de fora do assentamento",
+  DESINFORMACAO_BOATOS = "Desinformação ou boatos espalhados",
+  ORDEM_RELIGIOSA_BOAS_INTENCOES = "Ordem religiosa com boas intenções",
+  ESCASSEZ_RECURSOS = "Escassez de recursos essenciais",
+  PESTE_DOENCA = "Peste ou doença contagiosa",
+  PROFECIA_MAL_INTERPRETADA = "Profecia (possivelmente mal interpretada)",
+  FALTA_MAO_OBRA = "Falta de mão-de-obra",
+  INTERFERENCIA_FEITICEIRO = "Interferência de feiticeiro/eremita",
+  FENOMENO_NATURAL_INCOMUM = "Fenômeno natural incomum",
+  ESPIONAGEM_POLITICA = "Espionagem política",
+  MUDANCA_LIDERANCA = "Mudança repentina de liderança local",
+  DISPUTA_TERRITORIO = "Disputa por território ou recursos",
+  EVENTO_SAZONAL = "Evento sazonal inesperado",
+  MORTE_HUMANOIDE_IMPORTANTE = "A morte de um humanoide importante",
+}
+
+/**
+ * Complicadores adicionais conforme tabela "Complicador Adicional"
+ */
+export enum ServiceAdditionalComplicator {
+  UM_POUCO_AZAR = "Um pouco de azar",
+  MAL_ENTENDIDO = "Um mal entendido",
+  INTERVENCAO_DIVINA = "Intervenção divina",
+  GANANCIA = "Ganância",
+  QUEBRA_MALDICAO = "A quebra de uma maldição",
+  ROMANCE_INTERROMPIDO = "Um romance interrompido",
+  TRAICAO = "Traição",
+  SUMIÇO_ARTEFATO = "O sumiço de um importante artefato",
+  CONFLITO_FACCOES = "Conflito entre facções",
+  CHANTAGEM = "Chantagem",
+  DIVIDA = "Dívida",
+  ATRASO_INESPERADO = "Um atraso inesperado",
+  PRESSAO_TEMPO = "Pressão do tempo",
+  VISITA_SURPRESA = "Uma visita surpresa",
+  INCOMPETENCIA = "Incompetência",
+  ACIDENTE_INESPERADO = "Acidente inesperado",
+  EXCESSO_BUROCRACIA = "Excesso de burocracia",
+  INTERFERENCIA_EXTERNA = "Interferência externa",
+  MUDANCA_PLANOS = "Mudança de planos",
+  EVENTO_CLIMATICO = "Evento climático/desastre natural",
+}
+
+/**
+ * Interface para desafios adicionais conforme seção "Desafio Adicional"
+ * Representa obstáculos únicos que surgem durante a execução do serviço
+ */
+export interface ServiceAdditionalChallenge {
+  description: string; // Descrição do desafio (vem da tabela d100)
+  hasChallenge: boolean; // Se há desafio (rolagem 1d20, só 20 = sim)
+}
+
+/**
 // ===== SCHEMAS ZOD PARA VALIDAÇÃO =====
 
 /**
@@ -264,6 +477,53 @@ export const ServiceValueSchema = z.object({
 });
 
 /**
+ * Schema para objetivo de serviços
+ */
+export const ServiceObjectiveSchema: z.ZodType<ServiceObjective> = z.object({
+  type: z.nativeEnum(ServiceObjectiveType),
+  description: z.string().min(1).max(500),
+  action: z.string().min(1).max(200),
+  target: z.string().min(1).max(200),
+  complication: z.string().min(1).max(300),
+  secondaryObjective: z.lazy(() => ServiceObjectiveSchema).optional(),
+});
+
+/**
+ * Schema para complicações de serviços
+ */
+export const ServiceComplicationSchema = z.object({
+  type: z.nativeEnum(ServiceComplicationType),
+  consequence: z.nativeEnum(ServiceComplicationConsequence),
+  description: z.string().min(1).max(300),
+});
+
+/**
+ * Schema para rivais em serviços
+ */
+export const ServiceRivalSchema = z.object({
+  action: z.nativeEnum(ServiceRivalAction),
+  motivation: z.nativeEnum(ServiceRivalMotivation),
+  description: z.string().min(1).max(300),
+});
+
+/**
+ * Schema para origem do serviço
+ */
+export const ServiceOriginSchema = z.object({
+  rootCause: z.nativeEnum(ServiceOriginCause),
+  additionalComplicator: z.nativeEnum(ServiceAdditionalComplicator),
+  description: z.string().min(1).max(300),
+});
+
+/**
+ * Schema para desafios adicionais
+ */
+export const ServiceAdditionalChallengeSchema = z.object({
+  description: z.string().min(1).max(500),
+  hasChallenge: z.boolean(),
+});
+
+/**
  * Schema principal para serviços
  */
 export const ServiceSchema = z.object({
@@ -275,6 +535,14 @@ export const ServiceSchema = z.object({
   difficulty: z.nativeEnum(ServiceDifficulty),
   contractorType: z.nativeEnum(ServiceContractorType),
   contractorName: z.string().optional(),
+
+  // Elementos narrativos expandidos
+  objective: ServiceObjectiveSchema.optional(),
+  complication: ServiceComplicationSchema.optional(),
+  rival: ServiceRivalSchema.optional(),
+  origin: ServiceOriginSchema.optional(),
+  additionalChallenge: ServiceAdditionalChallengeSchema.optional(),
+
   value: ServiceValueSchema,
   deadline: z.object({
     type: z.nativeEnum(ServiceDeadlineType),
