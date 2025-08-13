@@ -121,17 +121,17 @@
       <!-- Ações Rápidas -->
       <div class="mt-6 bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
         <h3 class="text-lg font-semibold text-amber-400 mb-4">Ações Rápidas</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-          <button @click="regenerateStructure" class="btn btn-outline flex items-center justify-center space-x-2"
-            :disabled="guildStore.isGenerating || guild?.locked">
-            <BuildingOffice2Icon class="w-4 h-4" />
-            <span>Regenerar Estrutura</span>
-          </button>
-          <button @click="regenerateRelations" class="btn btn-outline flex items-center justify-center space-x-2"
-            :disabled="guildStore.isGenerating || guild?.locked">
-            <UserGroupIcon class="w-4 h-4" />
-            <span>Regenerar Relações</span>
-          </button>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <router-link
+            to="/timeline"
+            class="btn btn-primary flex items-center justify-center space-x-2"
+            :class="{ 'opacity-60 pointer-events-none': !guild }"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span>Gerenciar Tempo</span>
+          </router-link>
           <button @click="toggleLock" :class="[
             'btn flex items-center justify-center space-x-2',
             guild?.locked ? 'btn-outline-danger' : (isGuildInHistory ? 'btn-outline' : 'btn-outline opacity-60')
@@ -140,7 +140,7 @@
             <LockOpenIcon v-else class="w-4 h-4" />
             <span>{{
               guild?.locked ? 'Desbloquear' :
-                isGuildInHistory ? 'Bloquear' : 'Salvar p/ Bloquear'
+                isGuildInHistory ? 'Bloquear' : 'Salve para Bloquear'
             }}</span>
           </button>
           <button @click="saveToHistory" :class="[
@@ -218,8 +218,6 @@ import {
   XMarkIcon,
   ArrowPathIcon,
   ArrowDownTrayIcon,
-  BuildingOffice2Icon,
-  UserGroupIcon,
   BookmarkIcon,
   TrashIcon,
   PlusIcon,
