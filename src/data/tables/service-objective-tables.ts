@@ -889,6 +889,531 @@ export const NEGOTIATE_OR_COERCE_TABLE: ThreeColumnObjectiveTable = [
   },
 ];
 
+// ===== AUXILIAR OU CUIDAR (d20 x 3 colunas) =====
+
+/**
+ * Tabela de "Auxiliar ou Cuidar"
+ * Sistema de três colunas: [Auxiliar ou cuidar de...] + [Em...] + [Mas...]
+ */
+export const AUXILIAR_OU_CUIDAR_TABLE: ThreeColumnObjectiveTable = [
+  {
+    min: 1,
+    max: 1,
+    result: {
+      action: "Orfanato",
+      target: "Na colheita",
+      complication: "O responsável principal está ausente"
+    }
+  },
+  {
+    min: 2,
+    max: 2,
+    result: {
+      action: "Plebeu trabalhador",
+      target: "Em uma infestação",
+      complication: "Tudo está comprometido"
+    }
+  },
+  {
+    min: 3,
+    max: 3,
+    result: {
+      action: "Ordem religiosa",
+      target: "Distribuir mantimentos",
+      complication: "Os recursos são insuficientes"
+    }
+  },
+  {
+    min: 4,
+    max: 4,
+    result: {
+      action: "Instituição de ofício",
+      target: "Assuntos burocráticos",
+      complication: "Não contaram toda a verdade"
+    }
+  },
+  {
+    min: 5,
+    max: 5,
+    result: {
+      action: "Governo local",
+      target: "Abater e preparar animais",
+      complication: "A interferência de bestas atrapalha"
+    }
+  },
+  {
+    min: 6,
+    max: 6,
+    result: {
+      action: "Turistas/forasteiros",
+      target: "Gerenciar estabelecimento",
+      complication: "Você descobre um esquema de corrupção"
+    }
+  },
+  {
+    min: 7,
+    max: 7,
+    result: {
+      action: "Crianças",
+      target: "Cuidar de jardins ou estufas",
+      complication: "Há uma importante inspeção surpresa"
+    }
+  },
+  {
+    min: 8,
+    max: 8,
+    result: {
+      action: "Idosos",
+      target: "Consertar estruturas simples",
+      complication: "O clima não é adequado"
+    }
+  },
+  {
+    min: 9,
+    max: 9,
+    result: {
+      action: "Estudantes",
+      target: "Preparar para provas",
+      complication: "Recursos foram danificados por um acidente"
+    }
+  },
+  {
+    min: 10,
+    max: 10,
+    result: {
+      action: "Comerciantes",
+      target: "Inventário de mercadorias",
+      complication: "Uma pessoa-chave insiste em mudar o plano"
+    }
+  },
+  {
+    min: 11,
+    max: 11,
+    result: {
+      action: "Animais de estimação",
+      target: "Banho (e/ou tosa)",
+      complication: "O contratante exige discrição absoluta"
+    }
+  },
+  {
+    min: 12,
+    max: 12,
+    result: {
+      action: "Grupo de aventureiros",
+      target: "Planejar viagem",
+      complication: "Exige ferramentas específicas"
+    }
+  },
+  {
+    min: 13,
+    max: 13,
+    result: {
+      action: "Artistas",
+      target: "Alimentar animais",
+      complication: "Há resistência a mudanças"
+    }
+  },
+  {
+    min: 14,
+    max: 14,
+    result: {
+      action: "Agricultores",
+      target: "No plantio",
+      complication: "É preciso seguir regras excessivamente rígidas"
+    }
+  },
+  {
+    min: 15,
+    max: 15,
+    result: {
+      action: "Pescadores",
+      target: "Limpar equipamentos",
+      complication: "Ferramentas estão degradadas"
+    }
+  },
+  {
+    min: 16,
+    max: 16,
+    result: {
+      action: "Grupo de jovens",
+      target: "Organizar evento cultural",
+      complication: "Precisa feito em horários específicos"
+    }
+  },
+  {
+    min: 17,
+    max: 17,
+    result: {
+      action: "Professores",
+      target: "Corrigir provas",
+      complication: "Deve ser feito sem contato direto com o alvo"
+    }
+  },
+  {
+    min: 18,
+    max: 18,
+    result: {
+      action: "Voluntários",
+      target: "Limpar e reorganizar um espaço",
+      complication: "A demanda é maior que o esperado"
+    }
+  },
+  {
+    min: 19,
+    max: 19,
+    result: {
+      action: "Taberneiro",
+      target: "Ensaiar apresentação",
+      complication: "O alvo está em constante deslocamento"
+    }
+  },
+  {
+    min: 20,
+    max: 20,
+    result: {
+      action: "Refugiados",
+      target: "Resolver disputa",
+      complication: "O alvo exige discrição absoluta"
+    }
+  }
+];
+
+// ===== EXTRAIR RECURSOS (d20 x 3 colunas) =====
+
+/**
+ * Tabela de "Extrair Recursos"
+ * Sistema de três colunas: [Extrair...] + [De...] + [Mas...]
+ */
+export const EXTRAIR_RECURSOS_TABLE: ThreeColumnObjectiveTable = [
+  {
+    min: 1,
+    max: 2,
+    result: {
+      action: "Mineral metálico",
+      target: "Poço",
+      complication: "O local está infestado/ocupado"
+    }
+  },
+  {
+    min: 3,
+    max: 5,
+    result: {
+      action: "Extrativismo vegetal",
+      target: "Local condenado/abandonado",
+      complication: "Exige ferramentas caras e específicas"
+    }
+  },
+  {
+    min: 6,
+    max: 8,
+    result: {
+      action: "Extrativismo animal",
+      target: "Clareira",
+      complication: "Clima adverso dificulta"
+    }
+  },
+  {
+    min: 9,
+    max: 12,
+    result: {
+      action: "Material comum",
+      target: "Ambiente selvagem",
+      complication: "O acesso é perigoso"
+    }
+  },
+  {
+    min: 13,
+    max: 14,
+    result: {
+      action: "Especiaria",
+      target: "Caverna",
+      complication: "O local é instável"
+    }
+  },
+  {
+    min: 15,
+    max: 15,
+    result: {
+      action: "Componente mágico",
+      target: "Ruínas antigas",
+      complication: "O local/ação é nojenta e/ou humilhante"
+    }
+  },
+  {
+    min: 16,
+    max: 16,
+    result: {
+      action: "Plantas medicinais",
+      target: "Abismo/ravina",
+      complication: "Ambiente de condição extrema"
+    }
+  },
+  {
+    min: 17,
+    max: 18,
+    result: {
+      action: "Mineral não-metálico",
+      target: "Pântano",
+      complication: "O cheiro é insuportável"
+    }
+  },
+  {
+    min: 19,
+    max: 19,
+    result: {
+      action: "Cogumelos",
+      target: "Covil",
+      complication: "Há veneno ou toxinas"
+    }
+  },
+  {
+    min: 20,
+    max: 20,
+    result: {
+      action: "Role duas vezes e use ambos",
+      target: "Submerso",
+      complication: "O local é protegido por encantos"
+    }
+  }
+];
+
+// ===== CONSTRUIR, CRIAR OU REPARAR (d20 x 3 colunas) =====
+
+/**
+ * Tabela de "Construir, Criar ou Reparar"
+ * Sistema de três colunas: [Construir/Criar/Reparar...] + [Para...] + [Mas...]
+ */
+export const CONSTRUIR_CRIAR_OU_REPARAR_TABLE: ThreeColumnObjectiveTable = [
+  {
+    min: 1,
+    max: 1,
+    result: {
+      action: "Construção histórica",
+      target: "Instituição de caridade",
+      complication: "Recursos adquiridos de maneira ilegal"
+    }
+  },
+  {
+    min: 2,
+    max: 2,
+    result: {
+      action: "Estrada",
+      target: "Nobre poderoso",
+      complication: "Roubam os materiais/ferramentas"
+    }
+  },
+  {
+    min: 3,
+    max: 3,
+    result: {
+      action: "Ponte",
+      target: "Líder local",
+      complication: "Outro especialista discorda de você"
+    }
+  },
+  {
+    min: 4,
+    max: 4,
+    result: {
+      action: "Torre/fortaleza/muralha/proteção",
+      target: "Adepto religioso/arcano",
+      complication: "O serviço deve ser perfeito"
+    }
+  },
+  {
+    min: 5,
+    max: 5,
+    result: {
+      action: "Estabelecimento/moradia",
+      target: "Um marinheiro/corsário",
+      complication: "O local é afastado e inóspito"
+    }
+  },
+  {
+    min: 6,
+    max: 6,
+    result: {
+      action: "Um relacionamento",
+      target: "Uma organização",
+      complication: "Deve ser feito em segredo/escondido"
+    }
+  },
+  {
+    min: 7,
+    max: 7,
+    result: {
+      action: "Ferramenta agrícola",
+      target: "Agricultor",
+      complication: "O material é de baixa qualidade"
+    }
+  },
+  {
+    min: 8,
+    max: 8,
+    result: {
+      action: "Instrumento musical",
+      target: "Grupo de artistas",
+      complication: "Medidas erradas foram passadas"
+    }
+  },
+  {
+    min: 9,
+    max: 9,
+    result: {
+      action: "Roupas/uniformes",
+      target: "Escola local",
+      complication: "O clima atrapalha o trabalho"
+    }
+  },
+  {
+    min: 10,
+    max: 10,
+    result: {
+      action: "Brinquedos",
+      target: "Crianças",
+      complication: "O espaço disponível é menor do que o planejado"
+    }
+  },
+  {
+    min: 11,
+    max: 11,
+    result: {
+      action: "Poço ou cisterna",
+      target: "Comunidade local",
+      complication: "O projeto precisa seguir normas rígidas"
+    }
+  },
+  {
+    min: 12,
+    max: 12,
+    result: {
+      action: "Mural ou pintura",
+      target: "Governo",
+      complication: "O contratante exige personalização exclusiva"
+    }
+  },
+  {
+    min: 13,
+    max: 13,
+    result: {
+      action: "Veículo",
+      target: "Comerciante itinerante",
+      complication: "O trabalho será supervisionado por um avaliador rigoroso"
+    }
+  },
+  {
+    min: 14,
+    max: 14,
+    result: {
+      action: "Estátua",
+      target: "Templo local",
+      complication: "O local é compartilhado com outros grupos"
+    }
+  },
+  {
+    min: 15,
+    max: 15,
+    result: {
+      action: "Jardim",
+      target: "Casa de idosos",
+      complication: "O projeto deve ser silencioso durante a execução"
+    }
+  },
+  {
+    min: 16,
+    max: 16,
+    result: {
+      action: "Aqueduto",
+      target: "Pescador",
+      complication: "O contratante exige documentação detalhada do processo"
+    }
+  },
+  {
+    min: 17,
+    max: 17,
+    result: {
+      action: "Ferramenta de ofício",
+      target: "Taverneiro",
+      complication: "O trabalho precisa agradar várias partes em desacordo"
+    }
+  },
+  {
+    min: 18,
+    max: 18,
+    result: {
+      action: "Barco",
+      target: "Hospital/Enfermaria",
+      complication: "Há pressa excessiva para entrega"
+    }
+  },
+  {
+    min: 19,
+    max: 19,
+    result: {
+      action: "Mobília",
+      target: "Viajantes",
+      complication: "É necessário reutilizar peças/partes/materiais velhos"
+    }
+  },
+  {
+    min: 20,
+    max: 20,
+    result: {
+      action: "Armas/Armaduras",
+      target: "Mercado local",
+      complication: "Um detalhe estético é mais importante que a funcionalidade"
+    }
+  }
+];
+
+// ===== EXEMPLOS DE RECURSOS =====
+
+/**
+ * Lista detalhada de exemplos para cada tipo de recurso
+ */
+export const RESOURCE_EXAMPLES = {
+  "Mineral metálico": [
+    "ferro", "alumínio", "manganês", "magnésio", "cobre", "cromo",
+    "mercúrio", "chumbo", "estanho", "ouro", "prata", "níquel", "zinco", "urânio"
+  ],
+  "Extrativismo vegetal": [
+    "frutos", "madeira", "raízes", "folhas", "flores", "sementes",
+    "resinas", "óleos", "fibras", "turfa", "carvão", "cascas"
+  ],
+  "Extrativismo animal": [
+    "caça", "pesca", "ovos", "mel", "couro", "lã", "leite", "cera", "penas"
+  ],
+  "Material comum": [
+    "pedra", "água", "barro", "terra", "madeira", "carvão vegetal", "cogumelos", "petróleo"
+  ],
+  "Especiaria": [
+    "ervas aromáticas", "temperos", "flores raras", "sementes exóticas"
+  ],
+  "Componente mágico": [
+    "materiais de feitiços", "cristais mágicos", "outros componentes arcanos"
+  ],
+  "Plantas medicinais": [
+    "ervas curativas", "raízes medicinais", "flores terapêuticas", "folhas medicinais"
+  ],
+  "Mineral não-metálico": [
+    "sal", "enxofre", "fosfatos", "nitratos", "quartzo", "argila", "gesso",
+    "calcário", "granito", "mármore", "areia", "cascalho", "amianto",
+    "carvão mineral", "pedras preciosas", "pedras semi-preciosas"
+  ],
+  "Cogumelos": [
+    "cogumelos comestíveis", "cogumelos venenosos", "cogumelos raros",
+    "fungos medicinais", "cogumelos luminescentes"
+  ]
+} as const;
+
+/**
+ * Ambientes selvagens para extração de recursos
+ */
+export const WILD_ENVIRONMENTS = [
+  "florestas", "montanhas", "desertos", "bosques", "cavernas", "vales",
+  "pântanos", "rios", "campos", "lagos", "cachoeiras", "planícies"
+] as const;
+
 // ===== FUNÇÕES UTILITÁRIAS =====
 
 /**
@@ -950,11 +1475,14 @@ export function getThreeColumnTable(
       return HEAL_OR_RECOVER_TABLE;
     case ServiceObjectiveType.NEGOCIAR_OU_COAGIR:
       return NEGOTIATE_OR_COERCE_TABLE;
-
-    // Tabelas não implementadas nesta issue (serão feitas nas Issues 5.12 e 5.13)
     case ServiceObjectiveType.AUXILIAR_OU_CUIDAR:
+      return AUXILIAR_OU_CUIDAR_TABLE;
     case ServiceObjectiveType.EXTRAIR_RECURSOS:
+      return EXTRAIR_RECURSOS_TABLE;
     case ServiceObjectiveType.CONSTRUIR_CRIAR_OU_REPARAR:
+      return CONSTRUIR_CRIAR_OU_REPARAR_TABLE;
+
+    // Tabelas não implementadas nesta issue (TODO: serão feitas na Issue 5.13)
     case ServiceObjectiveType.SERVICOS_ESPECIFICOS:
     case ServiceObjectiveType.RELIGIOSO:
     case ServiceObjectiveType.MULTIPLO:
@@ -1001,7 +1529,7 @@ export function generateServiceObjective(objectiveType: ServiceObjectiveType): {
 // ===== CONSTANTES E CONFIGURAÇÕES =====
 
 /**
- * Lista dos tipos de objetivo implementados nesta issue
+ * Lista dos tipos de objetivo implementados
  * Útil para validações e interfaces
  */
 export const IMPLEMENTED_OBJECTIVE_TYPES: ServiceObjectiveType[] = [
@@ -1009,6 +1537,9 @@ export const IMPLEMENTED_OBJECTIVE_TYPES: ServiceObjectiveType[] = [
   ServiceObjectiveType.RECRUTAR,
   ServiceObjectiveType.CURAR_OU_RECUPERAR,
   ServiceObjectiveType.NEGOCIAR_OU_COAGIR,
+  ServiceObjectiveType.AUXILIAR_OU_CUIDAR,
+  ServiceObjectiveType.EXTRAIR_RECURSOS,
+  ServiceObjectiveType.CONSTRUIR_CRIAR_OU_REPARAR,
 ];
 
 /**
@@ -1022,3 +1553,127 @@ export const THREE_COLUMN_SYSTEM_NOTE =
  */
 export const USAGE_EXAMPLE =
   'Caso os resultados de Treinar ou Ensinar forem 3, 5 e 2, a descrição seria: "Treinar ou ensinar a arte do combate para crianças órfãs, mas o conhecimento será usado contra você."';
+
+// ===== FUNÇÕES UTILITÁRIAS ESPECÍFICAS =====
+
+/**
+ * Retorna exemplos de recursos específicos baseados no tipo
+ */
+export function getResourceExamples(resourceType: string): readonly string[] {
+  return RESOURCE_EXAMPLES[resourceType as keyof typeof RESOURCE_EXAMPLES] || [];
+}
+
+/**
+ * Retorna um exemplo aleatório de recurso específico
+ */
+export function getRandomResourceExample(resourceType: string): string {
+  const examples = getResourceExamples(resourceType);
+  if (examples.length === 0) return resourceType;
+  
+  return examples[Math.floor(Math.random() * examples.length)];
+}
+
+/**
+ * Gera uma descrição personalizada para objetivos de "Extrair Recursos"
+ * Inclui exemplos contextuais quando possível
+ */
+export function generateResourceExtractionDescription(
+  action: string, 
+  target: string, 
+  complication: string
+): string {
+  // Tratamento especial para resultado 20 (múltiplo)
+  if (action === "Role duas vezes e use ambos") {
+    const alternativeResources = ["Mineral metálico", "Extrativismo vegetal"];
+    const altResource = alternativeResources[Math.floor(Math.random() * alternativeResources.length)];
+    const example = getRandomResourceExample(altResource);
+    return `Extrair ${example} de ${target.toLowerCase()}, mas ${complication.toLowerCase()}`;
+  }
+
+  // Gera um exemplo específico do tipo de recurso
+  const specificExample = getRandomResourceExample(action);
+  
+  return `Extrair ${specificExample} de ${target.toLowerCase()}, mas ${complication.toLowerCase()}`;
+}
+
+/**
+ * Gera uma descrição personalizada para objetivos de "Auxiliar ou Cuidar"
+ * Ajusta a linguagem conforme o contexto
+ */
+export function generateCareDescription(
+  target: string,
+  activity: string, 
+  complication: string
+): string {
+  const careAction = target.toLowerCase().includes('criança') || target.toLowerCase().includes('idoso') 
+    ? 'cuidar de' 
+    : 'auxiliar';
+    
+  return `${careAction.charAt(0).toUpperCase() + careAction.slice(1)} ${target.toLowerCase()} em ${activity.toLowerCase()}, mas ${complication.toLowerCase()}`;
+}
+
+/**
+ * Valida se um ambiente é considerado selvagem para extração
+ */
+export function isWildEnvironment(environment: string): boolean {
+  return WILD_ENVIRONMENTS.some(wild => 
+    environment.toLowerCase().includes(wild.toLowerCase())
+  ) || environment.toLowerCase().includes('selvagem');
+}
+
+/**
+ * Gera objetivos de serviço com descrições aprimoradas
+ * Inclui tratamento especial para os novos tipos implementados
+ */
+export function generateEnhancedServiceObjective(objectiveType: ServiceObjectiveType): {
+  type: ServiceObjectiveType;
+  description: string;
+  action: string;
+  target: string;
+  complication: string;
+} | null {
+  const table = getThreeColumnTable(objectiveType);
+  if (!table) {
+    return null; // Tabela não implementada
+  }
+
+  const result = rollThreeColumnObjective(table);
+
+  // Descrições personalizadas para novos tipos
+  let description: string;
+  
+  switch (objectiveType) {
+    case ServiceObjectiveType.EXTRAIR_RECURSOS:
+      description = generateResourceExtractionDescription(
+        result.action, 
+        result.target, 
+        result.complication
+      );
+      break;
+      
+    case ServiceObjectiveType.AUXILIAR_OU_CUIDAR:
+      description = generateCareDescription(
+        result.action, // Na nossa implementação, action = quem cuidar
+        result.target, // target = atividade
+        result.complication
+      );
+      break;
+      
+    case ServiceObjectiveType.CONSTRUIR_CRIAR_OU_REPARAR:
+      description = `Construir/criar/reparar ${result.action.toLowerCase()} para ${result.target.toLowerCase()}, mas ${result.complication.toLowerCase()}`;
+      break;
+      
+    default:
+      // Usa a formatação padrão para outros tipos
+      description = `${objectiveType} ${result.action} ${result.target}, mas ${result.complication}`;
+      break;
+  }
+
+  return {
+    type: objectiveType,
+    description,
+    action: result.action,
+    target: result.target,
+    complication: result.complication,
+  };
+}
