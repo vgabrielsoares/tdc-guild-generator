@@ -1,4 +1,9 @@
 import { rollDice, rollOnTable } from "../dice";
+import {
+  convertTimeStringToDays,
+  selectByCriteria,
+  selectRandomItems,
+} from "../lifecycle-utils";
 import type { Contract } from "../../types/contract";
 import {
   ContractStatus,
@@ -26,63 +31,6 @@ export interface ContractResolutionTime {
 
 export interface NewContractsTime {
   days: number; // dias até novos contratos aparecerem
-}
-
-// ===== FUNÇÕES UTILITÁRIAS =====
-
-/**
- * Converte string de dados em dias
- */
-function convertTimeStringToDays(timeString: string): number {
-  // Remove espaços e converte para lowercase
-  const cleaned = timeString.toLowerCase().trim();
-
-  if (cleaned.includes("dia")) {
-    // Extrair e rolar dados para dias
-    const diceMatch = cleaned.match(/(\d+d\d+(?:\+\d+)?|\d+)/);
-    if (diceMatch) {
-      const diceNotation = diceMatch[1];
-      if (diceNotation.includes("d")) {
-        return rollDice({ notation: diceNotation }).result;
-      } else {
-        return parseInt(diceNotation);
-      }
-    }
-  } else if (cleaned.includes("semana")) {
-    // Extrair e rolar dados para semanas, depois converter para dias
-    const diceMatch = cleaned.match(/(\d+d\d+(?:\+\d+)?|\d+)/);
-    if (diceMatch) {
-      const diceNotation = diceMatch[1];
-      let weeks: number;
-      if (diceNotation.includes("d")) {
-        weeks = rollDice({ notation: diceNotation }).result;
-      } else {
-        weeks = parseInt(diceNotation);
-      }
-      return weeks * 7; // Converter semanas para dias
-    }
-  } else if (cleaned.includes("mês") || cleaned.includes("mes")) {
-    // Extrair e rolar dados para meses, depois converter para dias
-    const diceMatch = cleaned.match(/(\d+d\d+(?:\+\d+)?|\d+)/);
-    if (diceMatch) {
-      const diceNotation = diceMatch[1];
-      let months: number;
-      if (diceNotation.includes("d")) {
-        months = rollDice({ notation: diceNotation }).result;
-      } else {
-        months = parseInt(diceNotation);
-      }
-      return months * 30; // Converter meses para dias (aproximado)
-    }
-  }
-
-  // Fallback - tentar extrair número diretamente
-  const numberMatch = cleaned.match(/\d+/);
-  if (numberMatch) {
-    return parseInt(numberMatch[0]);
-  }
-
-  return 7; // Default de 1 semana
 }
 
 // ===== FUNÇÕES DE ROLAGEM =====
@@ -343,11 +291,11 @@ export function applyUnsignedContractResolution(
 
     case UnsignedResolutionResult.MENORES_XP_RESOLVIDOS: {
       // Ordenar por XP e pegar os menores
-      const sortedByXP = [...unsignedContracts].sort(
-        (a, b) => a.value.experienceValue - b.value.experienceValue
+      const toResolve = selectByCriteria(
+        unsignedContracts,
+        (contract) => contract.value.experienceValue,
+        "lowest"
       );
-      const halfCount = Math.ceil(sortedByXP.length / 2);
-      const toResolve = sortedByXP.slice(0, halfCount);
 
       return contracts.map((contract) =>
         toResolve.includes(contract)
@@ -362,11 +310,11 @@ export function applyUnsignedContractResolution(
 
     case UnsignedResolutionResult.MELHORES_RECOMPENSAS_RESOLVIDOS: {
       // Ordenar por recompensa e pegar os melhores
-      const sortedByReward = [...unsignedContracts].sort(
-        (a, b) => b.value.finalGoldReward - a.value.finalGoldReward
+      const toResolve = selectByCriteria(
+        unsignedContracts,
+        (contract) => contract.value.finalGoldReward,
+        "highest"
       );
-      const halfCount = Math.ceil(sortedByReward.length / 2);
-      const toResolve = sortedByReward.slice(0, halfCount);
 
       return contracts.map((contract) =>
         toResolve.includes(contract)
@@ -381,9 +329,8 @@ export function applyUnsignedContractResolution(
 
     case UnsignedResolutionResult.ALEATORIOS_RESOLVIDOS: {
       // Resolver quantidade aleatória
-      const count = Math.min(resolution.count || 1, unsignedContracts.length);
-      const shuffled = [...unsignedContracts].sort(() => Math.random() - 0.5);
-      const toResolve = shuffled.slice(0, count);
+      const count = resolution.count || 1;
+      const toResolve = selectRandomItems(unsignedContracts, count);
 
       return contracts.map((contract) =>
         toResolve.includes(contract)
@@ -398,9 +345,8 @@ export function applyUnsignedContractResolution(
 
     case UnsignedResolutionResult.ASSINADOS_NAO_RESOLVIDOS: {
       // Marcar como aceitos mas não resolvidos
-      const count = Math.min(resolution.count || 1, unsignedContracts.length);
-      const shuffled = [...unsignedContracts].sort(() => Math.random() - 0.5);
-      const toSign = shuffled.slice(0, count);
+      const count = resolution.count || 1;
+      const toSign = selectRandomItems(unsignedContracts, count);
 
       return contracts.map((contract) => {
         if (toSign.includes(contract)) {
