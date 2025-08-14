@@ -1989,6 +1989,11 @@ export function generateServiceObjective(objectiveType: ServiceObjectiveType): {
   target: string;
   complication: string;
 } | null {
+  // Tratamento especial para objetivos múltiplos
+  if (objectiveType === ServiceObjectiveType.MULTIPLO) {
+    return generateMultipleObjective();
+  }
+
   const table = getThreeColumnTable(objectiveType);
   if (!table) {
     return null; // Tabela não implementada nesta issue
@@ -2017,6 +2022,175 @@ export function generateServiceObjective(objectiveType: ServiceObjectiveType): {
   };
 }
 
+/**
+ * Gera um objetivo múltiplo (quando rola 20 na tabela principal)
+ * Permite múltiplas rolagens de "Múltiplo", acumulando objetivos únicos
+ * Para quando não há mais tipos únicos para adicionar
+ * GARANTE pelo menos 2 objetivos para justificar o nome "múltiplo"
+ */
+export function generateMultipleObjective(): {
+  type: ServiceObjectiveType;
+  description: string;
+  action: string;
+  target: string;
+  complication: string;
+} {
+  const usedTypes = new Set<ServiceObjectiveType>();
+  const objectives: Array<{
+    type: ServiceObjectiveType;
+    description: string;
+    action: string;
+    target: string;
+    complication: string;
+  }> = [];
+
+  // Continue rolando até ter pelo menos 2 objetivos OU não conseguir mais tipos únicos
+  let shouldContinue = true;
+  while (shouldContinue) {
+    const rolledType = rollFromAvailableTypes(usedTypes);
+    
+    // Se não há mais tipos disponíveis além dos já usados, parar
+    if (!rolledType) {
+      shouldContinue = false;
+      break;
+    }
+
+    // Se rolou "Múltiplo", continue para rolar mais objetivos
+    if (rolledType === ServiceObjectiveType.MULTIPLO) {
+      // Continue o loop para rolar mais objetivos
+      continue;
+    }
+
+    // Se já usamos este tipo, pular
+    if (usedTypes.has(rolledType)) {
+      continue;
+    }
+
+    // Gerar o objetivo
+    const objective = generateServiceObjective(rolledType);
+    if (objective) {
+      objectives.push(objective);
+      usedTypes.add(rolledType);
+    }
+
+    // Se já temos pelo menos 2 objetivos, rolar para ver se continua
+    if (objectives.length >= 2) {
+      const continueRoll = rollOnTable(SERVICE_OBJECTIVE_TYPE_TABLE);
+      
+      // Se não rolou "Múltiplo" novamente, parar
+      if (continueRoll.result.type !== ServiceObjectiveType.MULTIPLO) {
+        shouldContinue = false;
+      }
+    }
+    // Se ainda tem menos de 2 objetivos, continue forçadamente
+  }
+
+  // Se ainda não conseguiu pelo menos 2 objetivos, forçar mais um
+  while (objectives.length < 2) {
+    const availableTypes = IMPLEMENTED_OBJECTIVE_TYPES.filter(
+      type => type !== ServiceObjectiveType.MULTIPLO && !usedTypes.has(type)
+    );
+    
+    if (availableTypes.length === 0) {
+      // Se não há mais tipos disponíveis, duplicar o primeiro objetivo com ajuste
+      if (objectives.length > 0) {
+        const firstObjective = objectives[0];
+        const duplicatedObjective = {
+          ...firstObjective,
+          description: firstObjective.description + " (variação)",
+        };
+        objectives.push(duplicatedObjective);
+      } else {
+        // Fallback absoluto
+        const fallbackType = ServiceObjectiveType.TREINAR_OU_ENSINAR;
+        const fallbackObjective = generateServiceObjective(fallbackType);
+        if (fallbackObjective) {
+          objectives.push(fallbackObjective);
+        }
+      }
+    } else {
+      // Escolher aleatoriamente um tipo disponível
+      const randomIndex = Math.floor(Math.random() * availableTypes.length);
+      const selectedType = availableTypes[randomIndex];
+      
+      const objective = generateServiceObjective(selectedType);
+      if (objective) {
+        objectives.push(objective);
+        usedTypes.add(selectedType);
+      }
+    }
+  }
+
+  // Combinar todos os objetivos
+  return combineMultipleObjectives(objectives);
+}
+
+/**
+ * Rola um tipo de objetivo excluindo os já usados e o tipo "Múltiplo"
+ * Retorna null se não há mais tipos disponíveis
+ */
+function rollFromAvailableTypes(usedTypes: Set<ServiceObjectiveType>): ServiceObjectiveType | null {
+  const availableTypes = IMPLEMENTED_OBJECTIVE_TYPES.filter(
+    type => type !== ServiceObjectiveType.MULTIPLO && !usedTypes.has(type)
+  );
+
+  // Se não há mais tipos disponíveis, retornar null
+  if (availableTypes.length === 0) {
+    return null;
+  }
+
+  // Rolar na tabela principal
+  const result = rollOnTable(SERVICE_OBJECTIVE_TYPE_TABLE);
+  return result.result.type;
+}
+
+/**
+ * Combina múltiplos objetivos em um único resultado
+ */
+function combineMultipleObjectives(objectives: Array<{
+  type: ServiceObjectiveType;
+  description: string;
+  action: string;
+  target: string;
+  complication: string;
+}>): {
+  type: ServiceObjectiveType;
+  description: string;
+  action: string;
+  target: string;
+  complication: string;
+} {
+  if (objectives.length === 0) {
+    throw new Error("Cannot combine empty objectives array");
+  }
+
+  if (objectives.length === 1) {
+    return {
+      ...objectives[0],
+      type: ServiceObjectiveType.MULTIPLO,
+    };
+  }
+
+  // Combinar descrições com conectores apropriados
+  const descriptions = objectives.map(obj => obj.description);
+  const combinedDescription = descriptions.length === 2 
+    ? `${descriptions[0]} e também ${descriptions[1]}`
+    : descriptions.slice(0, -1).join(", ") + ` e também ${descriptions[descriptions.length - 1]}`;
+
+  // Combinar ações, alvos e complicações
+  const combinedAction = objectives.map(obj => obj.action).join(" + ");
+  const combinedTarget = objectives.map(obj => obj.target).join(" + ");
+  const combinedComplication = objectives.map(obj => obj.complication).join(" + ");
+
+  return {
+    type: ServiceObjectiveType.MULTIPLO,
+    description: combinedDescription,
+    action: combinedAction,
+    target: combinedTarget,
+    complication: combinedComplication,
+  };
+}
+
 // ===== CONSTANTES E CONFIGURAÇÕES =====
 
 /**
@@ -2033,6 +2207,7 @@ export const IMPLEMENTED_OBJECTIVE_TYPES: ServiceObjectiveType[] = [
   ServiceObjectiveType.CONSTRUIR_CRIAR_OU_REPARAR,
   ServiceObjectiveType.SERVICOS_ESPECIFICOS,
   ServiceObjectiveType.RELIGIOSO,
+  ServiceObjectiveType.MULTIPLO,
 ];
 
 /**
