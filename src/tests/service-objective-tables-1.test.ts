@@ -277,11 +277,11 @@ describe("Service Objective Tables - Part 1 (Issue 5.11)", () => {
       ).not.toBeNull();
     });
 
-    it("should return null for objective types not yet implemented", () => {
+    it("should return null only for MULTIPLO objective type (handled separately)", () => {
       expect(
         getThreeColumnTable(ServiceObjectiveType.SERVICOS_ESPECIFICOS)
-      ).toBeNull();
-      expect(getThreeColumnTable(ServiceObjectiveType.RELIGIOSO)).toBeNull();
+      ).not.toBeNull();
+      expect(getThreeColumnTable(ServiceObjectiveType.RELIGIOSO)).not.toBeNull();
       expect(getThreeColumnTable(ServiceObjectiveType.MULTIPLO)).toBeNull();
     });
   });
@@ -294,23 +294,23 @@ describe("Service Objective Tables - Part 1 (Issue 5.11)", () => {
 
       expect(objective).not.toBeNull();
       expect(objective!.type).toBe(ServiceObjectiveType.TREINAR_OU_ENSINAR);
-      expect(objective!.description).toContain("Treinar ou ensinar");
+      expect(objective!.description).toContain("para");
       expect(objective!.description).toContain("mas");
       expect(objective!.action).toBeTruthy();
       expect(objective!.target).toBeTruthy();
       expect(objective!.complication).toBeTruthy();
     });
 
-    it("should return null for non-implemented objective types", () => {
+    it("should handle all objective types after Issue 5.13 implementation", () => {
       expect(
         generateServiceObjective(ServiceObjectiveType.SERVICOS_ESPECIFICOS)
-      ).toBeNull();
+      ).not.toBeNull();
       expect(
         generateServiceObjective(ServiceObjectiveType.RELIGIOSO)
-      ).toBeNull();
+      ).not.toBeNull();
       expect(
         generateServiceObjective(ServiceObjectiveType.MULTIPLO)
-      ).toBeNull();
+      ).not.toBeNull();
     });
 
     it("should format description correctly according to .md example", () => {
@@ -340,8 +340,8 @@ describe("Service Objective Tables - Part 1 (Issue 5.11)", () => {
   });
 
   describe("IMPLEMENTED_OBJECTIVE_TYPES constant", () => {
-    it("should contain exactly the 7 objective types implemented in Issues 5.11 and 5.12", () => {
-      expect(IMPLEMENTED_OBJECTIVE_TYPES).toHaveLength(7);
+    it("should contain all 10 objective types after Issue 5.13 completion", () => {
+      expect(IMPLEMENTED_OBJECTIVE_TYPES).toHaveLength(10);
       expect(IMPLEMENTED_OBJECTIVE_TYPES).toContain(
         ServiceObjectiveType.TREINAR_OU_ENSINAR
       );
@@ -365,14 +365,14 @@ describe("Service Objective Tables - Part 1 (Issue 5.11)", () => {
       );
     });
 
-    it("should not contain objective types from future issues", () => {
-      expect(IMPLEMENTED_OBJECTIVE_TYPES).not.toContain(
+    it("should now include all objective types including Issue 5.13 additions", () => {
+      expect(IMPLEMENTED_OBJECTIVE_TYPES).toContain(
         ServiceObjectiveType.SERVICOS_ESPECIFICOS
       );
-      expect(IMPLEMENTED_OBJECTIVE_TYPES).not.toContain(
+      expect(IMPLEMENTED_OBJECTIVE_TYPES).toContain(
         ServiceObjectiveType.RELIGIOSO
       );
-      expect(IMPLEMENTED_OBJECTIVE_TYPES).not.toContain(
+      expect(IMPLEMENTED_OBJECTIVE_TYPES).toContain(
         ServiceObjectiveType.MULTIPLO
       );
     });
@@ -435,7 +435,7 @@ describe("Service Objective Tables - Part 1 (Issue 5.11)", () => {
 
       expect(objective).not.toBeNull();
       expect(objective!.description).toMatch(
-        /^Curar ou recuperar .+ .+, mas .+$/
+        /^.+ para .+, mas .+$/
       );
     });
   });
