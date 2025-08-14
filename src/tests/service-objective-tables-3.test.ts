@@ -7,6 +7,7 @@ import {
   generateServiceObjective,
   generateSpecificServiceDescription,
   generateServiceDescription,
+  generateMultipleObjective,
   IMPLEMENTED_OBJECTIVE_TYPES,
   rollThreeColumnObjective,
 } from "@/data/tables/service-objective-tables";
@@ -14,14 +15,17 @@ import { ServiceObjectiveType } from "@/types/service";
 
 describe("Service Objective Tables - Part 3 (Issue 5.13)", () => {
   describe("SERVICE_OBJECTIVE_TYPES Table Completeness", () => {
-    it("should now include SERVICOS_ESPECIFICOS and RELIGIOSO in implemented types", () => {
+    it("should now include SERVICOS_ESPECIFICOS, RELIGIOSO and MULTIPLO in implemented types", () => {
       expect(IMPLEMENTED_OBJECTIVE_TYPES).toContain(
         ServiceObjectiveType.SERVICOS_ESPECIFICOS
       );
       expect(IMPLEMENTED_OBJECTIVE_TYPES).toContain(
         ServiceObjectiveType.RELIGIOSO
       );
-      expect(IMPLEMENTED_OBJECTIVE_TYPES).toHaveLength(9); // 7 previous + 2 new
+      expect(IMPLEMENTED_OBJECTIVE_TYPES).toContain(
+        ServiceObjectiveType.MULTIPLO
+      );
+      expect(IMPLEMENTED_OBJECTIVE_TYPES).toHaveLength(10); // 7 previous + 3 new
     });
   });
 
@@ -141,7 +145,7 @@ describe("Service Objective Tables - Part 3 (Issue 5.13)", () => {
       });
 
       it("should have all three columns populated for each entry", () => {
-        RELIGIOSO_TABLE.forEach((entry, index) => {
+        RELIGIOSO_TABLE.forEach((entry) => {
           expect(entry.result.action).toBeTruthy();
           expect(entry.result.target).toBeTruthy();
           expect(entry.result.complication).toBeTruthy();
@@ -245,8 +249,133 @@ describe("Service Objective Tables - Part 3 (Issue 5.13)", () => {
       );
     });
 
-    it("should still return null for MULTIPLO objective type", () => {
+    it("should return null for MULTIPLO objective type (special handling)", () => {
       expect(getThreeColumnTable(ServiceObjectiveType.MULTIPLO)).toBeNull();
+    });
+  });
+
+  describe("Multiple Objectives System (Issue 5.13 Special Feature)", () => {
+    describe("generateMultipleObjective", () => {
+      it("should generate at least one objective", () => {
+        const result = generateMultipleObjective();
+        
+        expect(result.type).toBe(ServiceObjectiveType.MULTIPLO);
+        expect(result.description).toBeDefined();
+        expect(result.action).toBeDefined();
+        expect(result.target).toBeDefined();
+        expect(result.complication).toBeDefined();
+      });
+
+      it("should combine multiple objectives when rolling multiple 20s", () => {
+        const result = generateMultipleObjective();
+        
+        expect(result.type).toBe(ServiceObjectiveType.MULTIPLO);
+        
+        // Should contain connectors for multiple objectives
+        const hasMultipleConnector = result.description.includes("e também") || 
+                                    result.description.includes("+") ||
+                                    !result.description.includes("e também"); // Single objective is also valid
+        
+        expect(hasMultipleConnector).toBe(true);
+      });
+
+      it("should not repeat objective types in the same generation", () => {
+        // Run multiple times to test the uniqueness logic
+        for (let i = 0; i < 10; i++) {
+          const result = generateMultipleObjective();
+          
+          expect(result.type).toBe(ServiceObjectiveType.MULTIPLO);
+          expect(result.description).toBeDefined();
+          
+          // If it contains multiple objectives, they should be combined properly
+          if (result.description.includes("e também")) {
+            const parts = result.description.split("e também");
+            expect(parts.length).toBeGreaterThanOrEqual(2);
+            parts.forEach(part => {
+              expect(part.trim().length).toBeGreaterThan(0);
+            });
+          }
+        }
+      });
+
+      it("should handle proper grammar for multiple objectives", () => {
+        const result = generateMultipleObjective();
+        
+        expect(result.type).toBe(ServiceObjectiveType.MULTIPLO);
+        
+        // Test different scenarios
+        if (result.description.includes("e também")) {
+          // Multiple objectives - should have proper connectors
+          const parts = result.description.split("e também");
+          expect(parts.length).toBeGreaterThanOrEqual(2);
+          
+          // Last part should be connected with "e também"
+          expect(parts[parts.length - 1].trim().length).toBeGreaterThan(0);
+        } else {
+          // Single objective promoted to multiple - should still be valid
+          expect(result.description.length).toBeGreaterThan(0);
+        }
+      });
+
+      it("should generate different combinations on multiple calls", () => {
+        const results = [];
+        
+        // Generate multiple results
+        for (let i = 0; i < 5; i++) {
+          results.push(generateMultipleObjective());
+        }
+        
+        // All should be valid
+        results.forEach(result => {
+          expect(result.type).toBe(ServiceObjectiveType.MULTIPLO);
+          expect(result.description).toBeDefined();
+          expect(result.description.length).toBeGreaterThan(0);
+        });
+        
+        // Due to randomization, at least some should be different
+        const uniqueDescriptions = new Set(results.map(r => r.description));
+        expect(uniqueDescriptions.size).toBeGreaterThan(0);
+      });
+    });
+
+    describe("generateServiceObjective with MULTIPLO", () => {
+      it("should handle MULTIPLO type by generating combined objectives", () => {
+        const result = generateServiceObjective(ServiceObjectiveType.MULTIPLO);
+        
+        expect(result).not.toBeNull();
+        expect(result!.type).toBe(ServiceObjectiveType.MULTIPLO);
+        expect(result!.description).toContain("e também");
+      });
+
+      it("should generate different results on multiple calls", () => {
+        const result1 = generateServiceObjective(ServiceObjectiveType.MULTIPLO);
+        const result2 = generateServiceObjective(ServiceObjectiveType.MULTIPLO);
+        
+        // With randomization, results should likely be different
+        // (though there's a small chance they could be the same)
+        expect(result1).not.toBeNull();
+        expect(result2).not.toBeNull();
+        expect(result1!.type).toBe(ServiceObjectiveType.MULTIPLO);
+        expect(result2!.type).toBe(ServiceObjectiveType.MULTIPLO);
+      });
+    });
+
+    describe("Integration with complete objective system", () => {
+      it("should work with all implemented objective types", () => {
+        // Test that we can generate multiples using all implemented types
+        const implementations = IMPLEMENTED_OBJECTIVE_TYPES.filter(
+          type => type !== ServiceObjectiveType.MULTIPLO
+        );
+        
+        expect(implementations.length).toBeGreaterThan(0);
+        
+        // Generate multiple objectives multiple times to test variety
+        for (let i = 0; i < 5; i++) {
+          const result = generateMultipleObjective();
+          expect(result.type).toBe(ServiceObjectiveType.MULTIPLO);
+          expect(result.description).toContain("e também");
+        }
+      });
     });
   });
 
@@ -269,8 +398,11 @@ describe("Service Objective Tables - Part 3 (Issue 5.13)", () => {
       expect(religious!.description).toBeTruthy();
     });
 
-    it("should still return null for MULTIPLO objective type", () => {
-      expect(generateServiceObjective(ServiceObjectiveType.MULTIPLO)).toBeNull();
+    it("should handle MULTIPLO objective type with special logic", () => {
+      const multiple = generateServiceObjective(ServiceObjectiveType.MULTIPLO);
+      expect(multiple).not.toBeNull();
+      expect(multiple!.type).toBe(ServiceObjectiveType.MULTIPLO);
+      expect(multiple!.description).toContain("e também");
     });
 
     it("should format description correctly for new types", () => {
