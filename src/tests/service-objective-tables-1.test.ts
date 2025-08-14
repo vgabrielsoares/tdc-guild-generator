@@ -9,7 +9,7 @@ import {
   getThreeColumnTable,
   generateServiceObjective,
   IMPLEMENTED_OBJECTIVE_TYPES,
-} from "@/data/tables/service-objective-tables-1";
+} from "@/data/tables/service-objective-tables";
 import { ServiceObjectiveType } from "@/types/service";
 
 describe("Service Objective Tables - Part 1 (Issue 5.11)", () => {
@@ -245,23 +245,42 @@ describe("Service Objective Tables - Part 1 (Issue 5.11)", () => {
 
       expect(result20.action).toBe("Jogos e esportes simples");
       expect(result20.target).toBe("Um grupo de crianças");
-      expect(result20.complication).toBe("O treinado espera recompensas extras para se dedicar");
+      expect(result20.complication).toBe(
+        "O treinado espera recompensas extras para se dedicar"
+      );
     });
   });
 
   describe("getThreeColumnTable", () => {
     it("should return correct tables for implemented objective types", () => {
-      expect(getThreeColumnTable(ServiceObjectiveType.TREINAR_OU_ENSINAR)).toBe(TRAIN_OR_TEACH_TABLE);
-      expect(getThreeColumnTable(ServiceObjectiveType.RECRUTAR)).toBe(RECRUIT_TABLE);
-      expect(getThreeColumnTable(ServiceObjectiveType.CURAR_OU_RECUPERAR)).toBe(HEAL_OR_RECOVER_TABLE);
-      expect(getThreeColumnTable(ServiceObjectiveType.NEGOCIAR_OU_COAGIR)).toBe(NEGOTIATE_OR_COERCE_TABLE);
+      expect(getThreeColumnTable(ServiceObjectiveType.TREINAR_OU_ENSINAR)).toBe(
+        TRAIN_OR_TEACH_TABLE
+      );
+      expect(getThreeColumnTable(ServiceObjectiveType.RECRUTAR)).toBe(
+        RECRUIT_TABLE
+      );
+      expect(getThreeColumnTable(ServiceObjectiveType.CURAR_OU_RECUPERAR)).toBe(
+        HEAL_OR_RECOVER_TABLE
+      );
+      expect(getThreeColumnTable(ServiceObjectiveType.NEGOCIAR_OU_COAGIR)).toBe(
+        NEGOTIATE_OR_COERCE_TABLE
+      );
+
+      expect(
+        getThreeColumnTable(ServiceObjectiveType.AUXILIAR_OU_CUIDAR)
+      ).not.toBeNull();
+      expect(
+        getThreeColumnTable(ServiceObjectiveType.EXTRAIR_RECURSOS)
+      ).not.toBeNull();
+      expect(
+        getThreeColumnTable(ServiceObjectiveType.CONSTRUIR_CRIAR_OU_REPARAR)
+      ).not.toBeNull();
     });
 
-    it("should return null for objective types not implemented in Issue 5.11", () => {
-      expect(getThreeColumnTable(ServiceObjectiveType.AUXILIAR_OU_CUIDAR)).toBeNull();
-      expect(getThreeColumnTable(ServiceObjectiveType.EXTRAIR_RECURSOS)).toBeNull();
-      expect(getThreeColumnTable(ServiceObjectiveType.CONSTRUIR_CRIAR_OU_REPARAR)).toBeNull();
-      expect(getThreeColumnTable(ServiceObjectiveType.SERVICOS_ESPECIFICOS)).toBeNull();
+    it("should return null for objective types not yet implemented", () => {
+      expect(
+        getThreeColumnTable(ServiceObjectiveType.SERVICOS_ESPECIFICOS)
+      ).toBeNull();
       expect(getThreeColumnTable(ServiceObjectiveType.RELIGIOSO)).toBeNull();
       expect(getThreeColumnTable(ServiceObjectiveType.MULTIPLO)).toBeNull();
     });
@@ -269,7 +288,9 @@ describe("Service Objective Tables - Part 1 (Issue 5.11)", () => {
 
   describe("generateServiceObjective", () => {
     it("should generate complete objectives for implemented types", () => {
-      const objective = generateServiceObjective(ServiceObjectiveType.TREINAR_OU_ENSINAR);
+      const objective = generateServiceObjective(
+        ServiceObjectiveType.TREINAR_OU_ENSINAR
+      );
 
       expect(objective).not.toBeNull();
       expect(objective!.type).toBe(ServiceObjectiveType.TREINAR_OU_ENSINAR);
@@ -281,14 +302,21 @@ describe("Service Objective Tables - Part 1 (Issue 5.11)", () => {
     });
 
     it("should return null for non-implemented objective types", () => {
-      expect(generateServiceObjective(ServiceObjectiveType.AUXILIAR_OU_CUIDAR)).toBeNull();
-      expect(generateServiceObjective(ServiceObjectiveType.EXTRAIR_RECURSOS)).toBeNull();
+      expect(
+        generateServiceObjective(ServiceObjectiveType.SERVICOS_ESPECIFICOS)
+      ).toBeNull();
+      expect(
+        generateServiceObjective(ServiceObjectiveType.RELIGIOSO)
+      ).toBeNull();
+      expect(
+        generateServiceObjective(ServiceObjectiveType.MULTIPLO)
+      ).toBeNull();
     });
 
     it("should format description correctly according to .md example", () => {
       // Mock para gerar o exemplo
       const mockActionRoll = () => 3; // "A arte do combate"
-      const mockTargetRoll = () => 5; // "Para crianças órfãs"  
+      const mockTargetRoll = () => 5; // "Para crianças órfãs"
       const mockComplicationRoll = () => 2; // "O conhecimento será usado contra você"
 
       const result = rollThreeColumnObjective(
@@ -312,21 +340,41 @@ describe("Service Objective Tables - Part 1 (Issue 5.11)", () => {
   });
 
   describe("IMPLEMENTED_OBJECTIVE_TYPES constant", () => {
-    it("should contain exactly the 4 objective types implemented in Issue 5.11", () => {
-      expect(IMPLEMENTED_OBJECTIVE_TYPES).toHaveLength(4);
-      expect(IMPLEMENTED_OBJECTIVE_TYPES).toContain(ServiceObjectiveType.TREINAR_OU_ENSINAR);
-      expect(IMPLEMENTED_OBJECTIVE_TYPES).toContain(ServiceObjectiveType.RECRUTAR);
-      expect(IMPLEMENTED_OBJECTIVE_TYPES).toContain(ServiceObjectiveType.CURAR_OU_RECUPERAR);
-      expect(IMPLEMENTED_OBJECTIVE_TYPES).toContain(ServiceObjectiveType.NEGOCIAR_OU_COAGIR);
+    it("should contain exactly the 7 objective types implemented in Issues 5.11 and 5.12", () => {
+      expect(IMPLEMENTED_OBJECTIVE_TYPES).toHaveLength(7);
+      expect(IMPLEMENTED_OBJECTIVE_TYPES).toContain(
+        ServiceObjectiveType.TREINAR_OU_ENSINAR
+      );
+      expect(IMPLEMENTED_OBJECTIVE_TYPES).toContain(
+        ServiceObjectiveType.RECRUTAR
+      );
+      expect(IMPLEMENTED_OBJECTIVE_TYPES).toContain(
+        ServiceObjectiveType.CURAR_OU_RECUPERAR
+      );
+      expect(IMPLEMENTED_OBJECTIVE_TYPES).toContain(
+        ServiceObjectiveType.NEGOCIAR_OU_COAGIR
+      );
+      expect(IMPLEMENTED_OBJECTIVE_TYPES).toContain(
+        ServiceObjectiveType.AUXILIAR_OU_CUIDAR
+      );
+      expect(IMPLEMENTED_OBJECTIVE_TYPES).toContain(
+        ServiceObjectiveType.EXTRAIR_RECURSOS
+      );
+      expect(IMPLEMENTED_OBJECTIVE_TYPES).toContain(
+        ServiceObjectiveType.CONSTRUIR_CRIAR_OU_REPARAR
+      );
     });
 
     it("should not contain objective types from future issues", () => {
-      expect(IMPLEMENTED_OBJECTIVE_TYPES).not.toContain(ServiceObjectiveType.AUXILIAR_OU_CUIDAR);
-      expect(IMPLEMENTED_OBJECTIVE_TYPES).not.toContain(ServiceObjectiveType.EXTRAIR_RECURSOS);
-      expect(IMPLEMENTED_OBJECTIVE_TYPES).not.toContain(ServiceObjectiveType.CONSTRUIR_CRIAR_OU_REPARAR);
-      expect(IMPLEMENTED_OBJECTIVE_TYPES).not.toContain(ServiceObjectiveType.SERVICOS_ESPECIFICOS);
-      expect(IMPLEMENTED_OBJECTIVE_TYPES).not.toContain(ServiceObjectiveType.RELIGIOSO);
-      expect(IMPLEMENTED_OBJECTIVE_TYPES).not.toContain(ServiceObjectiveType.MULTIPLO);
+      expect(IMPLEMENTED_OBJECTIVE_TYPES).not.toContain(
+        ServiceObjectiveType.SERVICOS_ESPECIFICOS
+      );
+      expect(IMPLEMENTED_OBJECTIVE_TYPES).not.toContain(
+        ServiceObjectiveType.RELIGIOSO
+      );
+      expect(IMPLEMENTED_OBJECTIVE_TYPES).not.toContain(
+        ServiceObjectiveType.MULTIPLO
+      );
     });
   });
 
@@ -335,7 +383,7 @@ describe("Service Objective Tables - Part 1 (Issue 5.11)", () => {
       const objective = generateServiceObjective(ServiceObjectiveType.RECRUTAR);
 
       expect(objective).not.toBeNull();
-      
+
       // Verifica compatibilidade com interface ServiceObjective
       const serviceObjective = {
         type: objective!.type,
@@ -358,27 +406,37 @@ describe("Service Objective Tables - Part 1 (Issue 5.11)", () => {
     it("should follow three-column system as specified in .md", () => {
       // "Como as tabelas possuem três colunas, role um dado para cada coluna"
       const actionRoll = 3;
-      const targetRoll = 5; 
+      const targetRoll = 5;
       const complicationRoll = 2;
 
       const result = rollThreeColumnObjective(
         TRAIN_OR_TEACH_TABLE,
         () => actionRoll,
-        () => targetRoll, 
+        () => targetRoll,
         () => complicationRoll
       );
 
       // Deve usar resultados independentes para cada coluna
-      expect(result.action).toBe(TRAIN_OR_TEACH_TABLE[actionRoll - 1].result.action);
-      expect(result.target).toBe(TRAIN_OR_TEACH_TABLE[targetRoll - 1].result.target);
-      expect(result.complication).toBe(TRAIN_OR_TEACH_TABLE[complicationRoll - 1].result.complication);
+      expect(result.action).toBe(
+        TRAIN_OR_TEACH_TABLE[actionRoll - 1].result.action
+      );
+      expect(result.target).toBe(
+        TRAIN_OR_TEACH_TABLE[targetRoll - 1].result.target
+      );
+      expect(result.complication).toBe(
+        TRAIN_OR_TEACH_TABLE[complicationRoll - 1].result.complication
+      );
     });
 
     it("should generate descriptions following the format pattern", () => {
-      const objective = generateServiceObjective(ServiceObjectiveType.CURAR_OU_RECUPERAR);
-      
+      const objective = generateServiceObjective(
+        ServiceObjectiveType.CURAR_OU_RECUPERAR
+      );
+
       expect(objective).not.toBeNull();
-      expect(objective!.description).toMatch(/^Curar ou recuperar .+ .+, mas .+$/);
+      expect(objective!.description).toMatch(
+        /^Curar ou recuperar .+ .+, mas .+$/
+      );
     });
   });
 });
