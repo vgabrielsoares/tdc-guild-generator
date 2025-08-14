@@ -1,5 +1,6 @@
 import type { TableEntry } from "@/types/tables";
 import { ServiceObjectiveType } from "@/types/service";
+import { rollOnTable } from "@/utils/tableRoller";
 
 // ===== TABELAS DE OBJETIVOS DE SERVIÇOS =====
 
@@ -1367,6 +1368,413 @@ export const CONSTRUIR_CRIAR_OU_REPARAR_TABLE: ThreeColumnObjectiveTable = [
   },
 ];
 
+// ===== SERVIÇOS ESPECÍFICOS (d20 x 3 colunas) =====
+
+/**
+ * Tabela de "Serviços Específicos"
+ * Sistema de três colunas: [Serviços específicos...] + [De...] + [Mas...]
+ */
+export const SERVICOS_ESPECIFICOS_TABLE: ThreeColumnObjectiveTable = [
+  {
+    min: 1,
+    max: 1,
+    result: {
+      action: "Limpar construção/local",
+      target: "Um nobre soberbo",
+      complication: "Alguém tenta constantemente dar ordens conflitantes"
+    }
+  },
+  {
+    min: 2,
+    max: 2,
+    result: {
+      action: "Cobrar impostos/dívidas",
+      target: "Um humanoide ranzinza",
+      complication: "Deve ser feito durante a madrugada"
+    }
+  },
+  {
+    min: 3,
+    max: 3,
+    result: {
+      action: "Criar/ajudar em um evento",
+      target: "Um mercador",
+      complication: "Um humanoide insiste em te atrapalhar"
+    }
+  },
+  {
+    min: 4,
+    max: 4,
+    result: {
+      action: "Desmentir boatos/fofocas",
+      target: "Um grupo de guardas",
+      complication: "Você está constantemente sendo vigiado"
+    }
+  },
+  {
+    min: 5,
+    max: 5,
+    result: {
+      action: "Traduzir/transcrever material",
+      target: "Uma criatura muito desconfiada",
+      complication: "local é de difícil acesso"
+    }
+  },
+  {
+    min: 6,
+    max: 6,
+    result: {
+      action: "Trabalho rural",
+      target: "Um criminoso/mafioso",
+      complication: "Vai contra a moral e os bons costumes"
+    }
+  },
+  {
+    min: 7,
+    max: 7,
+    result: {
+      action: "Organizar arquivos/livros",
+      target: "Um estudioso",
+      complication: "Muitos recursos estão danificados"
+    }
+  },
+  {
+    min: 8,
+    max: 8,
+    result: {
+      action: "Pintar estrutura",
+      target: "Um comerciante",
+      complication: "Recursos são de má qualidade"
+    }
+  },
+  {
+    min: 9,
+    max: 9,
+    result: {
+      action: "Consertar instrumento musical",
+      target: "Um artista local",
+      complication: "Itens necessários estão espalhados por vários locais"
+    }
+  },
+  {
+    min: 10,
+    max: 10,
+    result: {
+      action: "Preparar refeição comunitária",
+      target: "Um grupo de voluntários",
+      complication: "Recursos são insuficientes"
+    }
+  },
+  {
+    min: 11,
+    max: 11,
+    result: {
+      action: "Ajudar em mudança",
+      target: "Uma família",
+      complication: "Um visitante inesperado altera os planos"
+    }
+  },
+  {
+    min: 12,
+    max: 12,
+    result: {
+      action: "Cuidar de jardim",
+      target: "Um idoso",
+      complication: "Criaturas estão doentes"
+    }
+  },
+  {
+    min: 13,
+    max: 13,
+    result: {
+      action: "Realizar inventário/catalogar coleções",
+      target: "Um colecionar excêntrico",
+      complication: "Exige transporte de itens frágeis"
+    }
+  },
+  {
+    min: 14,
+    max: 14,
+    result: {
+      action: "Entregar correspondência ou pacotes",
+      target: "Um grupo de artesões",
+      complication: "O espaço é pequeno"
+    }
+  },
+  {
+    min: 15,
+    max: 15,
+    result: {
+      action: "Fazer reparos em móveis",
+      target: "Um taverneiro",
+      complication: "Exige que não haja desperdício"
+    }
+  },
+  {
+    min: 16,
+    max: 16,
+    result: {
+      action: "Ajudar em feira",
+      target: "Um camponês",
+      complication: "O tempo está instável"
+    }
+  },
+  {
+    min: 17,
+    max: 17,
+    result: {
+      action: "Preparar decoração",
+      target: "Um grupo religioso",
+      complication: "O material é frágil"
+    }
+  },
+  {
+    min: 18,
+    max: 18,
+    result: {
+      action: "Ajudar em campanha",
+      target: "Um curandeiro",
+      complication: "Depende de autorização prévia"
+    }
+  },
+  {
+    min: 19,
+    max: 19,
+    result: {
+      action: "Supervisionar transporte de carga",
+      target: "Um grupo de crianças",
+      complication: "Exige uso de uniforme específico"
+    }
+  },
+  {
+    min: 20,
+    max: 20,
+    result: {
+      action: "Cuidar de mascote",
+      target: "Um grupo de jovens aprendizes",
+      complication: "Há uma criatura hiperativa"
+    }
+  }
+];
+
+// ===== TRABALHO RURAL (d20) - Tabela Auxiliar =====
+
+/**
+ * Tabela auxiliar para quando o resultado for "Trabalho rural"
+ * Expande o tipo específico de trabalho rural
+ */
+export const TRABALHO_RURAL_TABLE: TableEntry<string>[] = [
+  { min: 1, max: 1, result: "Pecuária" },
+  { min: 2, max: 2, result: "Lavoura" },
+  { min: 3, max: 3, result: "Horticultura" },
+  { min: 4, max: 4, result: "Produtos florestais" },
+  { min: 5, max: 5, result: "Apicultura" },
+  { min: 6, max: 6, result: "Extrativismo" },
+  { min: 7, max: 7, result: "Avicultura" },
+  { min: 8, max: 8, result: "Irrigação" },
+  { min: 9, max: 9, result: "Cuidar do Esterco/Adubo" },
+  { min: 10, max: 10, result: "Plantio de mudas" },
+  { min: 11, max: 11, result: "Colheita" },
+  { min: 12, max: 12, result: "Manutenção de cercas" },
+  { min: 13, max: 13, result: "Controle de pragas" },
+  { min: 14, max: 14, result: "Semeadura" },
+  { min: 15, max: 15, result: "Limpeza de pastos" },
+  { min: 16, max: 16, result: "Ordenha" },
+  { min: 17, max: 17, result: "Transporte de produtos rurais" },
+  { min: 18, max: 18, result: "Seleção de sementes" },
+  { min: 19, max: 19, result: "Cuidado de viveiros" },
+  { min: 20, max: 20, result: "Reflorestamento" }
+];
+
+// ===== RELIGIOSO (d20 x 3 colunas) =====
+
+/**
+ * Tabela de "Religioso"
+ * Sistema de três colunas: [Religioso...] + [O que/quem?] + [Mas...]
+ */
+export const RELIGIOSO_TABLE: ThreeColumnObjectiveTable = [
+  {
+    min: 1,
+    max: 1,
+    result: {
+      action: "Pregar em praça pública",
+      target: "Um herói ancestral",
+      complication: "Envolve um ritual macabro"
+    }
+  },
+  {
+    min: 2,
+    max: 2,
+    result: {
+      action: "Converter/purificar",
+      target: "Toda uma vila/culto",
+      complication: "Rumores preveem uma tragédia"
+    }
+  },
+  {
+    min: 3,
+    max: 3,
+    result: {
+      action: "Retirar maldição",
+      target: "Um condenado",
+      complication: "Há uma maldição"
+    }
+  },
+  {
+    min: 4,
+    max: 4,
+    result: {
+      action: "Ministrar um evento religioso",
+      target: "Artefato mágico vivo",
+      complication: "O líder local desaprova"
+    }
+  },
+  {
+    min: 5,
+    max: 5,
+    result: {
+      action: "Fazer um exorcismo",
+      target: "Nobre poderoso",
+      complication: "Cultistas te observam"
+    }
+  },
+  {
+    min: 6,
+    max: 6,
+    result: {
+      action: "Administrar um templo",
+      target: "Outros aventureiros",
+      complication: "Um charlatão tenta se aproveitar"
+    }
+  },
+  {
+    min: 7,
+    max: 7,
+    result: {
+      action: "Organizar procissão",
+      target: "Comunidade local",
+      complication: "O clima está ruim"
+    }
+  },
+  {
+    min: 8,
+    max: 8,
+    result: {
+      action: "Preparar oferenda",
+      target: "Divindade menor",
+      complication: "Um falso profeta surge"
+    }
+  },
+  {
+    min: 9,
+    max: 9,
+    result: {
+      action: "Ensinar cânticos",
+      target: "Crianças do vilarejo",
+      complication: "Símbolos religiosos foram roubados"
+    }
+  },
+  {
+    min: 10,
+    max: 10,
+    result: {
+      action: "Restaurar altar",
+      target: "Templo antigo",
+      complication: "O local é de difícil acesso"
+    }
+  },
+  {
+    min: 11,
+    max: 11,
+    result: {
+      action: "Abençoar colheita",
+      target: "Agricultores",
+      complication: "Recursos são considerados impuros"
+    }
+  },
+  {
+    min: 12,
+    max: 12,
+    result: {
+      action: "Realizar batismo",
+      target: "Grupo de jovens",
+      complication: "Ofende outra religião/divindade"
+    }
+  },
+  {
+    min: 13,
+    max: 13,
+    result: {
+      action: "Preparar festival",
+      target: "Besta Sagrada",
+      complication: "O evento coincide com outro"
+    }
+  },
+  {
+    min: 14,
+    max: 14,
+    result: {
+      action: "Mediar disputa religiosa",
+      target: "Nobres menores",
+      complication: "O contratante esconde informações"
+    }
+  },
+  {
+    min: 15,
+    max: 15,
+    result: {
+      action: "Escrever sermão",
+      target: "Sacerdote",
+      complication: "O ritual exige silêncio absoluto"
+    }
+  },
+  {
+    min: 16,
+    max: 16,
+    result: {
+      action: "Traduzir texto sagrado",
+      target: "Estudioso",
+      complication: "Há divisão por rivalidade"
+    }
+  },
+  {
+    min: 17,
+    max: 17,
+    result: {
+      action: "Cuidar de relíquia",
+      target: "Ordem religiosa",
+      complication: "O evento é alvo de sabotagem"
+    }
+  },
+  {
+    min: 18,
+    max: 18,
+    result: {
+      action: "Organizar retiro espiritual",
+      target: "Grupo de fiéis",
+      complication: "O local é afastado"
+    }
+  },
+  {
+    min: 19,
+    max: 19,
+    result: {
+      action: "Preparar casamento",
+      target: "Líder Religioso",
+      complication: "O evento precisa ser secreto"
+    }
+  },
+  {
+    min: 20,
+    max: 20,
+    result: {
+      action: "Ajudar em enterro",
+      target: "Festival Tradicional",
+      complication: "Atrai curiosos indesejados"
+    }
+  }
+];
+
 // ===== EXEMPLOS DE RECURSOS =====
 
 /**
@@ -1553,10 +1961,12 @@ export function getThreeColumnTable(
       return EXTRAIR_RECURSOS_TABLE;
     case ServiceObjectiveType.CONSTRUIR_CRIAR_OU_REPARAR:
       return CONSTRUIR_CRIAR_OU_REPARAR_TABLE;
-
-    // Tabelas não implementadas nesta issue (TODO: serão feitas na Issue 5.13)
     case ServiceObjectiveType.SERVICOS_ESPECIFICOS:
+      return SERVICOS_ESPECIFICOS_TABLE;
     case ServiceObjectiveType.RELIGIOSO:
+      return RELIGIOSO_TABLE;
+
+    // Tabela especial - não implementada como tabela de três colunas
     case ServiceObjectiveType.MULTIPLO:
       return null;
 
@@ -1586,8 +1996,17 @@ export function generateServiceObjective(objectiveType: ServiceObjectiveType): {
 
   const result = rollThreeColumnObjective(table);
 
-  // Formata descrição
-  const description = `${objectiveType} ${result.action} ${result.target}, mas ${result.complication}`;
+  // Formata descrição usando funções especializadas
+  let description: string;
+  
+  if (objectiveType === ServiceObjectiveType.SERVICOS_ESPECIFICOS) {
+    description = generateSpecificServiceDescription(result.action, result.target, result.complication);
+  } else if (objectiveType === ServiceObjectiveType.RELIGIOSO) {
+    description = generateServiceDescription(result.action, result.target, result.complication, "relacionado a");
+  } else {
+    // Formato padrão para outros tipos
+    description = generateServiceDescription(result.action, result.target, result.complication);
+  }
 
   return {
     type: objectiveType,
@@ -1612,6 +2031,8 @@ export const IMPLEMENTED_OBJECTIVE_TYPES: ServiceObjectiveType[] = [
   ServiceObjectiveType.AUXILIAR_OU_CUIDAR,
   ServiceObjectiveType.EXTRAIR_RECURSOS,
   ServiceObjectiveType.CONSTRUIR_CRIAR_OU_REPARAR,
+  ServiceObjectiveType.SERVICOS_ESPECIFICOS,
+  ServiceObjectiveType.RELIGIOSO,
 ];
 
 /**
@@ -1700,6 +2121,40 @@ export function isWildEnvironment(environment: string): boolean {
       environment.toLowerCase().includes(wild.toLowerCase())
     ) || environment.toLowerCase().includes("selvagem")
   );
+}
+
+/**
+ * Gera uma descrição genérica para objetivos de serviço
+ * @param action - A ação a ser realizada
+ * @param target - O alvo da ação
+ * @param complication - A complicação
+ * @param connector - Palavra de conexão ("para", "relacionado a", etc.)
+ */
+export function generateServiceDescription(
+  action: string,
+  target: string,
+  complication: string,
+  connector: string = "para"
+): string {
+  return `${action} ${connector} ${target.toLowerCase()}, mas ${complication.toLowerCase()}`;
+}
+
+/**
+ * Gera uma descrição personalizada para objetivos de "Serviços Específicos"
+ * Inclui tratamento especial para "Trabalho rural"
+ */
+export function generateSpecificServiceDescription(
+  action: string,
+  target: string,
+  complication: string
+): string {
+  // Se o serviço for "Trabalho rural", gerar especificação
+  if (action === "Trabalho rural") {
+    const ruralType = rollOnTable(TRABALHO_RURAL_TABLE);
+    return generateServiceDescription(ruralType.result, target, complication, "para");
+  }
+  
+  return generateServiceDescription(action, target, complication, "para");
 }
 
 /**
