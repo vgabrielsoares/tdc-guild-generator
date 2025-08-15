@@ -53,6 +53,7 @@ import { SERVICE_NARRATIVE_TABLES } from "@/data/tables/service-narrative-tables
 import {
   SERVICE_DIFFICULTY_TABLE,
   SERVICE_COMPLEXITY_TABLE,
+  createServiceTestStructure,
 } from "@/data/tables/service-difficulty-tables";
 
 // ===== INTERFACES DE CONFIGURAÇÃO =====
@@ -318,6 +319,12 @@ export class ServiceGenerator {
     // GERAÇÃO DE COMPLEXIDADE
     const complexity = this.generateServiceComplexity();
 
+    // GERAÇÃO DE ESTRUTURA DE TESTES
+    const testStructure = createServiceTestStructure(
+      complexity,
+      value.difficulty
+    );
+
     // GERAÇÃO DE CONTEÚDO NARRATIVO
     const objective = this.generateServiceObjective();
     const complication = this.generateComplication();
@@ -336,6 +343,7 @@ export class ServiceGenerator {
       status: ServiceStatusEnum.DISPONIVEL,
       complexity: complexity,
       difficulty: value.difficulty,
+      testStructure,
       contractorType: contractor.type,
       contractorName: contractor.name,
       value,
@@ -878,5 +886,102 @@ export class ServiceGenerator {
    */
   private static generateServiceId(): string {
     return `service_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  }
+
+  // ===== MÉTODOS PARA SISTEMA DE TESTES E RECOMPENSAS =====
+
+  /**
+   * Calcula recompensa final baseada na estrutura de testes
+   * Aplica modificadores de outcome e taxa de recorrência
+   *
+   * @param service - Serviço com estrutura de testes
+   * @param timesPreviouslyFailed - Quantas vezes o serviço falhou antes (para recorrência)
+   * @returns Valor final da recompensa
+   */
+  public static calculateFinalReward(
+    service: Service,
+    timesPreviouslyFailed: number = 0
+  ): number {
+    let baseReward = service.value.rewardAmount;
+
+    // Aplicar taxa de recorrência se o serviço falhou antes
+    if (timesPreviouslyFailed > 0) {
+      const recurrenceBonus =
+        service.value.recurrenceBonusAmount * timesPreviouslyFailed;
+      baseReward += recurrenceBonus;
+    }
+
+    // Se não há outcome (testes não concluídos), retornar base + recorrência
+    if (!service.testStructure.outcome) {
+      return Math.floor(baseReward);
+    }
+
+    // Aplicar modificador de recompensa do outcome
+    let finalReward = baseReward * service.testStructure.outcome.rewardModifier;
+
+    // Para trabalho primoroso (masterwork), role novamente e some
+    if (service.testStructure.outcome.masterwork) {
+      // Simular nova rolagem da recompensa base
+      const bonusReward = this.rollServiceReward(service.value.rewardRoll);
+      finalReward = baseReward + bonusReward;
+    }
+
+    return Math.floor(finalReward);
+  }
+
+  /**
+   * Aplica taxa de recorrência a um serviço não resolvido
+   * Conforme especificação "Taxa de recorrência"
+   *
+   * @param service - Serviço original
+   * @param failureCount - Número de falhas consecutivas
+   * @returns Serviço com valor atualizado
+   */
+  public static applyRecurrenceBonus(
+    service: Service,
+    failureCount: number
+  ): Service {
+    if (failureCount <= 0) return service;
+
+    const totalBonus = service.value.recurrenceBonusAmount * failureCount;
+    const updatedValue = {
+      ...service.value,
+      rewardAmount: service.value.rewardAmount + totalBonus,
+    };
+
+    return {
+      ...service,
+      value: updatedValue,
+    };
+  }
+
+  /**
+   * Rola recompensa de serviço usando notação de dados
+   * Suporte para casos complexos como "(1d3+1)*10 C$"
+   */
+  private static rollServiceReward(rewardRoll: string): number {
+    try {
+      // Para recompensas com multiplicador como "(1d3+1)*10 C$"
+      const multiplierMatch = rewardRoll.match(
+        /\((\d+d\d+(?:[+-]\d+)?)\)\*(\d+)/
+      );
+      if (multiplierMatch) {
+        const baseRoll = rollDice({ notation: multiplierMatch[1] });
+        const multiplier = parseInt(multiplierMatch[2]);
+        return baseRoll.result * multiplier;
+      }
+
+      // Para recompensas simples como "3d4 C$" ou "2d4+1 PO$"
+      const diceMatch = rewardRoll.match(/(\d+d\d+(?:[+-]\d+)?)/);
+      if (diceMatch) {
+        const rollResult = rollDice({ notation: diceMatch[1] });
+        return rollResult.result;
+      }
+
+      // Fallback
+      return 5;
+    } catch {
+      return 5; // Fallback seguro
+    }
   }
 }
