@@ -5,13 +5,23 @@ import type {
   ServiceDeadlineType,
   ServicePaymentType,
   ServiceValue,
+  ServiceObjective,
+  ServiceComplication,
+  ServiceRival,
+  ServiceOrigin,
 } from "@/types/service";
 import {
   ServiceStatus as ServiceStatusEnum,
   ServiceContractorType as ContractorTypeEnum,
   ServiceDeadlineType as DeadlineTypeEnum,
-  ServiceComplexity as ComplexityEnum,
-  ServiceDifficulty as DifficultyEnum,
+  ServiceComplexity,
+  ServiceObjectiveType,
+  ServiceComplicationType,
+  ServiceComplicationConsequence,
+  ServiceRivalAction,
+  ServiceRivalMotivation,
+  ServiceOriginCause,
+  ServiceAdditionalComplicator,
 } from "@/types/service";
 import type { Guild, RelationLevel } from "@/types/guild";
 import type { GameDate } from "@/types/timeline";
@@ -34,6 +44,16 @@ import {
   type PopulationRelationLevel,
   type GovernmentRelationLevel,
 } from "@/data/tables/service-contractor-tables";
+import {
+  SERVICE_OBJECTIVE_TYPE_TABLE,
+  generateServiceObjective,
+  generateEnhancedServiceObjective,
+} from "@/data/tables/service-objective-tables";
+import { SERVICE_NARRATIVE_TABLES } from "@/data/tables/service-narrative-tables";
+import {
+  SERVICE_DIFFICULTY_TABLE,
+  SERVICE_COMPLEXITY_TABLE,
+} from "@/data/tables/service-difficulty-tables";
 
 // ===== INTERFACES DE CONFIGURAÇÃO =====
 
@@ -111,11 +131,11 @@ export class ServiceGenerator {
       // ETAPA 1: Determinar quantidade base de serviços
       const baseQuantity = this.calculateBaseQuantity(config);
 
-      // ETAPA 2: Aplicar reduções por frequentadores (se habilitado)
+      // ETAPA 2: Aplicar reduções por frequentadores (apenas se quantidade não foi especificada manualmente)
       let finalQuantity = baseQuantity;
       let reductionApplied = 0;
 
-      if (config.applyReductions !== false) {
+      if (config.applyReductions !== false && config.quantity === undefined) {
         const reduction = this.calculateVisitorReduction(config.guild);
         reductionApplied = reduction;
         finalQuantity = Math.max(0, baseQuantity - reduction);
@@ -191,12 +211,24 @@ export class ServiceGenerator {
     // Passo 1: Rolar na tabela de quantidade disponível (1d20)
     const quantityTableResult = rollOnTable(SERVICE_QUANTITY_TABLE);
 
-    // Passo 2: Rolar os dados da quantidade
+    // Passo 2: Extrair apenas a notação de dados da string
+    const quantityString = quantityTableResult.result.quantity;
+    const diceNotationMatch = quantityString.match(/(\d+d\d+(?:[+-]\d+)?)/);
+
+    if (!diceNotationMatch) {
+      throw new Error(
+        `Formato de dados inválido na tabela de quantidade: ${quantityString}`
+      );
+    }
+
+    const diceNotation = diceNotationMatch[1];
+
+    // Passo 3: Rolar os dados da quantidade
     const quantityDiceResult = rollDice({
-      notation: quantityTableResult.result.quantity,
+      notation: diceNotation,
     });
 
-    // Passo 3: Aplicar modificador de funcionários ao resultado final
+    // Passo 4: Aplicar modificador de funcionários ao resultado final
     const finalQuantity = Math.max(
       0,
       quantityDiceResult.result + this.getStaffModifier(config.guild)
@@ -265,7 +297,6 @@ export class ServiceGenerator {
 
   /**
    * Gera um serviço individual
-   * Implementa geração básica
    */
   private static generateIndividualService(
     config: IndividualServiceConfig
@@ -284,14 +315,27 @@ export class ServiceGenerator {
     // VALORES E RECOMPENSAS
     const value = this.generateBasicValue(config.guild);
 
+    // GERAÇÃO DE COMPLEXIDADE
+    const complexity = this.generateServiceComplexity();
+
+    // GERAÇÃO DE CONTEÚDO NARRATIVO
+    const objective = this.generateServiceObjective();
+    const complication = this.generateComplication();
+    const rival = this.generateRival();
+    const origin = this.generateOrigin();
+
     // CRIAÇÃO DO SERVIÇO
     const service: Service = {
       id: serviceId,
-      title: `Serviço ${config.serviceIndex + 1}`,
-      description: `Serviço gerado para ${contractor.type}`,
+      title: this.generateServiceTitle(objective),
+      description: this.generateServiceDescription(
+        objective,
+        contractor,
+        complication
+      ),
       status: ServiceStatusEnum.DISPONIVEL,
-      complexity: ComplexityEnum.SIMPLES,
-      difficulty: DifficultyEnum.MUITO_FACIL,
+      complexity: complexity,
+      difficulty: value.difficulty,
       contractorType: contractor.type,
       contractorName: contractor.name,
       value,
@@ -300,6 +344,11 @@ export class ServiceGenerator {
       createdAt: config.currentDate,
       isActive: false,
       isExpired: false,
+      // Novos campos narrativos
+      objective,
+      complication,
+      rival,
+      origin,
     };
 
     return service;
@@ -386,20 +435,70 @@ export class ServiceGenerator {
   }
 
   /**
-   * Gera valor básico do serviço
-   * TODO: Implementação completa será na Issue 5.20-5.21
+   * Gera valor completo do serviço com dificuldade e complexidade
+   * Baseado nas tabelas "Dificuldade e Recompensas" e "Nível de Complexidade"
    */
   private static generateBasicValue(guild: Guild): ServiceValue {
-    // Implementação básica temporária
-    const baseReward = rollDice({ notation: "1d6" });
+    // ETAPA 1: Gerar dificuldade e recompensa (1d20)
+    const difficultyResult = rollOnTable(SERVICE_DIFFICULTY_TABLE);
+    const difficulty = difficultyResult.result.difficulty;
+    const rewardRoll = difficultyResult.result.baseReward;
+    const recurrenceBonus = difficultyResult.result.recurrence;
+
+    // ETAPA 2: Calcular recompensa atual
+    let rewardAmount = 0;
+    try {
+      // Extrair notação de dados da string (ex: "1d6 C$" -> "1d6")
+      const diceMatch = rewardRoll.match(/(\d+d\d+(?:[+-]\d+)?)/);
+      if (diceMatch) {
+        const rollResult = rollDice({ notation: diceMatch[1] });
+        rewardAmount = rollResult.result;
+      } else {
+        // Para recompensas fixas como "(1d3+1)*10 C$"
+        const multiplierMatch = rewardRoll.match(
+          /\((\d+d\d+(?:[+-]\d+)?)\)\*(\d+)/
+        );
+        if (multiplierMatch) {
+          const baseRoll = rollDice({ notation: multiplierMatch[1] });
+          const multiplier = parseInt(multiplierMatch[2]);
+          rewardAmount = baseRoll.result * multiplier;
+        } else {
+          // Para recompensas simples como "3d4 C$"
+          const simpleMatch = rewardRoll.match(/(\d+d\d+)/);
+          if (simpleMatch) {
+            const rollResult = rollDice({ notation: simpleMatch[1] });
+            rewardAmount = rollResult.result;
+          } else {
+            // Fallback para casos não cobertos
+            rewardAmount = 5;
+          }
+        }
+      }
+    } catch {
+      rewardAmount = 5; // Fallback seguro
+    }
+
+    // ETAPA 3: Calcular valor de recorrência
+    let recurrenceBonusAmount = 0;
+    try {
+      const bonusMatch = recurrenceBonus.match(/\+([0-9,]+)\s*C\$/);
+      if (bonusMatch) {
+        recurrenceBonusAmount = parseFloat(bonusMatch[1].replace(",", "."));
+      }
+    } catch {
+      recurrenceBonusAmount = 0.5; // Fallback
+    }
+
+    // ETAPA 4: Determinar moeda
+    const currency = rewardRoll.includes("PO$") ? "PO$" : "C$";
 
     return {
-      rewardRoll: "1d6 C$",
-      rewardAmount: baseReward.result,
-      currency: "C$",
-      recurrenceBonus: "+0,5 C$",
-      recurrenceBonusAmount: 0.5,
-      difficulty: DifficultyEnum.MUITO_FACIL,
+      rewardRoll,
+      rewardAmount,
+      currency,
+      recurrenceBonus,
+      recurrenceBonusAmount,
+      difficulty,
       modifiers: {
         populationRelation: this.getPopulationRelationModifier(
           guild.relations.population
@@ -498,7 +597,280 @@ export class ServiceGenerator {
     }
   }
 
+  // ===== GERAÇÃO DE CONTEÚDO NARRATIVO =====
+
+  /**
+   * Gera complexidade do serviço
+   * Baseado na tabela "Nível de Complexidade"
+   */
+  private static generateServiceComplexity(): ServiceComplexity {
+    const complexityResult = rollOnTable(SERVICE_COMPLEXITY_TABLE);
+    return complexityResult.result.complexity;
+  }
+
+  /**
+   * Gera objetivo do serviço com sistema de três colunas
+   * Baseado nas tabelas de objetivos específicas
+   */
+  private static generateServiceObjective(): ServiceObjective {
+    // Primeiro, determinar o tipo de objetivo (1d20)
+    const objectiveResult = rollOnTable(SERVICE_OBJECTIVE_TYPE_TABLE);
+
+    if (objectiveResult.result.hasMultiple) {
+      // Resultado 20: Role duas vezes e use ambos
+      const enhanced = generateEnhancedServiceObjective(
+        objectiveResult.result.type
+      );
+      return enhanced || this.createFallbackObjective();
+    } else {
+      // Gerar objetivo simples
+      const objective = generateServiceObjective(objectiveResult.result.type);
+      return objective || this.createFallbackObjective();
+    }
+  }
+
+  /**
+   * Gera complicação para o serviço (sistema de chances)
+   * Baseado nas tabelas de complicações
+   */
+  private static generateComplication(): ServiceComplication | undefined {
+    // Verificar se há complicação usando tabela de chances
+    const chanceResult = rollOnTable(
+      SERVICE_NARRATIVE_TABLES.complicationChance
+    );
+
+    if (chanceResult.result.hasComplication) {
+      // Gerar tipo de complicação
+      const typeResult = rollOnTable(SERVICE_NARRATIVE_TABLES.complicationType);
+
+      // Gerar consequência da complicação
+      const consequenceResult = rollOnTable(
+        SERVICE_NARRATIVE_TABLES.complicationConsequence
+      );
+
+      // Mapear descriptions para enums (implementação robusta)
+      const type = this.mapDescriptionToComplicationType(
+        typeResult.result.description
+      );
+      const consequence = this.mapDescriptionToComplicationConsequence(
+        consequenceResult.result.description
+      );
+
+      return {
+        type,
+        consequence,
+        description: `${typeResult.result.description}: ${consequenceResult.result.description}`,
+      };
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Gera rival para o serviço (sistema de chances)
+   * Baseado nas tabelas de rivais
+   */
+  private static generateRival(): ServiceRival | undefined {
+    // Verificar se há rival usando tabela de chances
+    const chanceResult = rollOnTable(SERVICE_NARRATIVE_TABLES.rivalChance);
+
+    if (chanceResult.result.hasRival) {
+      const actionResult = rollOnTable(SERVICE_NARRATIVE_TABLES.rivalAction);
+      const motivationResult = rollOnTable(
+        SERVICE_NARRATIVE_TABLES.rivalMotivation
+      );
+
+      // Mapear descriptions para enums
+      const action = this.mapDescriptionToRivalAction(
+        actionResult.result.description
+      );
+      const motivation = this.mapDescriptionToRivalMotivation(
+        motivationResult.result.description
+      );
+
+      return {
+        action,
+        motivation,
+        description: `${actionResult.result.description} - ${motivationResult.result.description}`,
+      };
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Gera origem do problema do serviço
+   * Baseado na tabela "A Raiz do Problema"
+   */
+  private static generateOrigin(): ServiceOrigin {
+    const originResult = rollOnTable(SERVICE_NARRATIVE_TABLES.origin);
+    const complicatorResult = rollOnTable(
+      SERVICE_NARRATIVE_TABLES.additionalComplicator
+    );
+
+    // Mapear descriptions para enums
+    const rootCause = this.mapDescriptionToOriginCause(
+      originResult.result.description
+    );
+    const additionalComplicator = this.mapDescriptionToAdditionalComplicator(
+      complicatorResult.result.description
+    );
+
+    return {
+      rootCause,
+      additionalComplicator,
+      description: `${originResult.result.description} + ${complicatorResult.result.description}`,
+    };
+  }
+
+  /**
+   * Cria um objetivo fallback caso as funções das tabelas falhem
+   */
+  private static createFallbackObjective(): ServiceObjective {
+    return {
+      type: ServiceObjectiveType.AUXILIAR_OU_CUIDAR,
+      description: "Auxiliar ou cuidar",
+      action: "Auxiliar",
+      target: "pessoa local",
+      complication: "prazo é apertado",
+    };
+  }
+
+  /**
+   * Gera título descritivo para o serviço baseado no objetivo
+   */
+  private static generateServiceTitle(objective: ServiceObjective): string {
+    const baseTitle = objective.description || objective.type;
+    return `${baseTitle}: ${objective.action}`;
+  }
+
+  /**
+   * Gera descrição narrativa completa do serviço
+   */
+  private static generateServiceDescription(
+    objective: ServiceObjective,
+    contractor: { type: ServiceContractorType; name?: string },
+    complication?: ServiceComplication
+  ): string {
+    let description = `${objective.action} ${objective.target}`;
+
+    if (objective.complication) {
+      description += `, mas ${objective.complication}`;
+    }
+
+    description += `. Contratante: ${contractor.name || contractor.type}`;
+
+    if (complication) {
+      description += `. Complicação: ${complication.description}`;
+    }
+
+    return description;
+  }
+
   // ===== MÉTODOS PRIVADOS DE APOIO =====
+
+  /**
+   * Mapeia descrição para enum utilizando os valores dos próprios enums
+   * Solução elegante que elimina mapeamentos manuais propensos a erro
+   */
+  private static mapDescriptionToEnum<T extends Record<string, string>>(
+    description: string,
+    enumObj: T
+  ): T[keyof T] {
+    // Busca por valor exato primeiro
+    const exactMatch = Object.values(enumObj).find(
+      (value) => value === description
+    );
+    if (exactMatch) {
+      return exactMatch as T[keyof T];
+    }
+
+    // Busca por correspondência parcial (case-insensitive)
+    const partialMatch = Object.values(enumObj).find(
+      (value) =>
+        value.toLowerCase().includes(description.toLowerCase()) ||
+        description.toLowerCase().includes(value.toLowerCase())
+    );
+
+    if (partialMatch) {
+      return partialMatch as T[keyof T];
+    }
+
+    // Fallback para primeiro valor do enum
+    return Object.values(enumObj)[0] as T[keyof T];
+  }
+
+  /**
+   * Mapeia descrição para enum de tipo de complicação
+   */
+  private static mapDescriptionToComplicationType(
+    description: string
+  ): ServiceComplicationType {
+    return this.mapDescriptionToEnum(
+      description,
+      ServiceComplicationType
+    ) as ServiceComplicationType;
+  }
+
+  /**
+   * Mapeia descrição para enum de consequência de complicação
+   */
+  private static mapDescriptionToComplicationConsequence(
+    description: string
+  ): ServiceComplicationConsequence {
+    return this.mapDescriptionToEnum(
+      description,
+      ServiceComplicationConsequence
+    ) as ServiceComplicationConsequence;
+  }
+
+  /**
+   * Mapeia descrição para enum de ação de rival
+   */
+  private static mapDescriptionToRivalAction(
+    description: string
+  ): ServiceRivalAction {
+    return this.mapDescriptionToEnum(
+      description,
+      ServiceRivalAction
+    ) as ServiceRivalAction;
+  }
+
+  /**
+   * Mapeia descrição para enum de motivação de rival
+   */
+  private static mapDescriptionToRivalMotivation(
+    description: string
+  ): ServiceRivalMotivation {
+    return this.mapDescriptionToEnum(
+      description,
+      ServiceRivalMotivation
+    ) as ServiceRivalMotivation;
+  }
+
+  /**
+   * Mapeia descrição para enum de causa de origem
+   */
+  private static mapDescriptionToOriginCause(
+    description: string
+  ): ServiceOriginCause {
+    return this.mapDescriptionToEnum(
+      description,
+      ServiceOriginCause
+    ) as ServiceOriginCause;
+  }
+
+  /**
+   * Mapeia descrição para enum de complicador adicional
+   */
+  private static mapDescriptionToAdditionalComplicator(
+    description: string
+  ): ServiceAdditionalComplicator {
+    return this.mapDescriptionToEnum(
+      description,
+      ServiceAdditionalComplicator
+    ) as ServiceAdditionalComplicator;
+  }
 
   /**
    * Gera um ID único para o serviço
