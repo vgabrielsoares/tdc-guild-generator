@@ -1,5 +1,11 @@
 import type { TableEntry } from "@/types/tables";
-import { ServiceDifficulty, ServiceComplexity } from "@/types/service";
+import { 
+  ServiceDifficulty, 
+  ServiceComplexity,
+  type ServiceTestStructure,
+  type ServiceTest,
+  type ServiceTestOutcome,
+} from "@/types/service";
 
 /**
  * Interface para resultados da tabela de dificuldade
@@ -508,4 +514,180 @@ export function getTestDifficulties(
 ): number[] {
   const requirements = getComplexityRequirements(complexity);
   return requirements.difficultyModifiers.map(modifier => baseND + modifier);
+}
+
+// ===== FUNÇÕES PARA SISTEMA DE ND E TESTES =====
+
+/**
+ * Extrai o valor de ND de uma ServiceDifficulty
+ * Baseado na tabela "Dificuldade e Recompensas"
+ * 
+ * @param difficulty - Dificuldade do serviço
+ * @returns Valor numérico do ND
+ */
+export function extractNDFromDifficulty(difficulty: ServiceDifficulty): number {
+  // Extrair ND do texto da dificuldade (ex: "Muito Fácil (ND 10)" -> 10)
+  const ndMatch = difficulty.match(/ND (\d+)/);
+  if (ndMatch) {
+    return parseInt(ndMatch[1], 10);
+  }
+  
+  // Fallback para casos não previstos
+  return 17; // ND médio como fallback
+}
+
+/**
+ * Cria estrutura completa de testes baseada na complexidade e dificuldade
+ * 
+ * @param complexity - Complexidade do serviço
+ * @param difficulty - Dificuldade do serviço (para extrair ND base)
+ * @returns Estrutura completa de testes
+ */
+export function createServiceTestStructure(
+  complexity: ServiceComplexity,
+  difficulty: ServiceDifficulty
+): ServiceTestStructure {
+  const baseND = extractNDFromDifficulty(difficulty);
+  const complexityData = getComplexityRequirements(complexity);
+  
+  // Criar testes individuais com modificadores
+  const tests: ServiceTest[] = complexityData.difficultyModifiers.map((modifier, index) => ({
+    baseND,
+    ndModifier: modifier,
+    finalND: baseND + modifier,
+    testIndex: index,
+    completed: false,
+    rollResult: undefined,
+    success: undefined,
+  }));
+  
+  return {
+    complexity,
+    baseND,
+    totalTests: complexityData.testCount,
+    skillRequirement: complexityData.skillRequirement,
+    tests,
+    successCount: 0,
+    completed: false,
+    outcome: undefined,
+  };
+}
+
+/**
+ * Processa um teste individual (rolagem do usuário vs ND)
+ * 
+ * @param testStructure - Estrutura de testes
+ * @param testIndex - Índice do teste (0-based)
+ * @param rollResult - Resultado da rolagem do usuário (1-20)
+ * @returns Estrutura atualizada com resultado do teste
+ */
+export function processServiceTest(
+  testStructure: ServiceTestStructure,
+  testIndex: number,
+  rollResult: number
+): ServiceTestStructure {
+  if (testIndex < 0 || testIndex >= testStructure.tests.length) {
+    throw new Error(`Índice de teste inválido: ${testIndex}`);
+  }
+  
+  if (rollResult < 1 || rollResult > 20) {
+    throw new Error(`Resultado de rolagem inválido: ${rollResult} (deve ser 1-20)`);
+  }
+  
+  // Atualizar o teste específico
+  const updatedTests = [...testStructure.tests];
+  const test = updatedTests[testIndex];
+  
+  test.rollResult = rollResult;
+  test.success = rollResult >= test.finalND;
+  test.completed = true;
+  
+  // Calcular sucessos totais
+  const successCount = updatedTests.filter(t => t.success === true).length;
+  
+  // Verificar se todos os testes foram completados
+  const allCompleted = updatedTests.every(t => t.completed);
+  
+  let outcome: ServiceTestOutcome | undefined;
+  if (allCompleted) {
+    outcome = calculateServiceOutcome(testStructure.complexity, successCount);
+  }
+  
+  return {
+    ...testStructure,
+    tests: updatedTests,
+    successCount,
+    completed: allCompleted,
+    outcome,
+  };
+}
+
+/**
+ * Calcula o resultado final baseado na complexidade e sucessos
+ * Conforme tabelas de "Nível de Complexidade"
+ * 
+ * @param complexity - Complexidade do serviço
+ * @param successCount - Quantidade de sucessos obtidos
+ * @returns Resultado final com modificadores
+ */
+export function calculateServiceOutcome(
+  complexity: ServiceComplexity,
+  successCount: number
+): ServiceTestOutcome {
+  const complexityData = getComplexityRequirements(complexity);
+  const outcomeData = complexityData.successOutcomes[successCount];
+  
+  if (!outcomeData) {
+    // Fallback para casos não previstos
+    return {
+      result: "Resultado indeterminado",
+      renownModifier: 0,
+      rewardModifier: 0,
+      wellDone: false,
+      masterwork: false,
+    };
+  }
+  
+  return {
+    result: outcomeData.result,
+    renownModifier: outcomeData.renownModifier,
+    rewardModifier: outcomeData.rewardModifier,
+    wellDone: outcomeData.rewardModifier >= 1 && outcomeData.renownModifier >= 0,
+    masterwork: outcomeData.rewardModifier >= 2, // Trabalho primoroso
+  };
+}
+
+/**
+ * Verifica se um teste específico foi bem-sucedido
+ * 
+ * @param rollResult - Resultado da rolagem (1-20)
+ * @param targetND - ND alvo do teste
+ * @returns true se rolagem >= ND
+ */
+export function isTestSuccessful(rollResult: number, targetND: number): boolean {
+  return rollResult >= targetND;
+}
+
+/**
+ * Calcula recompensa final baseada no resultado dos testes
+ * Aplica modificador de recompensa conforme outcome
+ * 
+ * @param baseRewardAmount - Recompensa base do serviço
+ * @param outcome - Resultado dos testes
+ * @returns Valor final da recompensa
+ */
+export function calculateFinalReward(
+  baseRewardAmount: number,
+  outcome: ServiceTestOutcome
+): number {
+  let finalReward = baseRewardAmount * outcome.rewardModifier;
+  
+  // Para trabalho primoroso, role novamente e some
+  if (outcome.masterwork) {
+    // Nota: Esta função não faz a rolagem adicional automaticamente
+    // Isso deve ser feito externamente para manter a pureza da função
+    finalReward = baseRewardAmount + baseRewardAmount; // Dobrar como aproximação
+  }
+  
+  return Math.floor(finalReward);
 }
