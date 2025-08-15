@@ -84,27 +84,19 @@
 
       <!-- Valores e prazo -->
       <div class="flex items-center justify-between">
-        <ContractTooltip
-          :content="getDifficultyTooltip()"
-          :title="'Valor e Dificuldade'"
-          :difficulty="contract.difficulty"
-          :has-modifiers="hasValueModifiers"
-          :modifier-reasons="getModifierReasons()"
-        >
-          <div class="flex items-center gap-1">
-            <ContractValue
-              :value="contract.value"
-              :difficulty="contract.difficulty"
-              :contractor-type="contract.contractorType"
-              size="md"
-            />
-            <InfoButton
-              help-key="contract-values"
-              @open-help="$emit('open-help', 'contract-values')"
-              button-class="text-xs"
-            />
-          </div>
-        </ContractTooltip>
+        <div class="flex items-center gap-1">
+          <ContractValue
+            :value="contract.value"
+            :difficulty="contract.difficulty"
+            :contractor-type="contract.contractorType"
+            size="md"
+          />
+          <InfoButton
+            help-key="contract-values"
+            @open-help="$emit('open-help', 'contract-values')"
+            button-class="text-xs"
+          />
+        </div>
 
         <div v-if="contract.deadline.type !== 'Sem prazo'" class="text-right">
           <ContractTooltip
