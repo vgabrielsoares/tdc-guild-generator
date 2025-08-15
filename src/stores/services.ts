@@ -4,11 +4,13 @@ import type { Service, ServiceStatus } from "@/types/service";
 import { ServiceStatus as ServiceStatusEnum } from "@/types/service";
 import type { Guild } from "@/types/guild";
 import type { GameDate } from "@/types/timeline";
+import { createGameDate } from "@/utils/date-utils";
 import {
   ServiceLifecycleManager,
   applyServiceUnsignedResolution,
   type ServiceLifecycleState,
 } from "@/utils/generators/serviceLifeCycle";
+import { ServiceGenerator } from "@/utils/generators/serviceGenerator";
 import { saveToStorage, loadFromStorage } from "@/utils/storage";
 
 // Interface estendida para incluir guildId
@@ -69,14 +71,29 @@ export const useServicesStore = defineStore("services", () => {
   const generateServices = async (guild: Guild, quantity?: number) => {
     isLoading.value = true;
     try {
-      // eslint-disable-next-line no-console
-      console.log(
-        "[SERVICES STORE] Generate services - to be implemented in Issue 5.22"
-      );
-      // This will be implemented in the main services generation issue
-      // Avoid unused parameter warnings
-      void guild;
-      void quantity;
+      const config = {
+        guild,
+        quantity,
+        currentDate: createGameDate(1, 1, 2025), // Data padrão - TODO: pode ser melhorado para usar timeline atual
+        applyReductions: true
+      };
+      
+      const result = ServiceGenerator.generateServices(config);
+      
+      // Converter para ServiceWithGuild e adicionar à store
+      const servicesWithGuild: ServiceWithGuild[] = result.services.map((service: Service) => ({
+        ...service,
+        guildId: guild.id
+      }));
+      
+      // Adicionar todos os serviços gerados
+      servicesWithGuild.forEach(service => {
+        services.value.push(service);
+      });
+      
+      saveServicesToStorage();
+      
+      return servicesWithGuild;
     } finally {
       isLoading.value = false;
     }
