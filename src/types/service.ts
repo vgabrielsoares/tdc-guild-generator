@@ -160,6 +160,69 @@ export interface ServiceModifiers {
   staffCondition: number; // -1 (despreparados) ou +1 (experientes)
 }
 
+// ===== INTERFACES PARA SISTEMA DE TESTES E ND =====
+
+/**
+ * Interface para um teste individual conforme nível de complexidade
+ * Baseado nas especificações para estrutura de testes
+ */
+export interface ServiceTest {
+  /** ND base extraído da dificuldade do serviço */
+  baseND: number;
+  /** Modificador de ND específico deste teste (ex: -1, 0, +1, +2) */
+  ndModifier: number;
+  /** ND final para este teste (baseND + ndModifier) */
+  finalND: number;
+  /** Índice do teste na sequência (0, 1, 2, etc.) */
+  testIndex: number;
+  /** Se o teste foi realizado */
+  completed: boolean;
+  /** Resultado do teste (valor da rolagem do usuário) */
+  rollResult?: number;
+  /** Se o teste foi bem-sucedido */
+  success?: boolean;
+}
+
+/**
+ * Interface para estrutura completa de testes de um serviço
+ * Conforme tabela "Nível de Complexidade"
+ */
+export interface ServiceTestStructure {
+  /** Complexidade do serviço */
+  complexity: ServiceComplexity;
+  /** ND base extraído da dificuldade */
+  baseND: number;
+  /** Quantidade total de testes necessários */
+  totalTests: number;
+  /** Exigência de perícias (same/different/mixed) */
+  skillRequirement: "same" | "different" | "mixed";
+  /** Lista de testes individuais com seus modificadores */
+  tests: ServiceTest[];
+  /** Quantidade de sucessos obtidos */
+  successCount: number;
+  /** Se a estrutura de testes foi completada */
+  completed: boolean;
+  /** Resultado final conforme tabela de complexidade */
+  outcome?: ServiceTestOutcome;
+}
+
+/**
+ * Interface para resultado de conclusão de testes
+ * Baseado nos resultados das tabelas de complexidade
+ */
+export interface ServiceTestOutcome {
+  /** Descrição do resultado */
+  result: string;
+  /** Modificador de renome (-5 a +1) */
+  renownModifier: number;
+  /** Multiplicador de recompensa (0, 0.5, 1, 2) */
+  rewardModifier: number;
+  /** Se o serviço foi considerado "bem feito" */
+  wellDone: boolean;
+  /** Se houve trabalho primoroso (recompensa dupla) */
+  masterwork: boolean;
+}
+
 // ===== INTERFACES PARA STORAGE POR GUILDA =====
 
 /**
@@ -197,6 +260,9 @@ export interface Service {
   status: ServiceStatus;
   complexity: ServiceComplexity;
   difficulty: ServiceDifficulty; // ND para testes
+
+  // Sistema de testes e perícias
+  testStructure: ServiceTestStructure;
 
   // Informações do contratante
   contractorType: ServiceContractorType;
@@ -515,6 +581,50 @@ export const ServiceOriginSchema = z.object({
   description: z.string().min(1).max(300),
 });
 
+// ===== SCHEMAS PARA SISTEMA DE TESTES =====
+
+/**
+ * Schema para teste individual
+ */
+export const ServiceTestSchema = z.object({
+  baseND: z.number().int().min(10).max(30),
+  ndModifier: z.number().int().min(-5).max(5),
+  finalND: z.number().int().min(5).max(35),
+  testIndex: z.number().int().min(0).max(10),
+  completed: z.boolean(),
+  rollResult: z.number().int().min(1).max(20).optional(),
+  success: z.boolean().optional(),
+});
+
+/**
+ * Schema para resultado de testes
+ */
+export const ServiceTestOutcomeSchema = z.object({
+  result: z.string().min(1).max(200),
+  renownModifier: z.number().int().min(-5).max(5),
+  rewardModifier: z.number().min(0).max(2),
+  wellDone: z.boolean(),
+  masterwork: z.boolean(),
+});
+
+/**
+ * Schema para estrutura completa de testes
+ */
+export const ServiceTestStructureSchema = z.object({
+  complexity: z.nativeEnum(ServiceComplexity),
+  baseND: z.number().int().min(10).max(30),
+  totalTests: z.number().int().min(1).max(5),
+  skillRequirement: z.enum(["same", "different", "mixed"]),
+  tests: z.array(ServiceTestSchema),
+  successCount: z.number().int().min(0).max(5),
+  completed: z.boolean(),
+  outcome: ServiceTestOutcomeSchema.optional(),
+});
+
+/**
+ * Schema principal para serviços
+ */
+
 /**
  * Schema para desafios adicionais
  */
@@ -533,6 +643,10 @@ export const ServiceSchema = z.object({
   status: z.nativeEnum(ServiceStatus),
   complexity: z.nativeEnum(ServiceComplexity),
   difficulty: z.nativeEnum(ServiceDifficulty),
+
+  // Sistema de testes
+  testStructure: ServiceTestStructureSchema,
+
   contractorType: z.nativeEnum(ServiceContractorType),
   contractorName: z.string().optional(),
 

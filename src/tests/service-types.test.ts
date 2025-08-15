@@ -21,8 +21,22 @@ import {
   calculateFinalServiceReward,
   isServiceExpired,
   applyRecurrenceBonus,
+  type ServiceTestStructure,
 } from "../types/service";
 import type { GameDate } from "../types/timeline";
+import { createServiceTestStructure } from "../data/tables/service-difficulty-tables";
+
+// ===== HELPER FUNCTIONS =====
+
+/**
+ * Cria estrutura de teste padrão para uso em testes
+ */
+function createMockTestStructure(
+  complexity: ServiceComplexity = ServiceComplexity.SIMPLES,
+  difficulty: ServiceDifficulty = ServiceDifficulty.MEDIA_ND17
+): ServiceTestStructure {
+  return createServiceTestStructure(complexity, difficulty);
+}
 
 describe("Service Types - Issue 5.7 (Corrected)", () => {
   describe("Enums Corretos Conforme .md", () => {
@@ -100,6 +114,10 @@ describe("Service Types - Issue 5.7 (Corrected)", () => {
       status: ServiceStatus.DISPONIVEL,
       complexity: ServiceComplexity.SIMPLES,
       difficulty: ServiceDifficulty.FACIL_ND15,
+      testStructure: createMockTestStructure(
+        ServiceComplexity.SIMPLES,
+        ServiceDifficulty.FACIL_ND15
+      ),
       contractorType: ServiceContractorType.POVO,
       value: {
         rewardRoll: "3d6 C$", // Conforme tabela
@@ -153,6 +171,10 @@ describe("Service Types - Issue 5.7 (Corrected)", () => {
       status: ServiceStatus.DISPONIVEL,
       complexity: ServiceComplexity.MODERADA,
       difficulty: ServiceDifficulty.MEDIA_ND17,
+      testStructure: createMockTestStructure(
+        ServiceComplexity.MODERADA,
+        ServiceDifficulty.MEDIA_ND17
+      ),
       contractorType: ServiceContractorType.POVO,
       value: {
         rewardRoll: "5d6 C$",

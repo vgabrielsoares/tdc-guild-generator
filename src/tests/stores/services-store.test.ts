@@ -15,6 +15,7 @@ import {
   ServiceDeadlineType,
   ServicePaymentType,
 } from "@/types/service";
+import { createServiceTestStructure } from "@/data/tables/service-difficulty-tables";
 
 describe("Services Store - Issue 5.17", () => {
   beforeEach(() => {
@@ -41,6 +42,10 @@ describe("Services Store - Issue 5.17", () => {
     description: `Descrição do serviço ${id}`,
     complexity: ServiceComplexity.SIMPLES,
     difficulty: ServiceDifficulty.MUITO_FACIL,
+    testStructure: createServiceTestStructure(
+      ServiceComplexity.SIMPLES,
+      ServiceDifficulty.MUITO_FACIL
+    ),
     contractorType: ServiceContractorType.POVO,
     value: {
       rewardRoll: "1d6 C$",

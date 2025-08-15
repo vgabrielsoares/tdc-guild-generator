@@ -16,6 +16,7 @@ import {
 } from "../types/service";
 import type { Service } from "../types/service";
 import { createGameDate } from "../utils/date-utils";
+import { createServiceTestStructure } from "../data/tables/service-difficulty-tables";
 
 // ===== MOCK SERVICES PARA TESTES =====
 
@@ -30,6 +31,10 @@ const createMockService = (
   status,
   complexity: ServiceComplexity.SIMPLES,
   difficulty: ServiceDifficulty.MEDIA_ND17,
+  testStructure: createServiceTestStructure(
+    ServiceComplexity.SIMPLES,
+    ServiceDifficulty.MEDIA_ND17
+  ),
   contractorType: ServiceContractorType.POVO,
   contractorName: "João da Silva",
   objective: {
