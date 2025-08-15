@@ -488,21 +488,6 @@ function getObjectiveTooltip(): string {
   );
 }
 
-function getDifficultyTooltip(): string {
-  switch (props.contract.difficulty) {
-    case ContractDifficulty.FACIL:
-      return "Contratos simples para aventureiros iniciantes. Valor XP x1, Recompensa x1.";
-    case ContractDifficulty.MEDIO:
-      return "Desafios moderados para grupos experientes. Valor XP x2, Recompensa x1.3.";
-    case ContractDifficulty.DIFICIL:
-      return "Missões perigosas para veteranos. Valor XP x4, Recompensa x2.";
-    case ContractDifficulty.MORTAL:
-      return "Contratos épicos com risco extremo. Valor XP x8, Recompensa x3.";
-    default:
-      return "Dificuldade não especificada.";
-  }
-}
-
 function getLocationTooltip(): string {
   if (!props.contract.location) return "Localização não especificada.";
 
@@ -543,35 +528,6 @@ function getDeadlineTooltip(): string {
     " Alguns prazos são arbitrários, outros têm janela de oportunidade específica.";
 
   return tooltip;
-}
-
-const hasValueModifiers = computed(() => {
-  // Verificar se o contrato tem modificadores aplicados
-  return !!(
-    props.contract.distance ||
-    props.contract.difficulty !== ContractDifficulty.FACIL ||
-    props.contract.contractorType !== ContractorType.POVO
-  );
-});
-
-function getModifierReasons(): string {
-  const reasons = [];
-
-  if (props.contract.distance) {
-    reasons.push(`distância (${props.contract.distance.result})`);
-  }
-
-  if (props.contract.difficulty !== ContractDifficulty.FACIL) {
-    reasons.push(`dificuldade (${props.contract.difficulty})`);
-  }
-
-  if (props.contract.contractorType === ContractorType.GOVERNO) {
-    reasons.push("relação com governo");
-  } else if (props.contract.contractorType === ContractorType.INSTITUICAO) {
-    reasons.push("tipo institucional");
-  }
-
-  return reasons.join(", ") || "valor base";
 }
 </script>
 
