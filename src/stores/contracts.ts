@@ -47,6 +47,13 @@ import {
   isDateAfter,
   getDaysDifference,
 } from "@/utils/date-utils";
+import {
+  scheduleModuleEvents,
+  processModuleTimeAdvance,
+  type TimelineModuleConfig,
+  type ModuleEventConfig,
+  type ModuleEventHandler,
+} from "@/utils/timeline-store-integration";
 
 export const useContractsStore = defineStore("contracts", () => {
   // Store dependencies
@@ -326,118 +333,48 @@ export const useContractsStore = defineStore("contracts", () => {
   };
 
   /**
-   * Verifica se já existe um evento ativo de um tipo específico para a guilda atual
-   */
-  const hasActiveEvent = (
-    eventType: ScheduledEventType,
-    source?: string
-  ): boolean => {
-    if (!timelineStore.currentGameDate) return false;
-
-    const currentEvents = timelineStore.currentEvents;
-    const currentDate = timelineStore.currentGameDate;
-
-    return currentEvents.some((event) => {
-      // Verificar se é da guilda atual
-      if (event.data?.guildId !== currentGuildId.value) return false;
-
-      // Verificar se é do tipo correto
-      if (event.type !== eventType) return false;
-
-      // Verificar source se especificado
-      if (source && event.data?.source !== source) return false;
-
-      // Verificar se não é um evento para resolução hoje (esses podem ser processados)
-      if (eventType === ScheduledEventType.CONTRACT_RESOLUTION) {
-        const isToday =
-          event.date.year === currentDate.year &&
-          event.date.month === currentDate.month &&
-          event.date.day === currentDate.day;
-        if (isToday) return false; // Não considerar eventos de hoje como "ativos" para esta verificação
-      }
-
-      return true;
-    });
-  };
-
-  /**
    * Agenda eventos de timeline baseados no ciclo de vida dos contratos
    */
   const scheduleContractEvents = () => {
-    if (!timelineStore.currentGameDate) {
+    if (!timelineStore.currentGameDate || !currentGuildId.value) {
       return;
     }
 
-    // Verificar se já existe um evento de novos contratos ativo
-    if (
-      !hasActiveEvent(ScheduledEventType.NEW_CONTRACTS, "contract_generation")
-    ) {
-      // Agendar próximos novos contratos baseado nas regras
-      const daysUntilNewContracts = rollNewContractsTime();
-      const newContractsDate = addDays(
-        timelineStore.currentGameDate,
-        daysUntilNewContracts
-      );
+    // Configuração do módulo
+    const moduleConfig: TimelineModuleConfig = {
+      moduleType: "contracts",
+      guildIdGetter: () => currentGuildId.value || undefined,
+      timelineStore,
+    };
 
-      timelineStore.scheduleEvent(
-        ScheduledEventType.NEW_CONTRACTS,
-        newContractsDate,
-        "Novos contratos disponíveis",
-        { source: "contract_generation", guildId: currentGuildId.value }
-      );
-    }
+    // Configuração dos eventos
+    const eventConfigs: ModuleEventConfig[] = [
+      {
+        type: ScheduledEventType.NEW_CONTRACTS,
+        source: "contract_generation",
+        description: "Novos contratos disponíveis",
+        rollTimeFunction: rollNewContractsTime,
+        guildId: currentGuildId.value,
+      },
+      {
+        type: ScheduledEventType.CONTRACT_RESOLUTION,
+        source: "signed_resolution",
+        description: "Resolução automática de contratos assinados",
+        rollTimeFunction: rollSignedContractResolutionTime,
+        guildId: currentGuildId.value,
+        resolutionType: "signed",
+      },
+      {
+        type: ScheduledEventType.CONTRACT_RESOLUTION,
+        source: "unsigned_resolution",
+        description: "Resolução automática de contratos não assinados",
+        rollTimeFunction: rollUnsignedContractResolutionTime,
+        guildId: currentGuildId.value,
+        resolutionType: "unsigned",
+      },
+    ];
 
-    // Verificar se já existe um evento de resolução de contratos assinados ativo
-    if (
-      !hasActiveEvent(
-        ScheduledEventType.CONTRACT_RESOLUTION,
-        "signed_resolution"
-      )
-    ) {
-      const signedTime = rollSignedContractResolutionTime();
-      if (signedTime) {
-        const signedResolutionDate = addDays(
-          timelineStore.currentGameDate,
-          signedTime
-        );
-        timelineStore.scheduleEvent(
-          ScheduledEventType.CONTRACT_RESOLUTION,
-          signedResolutionDate,
-          "Resolução automática de contratos assinados",
-          {
-            source: "signed_resolution",
-            guildId: currentGuildId.value,
-            resolutionType: "signed",
-          }
-        );
-      }
-    }
-
-    // Verificar se já existe um evento de resolução de contratos não assinados ativo
-    if (
-      !hasActiveEvent(
-        ScheduledEventType.CONTRACT_RESOLUTION,
-        "unsigned_resolution"
-      )
-    ) {
-      const unsignedTime = rollUnsignedContractResolutionTime();
-      if (unsignedTime) {
-        const unsignedResolutionDate = addDays(
-          timelineStore.currentGameDate,
-          unsignedTime
-        );
-        timelineStore.scheduleEvent(
-          ScheduledEventType.CONTRACT_RESOLUTION,
-          unsignedResolutionDate,
-          "Resolução automática de contratos não assinados",
-          {
-            source: "unsigned_resolution",
-            guildId: currentGuildId.value,
-            resolutionType: "unsigned",
-          }
-        );
-      }
-    }
+    scheduleModuleEvents(moduleConfig, eventConfigs);
   };
 
   /**
@@ -552,8 +489,38 @@ export const useContractsStore = defineStore("contracts", () => {
     // Verificar contratos aceitos que passaram do prazo
     checkAndBreakOverdueContracts();
 
-    // Processar eventos de contratos
-    processTimelineEvents(result.triggeredEvents);
+    // Configuração dos handlers para eventos de contratos
+    const eventHandlers: ModuleEventHandler[] = [
+      {
+        eventType: ScheduledEventType.NEW_CONTRACTS,
+        handler: () => generateContractsAutomatically(),
+      },
+      {
+        eventType: ScheduledEventType.CONTRACT_RESOLUTION,
+        handler: (event) => {
+          if (event.data?.resolutionType === "signed") {
+            processSignedContractResolution();
+          } else if (event.data?.resolutionType === "unsigned") {
+            processUnsignedContractResolution();
+          }
+        },
+      },
+    ];
+
+    // Configuração do módulo
+    const moduleConfig: TimelineModuleConfig = {
+      moduleType: "contracts",
+      guildIdGetter: () => currentGuildId.value || undefined,
+      timelineStore,
+    };
+
+    // Processar eventos usando utilitário modular
+    processModuleTimeAdvance(
+      moduleConfig,
+      result,
+      eventHandlers,
+      scheduleContractEvents
+    );
 
     // Processar prazos baseado na data atual do jogo
     if (timelineStore.currentGameDate) {
@@ -1468,7 +1435,6 @@ export const useContractsStore = defineStore("contracts", () => {
     initializeLifecycle,
 
     // ===== INTEGRAÇÃO COM TIMELINE =====
-    hasActiveEvent,
     scheduleContractEvents,
     processSignedContractResolution,
     processUnsignedContractResolution,
