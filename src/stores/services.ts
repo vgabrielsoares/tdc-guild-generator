@@ -3,7 +3,8 @@ import { ref, computed } from "vue";
 import type { Service, ServiceStatus } from "@/types/service";
 import { ServiceStatus as ServiceStatusEnum } from "@/types/service";
 import type { Guild } from "@/types/guild";
-import type { GameDate } from "@/types/timeline";
+import type { GameDate, TimeAdvanceResult } from "@/types/timeline";
+import { ScheduledEventType } from "@/types/timeline";
 import { createGameDate } from "@/utils/date-utils";
 import {
   ServiceLifecycleManager,
@@ -12,6 +13,7 @@ import {
 } from "@/utils/generators/serviceLifeCycle";
 import { ServiceGenerator } from "@/utils/generators/serviceGenerator";
 import { saveToStorage, loadFromStorage } from "@/utils/storage";
+import { useTimelineStore } from "@/stores/timeline";
 
 // Interface estendida para incluir guildId
 interface ServiceWithGuild extends Service {
@@ -62,37 +64,49 @@ export const useServicesStore = defineStore("services", () => {
   const initializeLifecycleManager = (currentDate: GameDate) => {
     if (!lifecycleManager.value) {
       lifecycleManager.value = new ServiceLifecycleManager();
-      lifecycleManager.value.scheduleNextResolutions(
-        new Date(currentDate.year, currentDate.month - 1, currentDate.day)
+      // Converter GameDate para Date JavaScript para o lifecycle manager
+      const jsDate = new Date(
+        currentDate.year,
+        currentDate.month - 1,
+        currentDate.day
       );
+      lifecycleManager.value.scheduleNextResolutions(jsDate);
     }
   };
 
   const generateServices = async (guild: Guild, quantity?: number) => {
     isLoading.value = true;
     try {
+      // Usar a data atual da timeline da guilda em vez de data padrão
+      const timelineStore = useTimelineStore();
+      timelineStore.setCurrentGuild(guild.id);
+      const currentDate =
+        timelineStore.currentGameDate || createGameDate(1, 1, 2025);
+
       const config = {
         guild,
         quantity,
-        currentDate: createGameDate(1, 1, 2025), // Data padrão - TODO: pode ser melhorado para usar timeline atual
-        applyReductions: true
+        currentDate,
+        applyReductions: true,
       };
-      
+
       const result = ServiceGenerator.generateServices(config);
-      
+
       // Converter para ServiceWithGuild e adicionar à store
-      const servicesWithGuild: ServiceWithGuild[] = result.services.map((service: Service) => ({
-        ...service,
-        guildId: guild.id
-      }));
-      
+      const servicesWithGuild: ServiceWithGuild[] = result.services.map(
+        (service: Service) => ({
+          ...service,
+          guildId: guild.id,
+        })
+      );
+
       // Adicionar todos os serviços gerados
-      servicesWithGuild.forEach(service => {
+      servicesWithGuild.forEach((service) => {
         services.value.push(service);
       });
-      
+
       saveServicesToStorage();
-      
+
       return servicesWithGuild;
     } finally {
       isLoading.value = false;
@@ -151,6 +165,7 @@ export const useServicesStore = defineStore("services", () => {
       newGenerationTime: undefined as number | undefined,
     };
 
+    // Converter GameDate para Date JavaScript para compatibilidade com lifecycle manager
     const currentJSDate = new Date(
       currentDate.year,
       currentDate.month - 1,
@@ -255,7 +270,7 @@ export const useServicesStore = defineStore("services", () => {
     });
   };
 
-  const loadServicesFromStorage = (currentDate: GameDate) => {
+  const loadServicesFromStorage = (currentDate?: GameDate) => {
     const data = loadFromStorage<{
       services: ServiceWithGuild[];
       lifecycleState: ServiceLifecycleState | null;
@@ -263,7 +278,7 @@ export const useServicesStore = defineStore("services", () => {
 
     if (data) {
       services.value = data.services || [];
-      if (data.lifecycleState) {
+      if (data.lifecycleState && currentDate) {
         importLifecycleState(data.lifecycleState, currentDate);
       }
     }
@@ -273,6 +288,46 @@ export const useServicesStore = defineStore("services", () => {
     services.value = [];
     lifecycleManager.value = null;
     saveServicesToStorage();
+  };
+
+  /**
+   * Integração com passagem de tempo do timeline
+   * Processa eventos de serviços quando o tempo avança
+   */
+  const processTimeAdvance = async (result: TimeAdvanceResult) => {
+    if (!result || !result.triggeredEvents) return;
+
+    // Verificar eventos de serviços disparados
+    const serviceEvents = result.triggeredEvents.filter(
+      (event) =>
+        event.type === ScheduledEventType.NEW_SERVICES ||
+        event.type === ScheduledEventType.SERVICE_RESOLUTION
+    );
+
+    // Processar cada evento de serviço
+    for (const event of serviceEvents) {
+      switch (event.type) {
+        case ScheduledEventType.NEW_SERVICES:
+          // Processar geração de novos serviços
+          // TODO: Implementar lógica de geração automática de novos serviços
+          break;
+
+        case ScheduledEventType.SERVICE_RESOLUTION:
+          // Processar resoluções de serviços
+          // TODO: Implementar lógica de resolução automática
+          break;
+      }
+    }
+
+    // Processar resoluções baseado na data atual do jogo
+    if (result.newDate) {
+      const resolutionResults = await processServiceResolutions(result.newDate);
+
+      // Informar sobre resoluções automáticas se houver
+      if (resolutionResults.resolvedServices.length > 0) {
+        // TODO: Adicionar notificação via toast sobre resoluções
+      }
+    }
   };
 
   return {
@@ -301,6 +356,9 @@ export const useServicesStore = defineStore("services", () => {
     forceResolveServices,
     exportLifecycleState,
     importLifecycleState,
+
+    // Timeline integration
+    processTimeAdvance,
 
     // Storage actions
     saveServicesToStorage,
