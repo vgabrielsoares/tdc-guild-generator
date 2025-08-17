@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
-import type { Service } from "@/types/service";
+import type { Service, ServiceTestOutcome } from "@/types/service";
 import { ServiceStatus } from "@/types/service";
 import type { Guild } from "@/types/guild";
 import type { GameDate, TimeAdvanceResult } from "@/types/timeline";
@@ -28,7 +28,7 @@ import {
   type TimelineModuleConfig,
   type ModuleEventConfig,
   type ModuleEventHandler,
-  type ResolutionConfig
+  type ResolutionConfig,
 } from "@/utils/timeline-store-integration";
 
 // Interface estendida para incluir guildId
@@ -42,7 +42,7 @@ export const useServicesStore = defineStore("services", () => {
   const timelineStore = useTimelineStore();
   const guildStore = useGuildStore();
   const { success } = useToast();
-  
+
   // State
   const services = ref<ServiceWithGuild[]>([]);
   const isLoading = ref(false);
@@ -55,16 +55,14 @@ export const useServicesStore = defineStore("services", () => {
 
   // Configuração do módulo para integração com timeline
   const moduleConfig: TimelineModuleConfig = {
-    moduleType: 'services',
+    moduleType: "services",
     guildIdGetter: () => currentGuildId.value,
-    timelineStore
+    timelineStore,
   };
 
   // Getters
   const activeServices = computed(() =>
-    services.value.filter(
-      (service) => service.status === ServiceStatus.ACEITO
-    )
+    services.value.filter((service) => service.status === ServiceStatus.ACEITO)
   );
 
   const pendingServices = computed(() =>
@@ -337,7 +335,7 @@ export const useServicesStore = defineStore("services", () => {
         source: "service_generation",
         description: "Novos serviços disponíveis",
         rollTimeFunction: rollNewServicesTime,
-        guildId: currentGuildId.value
+        guildId: currentGuildId.value,
       },
       {
         type: ScheduledEventType.SERVICE_RESOLUTION,
@@ -345,7 +343,7 @@ export const useServicesStore = defineStore("services", () => {
         description: "Resolução automática de serviços assinados",
         rollTimeFunction: rollServiceSignedResolutionTime,
         guildId: currentGuildId.value,
-        resolutionType: "signed"
+        resolutionType: "signed",
       },
       {
         type: ScheduledEventType.SERVICE_RESOLUTION,
@@ -353,8 +351,8 @@ export const useServicesStore = defineStore("services", () => {
         description: "Resolução automática de serviços não assinados",
         rollTimeFunction: rollServiceUnsignedResolutionTime,
         guildId: currentGuildId.value,
-        resolutionType: "unsigned"
-      }
+        resolutionType: "unsigned",
+      },
     ];
 
     scheduleModuleEvents(moduleConfig, eventConfigs);
@@ -366,18 +364,21 @@ export const useServicesStore = defineStore("services", () => {
   const processSignedServiceResolution = () => {
     const resolutionConfig: ResolutionConfig<ServiceWithGuild> = {
       statusFilter: (s) => s.status === ServiceStatus.ACEITO_POR_OUTROS,
-      resolutionFunction: (items) => applyServiceSignedResolution(items as Service[]) as ServiceWithGuild[],
+      resolutionFunction: (items) =>
+        applyServiceSignedResolution(items as Service[]) as ServiceWithGuild[],
       successMessage: (count) => ({
         title: "Resolução de Serviços Aceitos por Outros",
-        message: `${count} serviço(s) aceito(s) por outros aventureiros foi(ram) processado(s)`
-      })
+        message: `${count} serviço(s) aceito(s) por outros aventureiros foi(ram) processado(s)`,
+      }),
     };
 
     applyAutomaticResolution(
       services.value,
       resolutionConfig,
       () => currentGuildId.value,
-      (updatedItems) => { services.value = updatedItems; },
+      (updatedItems) => {
+        services.value = updatedItems;
+      },
       saveServicesToStorage,
       success
     );
@@ -392,18 +393,23 @@ export const useServicesStore = defineStore("services", () => {
   const processUnsignedServiceResolution = () => {
     const resolutionConfig: ResolutionConfig<ServiceWithGuild> = {
       statusFilter: (s) => s.status === ServiceStatus.DISPONIVEL,
-      resolutionFunction: (items) => applyServiceUnsignedResolution(items as Service[]) as ServiceWithGuild[],
+      resolutionFunction: (items) =>
+        applyServiceUnsignedResolution(
+          items as Service[]
+        ) as ServiceWithGuild[],
       successMessage: (count) => ({
         title: "Resolução de Serviços Não Assinados",
-        message: `${count} serviço(s) não assinado(s) foi(ram) processado(s)`
-      })
+        message: `${count} serviço(s) não assinado(s) foi(ram) processado(s)`,
+      }),
     };
 
     applyAutomaticResolution(
       services.value,
       resolutionConfig,
       () => currentGuildId.value,
-      (updatedItems) => { services.value = updatedItems; },
+      (updatedItems) => {
+        services.value = updatedItems;
+      },
       saveServicesToStorage,
       success
     );
@@ -425,15 +431,15 @@ export const useServicesStore = defineStore("services", () => {
       guild: currentGuild.value,
       currentDate: timelineStore.currentGameDate,
       quantity: 1,
-      applyReductions: true
+      applyReductions: true,
     });
 
     if (result.services.length > 0) {
       const servicesWithGuild = result.services.map((service: Service) => ({
         ...service,
-        guildId: currentGuildId.value || 'unknown'
+        guildId: currentGuildId.value || "unknown",
       })) as ServiceWithGuild[];
-      
+
       services.value.push(...servicesWithGuild);
       lastUpdate.value = createGameDate(
         timelineStore.currentGameDate.day,
@@ -461,7 +467,7 @@ export const useServicesStore = defineStore("services", () => {
     const eventHandlers: ModuleEventHandler[] = [
       {
         eventType: ScheduledEventType.NEW_SERVICES,
-        handler: () => generateServicesAutomatically()
+        handler: () => generateServicesAutomatically(),
       },
       {
         eventType: ScheduledEventType.SERVICE_RESOLUTION,
@@ -471,15 +477,15 @@ export const useServicesStore = defineStore("services", () => {
           } else if (event.data?.resolutionType === "unsigned") {
             processUnsignedServiceResolution();
           }
-        }
-      }
+        },
+      },
     ];
 
     // Configuração do módulo
     const moduleConfig: TimelineModuleConfig = {
-      moduleType: 'services',
+      moduleType: "services",
       guildIdGetter: () => currentGuildId.value,
-      timelineStore
+      timelineStore,
     };
 
     // Processar eventos usando utilitário modular
@@ -489,6 +495,140 @@ export const useServicesStore = defineStore("services", () => {
       eventHandlers,
       scheduleServiceEvents
     );
+  };
+
+  // ===== SKILL TEST ACTIONS =====
+
+  /**
+   * Inicializa estrutura de testes para um serviço aceito
+   */
+  const initializeServiceTests = async (serviceId: string) => {
+    const service = services.value.find((s) => s.id === serviceId);
+    if (!service) {
+      throw new Error(`Serviço não encontrado: ${serviceId}`);
+    }
+
+    // Usar função já existente das tabelas
+    const { initializeServiceTests: initTests } = await import(
+      "@/utils/service-skill-resolution"
+    );
+    const testStructure = initTests(service);
+
+    // Atualizar serviço com estrutura de testes
+    service.testStructure = testStructure;
+    saveServicesToStorage();
+
+    return testStructure;
+  };
+
+  /**
+   * Processa um teste de perícia individual
+   */
+  const processServiceSkillTest = async (
+    serviceId: string,
+    testIndex: number,
+    rollResult: number
+  ) => {
+    const service = services.value.find((s) => s.id === serviceId);
+    if (!service) {
+      throw new Error(`Serviço não encontrado: ${serviceId}`);
+    }
+
+    if (!service.testStructure) {
+      throw new Error(
+        `Serviço ${serviceId} não possui estrutura de testes inicializada`
+      );
+    }
+
+    // Usar função já existente das tabelas
+    const { processSkillTest } = await import(
+      "@/utils/service-skill-resolution"
+    );
+    const { result, updatedStructure } = processSkillTest(
+      service.testStructure,
+      testIndex,
+      rollResult
+    );
+
+    // Atualizar serviço com estrutura atualizada
+    service.testStructure = updatedStructure;
+
+    // Se todos os testes foram completados, aplicar resultado
+    if (updatedStructure.completed && updatedStructure.outcome) {
+      await applyServiceTestOutcome(serviceId, updatedStructure.outcome);
+    }
+
+    saveServicesToStorage();
+
+    return { result, updatedStructure };
+  };
+
+  /**
+   * Aplica o resultado final dos testes ao serviço
+   */
+  const applyServiceTestOutcome = async (
+    serviceId: string,
+    outcome: ServiceTestOutcome
+  ) => {
+    const service = services.value.find((s) => s.id === serviceId);
+    if (!service) return;
+
+    // Aplicar modificadores de renome (será integrado com store de renome)
+    if (outcome.renownModifier !== 0) {
+      // TODO: Integrar com store de renome quando implementado
+      // renownStore.addRenown(outcome.renownModifier, `Serviço: ${service.objective?.description || 'Sem descrição'}`);
+    }
+
+    // Aplicar modificadores de recompensa
+    if (outcome.rewardModifier !== 1) {
+      const originalReward = service.value.rewardAmount;
+      service.value.rewardAmount = Math.floor(
+        originalReward * outcome.rewardModifier
+      );
+    }
+
+    // Marcar serviço como concluído
+    service.status = ServiceStatus.CONCLUIDO;
+    service.completedAt = timelineStore.currentTimeline?.currentDate;
+    service.resolvedAt = new Date();
+
+    saveServicesToStorage();
+
+    // Notificar sucesso
+    success(`Serviço concluído! ${outcome.result}`);
+  };
+
+  /**
+   * Reinicia testes de um serviço
+   */
+  const resetServiceTests = async (serviceId: string) => {
+    const service = services.value.find((s) => s.id === serviceId);
+    if (!service) {
+      throw new Error(`Serviço não encontrado: ${serviceId}`);
+    }
+
+    // Reinicializar estrutura de testes criando uma nova
+    const { initializeServiceTests: initTests } = await import(
+      "@/utils/service-skill-resolution"
+    );
+    service.testStructure = initTests(service);
+    saveServicesToStorage();
+  };
+
+  /**
+   * Obtém estrutura de testes de um serviço
+   */
+  const getServiceTestStructure = (serviceId: string) => {
+    const service = services.value.find((s) => s.id === serviceId);
+    return service?.testStructure;
+  };
+
+  /**
+   * Verifica se um serviço pode iniciar testes
+   */
+  const canStartTests = (serviceId: string): boolean => {
+    const service = services.value.find((s) => s.id === serviceId);
+    return service?.status === ServiceStatus.ACEITO;
   };
 
   return {
@@ -529,5 +669,13 @@ export const useServicesStore = defineStore("services", () => {
     saveServicesToStorage,
     loadServicesFromStorage,
     clearAllServices,
+
+    // Skill test actions
+    initializeServiceTests,
+    processServiceSkillTest,
+    applyServiceTestOutcome,
+    resetServiceTests,
+    getServiceTestStructure,
+    canStartTests,
   };
 });
