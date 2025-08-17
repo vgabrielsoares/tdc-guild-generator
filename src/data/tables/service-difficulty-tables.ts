@@ -699,7 +699,7 @@ export function createServiceTestStructure(
  *
  * @param testStructure - Estrutura de testes
  * @param testIndex - Índice do teste (0-based)
- * @param rollResult - Resultado da rolagem do usuário (1-20)
+ * @param rollResult - Resultado da rolagem do usuário (1-50)
  * @returns Estrutura atualizada com resultado do teste
  */
 export function processServiceTest(
@@ -711,9 +711,9 @@ export function processServiceTest(
     throw new Error(`Índice de teste inválido: ${testIndex}`);
   }
 
-  if (rollResult < 1 || rollResult > 20) {
+  if (rollResult < 1 || rollResult > 50) {
     throw new Error(
-      `Resultado de rolagem inválido: ${rollResult} (deve ser 1-20)`
+      `Resultado de rolagem inválido: ${rollResult} (deve ser 1-50)`
     );
   }
 
@@ -784,7 +784,7 @@ export function calculateServiceOutcome(
 /**
  * Verifica se um teste específico foi bem-sucedido
  *
- * @param rollResult - Resultado da rolagem (1-20)
+ * @param rollResult - Resultado da rolagem (1-50)
  * @param targetND - ND alvo do teste
  * @returns true se rolagem >= ND
  */
