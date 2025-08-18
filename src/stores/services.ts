@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import type { Service, ServiceTestOutcome } from "@/types/service";
-import { ServiceStatus } from "@/types/service";
+import { ServiceStatus, applyRecurrenceBonus } from "@/types/service";
 import type { Guild } from "@/types/guild";
 import type { GameDate, TimeAdvanceResult } from "@/types/timeline";
 import { ScheduledEventType } from "@/types/timeline";
@@ -388,8 +388,42 @@ export const useServicesStore = defineStore("services", () => {
   };
 
   /**
-   * Processa resolução automática específica para serviços não assinados
+   * Aplica bônus de recorrência para serviços não resolvidos
    */
+  const applyRecurrenceBonusToUnresolvedServices = () => {
+    const unresolvedServices = services.value.filter(
+      (service) =>
+        service.status === ServiceStatus.DISPONIVEL &&
+        service.guildId === currentGuildId.value &&
+        service.value.recurrenceBonusAmount > 0
+    );
+
+    if (unresolvedServices.length === 0) {
+      return;
+    }
+
+    let bonusAppliedCount = 0;
+
+    // Aplicar bônus de recorrência para cada serviço não resolvido
+    services.value = services.value.map((service) => {
+      if (unresolvedServices.includes(service as ServiceWithGuild)) {
+        bonusAppliedCount++;
+        // Usar a função de bônus de recorrência dos types
+        return applyRecurrenceBonus(service as Service) as ServiceWithGuild;
+      }
+      return service;
+    });
+
+    if (bonusAppliedCount > 0) {
+      // Salvar alterações
+      saveServicesToStorage();
+
+      // Notificação opcional
+      success(
+        `Taxa de recorrência aplicada: ${bonusAppliedCount} serviço(s) recebeu(ram) bônus por não serem resolvidos`
+      );
+    }
+  };
   const processUnsignedServiceResolution = () => {
     const resolutionConfig: ResolutionConfig<ServiceWithGuild> = {
       statusFilter: (s) => s.status === ServiceStatus.DISPONIVEL,
@@ -413,6 +447,9 @@ export const useServicesStore = defineStore("services", () => {
       saveServicesToStorage,
       success
     );
+
+    // Aplicar taxa de recorrência para serviços não resolvidos
+    applyRecurrenceBonusToUnresolvedServices();
 
     // Atualizar timestamp usando utilitário modular
     lastUpdate.value = updateModuleTimestamp(timelineStore);
@@ -589,7 +626,8 @@ export const useServicesStore = defineStore("services", () => {
 
     // Marcar serviço como concluído
     service.status = ServiceStatus.CONCLUIDO;
-    service.completedAt = timelineStore.currentTimeline?.currentDate;
+    service.completedAt =
+      timelineStore.currentGameDate || createGameDate(1, 1, 2024);
     service.resolvedAt = new Date();
 
     saveServicesToStorage();
