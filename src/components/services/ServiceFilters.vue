@@ -317,9 +317,6 @@ import {
   ServiceDeadlineType,
 } from "@/types/service";
 import { useTimeline } from "@/composables/useTimeline";
-import { getDaysDifference } from "@/utils/date-utils";
-import type { GameDate } from "@/types/timeline";
-import { ScheduledEventType } from "@/types/timeline";
 
 // Props
 interface Props {

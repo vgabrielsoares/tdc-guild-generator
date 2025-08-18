@@ -141,7 +141,6 @@ import { useTimeline } from "@/composables/useTimeline";
 import { useContractsStore } from "@/stores/contracts";
 import InfoButton from "@/components/common/InfoButton.vue";
 import Tooltip from "@/components/common/Tooltip.vue";
-import ContractTimelineWidget from "@/components/timeline/ContractTimelineWidget.vue";
 import { ScheduledEventType, type GameDate } from "@/types/timeline";
 import { CalendarIcon } from "@heroicons/vue/24/solid";
 
