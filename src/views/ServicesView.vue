@@ -57,18 +57,18 @@
         </div>
         <div class="flex flex-col">
           <span class="text-gray-400 uppercase tracking-wide text-lg"
-            >População</span
+            >Rel. Governo</span
           >
           <span class="text-white font-medium text-base">{{
-            guild.relations.population
+            guild.relations.government
           }}</span>
         </div>
         <div class="flex flex-col">
           <span class="text-gray-400 uppercase tracking-wide text-lg"
-            >Governo</span
+            >Rel. População</span
           >
           <span class="text-white font-medium text-base">{{
-            guild.relations.government
+            guild.relations.population
           }}</span>
         </div>
       </div>
