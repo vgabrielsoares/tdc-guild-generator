@@ -1,6 +1,6 @@
 <template>
   <div
-    class="service-filters bg-gray-800 rounded-lg border border-blue-700/50 p-4 space-y-4"
+    class="service-filters bg-gray-800 rounded-lg border border-gray-700 p-4 space-y-4"
   >
     <div class="flex items-center justify-between">
       <h3 class="text-lg font-semibold text-blue-400 flex items-center gap-2">
@@ -172,16 +172,22 @@
       <div class="filter-group">
         <label class="filter-label">Prazo</label>
         <select
-          :value="filters.deadlineType"
+          :value="deadlineFilterValue"
           @change="
-            updateDeadlineTypeFilter(($event.target as HTMLSelectElement).value)
+            updateDeadlineFilter(($event.target as HTMLSelectElement).value)
           "
           class="filter-select"
         >
           <option value="">Todos os prazos</option>
-          <option value="SEM_PRAZO">Sem prazo</option>
-          <option value="DIAS">Em dias</option>
-          <option value="SEMANAS">Em semanas</option>
+          <option value="with-deadline">
+            Com prazo ({{ servicesWithDeadline }})
+          </option>
+          <option value="no-deadline">
+            Sem prazo ({{ servicesWithoutDeadline }})
+          </option>
+          <option value="expiring-soon">
+            Expirando Em Breve ({{ expiringServices.length }})
+          </option>
         </select>
       </div>
 
@@ -308,7 +314,12 @@ import {
   ServiceDifficulty,
   ServiceComplexity,
   ServiceContractorType,
+  ServiceDeadlineType,
 } from "@/types/service";
+import { useTimeline } from "@/composables/useTimeline";
+import { getDaysDifference } from "@/utils/date-utils";
+import type { GameDate } from "@/types/timeline";
+import { ScheduledEventType } from "@/types/timeline";
 
 // Props
 interface Props {
@@ -336,10 +347,12 @@ export interface ServiceFilters {
   testCount: string;
   hasRecurrence: string;
   skillRequirement: string;
+  hasDeadline: string;
 }
 
 // State
 const showAdvancedFilters = ref(false);
+const { currentDate, dateUtils } = useTimeline();
 
 const filters = ref<ServiceFilters>({
   status: "",
@@ -354,6 +367,52 @@ const filters = ref<ServiceFilters>({
   testCount: "",
   hasRecurrence: "",
   skillRequirement: "",
+  hasDeadline: "",
+});
+
+// Computed para serviços expirando
+const expiringServices = computed(() => {
+  const current = currentDate.value;
+  if (!current) return [];
+
+  return props.services.filter((service) => {
+    if (!service.deadlineDate) return false;
+
+    if (
+      service.status !== ServiceStatus.DISPONIVEL &&
+      service.status !== ServiceStatus.ACEITO &&
+      service.status !== ServiceStatus.EM_ANDAMENTO
+    )
+      return false;
+
+    const daysUntilExpiration = dateUtils.getDaysDifference(
+      current,
+      service.deadlineDate
+    );
+
+    return daysUntilExpiration >= 0 && daysUntilExpiration <= 3;
+  });
+});
+
+// Computed para contadores de deadline
+const servicesWithDeadline = computed(() => {
+  return props.services.filter(
+    (s) => s.deadline?.type !== ServiceDeadlineType.SEM_PRAZO
+  ).length;
+});
+
+const servicesWithoutDeadline = computed(() => {
+  return props.services.filter(
+    (s) => s.deadline?.type === ServiceDeadlineType.SEM_PRAZO
+  ).length;
+});
+
+// Computed para valor do filtro de deadline
+const deadlineFilterValue = computed(() => {
+  if (filters.value.hasDeadline === "true") return "with-deadline";
+  if (filters.value.hasDeadline === "false") return "no-deadline";
+  if (filters.value.hasDeadline === "expiring") return "expiring-soon";
+  return "";
 });
 
 // Computed options with counts
@@ -508,7 +567,30 @@ const applyAllFilters = (
       if (service.value.rewardAmount < minReward) return false;
     }
 
-    // Prazo
+    // Prazo e deadline
+    if (filtersToApply.hasDeadline) {
+      const serviceHasDeadline =
+        service.deadline?.type !== ServiceDeadlineType.SEM_PRAZO;
+
+      if (filtersToApply.hasDeadline === "true" && !serviceHasDeadline)
+        return false;
+      if (filtersToApply.hasDeadline === "false" && serviceHasDeadline)
+        return false;
+      if (filtersToApply.hasDeadline === "expiring") {
+        // Verificar se está expirando em breve
+        if (!service.deadlineDate || !currentDate.value) return false;
+
+        const daysUntilExpiration = dateUtils.getDaysDifference(
+          currentDate.value,
+          service.deadlineDate
+        );
+
+        if (!(daysUntilExpiration >= 0 && daysUntilExpiration <= 3))
+          return false;
+      }
+    }
+
+    // Prazo por tipo (mantido para compatibilidade)
     if (
       filtersToApply.deadlineType &&
       service.deadline?.type !== filtersToApply.deadlineType
@@ -591,6 +673,24 @@ const activeFilters = computed(() => {
       key: "skillRequirement",
       label: `Perícias: ${filters.value.skillRequirement}`,
     });
+  if (filters.value.hasDeadline) {
+    let label = "Prazo: ";
+    switch (filters.value.hasDeadline) {
+      case "true":
+        label += "Com prazo";
+        break;
+      case "false":
+        label += "Sem prazo";
+        break;
+      case "expiring":
+        label += "Expirando em breve";
+        break;
+    }
+    active.push({
+      key: "hasDeadline",
+      label,
+    });
+  }
 
   return active;
 });
@@ -636,8 +736,22 @@ const updateRewardCurrencyFilter = (value: string) => {
   emitFilters();
 };
 
-const updateDeadlineTypeFilter = (value: string) => {
-  filters.value.deadlineType = value;
+const updateDeadlineFilter = (value: string) => {
+  // Mapear valores do select para o filtro hasDeadline
+  switch (value) {
+    case "with-deadline":
+      filters.value.hasDeadline = "true";
+      break;
+    case "no-deadline":
+      filters.value.hasDeadline = "false";
+      break;
+    case "expiring-soon":
+      filters.value.hasDeadline = "expiring";
+      break;
+    default:
+      filters.value.hasDeadline = "";
+      break;
+  }
   emitFilters();
 };
 
@@ -690,48 +804,59 @@ const formatCount = (total: number, filtered: number) => {
 .filter-group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.25rem;
 }
 
 .filter-label {
   display: block;
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 500;
-  color: rgb(147 197 253);
+  color: rgb(209, 213, 219);
 }
 
 .filter-select {
   width: 100%;
-  padding: 0.5rem 0.75rem;
-  background-color: rgb(55 65 81);
-  border: 1px solid rgba(37 99 235, 0.3);
+  background-color: rgb(55, 65, 81);
+  border: 1px solid rgb(75, 85, 99);
   border-radius: 0.375rem;
   color: white;
-  font-size: 0.875rem;
+  font-size: 1rem;
+  padding: 0.5rem 0.75rem;
+  transition: border-color 0.2s;
 }
 
 .filter-select:focus {
   outline: none;
-  border-color: transparent;
-  box-shadow: 0 0 0 2px rgb(59 130 246);
+  border-color: rgb(59, 130, 246);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+.filter-select:hover {
+  border-color: rgb(107, 114, 128);
 }
 
 .filter-input {
-  padding: 0.5rem 0.75rem;
-  background-color: rgb(55 65 81);
-  border: 1px solid rgba(37 99 235, 0.3);
+  width: 100%;
+  background-color: rgb(55, 65, 81);
+  border: 1px solid rgb(75, 85, 99);
   border-radius: 0.375rem;
   color: white;
-  font-size: 0.875rem;
-}
-
-.filter-input::placeholder {
-  color: rgb(156 163 175);
+  font-size: 1rem;
+  padding: 0.5rem 0.75rem;
+  transition: border-color 0.2s;
 }
 
 .filter-input:focus {
   outline: none;
-  border-color: transparent;
-  box-shadow: 0 0 0 2px rgb(59 130 246);
+  border-color: rgb(59, 130, 246);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+.filter-input:hover {
+  border-color: rgb(107, 114, 128);
+}
+
+.filter-input::placeholder {
+  color: rgb(156, 163, 175);
 }
 </style>
