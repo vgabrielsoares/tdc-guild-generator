@@ -139,6 +139,8 @@
 import { computed } from "vue";
 import { useTimeline } from "@/composables/useTimeline";
 import { useContractsStore } from "@/stores/contracts";
+import { useServicesStore } from "@/stores/services";
+import { ServiceStatus } from "@/types/service";
 import InfoButton from "@/components/common/InfoButton.vue";
 import Tooltip from "@/components/common/Tooltip.vue";
 import { ScheduledEventType, type GameDate } from "@/types/timeline";
@@ -155,10 +157,20 @@ const { currentDate, formattedDate, daysUntilNext, events, dateUtils } =
   useTimeline();
 
 const contractsStore = useContractsStore();
+const servicesStore = useServicesStore();
 
 // Computed - Estatísticas por módulo
 const moduleStats = computed(() => {
   const contractStats = contractsStore.contractStats;
+
+  // Calcular serviços ativos (disponíveis + aceitos + em andamento)
+  const activeServicesCount = servicesStore.services.filter(
+    (service) =>
+      service.status === ServiceStatus.DISPONIVEL ||
+      service.status === ServiceStatus.ACEITO ||
+      service.status === ServiceStatus.EM_ANDAMENTO ||
+      service.status === ServiceStatus.ACEITO_POR_OUTROS
+  ).length;
 
   return {
     contracts: {
@@ -169,8 +181,8 @@ const moduleStats = computed(() => {
       total: contractStats.total,
     },
     services: {
-      active: 0, // TODO: implementar quando serviços estiverem prontos
-      total: 0,
+      active: activeServicesCount,
+      total: servicesStore.services.length,
     },
     members: {
       available: 0, // TODO: implementar quando membros estiverem prontos
