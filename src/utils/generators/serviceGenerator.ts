@@ -772,7 +772,7 @@ export class ServiceGenerator {
   ): string {
     // Usar o enum como base, com ajustes mínimos para casos especiais
     let mainVerb: string = objective.type;
-    
+
     // Ajustes específicos apenas quando necessário
     if (objective.type === ServiceObjectiveType.EXTRAIR_RECURSOS) {
       mainVerb = "Extrair recursos de";
@@ -783,25 +783,27 @@ export class ServiceGenerator {
     } else if (objective.type === ServiceObjectiveType.MULTIPLO) {
       mainVerb = "Executar";
     }
-    
-    // Determinar conectivo baseado no tipo de objetivo  
+
+    // Determinar conectivo baseado no tipo de objetivo
     let connector = "para";
     const objectiveTypeLower = objective.type.toLowerCase();
-    
+
     // Usar "em" para contextos que indicam local/situação específicos
-    if (objectiveTypeLower.includes("extrair") || 
-        objectiveTypeLower.includes("construir") ||
-        objectiveTypeLower.includes("religioso")) {
+    if (
+      objectiveTypeLower.includes("extrair") ||
+      objectiveTypeLower.includes("construir") ||
+      objectiveTypeLower.includes("religioso")
+    ) {
       connector = "em";
     }
-    
+
     // Formatar componentes
     const action = objective.action.toLowerCase(); // O que do resultado da tabela
     const target = objective.target.toLowerCase(); // Para quem/onde
-    
+
     // Construir descrição base
     let description = `${mainVerb} ${action} ${connector} ${target}`;
-    
+
     // Adicionar complicação se houver
     if (objective.complication) {
       const complication = objective.complication.toLowerCase();
