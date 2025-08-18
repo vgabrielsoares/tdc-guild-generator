@@ -240,7 +240,7 @@ import {
 import { useToast } from "@/composables/useToast";
 import { useServicesStore } from "@/stores/services";
 import { useGuildStore } from "@/stores/guild";
-import { ServiceStatus } from "@/types/service";
+import { ServiceStatus, applyRecurrenceBonus } from "@/types/service";
 import type { Service } from "@/types/service";
 import type { ServiceFilters } from "@/components/services/ServiceFilters.vue";
 import type { SkillTestResult } from "@/utils/service-skill-resolution";
@@ -379,8 +379,27 @@ const handleCompleteService = (service: Service) => {
 
 const handleAbandonService = (service: Service) => {
   try {
-    servicesStore.updateServiceStatus(service.id, ServiceStatus.DISPONIVEL);
-    success(`Serviço "${service.title}" abandonado.`);
+    // Aplicar bônus de recorrência primeiro (se aplicável)
+    const updatedService = applyRecurrenceBonus(service);
+
+    // Encontrar o serviço no store e atualizá-lo
+    const serviceIndex = servicesStore.services.findIndex(
+      (s) => s.id === service.id
+    );
+    if (serviceIndex !== -1) {
+      // Atualizar o serviço no array do store
+      Object.assign(servicesStore.services[serviceIndex], {
+        ...updatedService,
+        status: ServiceStatus.DISPONIVEL,
+      });
+    }
+
+    // Salvar alterações no storage
+    servicesStore.saveServicesToStorage();
+
+    success(
+      `Serviço "${service.title}" abandonado. Taxa de recorrência aplicada.`
+    );
     closeServiceDetails();
   } catch (err) {
     error("Erro ao abandonar serviço:", String(err));
@@ -413,8 +432,9 @@ const handleTestCompleted = (result: SkillTestResult) => {
 };
 
 const handleTestsFinished = () => {
-  success("Todos os testes foram concluídos!");
-  closeTestsModal();
+  success(
+    "Todos os testes foram concluídos! Você pode revisar os resultados ou reiniciar os testes."
+  );
 };
 
 const handleServiceComplete = (service: Service) => {
