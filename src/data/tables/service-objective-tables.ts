@@ -1381,8 +1381,8 @@ export const SERVICOS_ESPECIFICOS_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Limpar construção/local",
       target: "Um nobre soberbo",
-      complication: "Alguém tenta constantemente dar ordens conflitantes"
-    }
+      complication: "Alguém tenta constantemente dar ordens conflitantes",
+    },
   },
   {
     min: 2,
@@ -1390,8 +1390,8 @@ export const SERVICOS_ESPECIFICOS_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Cobrar impostos/dívidas",
       target: "Um humanoide ranzinza",
-      complication: "Deve ser feito durante a madrugada"
-    }
+      complication: "Deve ser feito durante a madrugada",
+    },
   },
   {
     min: 3,
@@ -1399,8 +1399,8 @@ export const SERVICOS_ESPECIFICOS_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Criar/ajudar em um evento",
       target: "Um mercador",
-      complication: "Um humanoide insiste em te atrapalhar"
-    }
+      complication: "Um humanoide insiste em te atrapalhar",
+    },
   },
   {
     min: 4,
@@ -1408,8 +1408,8 @@ export const SERVICOS_ESPECIFICOS_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Desmentir boatos/fofocas",
       target: "Um grupo de guardas",
-      complication: "Você está constantemente sendo vigiado"
-    }
+      complication: "Você está constantemente sendo vigiado",
+    },
   },
   {
     min: 5,
@@ -1417,8 +1417,8 @@ export const SERVICOS_ESPECIFICOS_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Traduzir/transcrever material",
       target: "Uma criatura muito desconfiada",
-      complication: "local é de difícil acesso"
-    }
+      complication: "local é de difícil acesso",
+    },
   },
   {
     min: 6,
@@ -1426,8 +1426,8 @@ export const SERVICOS_ESPECIFICOS_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Trabalho rural",
       target: "Um criminoso/mafioso",
-      complication: "Vai contra a moral e os bons costumes"
-    }
+      complication: "Vai contra a moral e os bons costumes",
+    },
   },
   {
     min: 7,
@@ -1435,8 +1435,8 @@ export const SERVICOS_ESPECIFICOS_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Organizar arquivos/livros",
       target: "Um estudioso",
-      complication: "Muitos recursos estão danificados"
-    }
+      complication: "Muitos recursos estão danificados",
+    },
   },
   {
     min: 8,
@@ -1444,8 +1444,8 @@ export const SERVICOS_ESPECIFICOS_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Pintar estrutura",
       target: "Um comerciante",
-      complication: "Recursos são de má qualidade"
-    }
+      complication: "Recursos são de má qualidade",
+    },
   },
   {
     min: 9,
@@ -1453,8 +1453,8 @@ export const SERVICOS_ESPECIFICOS_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Consertar instrumento musical",
       target: "Um artista local",
-      complication: "Itens necessários estão espalhados por vários locais"
-    }
+      complication: "Itens necessários estão espalhados por vários locais",
+    },
   },
   {
     min: 10,
@@ -1462,8 +1462,8 @@ export const SERVICOS_ESPECIFICOS_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Preparar refeição comunitária",
       target: "Um grupo de voluntários",
-      complication: "Recursos são insuficientes"
-    }
+      complication: "Recursos são insuficientes",
+    },
   },
   {
     min: 11,
@@ -1471,8 +1471,8 @@ export const SERVICOS_ESPECIFICOS_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Ajudar em mudança",
       target: "Uma família",
-      complication: "Um visitante inesperado altera os planos"
-    }
+      complication: "Um visitante inesperado altera os planos",
+    },
   },
   {
     min: 12,
@@ -1480,8 +1480,8 @@ export const SERVICOS_ESPECIFICOS_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Cuidar de jardim",
       target: "Um idoso",
-      complication: "Criaturas estão doentes"
-    }
+      complication: "Criaturas estão doentes",
+    },
   },
   {
     min: 13,
@@ -1489,8 +1489,8 @@ export const SERVICOS_ESPECIFICOS_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Realizar inventário/catalogar coleções",
       target: "Um colecionar excêntrico",
-      complication: "Exige transporte de itens frágeis"
-    }
+      complication: "Exige transporte de itens frágeis",
+    },
   },
   {
     min: 14,
@@ -1498,8 +1498,8 @@ export const SERVICOS_ESPECIFICOS_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Entregar correspondência ou pacotes",
       target: "Um grupo de artesões",
-      complication: "O espaço é pequeno"
-    }
+      complication: "O espaço é pequeno",
+    },
   },
   {
     min: 15,
@@ -1507,8 +1507,8 @@ export const SERVICOS_ESPECIFICOS_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Fazer reparos em móveis",
       target: "Um taverneiro",
-      complication: "Exige que não haja desperdício"
-    }
+      complication: "Exige que não haja desperdício",
+    },
   },
   {
     min: 16,
@@ -1516,8 +1516,8 @@ export const SERVICOS_ESPECIFICOS_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Ajudar em feira",
       target: "Um camponês",
-      complication: "O tempo está instável"
-    }
+      complication: "O tempo está instável",
+    },
   },
   {
     min: 17,
@@ -1525,8 +1525,8 @@ export const SERVICOS_ESPECIFICOS_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Preparar decoração",
       target: "Um grupo religioso",
-      complication: "O material é frágil"
-    }
+      complication: "O material é frágil",
+    },
   },
   {
     min: 18,
@@ -1534,8 +1534,8 @@ export const SERVICOS_ESPECIFICOS_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Ajudar em campanha",
       target: "Um curandeiro",
-      complication: "Depende de autorização prévia"
-    }
+      complication: "Depende de autorização prévia",
+    },
   },
   {
     min: 19,
@@ -1543,8 +1543,8 @@ export const SERVICOS_ESPECIFICOS_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Supervisionar transporte de carga",
       target: "Um grupo de crianças",
-      complication: "Exige uso de uniforme específico"
-    }
+      complication: "Exige uso de uniforme específico",
+    },
   },
   {
     min: 20,
@@ -1552,9 +1552,9 @@ export const SERVICOS_ESPECIFICOS_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Cuidar de mascote",
       target: "Um grupo de jovens aprendizes",
-      complication: "Há uma criatura hiperativa"
-    }
-  }
+      complication: "Há uma criatura hiperativa",
+    },
+  },
 ];
 
 // ===== TRABALHO RURAL (d20) - Tabela Auxiliar =====
@@ -1583,7 +1583,7 @@ export const TRABALHO_RURAL_TABLE: TableEntry<string>[] = [
   { min: 17, max: 17, result: "Transporte de produtos rurais" },
   { min: 18, max: 18, result: "Seleção de sementes" },
   { min: 19, max: 19, result: "Cuidado de viveiros" },
-  { min: 20, max: 20, result: "Reflorestamento" }
+  { min: 20, max: 20, result: "Reflorestamento" },
 ];
 
 // ===== RELIGIOSO (d20 x 3 colunas) =====
@@ -1599,8 +1599,8 @@ export const RELIGIOSO_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Pregar em praça pública",
       target: "Um herói ancestral",
-      complication: "Envolve um ritual macabro"
-    }
+      complication: "Envolve um ritual macabro",
+    },
   },
   {
     min: 2,
@@ -1608,8 +1608,8 @@ export const RELIGIOSO_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Converter/purificar",
       target: "Toda uma vila/culto",
-      complication: "Rumores preveem uma tragédia"
-    }
+      complication: "Rumores preveem uma tragédia",
+    },
   },
   {
     min: 3,
@@ -1617,8 +1617,8 @@ export const RELIGIOSO_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Retirar maldição",
       target: "Um condenado",
-      complication: "Há uma maldição"
-    }
+      complication: "Há uma maldição",
+    },
   },
   {
     min: 4,
@@ -1626,8 +1626,8 @@ export const RELIGIOSO_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Ministrar um evento religioso",
       target: "Artefato mágico vivo",
-      complication: "O líder local desaprova"
-    }
+      complication: "O líder local desaprova",
+    },
   },
   {
     min: 5,
@@ -1635,8 +1635,8 @@ export const RELIGIOSO_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Fazer um exorcismo",
       target: "Nobre poderoso",
-      complication: "Cultistas te observam"
-    }
+      complication: "Cultistas te observam",
+    },
   },
   {
     min: 6,
@@ -1644,8 +1644,8 @@ export const RELIGIOSO_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Administrar um templo",
       target: "Outros aventureiros",
-      complication: "Um charlatão tenta se aproveitar"
-    }
+      complication: "Um charlatão tenta se aproveitar",
+    },
   },
   {
     min: 7,
@@ -1653,8 +1653,8 @@ export const RELIGIOSO_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Organizar procissão",
       target: "Comunidade local",
-      complication: "O clima está ruim"
-    }
+      complication: "O clima está ruim",
+    },
   },
   {
     min: 8,
@@ -1662,8 +1662,8 @@ export const RELIGIOSO_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Preparar oferenda",
       target: "Divindade menor",
-      complication: "Um falso profeta surge"
-    }
+      complication: "Um falso profeta surge",
+    },
   },
   {
     min: 9,
@@ -1671,8 +1671,8 @@ export const RELIGIOSO_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Ensinar cânticos",
       target: "Crianças do vilarejo",
-      complication: "Símbolos religiosos foram roubados"
-    }
+      complication: "Símbolos religiosos foram roubados",
+    },
   },
   {
     min: 10,
@@ -1680,8 +1680,8 @@ export const RELIGIOSO_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Restaurar altar",
       target: "Templo antigo",
-      complication: "O local é de difícil acesso"
-    }
+      complication: "O local é de difícil acesso",
+    },
   },
   {
     min: 11,
@@ -1689,8 +1689,8 @@ export const RELIGIOSO_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Abençoar colheita",
       target: "Agricultores",
-      complication: "Recursos são considerados impuros"
-    }
+      complication: "Recursos são considerados impuros",
+    },
   },
   {
     min: 12,
@@ -1698,8 +1698,8 @@ export const RELIGIOSO_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Realizar batismo",
       target: "Grupo de jovens",
-      complication: "Ofende outra religião/divindade"
-    }
+      complication: "Ofende outra religião/divindade",
+    },
   },
   {
     min: 13,
@@ -1707,8 +1707,8 @@ export const RELIGIOSO_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Preparar festival",
       target: "Besta Sagrada",
-      complication: "O evento coincide com outro"
-    }
+      complication: "O evento coincide com outro",
+    },
   },
   {
     min: 14,
@@ -1716,8 +1716,8 @@ export const RELIGIOSO_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Mediar disputa religiosa",
       target: "Nobres menores",
-      complication: "O contratante esconde informações"
-    }
+      complication: "O contratante esconde informações",
+    },
   },
   {
     min: 15,
@@ -1725,8 +1725,8 @@ export const RELIGIOSO_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Escrever sermão",
       target: "Sacerdote",
-      complication: "O ritual exige silêncio absoluto"
-    }
+      complication: "O ritual exige silêncio absoluto",
+    },
   },
   {
     min: 16,
@@ -1734,8 +1734,8 @@ export const RELIGIOSO_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Traduzir texto sagrado",
       target: "Estudioso",
-      complication: "Há divisão por rivalidade"
-    }
+      complication: "Há divisão por rivalidade",
+    },
   },
   {
     min: 17,
@@ -1743,8 +1743,8 @@ export const RELIGIOSO_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Cuidar de relíquia",
       target: "Ordem religiosa",
-      complication: "O evento é alvo de sabotagem"
-    }
+      complication: "O evento é alvo de sabotagem",
+    },
   },
   {
     min: 18,
@@ -1752,8 +1752,8 @@ export const RELIGIOSO_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Organizar retiro espiritual",
       target: "Grupo de fiéis",
-      complication: "O local é afastado"
-    }
+      complication: "O local é afastado",
+    },
   },
   {
     min: 19,
@@ -1761,8 +1761,8 @@ export const RELIGIOSO_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Preparar casamento",
       target: "Líder Religioso",
-      complication: "O evento precisa ser secreto"
-    }
+      complication: "O evento precisa ser secreto",
+    },
   },
   {
     min: 20,
@@ -1770,9 +1770,9 @@ export const RELIGIOSO_TABLE: ThreeColumnObjectiveTable = [
     result: {
       action: "Ajudar em enterro",
       target: "Festival Tradicional",
-      complication: "Atrai curiosos indesejados"
-    }
-  }
+      complication: "Atrai curiosos indesejados",
+    },
+  },
 ];
 
 // ===== EXEMPLOS DE RECURSOS =====
@@ -2003,14 +2003,27 @@ export function generateServiceObjective(objectiveType: ServiceObjectiveType): {
 
   // Formata descrição usando funções especializadas
   let description: string;
-  
+
   if (objectiveType === ServiceObjectiveType.SERVICOS_ESPECIFICOS) {
-    description = generateSpecificServiceDescription(result.action, result.target, result.complication);
+    description = generateSpecificServiceDescription(
+      result.action,
+      result.target,
+      result.complication
+    );
   } else if (objectiveType === ServiceObjectiveType.RELIGIOSO) {
-    description = generateServiceDescription(result.action, result.target, result.complication, "relacionado a");
+    description = generateServiceDescription(
+      result.action,
+      result.target,
+      result.complication,
+      "relacionado a"
+    );
   } else {
     // Formato padrão para outros tipos
-    description = generateServiceDescription(result.action, result.target, result.complication);
+    description = generateServiceDescription(
+      result.action,
+      result.target,
+      result.complication
+    );
   }
 
   return {
@@ -2048,7 +2061,7 @@ export function generateMultipleObjective(): {
   let shouldContinue = true;
   while (shouldContinue) {
     const rolledType = rollFromAvailableTypes(usedTypes);
-    
+
     // Se não há mais tipos disponíveis além dos já usados, parar
     if (!rolledType) {
       shouldContinue = false;
@@ -2076,7 +2089,7 @@ export function generateMultipleObjective(): {
     // Se já temos pelo menos 2 objetivos, rolar para ver se continua
     if (objectives.length >= 2) {
       const continueRoll = rollOnTable(SERVICE_OBJECTIVE_TYPE_TABLE);
-      
+
       // Se não rolou "Múltiplo" novamente, parar
       if (continueRoll.result.type !== ServiceObjectiveType.MULTIPLO) {
         shouldContinue = false;
@@ -2088,9 +2101,9 @@ export function generateMultipleObjective(): {
   // Se ainda não conseguiu pelo menos 2 objetivos, forçar mais um
   while (objectives.length < 2) {
     const availableTypes = IMPLEMENTED_OBJECTIVE_TYPES.filter(
-      type => type !== ServiceObjectiveType.MULTIPLO && !usedTypes.has(type)
+      (type) => type !== ServiceObjectiveType.MULTIPLO && !usedTypes.has(type)
     );
-    
+
     if (availableTypes.length === 0) {
       // Se não há mais tipos disponíveis, duplicar o primeiro objetivo com ajuste
       if (objectives.length > 0) {
@@ -2112,7 +2125,7 @@ export function generateMultipleObjective(): {
       // Escolher aleatoriamente um tipo disponível
       const randomIndex = Math.floor(Math.random() * availableTypes.length);
       const selectedType = availableTypes[randomIndex];
-      
+
       const objective = generateServiceObjective(selectedType);
       if (objective) {
         objectives.push(objective);
@@ -2129,9 +2142,11 @@ export function generateMultipleObjective(): {
  * Rola um tipo de objetivo excluindo os já usados e o tipo "Múltiplo"
  * Retorna null se não há mais tipos disponíveis
  */
-function rollFromAvailableTypes(usedTypes: Set<ServiceObjectiveType>): ServiceObjectiveType | null {
+function rollFromAvailableTypes(
+  usedTypes: Set<ServiceObjectiveType>
+): ServiceObjectiveType | null {
   const availableTypes = IMPLEMENTED_OBJECTIVE_TYPES.filter(
-    type => type !== ServiceObjectiveType.MULTIPLO && !usedTypes.has(type)
+    (type) => type !== ServiceObjectiveType.MULTIPLO && !usedTypes.has(type)
   );
 
   // Se não há mais tipos disponíveis, retornar null
@@ -2147,13 +2162,15 @@ function rollFromAvailableTypes(usedTypes: Set<ServiceObjectiveType>): ServiceOb
 /**
  * Combina múltiplos objetivos em um único resultado
  */
-function combineMultipleObjectives(objectives: Array<{
-  type: ServiceObjectiveType;
-  description: string;
-  action: string;
-  target: string;
-  complication: string;
-}>): {
+function combineMultipleObjectives(
+  objectives: Array<{
+    type: ServiceObjectiveType;
+    description: string;
+    action: string;
+    target: string;
+    complication: string;
+  }>
+): {
   type: ServiceObjectiveType;
   description: string;
   action: string;
@@ -2172,15 +2189,19 @@ function combineMultipleObjectives(objectives: Array<{
   }
 
   // Combinar descrições com conectores apropriados
-  const descriptions = objectives.map(obj => obj.description);
-  const combinedDescription = descriptions.length === 2 
-    ? `${descriptions[0]} e também ${descriptions[1]}`
-    : descriptions.slice(0, -1).join(", ") + ` e também ${descriptions[descriptions.length - 1]}`;
+  const descriptions = objectives.map((obj) => obj.description);
+  const combinedDescription =
+    descriptions.length === 2
+      ? `${descriptions[0]} e também ${descriptions[1]}`
+      : descriptions.slice(0, -1).join(", ") +
+        ` e também ${descriptions[descriptions.length - 1]}`;
 
   // Combinar ações, alvos e complicações
-  const combinedAction = objectives.map(obj => obj.action).join(" + ");
-  const combinedTarget = objectives.map(obj => obj.target).join(" + ");
-  const combinedComplication = objectives.map(obj => obj.complication).join(" + ");
+  const combinedAction = objectives.map((obj) => obj.action).join(" + ");
+  const combinedTarget = objectives.map((obj) => obj.target).join(" + ");
+  const combinedComplication = objectives
+    .map((obj) => obj.complication)
+    .join(" + ");
 
   return {
     type: ServiceObjectiveType.MULTIPLO,
@@ -2312,14 +2333,15 @@ export function generateServiceDescription(
   connector: string = "para"
 ): string {
   // Formatar action: primeira letra maiúscula, resto minúsculo
-  const formattedAction = action.charAt(0).toUpperCase() + action.slice(1).toLowerCase();
-  
+  const formattedAction =
+    action.charAt(0).toUpperCase() + action.slice(1).toLowerCase();
+
   // Formatar target: remover primeira letra maiúscula (exceto se for nome próprio)
   const formattedTarget = target.toLowerCase();
-  
+
   // Formatar complication: remover primeira letra maiúscula
   const formattedComplication = complication.toLowerCase();
-  
+
   return `${formattedAction} ${connector} ${formattedTarget}, mas ${formattedComplication}`;
 }
 
@@ -2335,23 +2357,40 @@ export function generateSpecificServiceDescription(
   // Se o serviço for "Trabalho rural", gerar especificação
   if (action === "Trabalho rural") {
     const ruralType = rollOnTable(TRABALHO_RURAL_TABLE);
-    return generateServiceDescription(ruralType.result, target, complication, "para");
+    return generateServiceDescription(
+      ruralType.result,
+      target,
+      complication,
+      "para"
+    );
   }
-  
+
   // Determinar conector baseado no tipo de ação
   let connector = "para";
   const actionLower = action.toLowerCase();
-  
-  if (actionLower.includes("limpar") || actionLower.includes("organizar") || actionLower.includes("pintar")) {
+
+  if (
+    actionLower.includes("limpar") ||
+    actionLower.includes("organizar") ||
+    actionLower.includes("pintar")
+  ) {
     connector = "em";
-  } else if (actionLower.includes("cobrar") || actionLower.includes("criar") || actionLower.includes("ajudar")) {
+  } else if (
+    actionLower.includes("cobrar") ||
+    actionLower.includes("criar") ||
+    actionLower.includes("ajudar")
+  ) {
     connector = "para";
-  } else if (actionLower.includes("traduzir") || actionLower.includes("consertar") || actionLower.includes("preparar")) {
+  } else if (
+    actionLower.includes("traduzir") ||
+    actionLower.includes("consertar") ||
+    actionLower.includes("preparar")
+  ) {
     connector = "para";
   } else if (actionLower.includes("trabalho")) {
     connector = "para";
   }
-  
+
   return generateServiceDescription(action, target, complication, connector);
 }
 
