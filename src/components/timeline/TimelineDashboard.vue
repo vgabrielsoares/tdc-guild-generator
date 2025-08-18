@@ -132,14 +132,6 @@
         A timeline está tranquila por enquanto
       </p>
     </div>
-
-    <!-- Widget específico de contratos -->
-    <div class="mt-6">
-      <ContractTimelineWidget
-        @open-help="$emit('open-help', 'contract-lifecycle')"
-        @generate-contracts="$emit('generate-contracts')"
-      />
-    </div>
   </div>
 </template>
 

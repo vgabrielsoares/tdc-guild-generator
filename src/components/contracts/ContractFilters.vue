@@ -5,7 +5,7 @@
     <div class="flex items-center justify-between">
       <h3 class="text-lg font-semibold text-amber-400 flex items-center gap-2">
         <FunnelIcon class="w-5 h-5" />
-        Filtros Avançados
+        Filtros de Contratos
       </h3>
       <button
         @click="clearAllFilters"

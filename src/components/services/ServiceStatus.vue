@@ -91,27 +91,27 @@ const statusIcon = computed(() => {
 const statusClass = computed(() => {
   switch (props.status) {
     case ServiceStatus.DISPONIVEL:
-      return "bg-blue-100 text-blue-800 border border-blue-200";
+      return "bg-blue-900/30 text-blue-300 border border-blue-600/50";
     case ServiceStatus.ACEITO:
-      return "bg-amber-100 text-amber-800 border border-amber-200";
+      return "bg-amber-900/30 text-amber-300 border border-amber-600/50";
     case ServiceStatus.EM_ANDAMENTO:
-      return "bg-indigo-100 text-indigo-800 border border-indigo-200";
+      return "bg-indigo-900/30 text-indigo-300 border border-indigo-600/50";
     case ServiceStatus.CONCLUIDO:
-      return "bg-green-100 text-green-800 border border-green-200";
+      return "bg-green-900/30 text-green-300 border border-green-600/50";
     case ServiceStatus.FALHOU:
-      return "bg-red-100 text-red-800 border border-red-200";
+      return "bg-red-900/30 text-red-300 border border-red-600/50";
     case ServiceStatus.EXPIRADO:
-      return "bg-orange-100 text-orange-800 border border-orange-200";
+      return "bg-orange-900/30 text-orange-300 border border-orange-600/50";
     case ServiceStatus.ANULADO:
-      return "bg-gray-100 text-gray-800 border border-gray-200";
+      return "bg-gray-900/30 text-gray-300 border border-gray-600/50";
     case ServiceStatus.RESOLVIDO_POR_OUTROS:
-      return "bg-purple-100 text-purple-800 border border-purple-200";
+      return "bg-purple-900/30 text-purple-300 border border-purple-600/50";
     case ServiceStatus.ACEITO_POR_OUTROS:
-      return "bg-cyan-100 text-cyan-800 border border-cyan-200";
+      return "bg-cyan-900/30 text-cyan-300 border border-cyan-600/50";
     case ServiceStatus.QUEBRADO:
-      return "bg-pink-100 text-pink-800 border border-pink-200";
+      return "bg-pink-900/30 text-pink-300 border border-pink-600/50";
     default:
-      return "bg-gray-100 text-gray-800 border border-gray-200";
+      return "bg-gray-900/30 text-gray-300 border border-gray-600/50";
   }
 });
 

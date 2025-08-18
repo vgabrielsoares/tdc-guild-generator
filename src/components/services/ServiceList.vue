@@ -18,7 +18,7 @@
         :key="status.value || `all-${index}`"
         @click="$emit('filter-status', status.value)"
         :class="[
-          'px-3 py-1 rounded-full text-xs font-medium transition-colors',
+          'px-3 py-1 rounded-full text-sm font-medium transition-colors',
           activeStatusFilter === status.value
             ? 'bg-blue-600 text-white'
             : 'bg-gray-700 text-gray-300 hover:bg-gray-600',
