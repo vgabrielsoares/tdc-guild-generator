@@ -6,7 +6,7 @@
       >
         <WrenchScrewdriverIcon class="w-7 h-7 text-gold-400" />
         Serviços da Guilda
-        <ServiceTooltip
+        <Tooltip
           content="Sistema completo de geração e gerenciamento de serviços para aventureiros com valores dinâmicos baseados na sede da guilda."
           title="Sistema de Serviços"
           position="auto"
@@ -16,97 +16,104 @@
             @open-help="handleOpenHelp"
             button-class="ml-2"
           />
-        </ServiceTooltip>
+        </Tooltip>
       </h1>
       <p class="text-lg text-gray-300 mb-8">
         Gerencie serviços da sede da guilda atual
       </p>
     </div>
 
-    <!-- Info da Guilda Atual -->
+    <!-- Aviso quando não há guilda -->
     <div
-      v-if="guild"
-      class="bg-gradient-to-r from-blue-900/20 to-indigo-900/20 border border-blue-600/50 rounded-lg p-6 mb-8"
+      v-if="!guild"
+      class="text-center bg-red-900/20 border border-red-600/50 rounded-lg p-8"
     >
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-xl font-semibold text-blue-400 flex items-center">
-          <BuildingOfficeIcon class="w-5 h-5 mr-2" />
-          {{ guild.name }}
-        </h3>
-        <span class="text-sm px-3 py-1 bg-blue-600 text-blue-100 rounded-full">
-          {{ guild.settlementType }}
-        </span>
-      </div>
-
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-        <div class="flex flex-col">
-          <span class="text-gray-400 uppercase tracking-wide text-lg"
-            >Sede</span
-          >
-          <span class="text-white font-medium text-base">{{
-            guild.structure.size
-          }}</span>
-        </div>
-        <div class="flex flex-col">
-          <span class="text-gray-400 uppercase tracking-wide text-lg"
-            >Recursos</span
-          >
-          <span class="text-white font-medium text-base">{{
-            guild.resources.level || guild.resources
-          }}</span>
-        </div>
-        <div class="flex flex-col">
-          <span class="text-gray-400 uppercase tracking-wide text-lg"
-            >Rel. Governo</span
-          >
-          <span class="text-white font-medium text-base">{{
-            guild.relations.government
-          }}</span>
-        </div>
-        <div class="flex flex-col">
-          <span class="text-gray-400 uppercase tracking-wide text-lg"
-            >Rel. População</span
-          >
-          <span class="text-white font-medium text-base">{{
-            guild.relations.population
-          }}</span>
-        </div>
-      </div>
+      <h2 class="text-xl font-semibold text-red-400 mb-2">
+        Nenhuma Guilda Encontrada
+      </h2>
+      <p class="text-gray-300 mb-6">
+        Para gerar serviços, você precisa primeiro ter uma guilda ativa. Acesse
+        a página de Guildas para gerar uma nova sede.
+      </p>
+      <router-link
+        to="/guild"
+        class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+      >
+        <PlusIcon class="w-4 h-4 mr-2" />
+        Gerar Nova Guilda
+      </router-link>
     </div>
 
-    <!-- Timeline e Controles -->
-    <div class="mb-8">
-      <div class="flex items-center justify-between mb-6">
-        <div class="flex items-center space-x-4">
-          <!-- Link para gerenciar tempo -->
-          <router-link
-            to="/timeline"
-            class="flex items-center text-blue-400 hover:text-blue-300 transition-colors"
+    <!-- Serviços (só mostra se há guilda) -->
+    <template v-if="guild">
+      <!-- Info da Guilda Atual -->
+      <div
+        class="bg-gradient-to-r from-blue-900/20 to-indigo-900/20 border border-blue-600/50 rounded-lg p-6"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-semibold text-blue-400 flex items-center">
+            <BuildingOfficeIcon class="w-5 h-5 mr-2" />
+            {{ guild.name }}
+          </h3>
+          <span
+            class="text-sm px-3 py-1 bg-blue-600 text-blue-100 rounded-full"
           >
-            <svg
-              class="w-5 h-5 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+            {{ guild.settlementType }}
+          </span>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+          <div class="flex flex-col">
+            <span class="text-gray-400 uppercase tracking-wide text-lg"
+              >Sede</span
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              ></path>
-            </svg>
-            Gerenciar Tempo
-          </router-link>
+            <span class="text-white font-medium text-base">{{
+              guild.structure.size
+            }}</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-gray-400 uppercase tracking-wide text-lg"
+              >Recursos</span
+            >
+            <span class="text-white font-medium text-base">{{
+              guild.resources.level || guild.resources
+            }}</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-gray-400 uppercase tracking-wide text-lg"
+              >População</span
+            >
+            <span class="text-white font-medium text-base">{{
+              guild.relations.population
+            }}</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-gray-400 uppercase tracking-wide text-lg"
+              >Governo</span
+            >
+            <span class="text-white font-medium text-base">{{
+              guild.relations.government
+            }}</span>
+          </div>
         </div>
       </div>
 
+      <!-- Filtros Avançados -->
+      <ServiceFiltersComponent
+        v-if="allServices.length > 0"
+        :filters="activeFilters"
+        :services="allServices"
+        @update:filters="handleFiltersChange"
+        @close="() => {}"
+      />
+
+      <!-- Timeline e Controles -->
       <ServiceTimeline
         @generate-services="handleGenerateServices"
         @force-resolution="handleForceResolution"
         @open-help="handleOpenHelp"
       />
-    </div>
+    </template>
 
     <!-- Filtros (sidebar quando visível) -->
     <Transition
@@ -228,6 +235,7 @@ import {
   WrenchScrewdriverIcon,
   FunnelIcon,
   BuildingOfficeIcon,
+  PlusIcon,
 } from "@heroicons/vue/24/outline";
 import { useToast } from "@/composables/useToast";
 import { useServicesStore } from "@/stores/services";
@@ -247,9 +255,9 @@ import ServiceList from "@/components/services/ServiceList.vue";
 import ServiceFiltersComponent from "@/components/services/ServiceFilters.vue";
 import ServiceDetails from "@/components/services/ServiceDetails.vue";
 import ServiceSkillTests from "@/components/services/ServiceSkillTests.vue";
-import ServiceTooltip from "@/components/services/ServiceTooltip.vue";
 import ServiceTimeline from "@/components/services/ServiceTimeline.vue";
 import InfoButton from "@/components/common/InfoButton.vue";
+import Tooltip from "@/components/common/Tooltip.vue";
 
 // Stores & Composables
 const servicesStore = useServicesStore();
