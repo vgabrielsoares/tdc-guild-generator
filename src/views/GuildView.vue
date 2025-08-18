@@ -21,16 +21,6 @@
       <p class="text-lg text-gray-300 mb-4">
         Gere e visualize a estrutura completa da sua guilda.
       </p>
-      <div
-        class="max-w-2xl mx-auto mb-8 p-4 bg-blue-900 bg-opacity-20 rounded-lg border border-blue-700"
-      >
-        <p class="text-blue-200 text-sm leading-relaxed">
-          <strong class="text-blue-300">Para Mestres:</strong> Use este sistema
-          para criar sedes da Guilda dinamicamente adaptadas ao tipo de
-          assentamento. Cada elemento gerado pode servir como gancho narrativo
-          para suas aventuras.
-        </p>
-      </div>
     </div>
 
     <!-- Guilda Atual e Geração -->
