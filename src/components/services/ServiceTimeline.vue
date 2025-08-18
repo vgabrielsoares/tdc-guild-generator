@@ -38,9 +38,9 @@
         class="bg-yellow-900/30 p-4 rounded-lg text-center border border-yellow-800/30"
       >
         <div class="text-2xl font-bold text-yellow-400">
-          {{ serviceStats.expiring }}
+          {{ expiringServices.length }}
         </div>
-        <div class="text-sm text-yellow-300">Com Prazo</div>
+        <div class="text-sm text-yellow-300">Expirando Em Breve</div>
       </div>
 
       <div
@@ -53,81 +53,108 @@
       </div>
     </div>
 
-    <!-- Ações principais -->
-    <div class="flex flex-wrap gap-4">
-      <button
-        @click="handleGenerateServices"
-        :disabled="!guild || isGenerating"
-        class="flex-1 min-w-[200px] px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors flex items-center justify-center"
-      >
-        <svg
-          v-if="isGenerating"
-          class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            class="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            stroke-width="4"
-          ></circle>
-          <path
-            class="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-          ></path>
-        </svg>
-        <WrenchScrewdriverIcon v-else class="w-5 h-5 mr-2" />
-        {{ isGenerating ? "Gerando..." : "Gerar Novos Serviços" }}
-      </button>
+    <!-- Serviços expirando -->
+    <div v-if="expiringServices.length > 0" class="mb-6">
+      <h4 class="text-lg font-medium text-white mb-3">
+        Serviços Expirando em Breve
+      </h4>
 
-      <button
-        @click="$emit('force-resolution')"
-        class="px-4 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-medium transition-colors flex items-center"
-      >
-        <ClockIcon class="w-5 h-5 mr-2" />
-        Avançar Tempo
-      </button>
+      <div class="space-y-2">
+        <div
+          v-for="service in expiringServices"
+          :key="service.id"
+          class="flex items-center justify-between p-3 bg-yellow-900/30 border border-yellow-800/30 rounded-lg"
+        >
+          <div class="flex-1">
+            <div class="font-medium text-white">
+              {{ service.contractorType || "Contratante não definido" }}
+            </div>
+            <div class="text-sm text-gray-300">
+              {{ service.description || "Descrição não definida" }}
+            </div>
+          </div>
+
+          <div class="text-right">
+            <div class="text-sm font-medium text-yellow-300">
+              {{ getExpirationText(service) }}
+            </div>
+            <div class="text-xs text-yellow-400" v-if="service.value">
+              {{ formatValue(service.value.rewardAmount) }}
+              {{ service.value.currency }}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Informações adicionais -->
-    <div v-if="currentTimeline" class="mt-6 p-4 bg-gray-700/50 rounded-lg">
-      <div class="text-sm text-gray-300">
-        <span class="font-medium">Data atual:</span>
-        {{ formattedCurrentDate || "Timeline inativa" }}
+    <!-- Eventos de timeline relacionados a serviços -->
+    <div v-if="serviceEvents.length > 0" class="mb-6">
+      <h4 class="text-lg font-medium text-white mb-3">
+        Próximos Eventos de Serviços
+      </h4>
+
+      <div class="space-y-2">
+        <div
+          v-for="event in serviceEvents"
+          :key="event.id"
+          class="flex items-center justify-between p-3 bg-blue-900/30 border border-blue-800/30 rounded-lg"
+        >
+          <div class="flex items-center space-x-3">
+            <div class="w-2 h-2 bg-blue-400 rounded-full"></div>
+            <div>
+              <div class="font-medium text-white">{{ event.description }}</div>
+              <div class="text-sm text-gray-300">
+                {{ formatEventDate(event.date) }}
+              </div>
+            </div>
+          </div>
+
+          <div class="text-sm font-medium text-blue-400">
+            {{ getDaysUntilEvent(event.date) }}
+          </div>
+        </div>
       </div>
+    </div>
+
+    <!-- Ações principais -->
+    <div class="flex justify-between items-center">
+      <div v-if="currentTimeline" class="p-4 bg-gray-700/50 rounded-lg">
+        <div class="text-sm text-gray-300">
+          <span class="font-medium">Data atual:</span>
+          {{ formattedCurrentDate || "Timeline inativa" }}
+        </div>
+      </div>
+
+      <router-link
+        to="/timeline"
+        class="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center"
+      >
+        <ClockIcon class="w-5 h-5 mr-2" />
+        Gerenciar Tempo
+      </router-link>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { WrenchScrewdriverIcon, ClockIcon } from "@heroicons/vue/24/outline";
+import { computed } from "vue";
+import { ClockIcon } from "@heroicons/vue/24/outline";
 import { useServicesStore } from "@/stores/services";
 import { useGuildStore } from "@/stores/guild";
 import { useTimelineStore } from "@/stores/timeline";
-import { ServiceStatus, ServiceDeadlineType } from "@/types/service";
+import { useTimeline } from "@/composables/useTimeline";
+import { ServiceStatus } from "@/types/service";
+import { ScheduledEventType } from "@/types/timeline";
+import type { GameDate } from "@/types/timeline";
+import { getDaysDifference } from "@/utils/date-utils";
 import InfoButton from "@/components/common/InfoButton.vue";
 import Tooltip from "@/components/common/Tooltip.vue";
-
-// Emits
-const emit = defineEmits<{
-  "generate-services": [];
-  "force-resolution": [];
-  "open-help": [helpKey: string];
-}>();
 
 // Stores
 const servicesStore = useServicesStore();
 const guildStore = useGuildStore();
 const timelineStore = useTimelineStore();
-
-// State
-const isGenerating = ref(false);
+const { currentDate, dateUtils } = useTimeline();
 
 // Computed
 const guild = computed(() => guildStore.currentGuild);
@@ -136,7 +163,46 @@ const formattedCurrentDate = computed(() => timelineStore.formattedCurrentDate);
 
 const allServices = computed(() => {
   if (!guild.value) return [];
-  return servicesStore.servicesByGuild[guild.value.id] || [];
+  return servicesStore.getServicesForGuild(guild.value.id);
+});
+
+// Serviços expirando em breve (próximos 3 dias)
+const expiringServices = computed(() => {
+  const current = currentDate.value;
+  if (!current) return [];
+
+  return allServices.value.filter((service) => {
+    // Usar deadlineDate (GameDate) em vez de expiresAt (Date JavaScript)
+    if (!service.deadlineDate) return false;
+
+    if (
+      service.status !== ServiceStatus.DISPONIVEL &&
+      service.status !== ServiceStatus.ACEITO &&
+      service.status !== ServiceStatus.EM_ANDAMENTO
+    )
+      return false;
+
+    // Calcular diferença de dias usando as funções de GameDate
+    const daysUntilExpiration = dateUtils.getDaysDifference(
+      current,
+      service.deadlineDate
+    );
+
+    // Considerar expirando se for nos próximos 3 dias (incluindo hoje)
+    return daysUntilExpiration >= 0 && daysUntilExpiration <= 3;
+  });
+});
+
+// Eventos de timeline relacionados a serviços
+const { events } = useTimeline();
+const serviceEvents = computed(() => {
+  return events.value
+    .filter(
+      (event) =>
+        event.type === ScheduledEventType.NEW_SERVICES ||
+        event.type === ScheduledEventType.SERVICE_RESOLUTION
+    )
+    .slice(0, 5); // Mostrar apenas os próximos 5 eventos
 });
 
 const serviceStats = computed(() => {
@@ -149,25 +215,49 @@ const serviceStats = computed(() => {
         s.status === ServiceStatus.ACEITO ||
         s.status === ServiceStatus.EM_ANDAMENTO
     ).length,
-    expiring: services.filter(
-      (s) => s.deadline && s.deadline.type !== ServiceDeadlineType.SEM_PRAZO
+    completed: services.filter(
+      (s) =>
+        s.status === ServiceStatus.CONCLUIDO ||
+        s.status === ServiceStatus.FALHOU ||
+        s.status === ServiceStatus.RESOLVIDO_POR_OUTROS
     ).length,
-    completed: services.filter((s) => s.status === ServiceStatus.CONCLUIDO)
-      .length,
   };
 });
 
-// Functions
-const handleGenerateServices = async () => {
-  if (!guild.value) return;
+// Methods
+function getExpirationText(service: { deadlineDate?: GameDate }): string {
+  if (!service.deadlineDate) return "Sem prazo";
 
-  try {
-    isGenerating.value = true;
-    emit("generate-services");
-  } finally {
-    isGenerating.value = false;
-  }
-};
+  const current = currentDate.value;
+  if (!current) return "Data não disponível";
+
+  // Calcular diferença em dias usando GameDate
+  const daysUntilExpiration = getDaysDifference(current, service.deadlineDate);
+
+  if (daysUntilExpiration < 0) return "Expirado";
+  if (daysUntilExpiration === 0) return "Expira hoje";
+  if (daysUntilExpiration === 1) return "Expira amanhã";
+  return `Expira em ${daysUntilExpiration} dias`;
+}
+
+function formatValue(value: number): string {
+  return Number(value.toFixed(1)).toString();
+}
+
+function formatEventDate(date: GameDate): string {
+  return dateUtils.format(date);
+}
+
+function getDaysUntilEvent(date: GameDate): string {
+  if (!currentDate.value) return "";
+
+  const days = dateUtils.getDaysDifference(currentDate.value, date);
+
+  if (days < 0) return "Passou";
+  if (days === 0) return "Hoje";
+  if (days === 1) return "Amanhã";
+  return `Em ${days} dias`;
+}
 </script>
 
 <style scoped></style>
