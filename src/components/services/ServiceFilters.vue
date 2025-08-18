@@ -150,7 +150,7 @@
             placeholder="Valor"
             min="0"
             step="0.5"
-            class="filter-input flex-1"
+            class="filter-input flex-[2]"
           />
           <select
             :value="filters.rewardCurrency"
@@ -159,7 +159,7 @@
                 ($event.target as HTMLSelectElement).value
               )
             "
-            class="filter-select w-20"
+            class="filter-select flex-1"
           >
             <option value="">Todas</option>
             <option value="C$">C$</option>
