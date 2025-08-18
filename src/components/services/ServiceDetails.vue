@@ -11,12 +11,30 @@
           <component :is="contractorIcon" class="w-6 h-6 text-blue-400" />
         </div>
         <h2 class="text-2xl font-bold text-white mb-2">
-          {{ service.title || `Serviço ${service.id.slice(0, 8)}` }}
+          {{ `Serviço #${service.id.slice(-8).toUpperCase()}` }}
         </h2>
         <p class="text-gray-300 mb-2">
-          {{ contractorTypeLabel }} - {{ service.contractorName }}
+          <template v-if="service.contractorName">
+            {{ contractorTypeLabel }} - {{ service.contractorName }}
+          </template>
+          <template v-else>
+            {{ contractorTypeLabel }}
+          </template>
         </p>
       </div>
+    </div>
+
+    <!-- Descrição geral do serviço -->
+    <div
+      v-if="service.description"
+      class="mb-6 p-4 bg-blue-900/20 rounded-lg border-l-4 border-blue-400"
+    >
+      <h3 class="text-lg font-semibold text-blue-300 mb-2">
+        Descrição do Serviço
+      </h3>
+      <p class="text-blue-100 leading-relaxed">
+        {{ service.description }}
+      </p>
     </div>
 
     <!-- Grid principal de informações -->
@@ -66,6 +84,7 @@
           v-if="service.value"
           :value="service.value"
           :show-details="true"
+          :recurrence-count="0"
         />
       </div>
 
@@ -102,12 +121,6 @@
         <div>
           <span class="text-sm text-gray-400">Tipo:</span>
           <p class="text-white font-medium">{{ service.objective.type }}</p>
-        </div>
-        <div>
-          <span class="text-sm text-gray-400">Descrição:</span>
-          <p class="text-gray-200 leading-relaxed">
-            {{ service.objective.description }}
-          </p>
         </div>
 
         <!-- Detalhes específicos do objetivo -->
@@ -193,6 +206,58 @@
         >
           Reiniciar Testes
         </button>
+      </div>
+    </div>
+
+    <!-- Elementos Narrativos Adicionais -->
+    <div
+      v-if="hasNarrativeElements()"
+      class="bg-gray-800/50 rounded-lg p-6 mb-6"
+    >
+      <h3
+        class="text-lg font-semibold text-purple-300 mb-4 flex items-center gap-2"
+      >
+        <BookOpenIcon class="w-5 h-5" />
+        Elementos Narrativos
+      </h3>
+      <div class="space-y-4">
+        <div
+          v-if="service.origin"
+          class="p-3 bg-blue-900/30 rounded-lg border-l-4 border-blue-400"
+        >
+          <h4 class="text-blue-300 font-medium mb-1">Origem do Problema</h4>
+          <p class="text-gray-300 text-sm">{{ service.origin.description }}</p>
+        </div>
+
+        <div
+          v-if="service.complication"
+          class="p-3 bg-orange-900/30 rounded-lg border-l-4 border-orange-400"
+        >
+          <h4 class="text-orange-300 font-medium mb-1">Complicação</h4>
+          <p class="text-gray-300 text-sm">
+            {{ service.complication.description }}
+          </p>
+        </div>
+
+        <div
+          v-if="service.rival"
+          class="p-3 bg-red-900/30 rounded-lg border-l-4 border-red-400"
+        >
+          <h4 class="text-red-300 font-medium mb-1">Rival</h4>
+          <p class="text-gray-300 text-sm">
+            {{ service.rival.action }} - {{ service.rival.motivation }}
+          </p>
+        </div>
+
+        <div
+          v-if="service.additionalChallenge"
+          class="p-3 bg-purple-900/30 rounded-lg border-l-4 border-purple-400"
+        >
+          <h4 class="text-purple-300 font-medium mb-1">Desafio Adicional</h4>
+          <p class="text-gray-300 text-sm">
+            {{ service.additionalChallenge.description }}
+          </p>
+        </div>
       </div>
     </div>
 
@@ -291,6 +356,7 @@ import {
   TagIcon,
   BeakerIcon,
   CalendarIcon,
+  BookOpenIcon,
 } from "@heroicons/vue/24/outline";
 import type { Service } from "@/types/service";
 import {
@@ -489,15 +555,22 @@ const extractNDFromDifficulty = (difficulty: string): number => {
 const formatGameDate = (date: GameDate): string => {
   return `${date.day}/${date.month}/${date.year}`;
 };
+
+// Verificar se há elementos narrativos
+const hasNarrativeElements = () => {
+  if (!props.service) return false;
+  return !!(
+    props.service.origin ||
+    props.service.complication ||
+    props.service.rival ||
+    props.service.additionalChallenge
+  );
+};
 </script>
 
 <style scoped>
 .service-details {
-  /* Gradiente específico para detalhes de serviços */
-  background: linear-gradient(
-    135deg,
-    rgba(30, 58, 138, 0.3) 0%,
-    rgba(30, 64, 175, 0.2) 100%
-  );
+  /* Fundo sólido sem transparência */
+  background: #111827; /* gray-900 sólido */
 }
 </style>
