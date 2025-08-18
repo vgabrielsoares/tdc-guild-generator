@@ -2311,7 +2311,16 @@ export function generateServiceDescription(
   complication: string,
   connector: string = "para"
 ): string {
-  return `${action} ${connector} ${target.toLowerCase()}, mas ${complication.toLowerCase()}`;
+  // Formatar action: primeira letra maiúscula, resto minúsculo
+  const formattedAction = action.charAt(0).toUpperCase() + action.slice(1).toLowerCase();
+  
+  // Formatar target: remover primeira letra maiúscula (exceto se for nome próprio)
+  const formattedTarget = target.toLowerCase();
+  
+  // Formatar complication: remover primeira letra maiúscula
+  const formattedComplication = complication.toLowerCase();
+  
+  return `${formattedAction} ${connector} ${formattedTarget}, mas ${formattedComplication}`;
 }
 
 /**
@@ -2329,7 +2338,21 @@ export function generateSpecificServiceDescription(
     return generateServiceDescription(ruralType.result, target, complication, "para");
   }
   
-  return generateServiceDescription(action, target, complication, "para");
+  // Determinar conector baseado no tipo de ação
+  let connector = "para";
+  const actionLower = action.toLowerCase();
+  
+  if (actionLower.includes("limpar") || actionLower.includes("organizar") || actionLower.includes("pintar")) {
+    connector = "em";
+  } else if (actionLower.includes("cobrar") || actionLower.includes("criar") || actionLower.includes("ajudar")) {
+    connector = "para";
+  } else if (actionLower.includes("traduzir") || actionLower.includes("consertar") || actionLower.includes("preparar")) {
+    connector = "para";
+  } else if (actionLower.includes("trabalho")) {
+    connector = "para";
+  }
+  
+  return generateServiceDescription(action, target, complication, connector);
 }
 
 /**
