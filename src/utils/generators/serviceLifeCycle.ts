@@ -30,6 +30,20 @@ import {
 
 // ===== TIPOS ESPECÍFICOS PARA CICLO DE VIDA DOS SERVIÇOS =====
 
+/**
+ * Obtém a data atual do timeline ou retorna uma data padrão
+ */
+function getCurrentGameDate() {
+  try {
+    const { useTimelineStore } = require("@/stores/timeline");
+    const timelineStore = useTimelineStore();
+    return timelineStore.currentDate || createGameDate(1, 1, 2025);
+  } catch {
+    // Fallback se o store não estiver disponível
+    return createGameDate(1, 1, 2025);
+  }
+}
+
 export interface ServiceResolutionTime {
   signed: number; // dias para resolução de serviços assinados
   unsigned: number; // dias para resolução de serviços não assinados
@@ -191,14 +205,14 @@ export function applyServiceSignedResolution(services: Service[]): Service[] {
         return {
           ...service,
           status: ServiceStatus.RESOLVIDO_POR_OUTROS,
-          completedAt: createGameDate(1, 1, 2024), // TODO: usar data atual do jogo
+          completedAt: getCurrentGameDate(),
         };
 
       case ServiceResolution.RESOLVIDO_COM_RESSALVAS:
         return {
           ...service,
           status: ServiceStatus.RESOLVIDO_POR_OUTROS,
-          completedAt: createGameDate(1, 1, 2024), // TODO: usar data atual do jogo
+          completedAt: getCurrentGameDate(),
           // Poderia adicionar flag para ressalvas
         };
 
@@ -208,7 +222,7 @@ export function applyServiceSignedResolution(services: Service[]): Service[] {
           return {
             ...service,
             status: ServiceStatus.ANULADO,
-            canceledAt: createGameDate(1, 1, 2024), // TODO: usar data atual do jogo
+            canceledAt: getCurrentGameDate(),
             cancelReason: resolution.reason,
           };
         } else {
@@ -267,7 +281,7 @@ export function applyServiceUnsignedResolution(services: Service[]): Service[] {
           ? {
               ...service,
               status: ServiceStatus.RESOLVIDO_POR_OUTROS,
-              completedAt: createGameDate(1, 1, 2024), // TODO: usar data atual do jogo
+              completedAt: getCurrentGameDate(),
             }
           : service
       );
@@ -285,7 +299,7 @@ export function applyServiceUnsignedResolution(services: Service[]): Service[] {
           ? {
               ...service,
               status: ServiceStatus.RESOLVIDO_POR_OUTROS,
-              completedAt: createGameDate(1, 1, 2024), // TODO: usar data atual do jogo
+              completedAt: getCurrentGameDate(),
             }
           : service
       );
@@ -304,7 +318,7 @@ export function applyServiceUnsignedResolution(services: Service[]): Service[] {
           ? {
               ...service,
               status: ServiceStatus.RESOLVIDO_POR_OUTROS,
-              completedAt: createGameDate(1, 1, 2024), // TODO: usar data atual do jogo
+              completedAt: getCurrentGameDate(),
             }
           : service
       );
@@ -319,7 +333,7 @@ export function applyServiceUnsignedResolution(services: Service[]): Service[] {
           ? {
               ...service,
               status: ServiceStatus.RESOLVIDO_POR_OUTROS,
-              completedAt: createGameDate(1, 1, 2024), // TODO: usar data atual do jogo
+              completedAt: getCurrentGameDate(),
             }
           : service
       );
@@ -346,7 +360,7 @@ export function applyServiceUnsignedResolution(services: Service[]): Service[] {
           return {
             ...service,
             status: ServiceStatus.ANULADO,
-            canceledAt: createGameDate(1, 1, 2024), // TODO: usar data atual do jogo
+            canceledAt: getCurrentGameDate(),
             cancelReason: reason,
           };
         } else {
