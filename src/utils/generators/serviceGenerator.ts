@@ -748,8 +748,19 @@ export class ServiceGenerator {
    * Gera título descritivo para o serviço baseado no objetivo
    */
   private static generateServiceTitle(objective: ServiceObjective): string {
-    const baseTitle = objective.description || objective.type;
-    return `${baseTitle}: ${objective.action}`;
+    // Se a action existe, use ela como início + target (se existir)
+    if (objective.action) {
+      const actionPart = objective.action;
+      const targetPart = objective.target ? ` ${objective.target}` : "";
+      const complicationPart = objective.complication
+        ? `, mas ${objective.complication}`
+        : "";
+
+      return `${actionPart}${targetPart}${complicationPart}`;
+    }
+
+    // Fallback para description ou type se action não existir
+    return objective.description || objective.type;
   }
 
   /**
