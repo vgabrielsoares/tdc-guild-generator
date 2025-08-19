@@ -108,11 +108,15 @@ export const useServicesStore = defineStore("services", () => {
   const generateServices = async (guild: Guild, quantity?: number) => {
     isLoading.value = true;
     try {
-      // Usar a data atual da timeline da guilda em vez de data padrão
-      const timelineStore = useTimelineStore();
+      // Garantir que a timeline está inicializada para esta guilda
       timelineStore.setCurrentGuild(guild.id);
       const currentDate =
         timelineStore.currentGameDate || createGameDate(1, 1, 2025);
+
+      // Inicializar lifecycle manager se necessário
+      if (!lifecycleManager.value) {
+        initializeLifecycleManager(currentDate);
+      }
 
       const config = {
         guild,
@@ -136,7 +140,11 @@ export const useServicesStore = defineStore("services", () => {
         services.value.push(service);
       });
 
+      // Salvar alterações primeiro
       saveServicesToStorage();
+
+      // Aguardar um momento para garantir que o estado esteja sincronizado
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Agendar eventos de timeline após gerar serviços
       scheduleServiceEvents();
