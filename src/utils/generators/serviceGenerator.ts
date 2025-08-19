@@ -366,7 +366,7 @@ export class ServiceGenerator {
     // CRIAÇÃO DO SERVIÇO
     const service: Service = {
       id: serviceId,
-      title: "",
+      title: this.generateServiceTitle(objective),
       description: this.generateServiceDescription(objective),
       status: ServiceStatusEnum.DISPONIVEL,
       complexity: complexity,
@@ -843,6 +843,35 @@ export class ServiceGenerator {
     }
 
     return description;
+  }
+
+  /**
+   * Gera título conciso para o serviço
+   */
+  private static generateServiceTitle(objective: ServiceObjective): string {
+    // Mapear tipos de objetivo para títulos mais concisos
+    const titleMap: Record<string, string> = {
+      [ServiceObjectiveType.TREINAR_OU_ENSINAR]: "Treinamento",
+      [ServiceObjectiveType.RECRUTAR]: "Recrutamento",
+      [ServiceObjectiveType.CURAR_OU_RECUPERAR]: "Cura",
+      [ServiceObjectiveType.NEGOCIAR_OU_COAGIR]: "Negociação",
+      [ServiceObjectiveType.AUXILIAR_OU_CUIDAR]: "Assistência",
+      [ServiceObjectiveType.EXTRAIR_RECURSOS]: "Extração",
+      [ServiceObjectiveType.CONSTRUIR_CRIAR_OU_REPARAR]: "Construção",
+      [ServiceObjectiveType.SERVICOS_ESPECIFICOS]: "Serviço",
+      [ServiceObjectiveType.RELIGIOSO]: "Ritual",
+      [ServiceObjectiveType.MULTIPLO]: "Múltiplas Tarefas",
+    };
+
+    const baseTitle = titleMap[objective.type] || "Serviço";
+    
+    // Adicionar contexto do alvo se disponível
+    if (objective.target) {
+      const targetShort = objective.target.split(' ').slice(0, 2).join(' ');
+      return `${baseTitle}: ${targetShort}`;
+    }
+
+    return baseTitle;
   }
 
   // ===== MÉTODOS PRIVADOS DE APOIO =====
