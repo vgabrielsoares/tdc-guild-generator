@@ -58,10 +58,8 @@
               ? 'bg-amber-600 text-white shadow-lg'
               : 'bg-gray-700 text-gray-300 hover:bg-gray-600',
           ]"
-          disabled
-          title="Implementação futura"
         >
-          Serviços (0)
+          Serviços ({{ serviceEvents.length }})
         </button>
 
         <button
@@ -227,6 +225,15 @@ const contractEvents = computed(() => {
   );
 });
 
+const serviceEvents = computed(() => {
+  return events.value.filter((event) =>
+    [
+      ScheduledEventType.NEW_SERVICES,
+      ScheduledEventType.SERVICE_RESOLUTION,
+    ].includes(event.type)
+  );
+});
+
 // Computed - Eventos filtrados
 const filteredEvents = computed(() => {
   const sortedEvents = [...events.value].sort((a, b) => {
@@ -245,8 +252,9 @@ const filteredEvents = computed(() => {
         contractEvents.value.includes(event)
       );
     case "services":
-      // TODO: implementar filtro de serviços
-      return [];
+      return sortedEvents.filter((event) =>
+        serviceEvents.value.includes(event)
+      );
     case "members":
       // TODO: implementar filtro de membros
       return [];
