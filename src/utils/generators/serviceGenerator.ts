@@ -28,6 +28,7 @@ import type { GameDate } from "@/types/timeline";
 import type { RollModifier } from "@/types/tables";
 import { rollOnTable } from "@/utils/tableRoller";
 import { rollDice } from "@/utils/dice";
+import { findTableEntry } from "@/utils/table-operations";
 import {
   SERVICE_QUANTITY_TABLE,
   SERVICE_VISITOR_REDUCTION_TABLE,
@@ -209,11 +210,35 @@ export class ServiceGenerator {
       return config.quantity;
     }
 
-    // Passo 1: Rolar na tabela de quantidade disponível (1d20)
-    const quantityTableResult = rollOnTable(SERVICE_QUANTITY_TABLE);
+    // Passo 1: Obter dados específicos do tamanho da sede
+    const sizeBasedDice = getServiceDiceBySize(config.guild.structure.size);
 
-    // Passo 2: Extrair apenas a notação de dados da string
-    const quantityString = quantityTableResult.result.quantity;
+    // Passo 2: Rolar os dados do tamanho da sede
+    const sizeBasedResult = rollDice({
+      notation: sizeBasedDice,
+      context: "Service Size-Based Dice",
+      logRoll: true,
+    });
+
+    // Passo 3: Aplicar modificador de funcionários
+    const staffModifier = this.getStaffModifier(config.guild);
+
+    const modifiedResult = sizeBasedResult.result + staffModifier;
+
+    // Passo 4: Usar resultado modificado para acessar tabela de quantidade
+    const quantityTableEntry = findTableEntry(
+      SERVICE_QUANTITY_TABLE,
+      modifiedResult
+    );
+
+    if (!quantityTableEntry) {
+      throw new Error(
+        `Valor ${modifiedResult} fora do range da tabela de quantidade`
+      );
+    }
+
+    // Passo 5: Extrair e rolar dados da quantidade final
+    const quantityString = quantityTableEntry.quantity;
     const diceNotationMatch = quantityString.match(/(\d+d\d+(?:[+-]\d+)?)/);
 
     if (!diceNotationMatch) {
@@ -224,16 +249,13 @@ export class ServiceGenerator {
 
     const diceNotation = diceNotationMatch[1];
 
-    // Passo 3: Rolar os dados da quantidade
     const quantityDiceResult = rollDice({
       notation: diceNotation,
+      context: "Service Final Quantity Dice",
+      logRoll: true,
     });
 
-    // Passo 4: Aplicar modificador de funcionários ao resultado final
-    const finalQuantity = Math.max(
-      0,
-      quantityDiceResult.result + this.getStaffModifier(config.guild)
-    );
+    const finalQuantity = Math.max(0, quantityDiceResult.result);
 
     return finalQuantity;
   }
@@ -271,7 +293,12 @@ export class ServiceGenerator {
     const diceMatch = reductionText.match(/-(\d+d\d+(?:[+-]\d+)?)/);
     if (diceMatch) {
       const diceNotation = diceMatch[1];
-      const rollResult = rollDice({ notation: diceNotation });
+      const rollResult = rollDice({
+        notation: diceNotation,
+        context: "Service Visitor Reduction",
+        logRoll: true,
+      });
+
       return rollResult.result;
     }
 
@@ -283,7 +310,12 @@ export class ServiceGenerator {
    * Baseado em: "Modificadores por Condição"
    */
   private static getStaffModifier(guild: Guild): number {
-    const staffDescription = guild.staff.description || "";
+    if (!guild.staff) {
+      return 0;
+    }
+
+    const staffDescription =
+      guild.staff.employees || guild.staff.description || "";
 
     if (staffDescription.toLowerCase().includes("despreparados")) {
       return -1;
