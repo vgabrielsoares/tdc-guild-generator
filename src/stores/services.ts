@@ -138,6 +138,9 @@ export const useServicesStore = defineStore("services", () => {
 
       saveServicesToStorage();
 
+      // Agendar eventos de timeline após gerar serviços
+      scheduleServiceEvents();
+
       return servicesWithGuild;
     } finally {
       isLoading.value = false;
