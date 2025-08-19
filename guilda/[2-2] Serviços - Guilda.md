@@ -1032,18 +1032,18 @@ A ideia dos serviços é que eles sejam resolvidos com perícias ou com a criati
 
 | 1d20  | Dificuldade           | Recompensa     | Taxa de recorrência |
 | ----- | --------------------- | -------------- | ------------------- |
-| 1     | Muito Fácil (ND 10)   | 1d6 C$         | +0,5 C$             |
-| 2-3   | Fácil (ND 14)         | 3d4 C$         | +1 C$               |
-| 4-6   | Fácil (ND 15)         | 3d6 C$         | +2 C$               |
-| 7     | Fácil (ND 16)         | 3d8 C$         | +3 C$               |
-| 8-12  | Média (ND 17)         | 5d6 C$         | +5 C$               |
-| 13    | Média (ND 18)         | (1d3+1)\*10 C$ | +6 C$               |
-| 14    | Média (ND 19)         | (1d4+1)\*10 C$ | +7 C$               |
-| 15-16 | Difícil (ND 20)       | 3d4\*10 C$     | +10 C$              |
-| 17    | Difícil (ND 21)       | 4d4\*10 C$     | +12 C$              |
-| 18    | Desafiador (ND 22)    | 4d6\*10 C$     | +15 C$              |
-| 19    | Desafiador (ND 23)    | 4d8\*10 C$     | +17 C$              |
-| 20    | Muito Difícil (ND 25) | 2d4+1 PO$      | +25 C$              |
+| 1     | Muito Fácil (ND 10)   | 3d6 C$         | +3 C$               |
+| 2-3   | Fácil (ND 14)         | 3d8 C$         | +5 C$               |
+| 4-6   | Fácil (ND 15)         | 5d6 C$         | +6 C$               |
+| 7     | Fácil (ND 16)         | (1d3+1)\*10 C$ | +7 C$               |
+| 8-12  | Média (ND 17)         | (1d4+1)\*10 C$ | +10 C$              |
+| 13    | Média (ND 18)         | 3d4\*10 C$     | +12 C$              |
+| 14    | Média (ND 19)         | 4d4\*10 C$     | +15 C$              |
+| 15-16 | Difícil (ND 20)       | 4d6\*10 C$     | +20 C$              |
+| 17    | Difícil (ND 21)       | 4d8\*10 C$     | +25 C$              |
+| 18    | Desafiador (ND 22)    | 1d6 PO$        | +50 C$              |
+| 19    | Desafiador (ND 23)    | 2d6 PO$        | +75 C$              |
+| 20    | Muito Difícil (ND 25) | 3d6 PO$        | +1 PO$              |
 
 > **Lembrete:** 100 C$ = 1 PO$
 
