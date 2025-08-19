@@ -50,8 +50,8 @@ export const SERVICE_DIFFICULTY_TABLE: TableEntry<DifficultyResult>[] = [
     max: 1,
     result: {
       difficulty: ServiceDifficulty.MUITO_FACIL,
-      baseReward: "1d6 C$",
-      recurrence: "+0,5 C$",
+      baseReward: "3d6 C$",
+      recurrence: "+3 C$",
       description: "Tarefas simples que qualquer pessoa pode executar",
     },
   },
@@ -60,8 +60,8 @@ export const SERVICE_DIFFICULTY_TABLE: TableEntry<DifficultyResult>[] = [
     max: 3,
     result: {
       difficulty: ServiceDifficulty.FACIL_ND14,
-      baseReward: "3d4 C$",
-      recurrence: "+1 C$",
+      baseReward: "3d8 C$",
+      recurrence: "+5 C$",
       description: "Tarefas básicas que requerem alguma habilidade",
     },
   },
@@ -70,8 +70,8 @@ export const SERVICE_DIFFICULTY_TABLE: TableEntry<DifficultyResult>[] = [
     max: 6,
     result: {
       difficulty: ServiceDifficulty.FACIL_ND15,
-      baseReward: "3d6 C$",
-      recurrence: "+2 C$",
+      baseReward: "5d6 C$",
+      recurrence: "+6 C$",
       description: "Trabalhos fáceis com pequenos desafios",
     },
   },
@@ -80,8 +80,8 @@ export const SERVICE_DIFFICULTY_TABLE: TableEntry<DifficultyResult>[] = [
     max: 7,
     result: {
       difficulty: ServiceDifficulty.FACIL_ND16,
-      baseReward: "3d8 C$",
-      recurrence: "+3 C$",
+      baseReward: "(1d3+1)*10 C$",
+      recurrence: "+7 C$",
       description: "Serviços que exigem competência específica",
     },
   },
@@ -90,8 +90,8 @@ export const SERVICE_DIFFICULTY_TABLE: TableEntry<DifficultyResult>[] = [
     max: 12,
     result: {
       difficulty: ServiceDifficulty.MEDIA_ND17,
-      baseReward: "5d6 C$",
-      recurrence: "+5 C$",
+      baseReward: "(1d4+1)*10 C$",
+      recurrence: "+10 C$",
       description: "Trabalhos de dificuldade moderada",
     },
   },
@@ -100,8 +100,8 @@ export const SERVICE_DIFFICULTY_TABLE: TableEntry<DifficultyResult>[] = [
     max: 13,
     result: {
       difficulty: ServiceDifficulty.MEDIA_ND18,
-      baseReward: "(1d3+1)*10 C$",
-      recurrence: "+6 C$",
+      baseReward: "3d4*10 C$",
+      recurrence: "+12 C$",
       description: "Serviços que demandam experiência",
     },
   },
@@ -110,8 +110,8 @@ export const SERVICE_DIFFICULTY_TABLE: TableEntry<DifficultyResult>[] = [
     max: 14,
     result: {
       difficulty: ServiceDifficulty.MEDIA_ND19,
-      baseReward: "(1d4+1)*10 C$",
-      recurrence: "+7 C$",
+      baseReward: "4d4*10 C$",
+      recurrence: "+15 C$",
       description: "Tarefas complexas com múltiplos aspectos",
     },
   },
@@ -120,8 +120,8 @@ export const SERVICE_DIFFICULTY_TABLE: TableEntry<DifficultyResult>[] = [
     max: 16,
     result: {
       difficulty: ServiceDifficulty.DIFICIL_ND20,
-      baseReward: "3d4*10 C$",
-      recurrence: "+10 C$",
+      baseReward: "4d6*10 C$",
+      recurrence: "+20 C$",
       description: "Trabalhos difíceis que testam habilidades",
     },
   },
@@ -130,8 +130,8 @@ export const SERVICE_DIFFICULTY_TABLE: TableEntry<DifficultyResult>[] = [
     max: 17,
     result: {
       difficulty: ServiceDifficulty.DIFICIL_ND21,
-      baseReward: "4d4*10 C$",
-      recurrence: "+12 C$",
+      baseReward: "4d8*10 C$",
+      recurrence: "+25 C$",
       description: "Serviços altamente especializados",
     },
   },
@@ -140,8 +140,8 @@ export const SERVICE_DIFFICULTY_TABLE: TableEntry<DifficultyResult>[] = [
     max: 18,
     result: {
       difficulty: ServiceDifficulty.DESAFIADOR_ND22,
-      baseReward: "4d6*10 C$",
-      recurrence: "+15 C$",
+      baseReward: "1d6 PO$",
+      recurrence: "+50 C$",
       description: "Desafios que poucos conseguem superar",
     },
   },
@@ -150,8 +150,8 @@ export const SERVICE_DIFFICULTY_TABLE: TableEntry<DifficultyResult>[] = [
     max: 19,
     result: {
       difficulty: ServiceDifficulty.DESAFIADOR_ND23,
-      baseReward: "4d8*10 C$",
-      recurrence: "+17 C$",
+      baseReward: "2d6 PO$",
+      recurrence: "+75 C$",
       description: "Trabalhos de extrema dificuldade",
     },
   },
@@ -160,8 +160,8 @@ export const SERVICE_DIFFICULTY_TABLE: TableEntry<DifficultyResult>[] = [
     max: 20,
     result: {
       difficulty: ServiceDifficulty.MUITO_DIFICIL,
-      baseReward: "2d4+1 PO$",
-      recurrence: "+25 C$",
+      baseReward: "3d6 PO$",
+      recurrence: "+1 PO$",
       description: "Tarefas quase impossíveis para pessoas comuns",
     },
   },
@@ -499,8 +499,15 @@ export function calculateServiceReward(
  * Função auxiliar para parsear a recorrência
  */
 function parseRecurrence(recurrence: string): number {
-  const recurrenceMatch = recurrence.match(/\+([0-9,]+)\s+C\$/);
-  return recurrenceMatch ? parseFloat(recurrenceMatch[1].replace(",", ".")) : 0;
+  // Para "+1 PO$", converter para equivalente em C$ (1 PO$ = 100 C$)
+  const poMatch = recurrence.match(/\+([0-9,]+)\s+PO\$/);
+  if (poMatch) {
+    return parseFloat(poMatch[1].replace(",", ".")) * 100; // Converter PO$ para C$
+  }
+
+  // Para valores em C$
+  const cMatch = recurrence.match(/\+([0-9,]+)\s+C\$/);
+  return cMatch ? parseFloat(cMatch[1].replace(",", ".")) : 0;
 }
 
 /**

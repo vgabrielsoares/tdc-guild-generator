@@ -58,16 +58,16 @@ describe("SERVICE_DIFFICULTY_TABLE", () => {
     it("deve retornar 'Muito Fácil (ND 10)' para rolagem 1", () => {
       const entry = SERVICE_DIFFICULTY_TABLE.find(e => e.min <= 1 && e.max >= 1);
       expect(entry?.result.difficulty).toBe(ServiceDifficulty.MUITO_FACIL);
-      expect(entry?.result.baseReward).toBe("1d6 C$");
-      expect(entry?.result.recurrence).toBe("+0,5 C$");
+      expect(entry?.result.baseReward).toBe("3d6 C$");
+      expect(entry?.result.recurrence).toBe("+3 C$");
     });
 
     it("deve retornar 'Fácil (ND 14)' para rolagens 2-3", () => {
       [2, 3].forEach(roll => {
         const entry = SERVICE_DIFFICULTY_TABLE.find(e => e.min <= roll && e.max >= roll);
         expect(entry?.result.difficulty).toBe(ServiceDifficulty.FACIL_ND14);
-        expect(entry?.result.baseReward).toBe("3d4 C$");
-        expect(entry?.result.recurrence).toBe("+1 C$");
+        expect(entry?.result.baseReward).toBe("3d8 C$");
+        expect(entry?.result.recurrence).toBe("+5 C$");
       });
     });
 
@@ -75,89 +75,95 @@ describe("SERVICE_DIFFICULTY_TABLE", () => {
       [4, 5, 6].forEach(roll => {
         const entry = SERVICE_DIFFICULTY_TABLE.find(e => e.min <= roll && e.max >= roll);
         expect(entry?.result.difficulty).toBe(ServiceDifficulty.FACIL_ND15);
-        expect(entry?.result.baseReward).toBe("3d6 C$");
-        expect(entry?.result.recurrence).toBe("+2 C$");
+        expect(entry?.result.baseReward).toBe("5d6 C$");
+        expect(entry?.result.recurrence).toBe("+6 C$");
       });
     });
 
     it("deve retornar 'Fácil (ND 16)' para rolagem 7", () => {
       const entry = SERVICE_DIFFICULTY_TABLE.find(e => e.min <= 7 && e.max >= 7);
       expect(entry?.result.difficulty).toBe(ServiceDifficulty.FACIL_ND16);
-      expect(entry?.result.baseReward).toBe("3d8 C$");
-      expect(entry?.result.recurrence).toBe("+3 C$");
+      expect(entry?.result.baseReward).toBe("(1d3+1)*10 C$");
+      expect(entry?.result.recurrence).toBe("+7 C$");
     });
 
     it("deve retornar 'Média (ND 17)' para rolagens 8-12", () => {
       [8, 9, 10, 11, 12].forEach(roll => {
         const entry = SERVICE_DIFFICULTY_TABLE.find(e => e.min <= roll && e.max >= roll);
         expect(entry?.result.difficulty).toBe(ServiceDifficulty.MEDIA_ND17);
-        expect(entry?.result.baseReward).toBe("5d6 C$");
-        expect(entry?.result.recurrence).toBe("+5 C$");
+        expect(entry?.result.baseReward).toBe("(1d4+1)*10 C$");
+        expect(entry?.result.recurrence).toBe("+10 C$");
       });
     });
 
     it("deve retornar 'Média (ND 18)' para rolagem 13", () => {
       const entry = SERVICE_DIFFICULTY_TABLE.find(e => e.min <= 13 && e.max >= 13);
       expect(entry?.result.difficulty).toBe(ServiceDifficulty.MEDIA_ND18);
-      expect(entry?.result.baseReward).toBe("(1d3+1)*10 C$");
-      expect(entry?.result.recurrence).toBe("+6 C$");
+      expect(entry?.result.baseReward).toBe("3d4*10 C$");
+      expect(entry?.result.recurrence).toBe("+12 C$");
     });
 
     it("deve retornar 'Média (ND 19)' para rolagem 14", () => {
       const entry = SERVICE_DIFFICULTY_TABLE.find(e => e.min <= 14 && e.max >= 14);
       expect(entry?.result.difficulty).toBe(ServiceDifficulty.MEDIA_ND19);
-      expect(entry?.result.baseReward).toBe("(1d4+1)*10 C$");
-      expect(entry?.result.recurrence).toBe("+7 C$");
+      expect(entry?.result.baseReward).toBe("4d4*10 C$");
+      expect(entry?.result.recurrence).toBe("+15 C$");
     });
 
     it("deve retornar 'Difícil (ND 20)' para rolagens 15-16", () => {
       [15, 16].forEach(roll => {
         const entry = SERVICE_DIFFICULTY_TABLE.find(e => e.min <= roll && e.max >= roll);
         expect(entry?.result.difficulty).toBe(ServiceDifficulty.DIFICIL_ND20);
-        expect(entry?.result.baseReward).toBe("3d4*10 C$");
-        expect(entry?.result.recurrence).toBe("+10 C$");
+        expect(entry?.result.baseReward).toBe("4d6*10 C$");
+        expect(entry?.result.recurrence).toBe("+20 C$");
       });
     });
 
     it("deve retornar 'Difícil (ND 21)' para rolagem 17", () => {
       const entry = SERVICE_DIFFICULTY_TABLE.find(e => e.min <= 17 && e.max >= 17);
       expect(entry?.result.difficulty).toBe(ServiceDifficulty.DIFICIL_ND21);
-      expect(entry?.result.baseReward).toBe("4d4*10 C$");
-      expect(entry?.result.recurrence).toBe("+12 C$");
+      expect(entry?.result.baseReward).toBe("4d8*10 C$");
+      expect(entry?.result.recurrence).toBe("+25 C$");
     });
 
     it("deve retornar 'Desafiador (ND 22)' para rolagem 18", () => {
       const entry = SERVICE_DIFFICULTY_TABLE.find(e => e.min <= 18 && e.max >= 18);
       expect(entry?.result.difficulty).toBe(ServiceDifficulty.DESAFIADOR_ND22);
-      expect(entry?.result.baseReward).toBe("4d6*10 C$");
-      expect(entry?.result.recurrence).toBe("+15 C$");
+      expect(entry?.result.baseReward).toBe("1d6 PO$");
+      expect(entry?.result.recurrence).toBe("+50 C$");
     });
 
     it("deve retornar 'Desafiador (ND 23)' para rolagem 19", () => {
       const entry = SERVICE_DIFFICULTY_TABLE.find(e => e.min <= 19 && e.max >= 19);
       expect(entry?.result.difficulty).toBe(ServiceDifficulty.DESAFIADOR_ND23);
-      expect(entry?.result.baseReward).toBe("4d8*10 C$");
-      expect(entry?.result.recurrence).toBe("+17 C$");
+      expect(entry?.result.baseReward).toBe("2d6 PO$");
+      expect(entry?.result.recurrence).toBe("+75 C$");
     });
 
     it("deve retornar 'Muito Difícil (ND 25)' para rolagem 20", () => {
       const entry = SERVICE_DIFFICULTY_TABLE.find(e => e.min <= 20 && e.max >= 20);
       expect(entry?.result.difficulty).toBe(ServiceDifficulty.MUITO_DIFICIL);
-      expect(entry?.result.baseReward).toBe("2d4+1 PO$");
-      expect(entry?.result.recurrence).toBe("+25 C$");
+      expect(entry?.result.baseReward).toBe("3d6 PO$");
+      expect(entry?.result.recurrence).toBe("+1 PO$");
     });
   });
 
   describe("Progressão de Recompensas", () => {
     it("deve ter progressão crescente de recorrência", () => {
       const recurrenceValues = SERVICE_DIFFICULTY_TABLE.map(entry => {
-        const match = entry.result.recurrence.match(/\+([0-9,]+)/);
-        return match ? parseFloat(match[1].replace(',', '.')) : 0;
+        // Usar a mesma lógica de parseRecurrence para consistência
+        const poMatch = entry.result.recurrence.match(/\+([0-9,]+)\s+PO\$/);
+        if (poMatch) {
+          return parseFloat(poMatch[1].replace(",", ".")) * 100; // Converter PO$ para C$
+        }
+        
+        const cMatch = entry.result.recurrence.match(/\+([0-9,]+)\s+C\$/);
+        return cMatch ? parseFloat(cMatch[1].replace(",", ".")) : 0;
       });
       
-      // Verificar que valores são crescentes (com algumas exceções por ranges)
+      // Verificar que temos os valores corretos
       const uniqueValues = [...new Set(recurrenceValues)].sort((a, b) => a - b);
-      expect(uniqueValues).toEqual([0.5, 1, 2, 3, 5, 6, 7, 10, 12, 15, 17, 25]);
+      expect(uniqueValues).toEqual([3, 5, 6, 7, 10, 12, 15, 20, 25, 50, 75, 100]); // 100 = 1 PO$ convertido
     });
 
     it("deve ter formatos de recompensa válidos", () => {
@@ -364,35 +370,35 @@ describe("calculateServiceReward", () => {
     it("deve calcular corretamente recompensa para Muito Fácil", () => {
       const reward = calculateServiceReward(ServiceDifficulty.MUITO_FACIL);
       
-      expect(reward.baseDice).toBe("1d6 C$");
+      expect(reward.baseDice).toBe("3d6 C$");
       expect(reward.currency).toBe("C$");
-      expect(reward.recurrenceBonus).toBe(0.5);
-      expect(reward.amount).toBeGreaterThan(0);
-      expect(reward.amount).toBeLessThanOrEqual(6);
+      expect(reward.recurrenceBonus).toBe(3);
+      expect(reward.amount).toBeGreaterThan(2); // Mínimo 3d6 = 3
+      expect(reward.amount).toBeLessThanOrEqual(18); // Máximo 3d6 = 18
     });
 
     it("deve calcular corretamente recompensa para Muito Difícil", () => {
       const reward = calculateServiceReward(ServiceDifficulty.MUITO_DIFICIL);
       
-      expect(reward.baseDice).toBe("2d4+1 PO$");
+      expect(reward.baseDice).toBe("3d6 PO$");
       expect(reward.currency).toBe("PO$");
-      expect(reward.recurrenceBonus).toBe(25);
-      expect(reward.amount).toBeGreaterThan(2); // Mínimo 2d4+1 = 3
-      expect(reward.amount).toBeLessThanOrEqual(9); // Máximo 2d4+1 = 9
+      expect(reward.recurrenceBonus).toBe(100); // "+1 PO$" = 100 C$
+      expect(reward.amount).toBeGreaterThan(2); // Mínimo 3d6 = 3
+      expect(reward.amount).toBeLessThanOrEqual(18); // Máximo 3d6 = 18
     });
 
     it("deve calcular corretamente formatos complexos", () => {
       const rewardND18 = calculateServiceReward(ServiceDifficulty.MEDIA_ND18);
-      expect(rewardND18.baseDice).toBe("(1d3+1)*10 C$");
+      expect(rewardND18.baseDice).toBe("3d4*10 C$");
       expect(rewardND18.currency).toBe("C$");
-      expect(rewardND18.amount).toBeGreaterThanOrEqual(20); // (1+1)*10 = 20
-      expect(rewardND18.amount).toBeLessThanOrEqual(40); // (3+1)*10 = 40
+      expect(rewardND18.amount).toBeGreaterThanOrEqual(30); // (3*1)*10 = 30 mínimo
+      expect(rewardND18.amount).toBeLessThanOrEqual(120); // (3*4)*10 = 120 máximo
 
       const rewardND20 = calculateServiceReward(ServiceDifficulty.DIFICIL_ND20);
-      expect(rewardND20.baseDice).toBe("3d4*10 C$");
+      expect(rewardND20.baseDice).toBe("4d6*10 C$");
       expect(rewardND20.currency).toBe("C$");
-      expect(rewardND20.amount).toBeGreaterThanOrEqual(30); // 3*1*10 = 30
-      expect(rewardND20.amount).toBeLessThanOrEqual(120); // 3*4*10 = 120
+      expect(rewardND20.amount).toBeGreaterThanOrEqual(40); // 4*1*10 = 40 mínimo
+      expect(rewardND20.amount).toBeLessThanOrEqual(240); // 4*6*10 = 240 máximo
     });
   });
 });
