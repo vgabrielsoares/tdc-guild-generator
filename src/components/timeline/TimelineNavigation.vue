@@ -339,9 +339,15 @@ async function initializeTimeline() {
     return;
   }
 
+  // Aguardar um tick para garantir que a timeline esteja totalmente inicializada
+  await new Promise((resolve) => setTimeout(resolve, 10));
+
   // Gerar contratos e serviços iniciais de uma vez
   try {
-    contractsStore.generateContracts();
+    // Primeiro gerar contratos
+    await contractsStore.generateContracts();
+
+    // Depois gerar serviços
     await servicesStore.generateServices(currentGuild);
 
     // Salvar a guilda no histórico
@@ -350,7 +356,7 @@ async function initializeTimeline() {
     // Bloquear a guilda
     guildStore.toggleGuildLock(currentGuild.id);
   } catch (error) {
-    // Erro tratado pelos stores individuais
+    // Erro tratado pelos stores individuais - adicionar log se necessário
   }
 }
 
