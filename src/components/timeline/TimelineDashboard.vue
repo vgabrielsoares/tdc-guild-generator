@@ -140,6 +140,7 @@ import { computed } from "vue";
 import { useTimeline } from "@/composables/useTimeline";
 import { useContractsStore } from "@/stores/contracts";
 import { useServicesStore } from "@/stores/services";
+import { useGuildStore } from "@/stores/guild";
 import { ServiceStatus } from "@/types/service";
 import InfoButton from "@/components/common/InfoButton.vue";
 import Tooltip from "@/components/common/Tooltip.vue";
@@ -158,19 +159,24 @@ const { currentDate, formattedDate, daysUntilNext, events, dateUtils } =
 
 const contractsStore = useContractsStore();
 const servicesStore = useServicesStore();
+const guildStore = useGuildStore();
 
 // Computed - Estatísticas por módulo
 const moduleStats = computed(() => {
   const contractStats = contractsStore.contractStats;
+  const currentGuild = guildStore.currentGuild;
 
-  // Calcular serviços ativos (disponíveis + aceitos + em andamento)
-  const activeServicesCount = servicesStore.services.filter(
-    (service) =>
-      service.status === ServiceStatus.DISPONIVEL ||
-      service.status === ServiceStatus.ACEITO ||
-      service.status === ServiceStatus.EM_ANDAMENTO ||
-      service.status === ServiceStatus.ACEITO_POR_OUTROS
-  ).length;
+  // Calcular serviços ativos APENAS da guilda atual
+  const activeServicesCount = currentGuild
+    ? servicesStore.services.filter(
+        (service) =>
+          service.guildId === currentGuild.id &&
+          (service.status === ServiceStatus.DISPONIVEL ||
+            service.status === ServiceStatus.ACEITO ||
+            service.status === ServiceStatus.EM_ANDAMENTO ||
+            service.status === ServiceStatus.ACEITO_POR_OUTROS)
+      ).length
+    : 0;
 
   return {
     contracts: {
