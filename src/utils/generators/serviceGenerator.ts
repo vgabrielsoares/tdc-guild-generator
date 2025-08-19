@@ -28,6 +28,7 @@ import type { GameDate } from "@/types/timeline";
 import type { RollModifier } from "@/types/tables";
 import { rollOnTable } from "@/utils/tableRoller";
 import { rollDice } from "@/utils/dice";
+import { findTableEntry } from "@/utils/table-operations";
 import {
   SERVICE_QUANTITY_TABLE,
   SERVICE_VISITOR_REDUCTION_TABLE,
@@ -209,11 +210,35 @@ export class ServiceGenerator {
       return config.quantity;
     }
 
-    // Passo 1: Rolar na tabela de quantidade disponível (1d20)
-    const quantityTableResult = rollOnTable(SERVICE_QUANTITY_TABLE);
+    // Passo 1: Obter dados específicos do tamanho da sede
+    const sizeBasedDice = getServiceDiceBySize(config.guild.structure.size);
 
-    // Passo 2: Extrair apenas a notação de dados da string
-    const quantityString = quantityTableResult.result.quantity;
+    // Passo 2: Rolar os dados do tamanho da sede
+    const sizeBasedResult = rollDice({
+      notation: sizeBasedDice,
+      context: "Service Size-Based Dice",
+      logRoll: true,
+    });
+
+    // Passo 3: Aplicar modificador de funcionários
+    const staffModifier = this.getStaffModifier(config.guild);
+
+    const modifiedResult = sizeBasedResult.result + staffModifier;
+
+    // Passo 4: Usar resultado modificado para acessar tabela de quantidade
+    const quantityTableEntry = findTableEntry(
+      SERVICE_QUANTITY_TABLE,
+      modifiedResult
+    );
+
+    if (!quantityTableEntry) {
+      throw new Error(
+        `Valor ${modifiedResult} fora do range da tabela de quantidade`
+      );
+    }
+
+    // Passo 5: Extrair e rolar dados da quantidade final
+    const quantityString = quantityTableEntry.quantity;
     const diceNotationMatch = quantityString.match(/(\d+d\d+(?:[+-]\d+)?)/);
 
     if (!diceNotationMatch) {
@@ -224,16 +249,13 @@ export class ServiceGenerator {
 
     const diceNotation = diceNotationMatch[1];
 
-    // Passo 3: Rolar os dados da quantidade
     const quantityDiceResult = rollDice({
       notation: diceNotation,
+      context: "Service Final Quantity Dice",
+      logRoll: true,
     });
 
-    // Passo 4: Aplicar modificador de funcionários ao resultado final
-    const finalQuantity = Math.max(
-      0,
-      quantityDiceResult.result + this.getStaffModifier(config.guild)
-    );
+    const finalQuantity = Math.max(0, quantityDiceResult.result);
 
     return finalQuantity;
   }
@@ -271,7 +293,12 @@ export class ServiceGenerator {
     const diceMatch = reductionText.match(/-(\d+d\d+(?:[+-]\d+)?)/);
     if (diceMatch) {
       const diceNotation = diceMatch[1];
-      const rollResult = rollDice({ notation: diceNotation });
+      const rollResult = rollDice({
+        notation: diceNotation,
+        context: "Service Visitor Reduction",
+        logRoll: true,
+      });
+
       return rollResult.result;
     }
 
@@ -283,7 +310,12 @@ export class ServiceGenerator {
    * Baseado em: "Modificadores por Condição"
    */
   private static getStaffModifier(guild: Guild): number {
-    const staffDescription = guild.staff.description || "";
+    if (!guild.staff) {
+      return 0;
+    }
+
+    const staffDescription =
+      guild.staff.employees || guild.staff.description || "";
 
     if (staffDescription.toLowerCase().includes("despreparados")) {
       return -1;
@@ -335,11 +367,7 @@ export class ServiceGenerator {
     const service: Service = {
       id: serviceId,
       title: this.generateServiceTitle(objective),
-      description: this.generateServiceDescription(
-        objective,
-        contractor,
-        complication
-      ),
+      description: this.generateServiceDescription(objective),
       status: ServiceStatusEnum.DISPONIVEL,
       complexity: complexity,
       difficulty: value.difficulty,
@@ -420,6 +448,25 @@ export class ServiceGenerator {
       };
     }
 
+    // Processar dados se houver notação de dados
+    let processedValue = deadlineText;
+
+    // Verificar se tem notação de dados (ex: "1d4 dias", "1d6+1 dias")
+    const diceMatch = deadlineText.match(/(\d+d\d+(?:[+-]\d+)?)/);
+    if (diceMatch) {
+      try {
+        const rollResult = rollDice({ notation: diceMatch[1] });
+        // Substituir a notação pelo resultado
+        processedValue = deadlineText.replace(
+          diceMatch[1],
+          rollResult.result.toString()
+        );
+      } catch {
+        // Em caso de erro, manter o texto original
+        processedValue = deadlineText;
+      }
+    }
+
     // Determinar tipo baseado no texto
     const type = deadlineText.includes("semana")
       ? DeadlineTypeEnum.SEMANAS
@@ -427,7 +474,7 @@ export class ServiceGenerator {
 
     return {
       type,
-      value: deadlineText,
+      value: processedValue,
     };
   }
 
@@ -456,25 +503,30 @@ export class ServiceGenerator {
     // ETAPA 2: Calcular recompensa atual
     let rewardAmount = 0;
     try {
-      // Extrair notação de dados da string (ex: "1d6 C$" -> "1d6")
-      const diceMatch = rewardRoll.match(/(\d+d\d+(?:[+-]\d+)?)/);
-      if (diceMatch) {
-        const rollResult = rollDice({ notation: diceMatch[1] });
-        rewardAmount = rollResult.result;
+      // PRIMEIRO: Para recompensas multiplicadas com parênteses como "(1d4+1)*10 C$"
+      const multiplierWithParentheses = rewardRoll.match(
+        /\((\d+d\d+(?:[+-]\d+)?)\)\*(\d+)/
+      );
+      if (multiplierWithParentheses) {
+        const baseRoll = rollDice({ notation: multiplierWithParentheses[1] });
+        const multiplier = parseInt(multiplierWithParentheses[2]);
+        rewardAmount = baseRoll.result * multiplier;
       } else {
-        // Para recompensas fixas como "(1d3+1)*10 C$"
-        const multiplierMatch = rewardRoll.match(
-          /\((\d+d\d+(?:[+-]\d+)?)\)\*(\d+)/
+        // SEGUNDO: Para recompensas multiplicadas sem parênteses como "4d8*10 C$"
+        const multiplierWithoutParentheses = rewardRoll.match(
+          /(\d+d\d+(?:[+-]\d+)?)\*(\d+)/
         );
-        if (multiplierMatch) {
-          const baseRoll = rollDice({ notation: multiplierMatch[1] });
-          const multiplier = parseInt(multiplierMatch[2]);
+        if (multiplierWithoutParentheses) {
+          const baseRoll = rollDice({
+            notation: multiplierWithoutParentheses[1],
+          });
+          const multiplier = parseInt(multiplierWithoutParentheses[2]);
           rewardAmount = baseRoll.result * multiplier;
         } else {
-          // Para recompensas simples como "3d4 C$"
-          const simpleMatch = rewardRoll.match(/(\d+d\d+)/);
-          if (simpleMatch) {
-            const rollResult = rollDice({ notation: simpleMatch[1] });
+          // TERCEIRO: Para recompensas normais como "1d6 C$" ou "3d4 C$"
+          const diceMatch = rewardRoll.match(/(\d+d\d+(?:[+-]\d+)?)/);
+          if (diceMatch) {
+            const rollResult = rollDice({ notation: diceMatch[1] });
             rewardAmount = rollResult.result;
           } else {
             // Fallback para casos não cobertos
@@ -745,34 +797,81 @@ export class ServiceGenerator {
   }
 
   /**
-   * Gera título descritivo para o serviço baseado no objetivo
-   */
-  private static generateServiceTitle(objective: ServiceObjective): string {
-    const baseTitle = objective.description || objective.type;
-    return `${baseTitle}: ${objective.action}`;
-  }
-
-  /**
    * Gera descrição narrativa completa do serviço
    */
   private static generateServiceDescription(
-    objective: ServiceObjective,
-    contractor: { type: ServiceContractorType; name?: string },
-    complication?: ServiceComplication
+    objective: ServiceObjective
   ): string {
-    let description = `${objective.action} ${objective.target}`;
+    // Usar o enum como base, com ajustes mínimos para casos especiais
+    let mainVerb: string = objective.type;
 
-    if (objective.complication) {
-      description += `, mas ${objective.complication}`;
+    // Ajustes específicos apenas quando necessário
+    if (objective.type === ServiceObjectiveType.EXTRAIR_RECURSOS) {
+      mainVerb = "Extrair recursos de";
+    } else if (objective.type === ServiceObjectiveType.SERVICOS_ESPECIFICOS) {
+      mainVerb = "Executar";
+    } else if (objective.type === ServiceObjectiveType.RELIGIOSO) {
+      mainVerb = "Realizar";
+    } else if (objective.type === ServiceObjectiveType.MULTIPLO) {
+      mainVerb = "Executar";
     }
 
-    description += `. Contratante: ${contractor.name || contractor.type}`;
+    // Determinar conectivo baseado no tipo de objetivo
+    let connector = "para";
+    const objectiveTypeLower = objective.type.toLowerCase();
 
-    if (complication) {
-      description += `. Complicação: ${complication.description}`;
+    // Usar "em" para contextos que indicam local/situação específicos
+    if (
+      objectiveTypeLower.includes("extrair") ||
+      objectiveTypeLower.includes("construir") ||
+      objectiveTypeLower.includes("religioso")
+    ) {
+      connector = "em";
+    }
+
+    // Formatar componentes
+    const action = objective.action.toLowerCase(); // O que do resultado da tabela
+    const target = objective.target.toLowerCase(); // Para quem/onde
+
+    // Construir descrição base
+    let description = `${mainVerb} ${action} ${connector} ${target}`;
+
+    // Adicionar complicação se houver
+    if (objective.complication) {
+      const complication = objective.complication.toLowerCase();
+      description += `, mas ${complication}`;
     }
 
     return description;
+  }
+
+  /**
+   * Gera título conciso para o serviço
+   */
+  private static generateServiceTitle(objective: ServiceObjective): string {
+    // Mapear tipos de objetivo para títulos mais concisos
+    const titleMap: Record<string, string> = {
+      [ServiceObjectiveType.TREINAR_OU_ENSINAR]: "Treinamento",
+      [ServiceObjectiveType.RECRUTAR]: "Recrutamento",
+      [ServiceObjectiveType.CURAR_OU_RECUPERAR]: "Cura",
+      [ServiceObjectiveType.NEGOCIAR_OU_COAGIR]: "Negociação",
+      [ServiceObjectiveType.AUXILIAR_OU_CUIDAR]: "Assistência",
+      [ServiceObjectiveType.EXTRAIR_RECURSOS]: "Extração",
+      [ServiceObjectiveType.CONSTRUIR_CRIAR_OU_REPARAR]: "Construção",
+      [ServiceObjectiveType.SERVICOS_ESPECIFICOS]: "Serviço",
+      [ServiceObjectiveType.RELIGIOSO]: "Ritual",
+      [ServiceObjectiveType.MULTIPLO]: "Múltiplas Tarefas",
+    };
+
+    const baseTitle = titleMap[objective.type] || "Serviço";
+    
+    // Adicionar contexto do alvo se disponível
+    if (objective.target) {
+      const targetShort = objective.target.split(' ').slice(0, 2).join(' ');
+      return `${baseTitle}: ${targetShort}`;
+    }
+
+    return baseTitle;
   }
 
   // ===== MÉTODOS PRIVADOS DE APOIO =====
@@ -882,10 +981,11 @@ export class ServiceGenerator {
 
   /**
    * Gera um ID único para o serviço
-   * Usa a mesma abordagem do generateGuildId para consistência
+   * Formato: número aleatório de 4 dígitos
    */
   private static generateServiceId(): string {
-    return `service_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    const fourDigitNumber = Math.floor(1000 + Math.random() * 9000);
+    return fourDigitNumber.toString();
   }
 
   // ===== MÉTODOS PARA SISTEMA DE TESTES E RECOMPENSAS =====
@@ -961,17 +1061,29 @@ export class ServiceGenerator {
    */
   private static rollServiceReward(rewardRoll: string): number {
     try {
-      // Para recompensas com multiplicador como "(1d3+1)*10 C$"
-      const multiplierMatch = rewardRoll.match(
+      // PRIMEIRO: Para recompensas multiplicadas com parênteses como "(1d3+1)*10 C$"
+      const multiplierWithParentheses = rewardRoll.match(
         /\((\d+d\d+(?:[+-]\d+)?)\)\*(\d+)/
       );
-      if (multiplierMatch) {
-        const baseRoll = rollDice({ notation: multiplierMatch[1] });
-        const multiplier = parseInt(multiplierMatch[2]);
+      if (multiplierWithParentheses) {
+        const baseRoll = rollDice({ notation: multiplierWithParentheses[1] });
+        const multiplier = parseInt(multiplierWithParentheses[2]);
         return baseRoll.result * multiplier;
       }
 
-      // Para recompensas simples como "3d4 C$" ou "2d4+1 PO$"
+      // SEGUNDO: Para recompensas multiplicadas sem parênteses como "4d8*10 C$"
+      const multiplierWithoutParentheses = rewardRoll.match(
+        /(\d+d\d+(?:[+-]\d+)?)\*(\d+)/
+      );
+      if (multiplierWithoutParentheses) {
+        const baseRoll = rollDice({
+          notation: multiplierWithoutParentheses[1],
+        });
+        const multiplier = parseInt(multiplierWithoutParentheses[2]);
+        return baseRoll.result * multiplier;
+      }
+
+      // TERCEIRO: Para recompensas simples como "3d4 C$" ou "2d4+1 PO$"
       const diceMatch = rewardRoll.match(/(\d+d\d+(?:[+-]\d+)?)/);
       if (diceMatch) {
         const rollResult = rollDice({ notation: diceMatch[1] });

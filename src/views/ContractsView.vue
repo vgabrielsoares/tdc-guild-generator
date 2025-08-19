@@ -21,6 +21,21 @@
       <p class="text-lg text-gray-300 mb-8">
         Gerencie contratos da sede da guilda atual
       </p>
+      <div class="flex flex-col items-center justify-center">
+        <div class="flex items-center gap-2">
+          <Tooltip
+            content="Sistema de quantidade baseado no tamanho da sede, funcionários e frequentadores da guilda."
+            title="Como funciona a geração"
+            position="auto"
+          >
+            <InfoButton
+              help-key="contract-quantity"
+              @open-help="handleOpenHelp"
+              button-class="text-gray-400 hover:text-amber-400"
+            />
+          </Tooltip>
+        </div>
+      </div>
     </div>
 
     <!-- Info da Guilda Atual -->
@@ -40,7 +55,7 @@
         </span>
       </div>
 
-      <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
         <div class="flex flex-col">
           <span class="text-gray-400 uppercase tracking-wide text-lg"
             >Sede</span
@@ -72,38 +87,6 @@
           <span class="text-white font-medium text-base">{{
             guild.relations.population
           }}</span>
-        </div>
-        <div class="flex flex-col">
-          <div class="flex items-center gap-2">
-            <span class="text-gray-400 uppercase tracking-wide text-lg"
-              >Sistema de Contratos</span
-            >
-            <Tooltip
-              content="Sistema de quantidade baseado no tamanho da sede, funcionários e frequentadores da guilda."
-              title="Como funciona a geração"
-              position="auto"
-            >
-              <InfoButton
-                help-key="contract-quantity"
-                @open-help="handleOpenHelp"
-                button-class="text-gray-400 hover:text-amber-400"
-              />
-            </Tooltip>
-          </div>
-          <span class="text-white font-medium text-base">Automático</span>
-        </div>
-      </div>
-
-      <div class="mt-4 pt-4 border-t border-amber-600/30">
-        <div class="flex items-center justify-between">
-          <span class="text-sm text-amber-200">
-            <MapPinIcon class="w-4 h-4 inline mr-2" />
-            Sede localizada em:
-            <span class="font-medium">{{ guild.settlementType }}</span>
-          </span>
-          <span class="text-sm text-gray-400">
-            Criada em: {{ formatDate(guild.createdAt) }}
-          </span>
         </div>
       </div>
     </div>
@@ -149,40 +132,11 @@
       <!-- Timeline e Contadores -->
       <div class="grid grid-cols-1 gap-6 mb-6">
         <!-- Contadores de Timeline e Navegação -->
-        <div
-          class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700"
-        >
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-xl font-semibold text-white">
-              Timeline dos Contratos
-            </h3>
-            <router-link
-              to="/timeline"
-              class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-            >
-              <svg
-                class="w-4 h-4 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                ></path>
-              </svg>
-              Gerenciar Tempo
-            </router-link>
-          </div>
-
-          <ContractTimeline
-            @generate-contracts="handleGenerateContracts"
-            @force-resolution="handleForceResolution"
-            @open-help="handleOpenHelp"
-          />
-        </div>
+        <ContractTimeline
+          @generate-contracts="handleGenerateContracts"
+          @force-resolution="handleForceResolution"
+          @open-help="handleOpenHelp"
+        />
       </div>
 
       <!-- Lista de Contratos -->
@@ -253,7 +207,6 @@ import Tooltip from "@/components/common/Tooltip.vue";
 import {
   DocumentTextIcon,
   BuildingOfficeIcon,
-  MapPinIcon,
   ExclamationTriangleIcon,
   PlusIcon,
 } from "@heroicons/vue/24/outline";
@@ -470,16 +423,7 @@ function handleCloseHelp() {
   currentHelpKey.value = "";
 }
 
-// Utility para formatação de data
-function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
-}
+
 
 // Métodos para integração com timeline
 function handleForceResolution() {

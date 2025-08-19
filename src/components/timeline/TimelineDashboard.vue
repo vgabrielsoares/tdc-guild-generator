@@ -132,14 +132,6 @@
         A timeline está tranquila por enquanto
       </p>
     </div>
-
-    <!-- Widget específico de contratos -->
-    <div class="mt-6">
-      <ContractTimelineWidget
-        @open-help="$emit('open-help', 'contract-lifecycle')"
-        @generate-contracts="$emit('generate-contracts')"
-      />
-    </div>
   </div>
 </template>
 
@@ -147,9 +139,11 @@
 import { computed } from "vue";
 import { useTimeline } from "@/composables/useTimeline";
 import { useContractsStore } from "@/stores/contracts";
+import { useServicesStore } from "@/stores/services";
+import { useGuildStore } from "@/stores/guild";
+import { ServiceStatus } from "@/types/service";
 import InfoButton from "@/components/common/InfoButton.vue";
 import Tooltip from "@/components/common/Tooltip.vue";
-import ContractTimelineWidget from "@/components/timeline/ContractTimelineWidget.vue";
 import { ScheduledEventType, type GameDate } from "@/types/timeline";
 import { CalendarIcon } from "@heroicons/vue/24/solid";
 
@@ -164,10 +158,25 @@ const { currentDate, formattedDate, daysUntilNext, events, dateUtils } =
   useTimeline();
 
 const contractsStore = useContractsStore();
+const servicesStore = useServicesStore();
+const guildStore = useGuildStore();
 
 // Computed - Estatísticas por módulo
 const moduleStats = computed(() => {
   const contractStats = contractsStore.contractStats;
+  const currentGuild = guildStore.currentGuild;
+
+  // Calcular serviços ativos APENAS da guilda atual
+  const activeServicesCount = currentGuild
+    ? servicesStore.services.filter(
+        (service) =>
+          service.guildId === currentGuild.id &&
+          (service.status === ServiceStatus.DISPONIVEL ||
+            service.status === ServiceStatus.ACEITO ||
+            service.status === ServiceStatus.EM_ANDAMENTO ||
+            service.status === ServiceStatus.ACEITO_POR_OUTROS)
+      ).length
+    : 0;
 
   return {
     contracts: {
@@ -178,8 +187,8 @@ const moduleStats = computed(() => {
       total: contractStats.total,
     },
     services: {
-      active: 0, // TODO: implementar quando serviços estiverem prontos
-      total: 0,
+      active: activeServicesCount,
+      total: servicesStore.services.length,
     },
     members: {
       available: 0, // TODO: implementar quando membros estiverem prontos

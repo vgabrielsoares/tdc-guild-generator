@@ -66,8 +66,13 @@ describe("Services Timeline Integration - Simple Test", () => {
       const servicesStore = useServicesStore();
       const timelineStore = useTimelineStore();
 
-      // Configurar guilda e data na timeline
+      // Configurar guilda e inicializar timeline
       timelineStore.setCurrentGuild("test-guild");
+      timelineStore.initializeTimelineForCurrentGuild({
+        day: 1,
+        month: 1,
+        year: 1000,
+      });
 
       // Executar métodos
       expect(() => {

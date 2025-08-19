@@ -28,14 +28,14 @@ describe("Service Base Tables - Issue 5.9", () => {
       expect(SERVICE_QUANTITY_TABLE[5]).toEqual({
         min: 12,
         max: 13,
-        result: { quantity: "2d4 serviços" },
+        result: { quantity: "4d4+2 serviços" },
       });
 
       // Verificar entrada 21+ (último range)
       expect(SERVICE_QUANTITY_TABLE[10]).toEqual({
         min: 21,
         max: 999,
-        result: { quantity: "5d6 serviços" },
+        result: { quantity: "5d10 serviços" },
       });
     });
 
@@ -83,12 +83,12 @@ describe("Service Base Tables - Issue 5.9", () => {
 
       // Quase deserta - redução mínima
       expect(SERVICE_VISITOR_REDUCTION_TABLE[1].result.reduction).toBe(
-        "-1 serviço"
+        "-1d4 serviços"
       );
 
       // Lotada - redução máxima
       expect(SERVICE_VISITOR_REDUCTION_TABLE[6].result.reduction).toBe(
-        "-3d4 serviços"
+        "-3d6+1 serviços"
       );
     });
   });
@@ -203,13 +203,13 @@ describe("Service Base Tables - Issue 5.9", () => {
       expect(NEW_SERVICES_TIME_TABLE[0]).toEqual({
         min: 1,
         max: 4,
-        result: { time: "1 semana" },
+        result: { time: "1d4 meses" },
       });
 
       expect(NEW_SERVICES_TIME_TABLE[9]).toEqual({
         min: 20,
         max: 20,
-        result: { time: "2d4+1 meses" },
+        result: { time: "1d4 dias" },
       });
     });
   });

@@ -212,9 +212,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch, onMounted } from "vue";
 import { useTimeline } from "@/composables/useTimeline";
 import { useGuildStore } from "@/stores/guild";
+import { useTimelineStore } from "@/stores/timeline";
 import { useContractsStore } from "@/stores/contracts";
 import { useTimelineIntegration } from "@/composables/useTimelineIntegration";
 
@@ -239,15 +240,16 @@ import {
   TrophyIcon,
 } from "@heroicons/vue/24/outline";
 
-// ===== INTEGRAÇÃO DE TIMELINE =====
-// Inicializa automaticamente a integração entre timeline e todos os módulos
-useTimelineIntegration();
-
 // ===== STORES =====
 const guildStore = useGuildStore();
+const timelineStore = useTimelineStore();
 
 // Importar store de contratos para a ação de gerar contratos
 const contractsStore = useContractsStore();
+
+// ===== INTEGRAÇÃO DE TIMELINE =====
+// Inicializa automaticamente a integração entre timeline e todos os módulos
+useTimelineIntegration();
 
 // ===== TIMELINE =====
 const { currentDate, events, daysUntilNext, dateUtils } = useTimeline();
@@ -259,6 +261,26 @@ const currentHelpKey = ref<string>("");
 
 // ===== COMPUTED =====
 const guild = computed(() => guildStore.currentGuild);
+
+// ===== WATCHERS =====
+// Quando a guilda muda, atualizar o guildId da timeline
+watch(
+  () => guild.value?.id,
+  (newGuildId) => {
+    if (newGuildId) {
+      timelineStore.setCurrentGuild(newGuildId);
+    }
+  },
+  { immediate: true }
+);
+
+// ===== LIFECYCLE =====
+onMounted(() => {
+  // Garantir que a timeline está configurada para a guilda atual
+  if (guild.value?.id) {
+    timelineStore.setCurrentGuild(guild.value.id);
+  }
+});
 
 // Computed - Contadores de eventos
 const todayEventsCount = computed(() => {

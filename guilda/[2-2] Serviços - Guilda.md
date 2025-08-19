@@ -43,15 +43,15 @@ Os dados usados em 'Quantidade e Prazos' é equivalente à estrutura da sede da 
 | ----- | --------------------- |
 | 1-4   | 1d4 serviços          |
 | 5-6   | 1d4+1 serviços        |
-| 7-9   | 1d4+2 serviços        |
-| 10    | 1d6+1 serviços        |
-| 11    | 1d6+2 serviços        |
-| 12-13 | 2d4 serviços          |
-| 14-16 | 2d4+1 serviços        |
-| 17-18 | 3d4 serviços          |
-| 19    | 4d4 serviços          |
-| 20    | 4d4+1 serviços        |
-| 21+   | 5d6 serviços          |
+| 7-9   | 1d6+2 serviços        |
+| 10    | 1d8+1 serviços        |
+| 11    | 2d6+2 serviços        |
+| 12-13 | 4d4+2 serviços        |
+| 14-16 | 4d6+1 serviços        |
+| 17-18 | 5d6 serviços          |
+| 19    | 6d6 serviços          |
+| 20    | 5d8+1 serviços        |
+| 21+   | 5d10 serviços         |
 
 #### Redução por Frequentadores
 
@@ -60,12 +60,12 @@ De acordo com aqueles que frequentam a guilda, a quantidade de serviços dispon�
 | Frequentadores      | Redução                             |
 | ------------------- | ----------------------------------- |
 | Vazia               | Todos os serviços estão disponíveis |
-| Quase deserta       | -1 serviço                          |
-| Pouco movimentada   | -1d4 serviços                       |
-| Nem muito nem pouco | -1d6+1 serviços                     |
-| Muito frequentada   | -2d4 serviços                       |
-| Abarrotada          | -2d4+2 serviços                     |
-| Lotada              | -3d4 serviços                       |
+| Quase deserta       | -1d4 serviços                       |
+| Pouco movimentada   | -1d6 serviços                       |
+| Nem muito nem pouco | -1d8+1 serviços                     |
+| Muito frequentada   | -1d12+1 serviços                    |
+| Abarrotada          | -2d6+2 serviços                     |
+| Lotada              | -3d6+1 serviços                     |
 
 > **Nota**: Caso o saldo fique negativo, retire o valor dos próximos serviços rolados.
 
@@ -222,16 +222,16 @@ Role nas tabelas abaixo para descobrir em quantos dias você poderá gerar novos
 
 | 1d20  | Novos serviços |
 | ----- | -------------- |
-| 1-4   | 1 semana       |
-| 5-8   | 2 semanas      |
+| 1-4   | 1d4 meses      |
+| 5-8   | 2d4+1 semanas  |
 | 9-10  | 1d4+1 semanas  |
-| 11-12 | 2d6 dias       |
-| 13-14 | 4d6 dias       |
-| 15    | 2d4+1 semanas  |
-| 16    | 1 mês          |
-| 17-18 | 2 meses        |
-| 19    | 1d4 meses      |
-| 20    | 2d4+1 meses    |
+| 11-12 | 1 mês          |
+| 13-14 | 2d6 dias       |
+| 15    | 1 semana       |
+| 16    | 2d4 dias       |
+| 17-18 | 1d8 dias       |
+| 19    | 1d6 dias       |
+| 20    | 1d4 dias       |
 
 ## Gerador de Serviços
 

@@ -59,63 +59,63 @@ export const SERVICE_QUANTITY_TABLE: TableEntry<ServiceQuantityResult>[] = [
     min: 7,
     max: 9,
     result: {
-      quantity: "1d4+2 serviços",
+      quantity: "1d6+2 serviços",
     },
   },
   {
     min: 10,
     max: 10,
     result: {
-      quantity: "1d6+1 serviços",
+      quantity: "1d8+1 serviços",
     },
   },
   {
     min: 11,
     max: 11,
     result: {
-      quantity: "1d6+2 serviços",
+      quantity: "2d6+2 serviços",
     },
   },
   {
     min: 12,
     max: 13,
     result: {
-      quantity: "2d4 serviços",
+      quantity: "4d4+2 serviços",
     },
   },
   {
     min: 14,
     max: 16,
     result: {
-      quantity: "2d4+1 serviços",
+      quantity: "4d6+1 serviços",
     },
   },
   {
     min: 17,
     max: 18,
     result: {
-      quantity: "3d4 serviços",
+      quantity: "5d6 serviços",
     },
   },
   {
     min: 19,
     max: 19,
     result: {
-      quantity: "4d4 serviços",
+      quantity: "6d6 serviços",
     },
   },
   {
     min: 20,
     max: 20,
     result: {
-      quantity: "4d4+1 serviços",
+      quantity: "5d8+1 serviços",
     },
   },
   {
     min: 21,
     max: 999,
     result: {
-      quantity: "5d6 serviços",
+      quantity: "5d10 serviços",
     },
   },
 ];
@@ -143,7 +143,7 @@ export const SERVICE_VISITOR_REDUCTION_TABLE: TableEntry<ServiceReductionResult>
       max: 2,
       result: {
         description: "Quase deserta",
-        reduction: "-1 serviço",
+        reduction: "-1d4 serviços",
       },
     },
     {
@@ -151,7 +151,7 @@ export const SERVICE_VISITOR_REDUCTION_TABLE: TableEntry<ServiceReductionResult>
       max: 3,
       result: {
         description: "Pouco movimentada",
-        reduction: "-1d4 serviços",
+        reduction: "-1d6 serviços",
       },
     },
     {
@@ -159,7 +159,7 @@ export const SERVICE_VISITOR_REDUCTION_TABLE: TableEntry<ServiceReductionResult>
       max: 4,
       result: {
         description: "Nem muito nem pouco",
-        reduction: "-1d6+1 serviços",
+        reduction: "-1d8+1 serviços",
       },
     },
     {
@@ -167,7 +167,7 @@ export const SERVICE_VISITOR_REDUCTION_TABLE: TableEntry<ServiceReductionResult>
       max: 5,
       result: {
         description: "Muito frequentada",
-        reduction: "-2d4 serviços",
+        reduction: "-1d12+1 serviços",
       },
     },
     {
@@ -175,7 +175,7 @@ export const SERVICE_VISITOR_REDUCTION_TABLE: TableEntry<ServiceReductionResult>
       max: 6,
       result: {
         description: "Abarrotada",
-        reduction: "-2d4+2 serviços",
+        reduction: "-2d6+2 serviços",
       },
     },
     {
@@ -183,7 +183,7 @@ export const SERVICE_VISITOR_REDUCTION_TABLE: TableEntry<ServiceReductionResult>
       max: 7,
       result: {
         description: "Lotada",
-        reduction: "-3d4 serviços",
+        reduction: "-3d6+1 serviços",
       },
     },
   ];
@@ -513,14 +513,14 @@ export const NEW_SERVICES_TIME_TABLE: TableEntry<NewServicesTimeResult>[] = [
     min: 1,
     max: 4,
     result: {
-      time: "1 semana",
+      time: "1d4 meses",
     },
   },
   {
     min: 5,
     max: 8,
     result: {
-      time: "2 semanas",
+      time: "2d4+1 semanas",
     },
   },
   {
@@ -534,49 +534,49 @@ export const NEW_SERVICES_TIME_TABLE: TableEntry<NewServicesTimeResult>[] = [
     min: 11,
     max: 12,
     result: {
-      time: "2d6 dias",
+      time: "1 mês",
     },
   },
   {
     min: 13,
     max: 14,
     result: {
-      time: "4d6 dias",
+      time: "2d6 dias",
     },
   },
   {
     min: 15,
     max: 15,
     result: {
-      time: "2d4+1 semanas",
+      time: "1 semana",
     },
   },
   {
     min: 16,
     max: 16,
     result: {
-      time: "1 mês",
+      time: "2d4 dias",
     },
   },
   {
     min: 17,
     max: 18,
     result: {
-      time: "2 meses",
+      time: "1d8 dias",
     },
   },
   {
     min: 19,
     max: 19,
     result: {
-      time: "1d4 meses",
+      time: "1d6 dias",
     },
   },
   {
     min: 20,
     max: 20,
     result: {
-      time: "2d4+1 meses",
+      time: "1d4 dias",
     },
   },
 ];
