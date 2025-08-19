@@ -223,6 +223,11 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { useTimeline } from "@/composables/useTimeline";
+import { useTimelineStore } from "@/stores/timeline";
+import { useGuildStore } from "@/stores/guild";
+import { useContractsStore } from "@/stores/contracts";
+import { useServicesStore } from "@/stores/services";
+import { createGameDate } from "@/utils/date-utils";
 import InfoButton from "@/components/common/InfoButton.vue";
 import Tooltip from "@/components/common/Tooltip.vue";
 import { ExclamationTriangleIcon } from "@heroicons/vue/24/solid";
@@ -251,6 +256,10 @@ const customDate = ref({
 });
 
 // Stores e composables
+const guildStore = useGuildStore();
+const contractsStore = useContractsStore();
+const servicesStore = useServicesStore();
+const timelineStore = useTimelineStore();
 const {
   currentDate,
   formattedDate,
@@ -315,8 +324,34 @@ watch(
 );
 
 // Methods
-function initializeTimeline() {
-  setDateFromValues(1, 1, 1000);
+async function initializeTimeline() {
+  // Verificar se há guilda atual
+  const currentGuild = guildStore.currentGuild;
+  if (!currentGuild) {
+    return;
+  }
+
+  // Inicializar timeline com data padrão
+  const startDate = createGameDate(1, 1, 1000);
+  const timeline = timelineStore.initializeTimelineForCurrentGuild(startDate);
+
+  if (!timeline) {
+    return;
+  }
+
+  // Gerar contratos e serviços iniciais de uma vez
+  try {
+    contractsStore.generateContracts();
+    await servicesStore.generateServices(currentGuild);
+
+    // Salvar a guilda no histórico
+    guildStore.addToHistory(currentGuild);
+
+    // Bloquear a guilda
+    guildStore.toggleGuildLock(currentGuild.id);
+  } catch (error) {
+    // Erro tratado pelos stores individuais
+  }
 }
 
 function handlePassDay(days: number) {
