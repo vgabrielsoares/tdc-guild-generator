@@ -162,7 +162,23 @@ const servicesStore = useServicesStore();
 const guildStore = useGuildStore();
 
 // Computed - Estatísticas por módulo
-const moduleStats = computed(() => {
+type ModuleStatsType = {
+  contracts: { active: number | string; total: number | string };
+  services: { active: number | string; total: number | string };
+  members: { available: number; total: number };
+  notices: { active: number; total: number };
+};
+
+const moduleStats = computed<ModuleStatsType>(() => {
+  if (!contractsStore.isReady) {
+    return {
+      contracts: { active: "—", total: "—" },
+      services: { active: "—", total: "—" },
+      members: { available: 0, total: 0 },
+      notices: { active: 0, total: 0 },
+    };
+  }
+
   const contractStats = contractsStore.contractStats;
   const currentGuild = guildStore.currentGuild;
 
