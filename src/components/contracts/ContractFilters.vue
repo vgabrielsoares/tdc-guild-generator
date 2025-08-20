@@ -120,9 +120,6 @@
             placeholder="Buscar por título, descrição, objetivo ou contratante..."
             class="filter-input pl-10"
           />
-          <MagnifyingGlassIcon
-            class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
-          />
           <button
             v-if="filters.searchText"
             @click="clearSearchFilter"
@@ -158,54 +155,6 @@
       </div>
     </div>
 
-    <!-- Filtros rápidos (botões) -->
-    <div class="border-t border-gray-600 pt-4">
-      <div class="flex items-center justify-between mb-2">
-        <h4 class="text-sm font-medium text-gray-300">Filtros Rápidos</h4>
-      </div>
-
-      <div class="flex flex-wrap gap-2">
-        <button
-          @click="applyQuickFilter('available')"
-          :class="quickFilterClasses('available')"
-        >
-          <ClockIcon class="w-4 h-4 mr-1" />
-          Disponíveis {{ formatQuickFilterCount(availableCount) }}
-        </button>
-
-        <button
-          @click="applyQuickFilter('accepted')"
-          :class="quickFilterClasses('accepted')"
-        >
-          <HandRaisedIcon class="w-4 h-4 mr-1" />
-          Aceitos {{ formatQuickFilterCount(acceptedCount) }}
-        </button>
-
-        <button
-          @click="applyQuickFilter('high-reward')"
-          :class="quickFilterClasses('high-reward')"
-        >
-          <CurrencyDollarIcon class="w-4 h-4 mr-1" />
-          Alta Recompensa {{ formatQuickFilterCount(highRewardCount) }}
-        </button>
-
-        <button
-          @click="applyQuickFilter('dangerous')"
-          :class="quickFilterClasses('dangerous')"
-        >
-          <XCircleIcon class="w-4 h-4 mr-1" />
-          Perigosos {{ formatQuickFilterCount(dangerousCount) }}
-        </button>
-
-        <button
-          @click="applyQuickFilter('no-deadline')"
-          :class="quickFilterClasses('no-deadline')"
-        >
-          <XCircleIcon class="w-4 h-4 mr-1" />
-          Sem Prazo ({{ contractsWithoutDeadline }})
-        </button>
-      </div>
-    </div>
 
     <!-- Resumo dos filtros ativos -->
     <div v-if="hasActiveFilters" class="border-t border-gray-600 pt-4">
@@ -238,15 +187,7 @@ import {
   ContractorType,
   DeadlineType,
 } from "@/types/contract";
-import {
-  FunnelIcon,
-  MagnifyingGlassIcon,
-  XMarkIcon,
-  ClockIcon,
-  HandRaisedIcon,
-  CurrencyDollarIcon,
-  XCircleIcon,
-} from "@heroicons/vue/24/outline";
+import { FunnelIcon, XMarkIcon } from "@heroicons/vue/24/outline";
 
 interface ContractFilters {
   status: string;
@@ -426,129 +367,6 @@ const formatCount = (totalCount: number, filteredCount: number): string => {
   return `(${filteredCount}/${totalCount})`;
 };
 
-// Contagens para filtros rápidos (considerando filtros ativos quando não conflitam)
-// Contagens para filtros rápidos (considerando filtros ativos quando não conflitam)
-const availableCount = computed(() => {
-  const total = props.contracts.filter(
-    (c) => c.status === ContractStatus.DISPONIVEL
-  ).length;
-  // Se filtro de status está ativo e não é "disponível", mostrar count com filtros
-  if (
-    props.filters.status &&
-    props.filters.status !== ContractStatus.DISPONIVEL
-  ) {
-    return { total, filtered: 0 }; // Não há disponíveis se outro status está selecionado
-  }
-  // Se status não está filtrado, aplicar outros filtros
-  const filtered = getFilteredContractsExcluding("status").filter(
-    (c) => c.status === ContractStatus.DISPONIVEL
-  ).length;
-  return { total, filtered };
-});
-
-const acceptedCount = computed(() => {
-  const total = props.contracts.filter(
-    (c) =>
-      c.status === ContractStatus.ACEITO ||
-      c.status === ContractStatus.EM_ANDAMENTO
-  ).length;
-  // Se filtro de status conflita, retornar 0
-  if (
-    props.filters.status &&
-    props.filters.status !== ContractStatus.ACEITO &&
-    props.filters.status !== ContractStatus.EM_ANDAMENTO
-  ) {
-    return { total, filtered: 0 };
-  }
-  // Aplicar outros filtros
-  const filtered = getFilteredContractsExcluding("status").filter(
-    (c) =>
-      c.status === ContractStatus.ACEITO ||
-      c.status === ContractStatus.EM_ANDAMENTO
-  ).length;
-  return { total, filtered };
-});
-
-const highRewardCount = computed(() => {
-  const total = props.contracts.filter(
-    (c) => c.value.finalGoldReward >= 100
-  ).length;
-  // Se filtros de valor conflitam, calcular apropriadamente
-  let contracts = props.contracts;
-
-  // Aplicar todos os filtros exceto os de valor para não criar conflito
-  if (props.filters.status) {
-    contracts = contracts.filter((c) => c.status === props.filters.status);
-  }
-  if (props.filters.difficulty) {
-    contracts = contracts.filter(
-      (c) => c.difficulty === props.filters.difficulty
-    );
-  }
-  if (props.filters.contractor) {
-    contracts = contracts.filter(
-      (c) => c.contractorType === props.filters.contractor
-    );
-  }
-  if (props.filters.searchText.trim()) {
-    const searchLower = props.filters.searchText.toLowerCase();
-    contracts = contracts.filter(
-      (c) =>
-        c.description.toLowerCase().includes(searchLower) ||
-        c.title.toLowerCase().includes(searchLower) ||
-        c.objective?.description?.toLowerCase().includes(searchLower) ||
-        c.contractorName?.toLowerCase().includes(searchLower) ||
-        c.location?.name?.toLowerCase().includes(searchLower)
-    );
-  }
-  if (props.filters.hasDeadline !== null) {
-    const hasDeadline = props.filters.hasDeadline;
-    contracts = contracts.filter((c) => {
-      const contractHasDeadline = c.deadline.type !== DeadlineType.SEM_PRAZO;
-      return contractHasDeadline === hasDeadline;
-    });
-  }
-
-  const filtered = contracts.filter(
-    (c) => c.value.finalGoldReward >= 100
-  ).length;
-  return { total, filtered };
-});
-
-const dangerousCount = computed(() => {
-  const total = props.contracts.filter((c) =>
-    [ContractDifficulty.DIFICIL, ContractDifficulty.MORTAL].includes(
-      c.difficulty
-    )
-  ).length;
-  // Se filtro de dificuldade conflita
-  if (
-    props.filters.difficulty &&
-    ![ContractDifficulty.DIFICIL, ContractDifficulty.MORTAL].includes(
-      props.filters.difficulty as ContractDifficulty
-    )
-  ) {
-    return { total, filtered: 0 };
-  }
-  // Aplicar outros filtros
-  const filtered = getFilteredContractsExcluding("difficulty").filter((c) =>
-    [ContractDifficulty.DIFICIL, ContractDifficulty.MORTAL].includes(
-      c.difficulty
-    )
-  ).length;
-  return { total, filtered };
-});
-
-// Função para formatar contadores de filtros rápidos
-const formatQuickFilterCount = (countObj: {
-  total: number;
-  filtered: number;
-}): string => {
-  if (countObj.total === countObj.filtered) {
-    return `(${countObj.total})`;
-  }
-  return `(${countObj.filtered}/${countObj.total})`;
-};
 
 const contractsWithDeadline = computed(
   () =>
@@ -668,60 +486,6 @@ function clearSearchFilter() {
 
 function clearAllFilters() {
   emit("clear-filters");
-}
-
-function applyQuickFilter(filterType: string) {
-  // Limpar filtros primeiro
-  emit("clear-filters");
-
-  // Aplicar filtro específico
-  switch (filterType) {
-    case "available":
-      emit("update-status", ContractStatus.DISPONIVEL);
-      break;
-    case "accepted":
-      emit("update-status", ContractStatus.ACEITO);
-      break;
-    case "high-reward":
-      emit("update-min-value", 100);
-      break;
-    case "dangerous":
-      emit("update-difficulty", ContractDifficulty.DIFICIL);
-      break;
-    case "no-deadline":
-      emit("update-deadline", false);
-      break;
-  }
-}
-
-function quickFilterClasses(filterType: string): string {
-  const baseClasses =
-    "px-3 py-1 rounded-full text-sm font-medium transition-colors";
-
-  // Verificar se o filtro está ativo
-  let isActive = false;
-
-  switch (filterType) {
-    case "available":
-      isActive = props.filters.status === ContractStatus.DISPONIVEL;
-      break;
-    case "accepted":
-      isActive = props.filters.status === ContractStatus.ACEITO;
-      break;
-    case "high-reward":
-      isActive = props.filters.minValue === 100;
-      break;
-    case "dangerous":
-      isActive = props.filters.difficulty === ContractDifficulty.DIFICIL;
-      break;
-    case "no-deadline":
-      isActive = props.filters.hasDeadline === false;
-      break;
-  }
-
-  return isActive
-    ? `${baseClasses} bg-amber-600 text-white`
-    : `${baseClasses} bg-gray-700 text-gray-300 hover:bg-gray-600`;
 }
 
 function removeFilter(filterKey: string) {
