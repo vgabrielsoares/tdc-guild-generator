@@ -395,10 +395,6 @@ export const useServicesStore = defineStore("services", () => {
       statusFilter: (s) => s.status === ServiceStatus.ACEITO_POR_OUTROS,
       resolutionFunction: (items) =>
         applyServiceSignedResolution(items as Service[]) as ServiceWithGuild[],
-      successMessage: (count) => ({
-        title: "Resolução de Serviços Aceitos por Outros",
-        message: `${count} serviço(s) aceito(s) por outros aventureiros foi(ram) processado(s)`,
-      }),
     };
 
     applyAutomaticResolution(
@@ -408,8 +404,7 @@ export const useServicesStore = defineStore("services", () => {
       (updatedItems) => {
         services.value = updatedItems;
       },
-      saveServicesToStorage,
-      success
+      saveServicesToStorage
     );
 
     // Atualizar timestamp usando utilitário modular
@@ -446,11 +441,6 @@ export const useServicesStore = defineStore("services", () => {
     if (bonusAppliedCount > 0) {
       // Salvar alterações
       saveServicesToStorage();
-
-      // Notificação opcional
-      success(
-        `Taxa de recorrência aplicada: ${bonusAppliedCount} serviço(s) recebeu(ram) bônus por não serem resolvidos`
-      );
     }
   };
   const processUnsignedServiceResolution = () => {
@@ -460,10 +450,6 @@ export const useServicesStore = defineStore("services", () => {
         applyServiceUnsignedResolution(
           items as Service[]
         ) as ServiceWithGuild[],
-      successMessage: (count) => ({
-        title: "Resolução de Serviços Não Assinados",
-        message: `${count} serviço(s) não assinado(s) foi(ram) processado(s)`,
-      }),
     };
 
     applyAutomaticResolution(
@@ -473,8 +459,7 @@ export const useServicesStore = defineStore("services", () => {
       (updatedItems) => {
         services.value = updatedItems;
       },
-      saveServicesToStorage,
-      success
+      saveServicesToStorage
     );
 
     // Aplicar taxa de recorrência para serviços não resolvidos
@@ -513,11 +498,6 @@ export const useServicesStore = defineStore("services", () => {
         timelineStore.currentGameDate.year
       );
       saveServicesToStorage();
-
-      success(
-        "Novos Serviços Gerados",
-        `${result.services.length} novo(s) serviço(s) foi(ram) disponibilizado(s)`
-      );
     }
   };
 

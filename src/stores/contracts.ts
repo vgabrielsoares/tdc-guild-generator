@@ -398,11 +398,6 @@ export const useContractsStore = defineStore("contracts", () => {
     contracts.value = applySignedContractResolution(contracts.value);
     lastUpdate.value = new Date();
     saveToStorage();
-
-    success(
-      "Resolução de Contratos Aceitos por Outros",
-      `${signedContracts.length} contrato(s) aceito(s) por outros aventureiros foi(ram) processado(s)`
-    );
   };
 
   /**
@@ -423,11 +418,6 @@ export const useContractsStore = defineStore("contracts", () => {
     contracts.value = applyUnsignedContractResolution(contracts.value);
     lastUpdate.value = new Date();
     saveToStorage();
-
-    success(
-      "Resolução de Contratos Não Assinados",
-      `${unsignedContracts.length} contrato(s) não assinado(s) foi(ram) processado(s)`
-    );
   };
 
   /**
@@ -643,11 +633,6 @@ export const useContractsStore = defineStore("contracts", () => {
 
       // Agendar próximos eventos de timeline
       scheduleContractEvents();
-
-      success(
-        "Contratos Gerados",
-        "Novos contratos foram gerados automaticamente"
-      );
     } catch (error) {
       // Log erro mas não mostrar ao usuário para geração automática
       generationError.value =
