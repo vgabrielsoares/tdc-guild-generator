@@ -106,6 +106,7 @@
         :services="allServices"
         @update:filters="handleFiltersChange"
         @close="() => {}"
+        @filtered="handleFilteredPayload"
       />
 
       <!-- Timeline e Controles -->
@@ -134,6 +135,7 @@
           :services="allServices"
           @update:filters="handleFiltersChange"
           @close="showFilters = false"
+          @filtered="handleFilteredPayload"
         />
       </div>
     </Transition>
@@ -269,6 +271,7 @@ const { success, error } = useToast();
 // State
 const showFilters = ref(false);
 const activeFilters = ref<Partial<ServiceFilters>>({});
+const filteredServicesState = ref<ServiceWithGuild[] | null>(null);
 const activeStatusFilter = ref<string | undefined>(undefined);
 const hasActiveFilters = computed(
   () => Object.keys(activeFilters.value).length > 0
@@ -291,6 +294,8 @@ const allServices = computed(() => {
 const isLoading = computed(() => servicesStore.isLoading);
 
 const filteredServices = computed(() => {
+  if (filteredServicesState.value) return filteredServicesState.value;
+
   let services = [...allServices.value];
 
   // Aplicar filtro de status rápido
@@ -452,8 +457,13 @@ const handleStatusFilter = (status: string | null) => {
   activeStatusFilter.value = status || undefined;
 };
 
-const handleFiltersChange = (filters: ServiceFilters) => {
+const handleFiltersChange = (filters: Partial<ServiceFilters>) => {
   activeFilters.value = filters;
+  filteredServicesState.value = null;
+};
+
+const handleFilteredPayload = (services: Service[]) => {
+  filteredServicesState.value = services as ServiceWithGuild[];
 };
 
 const handleClearFilters = () => {
