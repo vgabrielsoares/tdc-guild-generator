@@ -172,57 +172,61 @@ const paginatedContracts = computed(() => {
 });
 
 const statusFilters = computed(() => {
-  const statusCounts: Record<string, number> = {};
-  // Use allContracts (sem filtros) quando disponível, senão use props.contracts
+  // Contar contratos por status usando um Map para evitar problemas com chaves
+  const statusCounts = new Map<string, number>();
   const source = props.allContracts ?? props.contracts;
+
   source.forEach((contract) => {
-    statusCounts[contract.status] = (statusCounts[contract.status] || 0) + 1;
+    const count = statusCounts.get(contract.status) || 0;
+    statusCounts.set(contract.status, count + 1);
   });
-  // Sempre mostra o botão "Todos" com o total sem filtros
-  const filters = [
-    {
-      label: "Todos",
-      value: "",
-      count: source.length,
-    },
+
+  const filters: { label: string; value: string; count: number }[] = [
+    { value: "", label: "Todos", count: source.length },
   ];
-  if (statusCounts[ContractStatus.DISPONIVEL]) {
-    filters.push({
-      label: "Disponíveis",
-      value: ContractStatus.DISPONIVEL,
-      count: statusCounts[ContractStatus.DISPONIVEL],
-    });
-  }
-  if (statusCounts[ContractStatus.ACEITO]) {
-    filters.push({
-      label: "Aceitos",
-      value: ContractStatus.ACEITO,
-      count: statusCounts[ContractStatus.ACEITO],
-    });
-  }
-  if (statusCounts[ContractStatus.EM_ANDAMENTO]) {
-    filters.push({
-      label: "Em Andamento",
-      value: ContractStatus.EM_ANDAMENTO,
-      count: statusCounts[ContractStatus.EM_ANDAMENTO],
-    });
-  }
-  if (statusCounts[ContractStatus.CONCLUIDO]) {
-    filters.push({
-      label: "Concluídos",
-      value: ContractStatus.CONCLUIDO,
-      count: statusCounts[ContractStatus.CONCLUIDO],
-    });
-  }
-  if (statusCounts[ContractStatus.FALHOU]) {
-    filters.push({
-      label: "Falharam",
-      value: ContractStatus.FALHOU,
-      count: statusCounts[ContractStatus.FALHOU],
-    });
-  }
+
+  // Iterar sobre todos os valores da enum para preservar ordem e rótulos
+  Object.values(ContractStatus).forEach((status) => {
+    const count = statusCounts.get(status) || 0;
+    if (count > 0) {
+      filters.push({
+        value: status,
+        label: getStatusLabel(status as ContractStatus),
+        count,
+      });
+    }
+  });
+
   return filters;
 });
+
+// Helper para transformar um status em label amigável (plural quando aplicável)
+function getStatusLabel(status: ContractStatus): string {
+  switch (status) {
+    case ContractStatus.DISPONIVEL:
+      return "Disponíveis";
+    case ContractStatus.ACEITO:
+      return "Aceitos";
+    case ContractStatus.EM_ANDAMENTO:
+      return "Em Andamento";
+    case ContractStatus.CONCLUIDO:
+      return "Concluídos";
+    case ContractStatus.FALHOU:
+      return "Falharam";
+    case ContractStatus.EXPIRADO:
+      return "Expirados";
+    case ContractStatus.ANULADO:
+      return "Anulados";
+    case ContractStatus.RESOLVIDO_POR_OUTROS:
+      return "Resolvidos por Outros";
+    case ContractStatus.ACEITO_POR_OUTROS:
+      return "Aceitos por Outros";
+    case ContractStatus.QUEBRADO:
+      return "Quebrados";
+    default:
+      return status;
+  }
+}
 
 const emptyStateMessage = computed(() => {
   if (props.activeStatusFilter) {
