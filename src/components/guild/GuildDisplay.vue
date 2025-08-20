@@ -20,8 +20,8 @@
             <div v-if="!isEditingName" class="flex items-center group">
               <button
                 @click="regenerateGuildName"
-                class="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-green-400 p-1 ml-1"
-                :disabled="guild.locked"
+                class="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-green-400 p-1 ml-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                :disabled="guildStore.isGenerating || guild?.locked"
                 title="Regenerar nome da guilda"
               >
                 <ArrowPathIcon class="w-4 h-4" />
