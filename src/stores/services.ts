@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import type { Service, ServiceTestOutcome } from "@/types/service";
 import { ServiceStatus, applyRecurrenceBonus } from "@/types/service";
 import type { Guild } from "@/types/guild";
@@ -331,6 +331,24 @@ export const useServicesStore = defineStore("services", () => {
     lifecycleManager.value = null;
     saveServicesToStorage();
   };
+
+  // Auto-load de serviços fo storage quando store é incializado
+  // Garante serviços persistidos disponíveis para outras view (timeline)
+  loadServicesFromStorage();
+
+  // watch pra guilda atual pra inicializar o lifecycle manager com a timeline
+  watch(
+    () => guildStore.currentGuild?.id,
+    (newGuildId) => {
+      if (!newGuildId) return;
+      const currentDate = timelineStore.currentGameDate;
+      if (currentDate) {
+        // Initialize lifecycle manager with the current timeline date
+        initializeLifecycleManager(currentDate);
+      }
+    },
+    { immediate: true }
+  );
 
   /**
    * Agenda eventos de timeline baseados no ciclo de vida dos serviços

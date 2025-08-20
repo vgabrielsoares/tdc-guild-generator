@@ -1,6 +1,6 @@
 // Contracts Store
 import { defineStore } from "pinia";
-import { ref, computed, readonly } from "vue";
+import { ref, computed, readonly, watch } from "vue";
 import type { Contract } from "@/types/contract";
 import {
   ContractStatus,
@@ -63,6 +63,7 @@ export const useContractsStore = defineStore("contracts", () => {
   // Estado dos contratos atuais (da guilda selecionada)
   const contracts = ref<Contract[]>([]);
   const isLoading = ref(false);
+  const isReady = ref(false);
   const lastUpdate = ref<Date | null>(null);
   const generationError = ref<string | null>(null);
   const currentGuildId = ref<string | null>(null);
@@ -268,6 +269,9 @@ export const useContractsStore = defineStore("contracts", () => {
 
     // Inicializar timeline para esta guilda
     timelineStore.setCurrentGuild(guildId);
+
+    // Marca que o store já tinha sido reidratado ao menos uma vez
+    isReady.value = true;
   };
 
   /**
@@ -542,17 +546,50 @@ export const useContractsStore = defineStore("contracts", () => {
    */
   const initializeStore = async () => {
     try {
+      // Garantir que os dados do storage foram carregados
+      // Carregar explicitamente o storage para evitar condições de corrida
+      // entre stores (guild/timeline/contracts)
+      try {
+        storage.load();
+      } catch {
+        // silent: em ambientes de teste/localStorage indisponível
+      }
+
+      // Se o storage lembra da última guilda usada, restaurar seus contratos
+      const persistedGuildId = storage.data.value.currentGuildId;
+      if (persistedGuildId) {
+        loadGuildContracts(persistedGuildId);
+      }
+
       // Sincronizar com a guilda atual
       syncWithCurrentGuild();
 
       // Inicializar o lifecycle
       initializeLifecycle();
 
+      // Indicar que a reidratação/initialização foi concluída
+      isReady.value = true;
+
       generationError.value = null;
     } catch (error) {
       generationError.value = "Erro ao inicializar store de contratos";
     }
   };
+  // inicialização do store de contratos para persistência de outras views (timeline)
+  initializeStore();
+
+  // watch pra mudanças da guilda e re-sync
+  watch(
+    () => useGuildStore().currentGuild?.id,
+    () => {
+      try {
+        syncWithCurrentGuild();
+      } catch {
+        // silent
+      }
+    },
+    { immediate: true }
+  );
 
   /**
    * Gera novos contratos automaticamente via timeline (ignora limitações de geração manual)
@@ -1358,6 +1395,7 @@ export const useContractsStore = defineStore("contracts", () => {
   return {
     // ===== ESTADO =====
     contracts: readonly(contracts),
+    isReady: readonly(isReady),
     isLoading: readonly(isLoading),
     lastUpdate: readonly(lastUpdate),
     generationError: readonly(generationError),
