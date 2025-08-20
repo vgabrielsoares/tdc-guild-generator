@@ -57,7 +57,7 @@
             :value="difficulty.value"
           >
             {{ difficulty.label }}
-            {{ formatCount(difficulty.totalCount, difficulty.filteredCount) }}
+            {{ formatCount(difficulty.total, difficulty.filtered) }}
           </option>
         </select>
       </div>
@@ -180,13 +180,23 @@
         >
           <option value="">Todos os prazos</option>
           <option value="with-deadline">
-            Com prazo ({{ servicesWithDeadline }})
+            Com prazo
+            {{
+              formatCount(servicesWithDeadline, servicesWithDeadlineFiltered)
+            }}
           </option>
           <option value="no-deadline">
-            Sem prazo ({{ servicesWithoutDeadline }})
+            Sem prazo
+            {{
+              formatCount(
+                servicesWithoutDeadline,
+                servicesWithoutDeadlineFiltered
+              )
+            }}
           </option>
           <option value="expiring-soon">
-            Expirando Em Breve ({{ expiringServices.length }})
+            Expirando Em Breve
+            {{ formatCount(expiringServices.length, expiringServicesFiltered) }}
           </option>
         </select>
       </div>
@@ -212,6 +222,28 @@
 
     <!-- Filtros avançados (toggle) -->
     <div>
+      <!-- Busca por texto (sem avançados) -->
+      <div class="mt-2 mb-4">
+        <label class="filter-label">Buscar</label>
+        <div class="relative">
+          <input
+            :value="filters.searchText"
+            @input="
+              updateSearchFilter(($event.target as HTMLInputElement).value)
+            "
+            type="text"
+            placeholder="Buscar por título, descrição ou contratante..."
+            class="filter-input pl-10 w-full"
+          />
+          <button
+            v-if="filters.searchText"
+            @click="clearSearchFilter"
+            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+          >
+            <XMarkIcon class="w-4 h-4" />
+          </button>
+        </div>
+      </div>
       <button
         @click="showAdvancedFilters = !showAdvancedFilters"
         class="flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 transition-colors"
@@ -321,13 +353,16 @@ import { useTimeline } from "@/composables/useTimeline";
 // Props
 interface Props {
   services: Service[];
+  filters?: Partial<ServiceFilters>;
 }
 
 const props = defineProps<Props>();
 
 // Emits
 const emit = defineEmits<{
-  "filters-changed": [filters: ServiceFilters];
+  "update:filters": [filters: Partial<ServiceFilters>];
+  filtered: [services: Service[]];
+  close: [];
 }>();
 
 // Interface dos filtros
@@ -344,6 +379,7 @@ export interface ServiceFilters {
   testCount: string;
   hasRecurrence: string;
   skillRequirement: string;
+  searchText: string;
   hasDeadline: string;
 }
 
@@ -351,7 +387,7 @@ export interface ServiceFilters {
 const showAdvancedFilters = ref(false);
 const { currentDate, dateUtils } = useTimeline();
 
-const filters = ref<ServiceFilters>({
+const defaultFilters: ServiceFilters = {
   status: "",
   difficulty: "",
   complexity: "",
@@ -364,8 +400,25 @@ const filters = ref<ServiceFilters>({
   testCount: "",
   hasRecurrence: "",
   skillRequirement: "",
+  searchText: "",
   hasDeadline: "",
+};
+
+// Local reactive filters synced with prop (if provided)
+const filters = ref<ServiceFilters>({
+  ...defaultFilters,
+  ...(props.filters || {}),
 });
+
+import { watch } from "vue";
+
+watch(
+  () => props.filters,
+  (val) => {
+    filters.value = { ...defaultFilters, ...(val || {}) };
+  },
+  { deep: true, immediate: true }
+);
 
 // Computed para serviços expirando
 const expiringServices = computed(() => {
@@ -404,6 +457,19 @@ const servicesWithoutDeadline = computed(() => {
   ).length;
 });
 
+// Filtra contadores para prazos (contando com outros filtros ativos)
+const servicesWithDeadlineFiltered = computed(() => {
+  return getFilteredServicesForOption("hasDeadline", "true").length;
+});
+
+const servicesWithoutDeadlineFiltered = computed(() => {
+  return getFilteredServicesForOption("hasDeadline", "false").length;
+});
+
+const expiringServicesFiltered = computed(() => {
+  return getFilteredServicesForOption("hasDeadline", "expiring").length;
+});
+
 // Computed para valor do filtro de deadline
 const deadlineFilterValue = computed(() => {
   if (filters.value.hasDeadline === "true") return "with-deadline";
@@ -431,28 +497,42 @@ const statusOptions = computed(() => {
 });
 
 const difficultyOptions = computed(() => {
-  const difficultyCounts = new Map<
+  // Agrupar por rótulo base (ex: "Fácil", "Média") para evitar entradas duplicadas
+  const groupMap = new Map<
     string,
-    { total: number; filtered: number }
+    { value: string; label: string; total: number; filtered: number }
   >();
 
   Object.values(ServiceDifficulty).forEach((difficulty) => {
+    const baseLabel = String(difficulty).split(" (")[0];
+
+    // Conta total para o variant específico
     const total = props.services.filter(
       (s) => s.difficulty === difficulty
     ).length;
-    const filtered = getFilteredServicesForOption(
+
+    // Para o filtro "difficulty" agrupado por rótulo base, somamos os
+    // resultados filtrados de cada variante (evita duplicação/inversão)
+    const filteredForVariant = getFilteredServicesForOption(
       "difficulty",
       difficulty
     ).length;
-    difficultyCounts.set(difficulty, { total, filtered });
+
+    if (!groupMap.has(baseLabel)) {
+      groupMap.set(baseLabel, {
+        value: baseLabel,
+        label: baseLabel,
+        total,
+        filtered: filteredForVariant,
+      });
+    } else {
+      const existing = groupMap.get(baseLabel)!;
+      existing.total += total;
+      existing.filtered += filteredForVariant;
+    }
   });
 
-  return Object.values(ServiceDifficulty).map((difficulty) => ({
-    value: difficulty,
-    label: difficulty.split(" (")[0], // Remove ND da label
-    totalCount: difficultyCounts.get(difficulty)?.total || 0,
-    filteredCount: difficultyCounts.get(difficulty)?.filtered || 0,
-  }));
+  return Array.from(groupMap.values());
 });
 
 const complexityOptions = computed(() => {
@@ -525,11 +605,11 @@ const applyAllFilters = (
       return false;
 
     // Dificuldade
-    if (
-      filtersToApply.difficulty &&
-      service.difficulty !== filtersToApply.difficulty
-    )
-      return false;
+    if (filtersToApply.difficulty) {
+      // Suporta tanto filtro por rótulo base (ex: "Fácil") quanto valor exato
+      if (!String(service.difficulty).startsWith(filtersToApply.difficulty))
+        return false;
+    }
 
     // Complexidade
     if (
@@ -562,6 +642,22 @@ const applyAllFilters = (
           return false;
       }
       if (service.value.rewardAmount < minReward) return false;
+    }
+
+    // Busca por texto
+    if (filtersToApply.searchText && filtersToApply.searchText.trim()) {
+      const q = filtersToApply.searchText.toLowerCase();
+      const matches =
+        (service.title && service.title.toLowerCase().includes(q)) ||
+        (service.description &&
+          service.description.toLowerCase().includes(q)) ||
+        (service.contractorName &&
+          service.contractorName.toLowerCase().includes(q)) ||
+        (service.objective &&
+          service.objective.description &&
+          service.objective.description.toLowerCase().includes(q));
+
+      if (!matches) return false;
     }
 
     // Prazo e deadline
@@ -613,6 +709,11 @@ const applyAllFilters = (
     return true;
   });
 };
+
+// Lista de serviços já filtrada pelo conjunto atual de filtros (usada para emitir)
+const filteredServicesForComponent = computed(() => {
+  return applyAllFilters(props.services, filters.value);
+});
 
 // Extrair ND da string de dificuldade
 const extractNDFromDifficulty = (difficulty: string): number => {
@@ -669,6 +770,11 @@ const activeFilters = computed(() => {
     active.push({
       key: "skillRequirement",
       label: `Perícias: ${filters.value.skillRequirement}`,
+    });
+  if (filters.value.searchText && filters.value.searchText.trim())
+    active.push({
+      key: "searchText",
+      label: `Busca: ${filters.value.searchText}`,
     });
   if (filters.value.hasDeadline) {
     let label = "Prazo: ";
@@ -767,6 +873,16 @@ const updateSkillRequirementFilter = (value: string) => {
   emitFilters();
 };
 
+const updateSearchFilter = (value: string) => {
+  filters.value.searchText = value;
+  emitFilters();
+};
+
+const clearSearchFilter = () => {
+  filters.value.searchText = "";
+  emitFilters();
+};
+
 // Remover filtro específico
 const removeFilter = (filterKey: keyof ServiceFilters) => {
   filters.value[filterKey] = "";
@@ -784,7 +900,9 @@ const clearAllFilters = () => {
 
 // Emit filters
 const emitFilters = () => {
-  emit("filters-changed", filters.value);
+  const payload = { ...filters.value };
+  emit("update:filters", payload);
+  emit("filtered", filteredServicesForComponent.value);
 };
 
 // Formatar contadores
