@@ -991,39 +991,141 @@ export class ServiceGenerator {
   private static generateServiceDescription(
     objective: ServiceObjective
   ): string {
-    // Usar o enum como base, com ajustes mínimos para casos especiais
-    let mainVerb: string = objective.type;
+    // Helper para capitalizar a primeira letra (mantendo o resto)
+    const capitalizeFirst = (s: string) =>
+      s && s.length > 0 ? s[0].toUpperCase() + s.slice(1) : s;
 
-    // Ajustes específicos apenas quando necessário
+    // Normalizar componentes
+    const actionRaw = (objective.action || "").trim();
+    const targetRaw = (objective.target || "").trim();
+    const action = actionRaw.toLowerCase();
+    const target = targetRaw.toLowerCase();
+
+    // Preposições comuns para evitar duplicações
+    const leadingPreps = [
+      "para",
+      "em",
+      "na",
+      "no",
+      "de",
+      "do",
+      "da",
+      "dos",
+      "das",
+    ];
+
+    const startsWithPrep = (s: string) => {
+      if (!s) return false;
+      const lower = s.trim().toLowerCase();
+      return leadingPreps.some((p) => lower === p || lower.startsWith(p + " "));
+    };
+
+    const endsWithPrep = (s: string) => {
+      if (!s) return false;
+      return /\b(de|do|da|dos|das)$/i.test(s.trim());
+    };
+
+    // Decidir verbo principal (se for necessário) e conectivo
+    let mainVerb: string = objective.type;
+    const removeLeadingVerbForTypes = new Set<string>([
+      ServiceObjectiveType.SERVICOS_ESPECIFICOS,
+      ServiceObjectiveType.RELIGIOSO,
+    ]);
+
     if (objective.type === ServiceObjectiveType.EXTRAIR_RECURSOS) {
       mainVerb = "Extrair recursos de";
-    } else if (objective.type === ServiceObjectiveType.SERVICOS_ESPECIFICOS) {
-      mainVerb = "Executar";
-    } else if (objective.type === ServiceObjectiveType.RELIGIOSO) {
-      mainVerb = "Realizar";
     } else if (objective.type === ServiceObjectiveType.MULTIPLO) {
       mainVerb = "Executar";
     }
 
-    // Determinar conectivo baseado no tipo de objetivo
+    // Connector default
     let connector = "para";
-    const objectiveTypeLower = objective.type.toLowerCase();
+    if (objective.type === ServiceObjectiveType.CONSTRUIR_CRIAR_OU_REPARAR)
+      connector = "de";
+    if (objective.type === ServiceObjectiveType.RELIGIOSO) connector = "de";
 
-    // Usar "em" para contextos que indicam local/situação específicos
-    if (
-      objectiveTypeLower.includes("extrair") ||
-      objectiveTypeLower.includes("construir") ||
-      objectiveTypeLower.includes("religioso")
-    ) {
-      connector = "em";
+    const mainVerbEndsWithDe = /\bde$/i.test(mainVerb.trim());
+
+    // Construir descrição com boas heurísticas para preposições
+    let description = "";
+
+    if (removeLeadingVerbForTypes.has(objective.type)) {
+      // Começar pelo action capitalizado, sem verbo inicial
+      const lead = capitalizeFirst(action);
+      if (target) {
+        if (!startsWithPrep(target) && connector && !mainVerbEndsWithDe) {
+          description = `${lead} ${connector} ${target}`;
+        } else {
+          description = `${lead} ${target}`.trim();
+        }
+      } else {
+        description = lead;
+      }
+    } else if (objective.type === ServiceObjectiveType.AUXILIAR_OU_CUIDAR) {
+      // "Auxiliar ou cuidar de <action> [para <target>]" — evitar 'para em' quando target já tem preposição
+      const verb = mainVerb.trim();
+      if (target) {
+        if (startsWithPrep(target)) {
+          description = `${verb} de ${action} ${target}`
+            .replace(/\s+/g, " ")
+            .trim();
+        } else {
+          description = `${verb} de ${action} para ${target}`
+            .replace(/\s+/g, " ")
+            .trim();
+        }
+      } else {
+        description = `${verb} de ${action}`.trim();
+      }
+    } else {
+      // Caso geral
+      const verb = mainVerb.trim();
+      if (verb) {
+        if (mainVerbEndsWithDe) {
+          // Exemplo: "Extrair recursos de"
+          if (action && target) {
+            const actionWordCount = action.split(/\s+/).filter(Boolean).length;
+            const targetWordCount = target.split(/\s+/).filter(Boolean).length;
+
+            // Heurística: se action for uma única palavra (ex: 'especiaria') e target existir,
+            // inserir 'de' entre action e target: 'especiaria de pântano'.
+            // Se action tem múltiplas palavras e target é uma única palavra (ex: 'extrativismo animal' + 'submerso'),
+            // é provável que o target seja um adjetivo e não precise do 'de'.
+            if (!startsWithPrep(target) && !endsWithPrep(action)) {
+              if (actionWordCount === 1 && targetWordCount >= 1) {
+                description = `${verb} ${action} de ${target}`;
+              } else if (actionWordCount > 1 && targetWordCount === 1) {
+                description = `${verb} ${action} ${target}`;
+              } else {
+                description = `${verb} ${action} de ${target}`;
+              }
+            } else {
+              description = `${verb} ${action} ${target}`
+                .replace(/\s+/g, " ")
+                .trim();
+            }
+          } else {
+            description = `${verb} ${action} ${target}`
+              .replace(/\s+/g, " ")
+              .trim();
+          }
+        } else {
+          // Verb does not end with 'de'
+          if (action) {
+            description = `${verb} ${action}`;
+            if (target) {
+              if (!startsWithPrep(target) && connector)
+                description += ` ${connector} ${target}`;
+              else description += ` ${target}`;
+            }
+          } else {
+            description = `${action} ${connector} ${target}`.trim();
+          }
+        }
+      } else {
+        description = `${action} ${connector} ${target}`.trim();
+      }
     }
-
-    // Formatar componentes
-    const action = objective.action.toLowerCase(); // O que do resultado da tabela
-    const target = objective.target.toLowerCase(); // Para quem/onde
-
-    // Construir descrição base
-    let description = `${mainVerb} ${action} ${connector} ${target}`;
 
     // Adicionar complicação se houver
     if (objective.complication) {
@@ -1031,7 +1133,7 @@ export class ServiceGenerator {
       description += `, mas ${complication}`;
     }
 
-    return description;
+    return description.replace(/\s+/g, " ").trim();
   }
 
   /**
