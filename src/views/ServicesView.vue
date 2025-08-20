@@ -28,6 +28,7 @@
       v-if="!guild"
       class="text-center bg-red-900/20 border border-red-600/50 rounded-lg p-8"
     >
+      <ExclamationTriangleIcon class="w-16 h-16 text-red-400 mx-auto mb-4" />
       <h2 class="text-xl font-semibold text-red-400 mb-2">
         Nenhuma Guilda Encontrada
       </h2>
@@ -236,6 +237,7 @@ import {
   FunnelIcon,
   BuildingOfficeIcon,
   PlusIcon,
+  ExclamationTriangleIcon,
 } from "@heroicons/vue/24/outline";
 import { useToast } from "@/composables/useToast";
 import { useServicesStore } from "@/stores/services";
