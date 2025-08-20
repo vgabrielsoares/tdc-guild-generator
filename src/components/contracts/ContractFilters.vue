@@ -96,10 +96,22 @@
         >
           <option value="">Todos os prazos</option>
           <option value="with-deadline">
-            Com prazo ({{ contractsWithDeadline }})
+            Com prazo
+            {{
+              formatCount(
+                contractsWithDeadlineTotal,
+                contractsWithDeadlineFiltered
+              )
+            }}
           </option>
           <option value="no-deadline">
-            Sem prazo ({{ contractsWithoutDeadline }})
+            Sem prazo
+            {{
+              formatCount(
+                contractsWithoutDeadlineTotal,
+                contractsWithoutDeadlineFiltered
+              )
+            }}
           </option>
         </select>
       </div>
@@ -154,7 +166,6 @@
         </div>
       </div>
     </div>
-
 
     <!-- Resumo dos filtros ativos -->
     <div v-if="hasActiveFilters" class="border-t border-gray-600 pt-4">
@@ -367,17 +378,32 @@ const formatCount = (totalCount: number, filteredCount: number): string => {
   return `(${filteredCount}/${totalCount})`;
 };
 
-
-const contractsWithDeadline = computed(
+const contractsWithDeadlineTotal = computed(
   () =>
     props.contracts.filter((c) => c.deadline.type !== DeadlineType.SEM_PRAZO)
       .length
 );
 
-const contractsWithoutDeadline = computed(
+const contractsWithoutDeadlineTotal = computed(
   () =>
     props.contracts.filter((c) => c.deadline.type === DeadlineType.SEM_PRAZO)
       .length
+);
+
+const contractsExcludingDeadline = getFilteredContractsExcluding("hasDeadline");
+
+const contractsWithDeadlineFiltered = computed(
+  () =>
+    contractsExcludingDeadline.filter(
+      (c) => c.deadline.type !== DeadlineType.SEM_PRAZO
+    ).length
+);
+
+const contractsWithoutDeadlineFiltered = computed(
+  () =>
+    contractsExcludingDeadline.filter(
+      (c) => c.deadline.type === DeadlineType.SEM_PRAZO
+    ).length
 );
 
 // Valor do filtro de prazo convertido
