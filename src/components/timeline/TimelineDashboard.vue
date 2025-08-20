@@ -76,7 +76,7 @@
           {{ nextEventDays !== null ? nextEventDays : "∞" }}
         </div>
         <div class="text-sm text-rose-300">
-          {{ nextEventDays !== null ? "Dias até próximo" : "Sem eventos" }}
+          {{ nextEventDays !== null ? "Dias até próximo Evento" : "Sem eventos" }}
         </div>
       </div>
     </div>
