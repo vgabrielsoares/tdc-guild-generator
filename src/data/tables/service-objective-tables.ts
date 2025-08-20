@@ -2369,11 +2369,7 @@ export function generateSpecificServiceDescription(
   let connector = "para";
   const actionLower = action.toLowerCase();
 
-  if (
-    actionLower.includes("limpar") ||
-    actionLower.includes("organizar") ||
-    actionLower.includes("pintar")
-  ) {
+  if (actionLower.includes("limpar") || actionLower.includes("pintar")) {
     connector = "em";
   } else if (
     actionLower.includes("cobrar") ||
