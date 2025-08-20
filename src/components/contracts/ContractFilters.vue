@@ -198,6 +198,7 @@ import {
   ContractorType,
   DeadlineType,
 } from "@/types/contract";
+import { getStatusLabel } from "@/utils/status-labels";
 import { FunnelIcon, XMarkIcon } from "@heroicons/vue/24/outline";
 
 interface ContractFilters {
@@ -307,7 +308,7 @@ const statusOptions = computed(() => {
   return Object.values(ContractStatus)
     .map((status) => ({
       value: status,
-      label: status,
+      label: getStatusLabel(status as unknown as ContractStatus),
       totalCount: totalCounts[status] || 0,
       filteredCount: filteredCounts[status] || 0,
     }))

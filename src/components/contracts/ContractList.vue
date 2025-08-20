@@ -108,6 +108,7 @@
 import { computed } from "vue";
 import type { Contract } from "@/types/contract";
 import { ContractStatus } from "@/types/contract";
+import { getStatusLabel } from "@/utils/status-labels";
 import ContractCard from "./ContractCard.vue";
 import { DocumentTextIcon, ArrowPathIcon } from "@heroicons/vue/24/outline";
 
@@ -199,34 +200,6 @@ const statusFilters = computed(() => {
 
   return filters;
 });
-
-// Helper para transformar um status em label amigável (plural quando aplicável)
-function getStatusLabel(status: ContractStatus): string {
-  switch (status) {
-    case ContractStatus.DISPONIVEL:
-      return "Disponíveis";
-    case ContractStatus.ACEITO:
-      return "Aceitos";
-    case ContractStatus.EM_ANDAMENTO:
-      return "Em Andamento";
-    case ContractStatus.CONCLUIDO:
-      return "Concluídos";
-    case ContractStatus.FALHOU:
-      return "Falharam";
-    case ContractStatus.EXPIRADO:
-      return "Expirados";
-    case ContractStatus.ANULADO:
-      return "Anulados";
-    case ContractStatus.RESOLVIDO_POR_OUTROS:
-      return "Resolvidos por Outros";
-    case ContractStatus.ACEITO_POR_OUTROS:
-      return "Aceitos por Outros";
-    case ContractStatus.QUEBRADO:
-      return "Quebrados";
-    default:
-      return status;
-  }
-}
 
 const emptyStateMessage = computed(() => {
   if (props.activeStatusFilter) {
