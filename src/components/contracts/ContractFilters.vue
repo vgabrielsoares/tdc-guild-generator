@@ -391,18 +391,20 @@ const contractsWithoutDeadlineTotal = computed(
       .length
 );
 
-const contractsExcludingDeadline = getFilteredContractsExcluding("hasDeadline");
+const contractsExcludingDeadline = computed(() =>
+  getFilteredContractsExcluding("hasDeadline")
+);
 
 const contractsWithDeadlineFiltered = computed(
   () =>
-    contractsExcludingDeadline.filter(
+    contractsExcludingDeadline.value.filter(
       (c) => c.deadline.type !== DeadlineType.SEM_PRAZO
     ).length
 );
 
 const contractsWithoutDeadlineFiltered = computed(
   () =>
-    contractsExcludingDeadline.filter(
+    contractsExcludingDeadline.value.filter(
       (c) => c.deadline.type === DeadlineType.SEM_PRAZO
     ).length
 );
