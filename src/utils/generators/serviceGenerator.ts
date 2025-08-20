@@ -790,8 +790,8 @@ export class ServiceGenerator {
     return {
       type: ServiceObjectiveType.AUXILIAR_OU_CUIDAR,
       description: "Auxiliar ou cuidar",
-      action: "Auxiliar",
-      target: "pessoa local",
+      action: "Artesão",
+      target: "inventário de mercadorias",
       complication: "prazo é apertado",
     };
   }
@@ -864,10 +864,10 @@ export class ServiceGenerator {
     };
 
     const baseTitle = titleMap[objective.type] || "Serviço";
-    
+
     // Adicionar contexto do alvo se disponível
     if (objective.target) {
-      const targetShort = objective.target.split(' ').slice(0, 2).join(' ');
+      const targetShort = objective.target.split(" ").slice(0, 2).join(" ");
       return `${baseTitle}: ${targetShort}`;
     }
 
