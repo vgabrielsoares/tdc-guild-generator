@@ -8,6 +8,7 @@ import type {
   ServiceObjective,
   ServiceComplication,
   ServiceRival,
+  ServiceFailureReason,
   ServiceOrigin,
 } from "@/types/service";
 import {
@@ -16,6 +17,7 @@ import {
   ServiceDeadlineType as DeadlineTypeEnum,
   ServiceComplexity,
   ServiceObjectiveType,
+  ServiceResolution,
   ServiceComplicationType,
   ServiceComplicationConsequence,
   ServiceRivalAction,
@@ -51,6 +53,12 @@ import {
   generateEnhancedServiceObjective,
 } from "@/data/tables/service-objective-tables";
 import { SERVICE_NARRATIVE_TABLES } from "@/data/tables/service-narrative-tables";
+import {
+  SERVICE_SIGNED_RESOLUTION_TABLE,
+  SERVICE_FAILURE_REASONS_TABLE,
+  shouldCancelService,
+  shouldGetServiceRecurrenceBonus,
+} from "@/data/tables/service-resolution-tables";
 import {
   SERVICE_DIFFICULTY_TABLE,
   SERVICE_COMPLEXITY_TABLE,
@@ -143,9 +151,38 @@ export class ServiceGenerator {
         finalQuantity = Math.max(0, baseQuantity - reduction);
       }
 
+      // Calcular modificador de staff cedo (usado no metadata e ao retornar combinado)
+      const staffModifier = this.getStaffModifier(config.guild);
+
       // ETAPA 3: Gerar serviços individuais
       const services: Service[] = [];
       const notes: string[] = [];
+
+      // Se aplicamos reduções por frequentadores, precisamos gerar
+      // também os serviços "aceitos por outros" para manter
+      // compatibilidade com o fluxo dos contratos, delegamos a geração
+      // a uma função que calcula a versão com e sem redução e retorna
+      // a lista completa (disponíveis + aceitos por outros).
+      if (config.applyReductions !== false && config.quantity === undefined) {
+        const combined = this.generateServicesWithFrequentatorsReduction(
+          config,
+          config.currentDate
+        );
+
+        // combined já contém serviços disponíveis e os "taken by others"
+        return {
+          services: combined,
+          metadata: {
+            baseQuantity,
+            finalQuantity: combined.length,
+            reductionApplied,
+            guildSize: config.guild.structure.size,
+            staffModifier,
+            generatedAt: config.currentDate,
+            notes,
+          },
+        };
+      }
 
       for (let i = 0; i < finalQuantity; i++) {
         const serviceConfig: IndividualServiceConfig = {
@@ -166,7 +203,6 @@ export class ServiceGenerator {
       }
 
       // ETAPA 4: Metadados e informações da geração
-      const staffModifier = this.getStaffModifier(config.guild);
 
       if (reductionApplied > 0) {
         notes.push(
@@ -197,6 +233,159 @@ export class ServiceGenerator {
         `Falha na geração de serviços: ${error instanceof Error ? error.message : "Erro desconhecido"}`
       );
     }
+  }
+
+  /**
+   * Gera serviços aplicando redução por frequentadores, produzindo
+   * serviços disponíveis + serviços aceitos por outros (com status apropriado)
+   */
+  static generateServicesWithFrequentatorsReduction(
+    config: ServiceGenerationConfig,
+    currentDate: GameDate
+  ): Service[] {
+    // Calcula quantidade base (sem aplicar redução de frequentadores)
+    const baseQuantity = this.calculateBaseQuantity({
+      guild: config.guild,
+      currentDate: config.currentDate,
+    });
+
+    // Calcula redução e contador final
+    const reduction = this.calculateVisitorReduction(config.guild);
+    const withReductionCount = Math.max(0, baseQuantity - reduction);
+    const takenByOthersCount = Math.max(0, baseQuantity - withReductionCount);
+
+    // Gera serviços disponíveis (depois da redução)
+    const availableServices: Service[] = [];
+    for (let i = 0; i < withReductionCount; i++) {
+      availableServices.push(
+        this.generateIndividualService({
+          guild: config.guild,
+          currentDate,
+          serviceIndex: i,
+          totalServices: withReductionCount,
+        })
+      );
+    }
+
+    // Gera serviços aceitos por outros
+    const takenServices: Service[] = [];
+    for (let i = 0; i < takenByOthersCount; i++) {
+      takenServices.push(
+        this.generateServiceTakenByOthers(config, currentDate)
+      );
+    }
+
+    return [...availableServices, ...takenServices];
+  }
+
+  /**
+   * Gera um serviço que foi aceito por outros aventureiros
+   * Usa as tabelas de "Resoluções para Serviços Firmados" e motivos
+   */
+  private static generateServiceTakenByOthers(
+    config: ServiceGenerationConfig,
+    currentDate: GameDate
+  ): Service {
+    // Rolar para ver o que aconteceu com o serviço aceito por outros
+    const outcomeRoll = rollDice({ notation: "1d20" }).result;
+    const outcomeEntry = SERVICE_SIGNED_RESOLUTION_TABLE.find(
+      (entry) => outcomeRoll >= entry.min && outcomeRoll <= entry.max
+    );
+
+    // Se não encontrar, gerar um serviço base e marcar como ACEITO_POR_OUTROS
+    if (!outcomeEntry) {
+      const base = this.generateIndividualService({
+        guild: config.guild,
+        currentDate,
+        serviceIndex: 0,
+        totalServices: 1,
+      });
+
+      return {
+        ...base,
+        status: ServiceStatusEnum.ACEITO_POR_OUTROS,
+        takenByOthersInfo: {
+          takenAt: currentDate,
+          canReturnToAvailable: true,
+        },
+      };
+    }
+
+    const outcome = outcomeEntry.result as ServiceResolution;
+
+    let failureReason: ServiceFailureReason | undefined;
+
+    // Se resultado for NAO_RESOLVIDO, rola motivo de falha
+    if (outcome === ServiceResolution.NAO_RESOLVIDO) {
+      const reasonRoll = rollDice({ notation: "1d20" }).result;
+      const reasonEntry = SERVICE_FAILURE_REASONS_TABLE.find(
+        (entry) => reasonRoll >= entry.min && reasonRoll <= entry.max
+      );
+      failureReason = reasonEntry?.result;
+    }
+
+    // Se motivo de falha indica cancelamento, retorna um serviços anulado
+    if (failureReason && shouldCancelService(failureReason)) {
+      const base = this.generateIndividualService({
+        guild: config.guild,
+        currentDate,
+        serviceIndex: 0,
+        totalServices: 1,
+      });
+
+      return {
+        ...base,
+        status: ServiceStatusEnum.ANULADO,
+        takenByOthersInfo: {
+          takenAt: currentDate,
+          resolutionReason: failureReason,
+          canReturnToAvailable: false,
+        },
+      };
+    }
+
+    // Gera um serviço base e aplica a taxa de recorrência
+    let baseService = this.generateIndividualService({
+      guild: config.guild,
+      currentDate,
+      serviceIndex: 0,
+      totalServices: 1,
+    });
+
+    if (shouldGetServiceRecurrenceBonus(outcome, failureReason)) {
+      baseService = this.applyRecurrenceBonus(baseService, 1);
+    }
+
+    // Se resolvido por outros
+    if (
+      outcome === ServiceResolution.RESOLVIDO ||
+      outcome === ServiceResolution.RESOLVIDO_COM_RESSALVAS
+    ) {
+      return {
+        ...baseService,
+        status: ServiceStatusEnum.RESOLVIDO_POR_OUTROS,
+        takenByOthersInfo: {
+          takenAt: currentDate,
+          estimatedResolutionDate: currentDate,
+          resolutionReason:
+            outcome === ServiceResolution.RESOLVIDO_COM_RESSALVAS
+              ? "Resolvido com ressalvas"
+              : undefined,
+          canReturnToAvailable: false,
+        },
+        completedAt: currentDate,
+      };
+    }
+
+    // Ou marca aceito por outros (pode retornar a ficar disponível)
+    return {
+      ...baseService,
+      status: ServiceStatusEnum.ACEITO_POR_OUTROS,
+      takenByOthersInfo: {
+        takenAt: currentDate,
+        canReturnToAvailable: true,
+      },
+    };
   }
 
   /**

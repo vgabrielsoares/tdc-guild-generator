@@ -298,6 +298,14 @@ export interface Service {
   // Estado temporal
   isActive: boolean; // Se está sendo processado no timeline
   isExpired: boolean; // Se passou do prazo
+
+  // Informações para serviços aceitos por outros aventureiros
+  takenByOthersInfo?: {
+    takenAt: GameDate;
+    estimatedResolutionDate?: GameDate;
+    resolutionReason?: string;
+    canReturnToAvailable?: boolean;
+  };
 }
 
 // ===== INTERFACES PARA ELEMENTOS NARRATIVOS =====
