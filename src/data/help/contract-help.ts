@@ -653,9 +653,9 @@ export const contractHelpData: Record<string, HelpData> = {
     ],
     tips: [
       "Use resoluções automáticas para criar sensação de mundo vivo.",
-      'Contratos "perdidos" podem gerar arrependimento e urgência.',
+      'Contratos "perdidos" podem gerar senso de urgência.',
       "Considere as consequências de problemas não resolvidos.",
-      "NPCs competindo cria pressão temporal natural.",
+      "NPCs competindo por contratos cria pressão temporal natural.",
     ],
     examples: [
       {
