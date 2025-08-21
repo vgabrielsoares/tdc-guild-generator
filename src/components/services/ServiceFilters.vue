@@ -162,8 +162,13 @@
             class="filter-select flex-1"
           >
             <option value="">Todas</option>
-            <option value="C$">C$</option>
-            <option value="PO$">PO$</option>
+            <option
+              v-for="cur in rewardCurrencyOptions"
+              :key="cur.value"
+              :value="cur.value"
+            >
+              {{ cur.label }} {{ formatCount(cur.total, cur.filtered) }}
+            </option>
           </select>
         </div>
       </div>
@@ -212,10 +217,13 @@
           class="filter-select"
         >
           <option value="">Qualquer quantidade</option>
-          <option value="1">1 teste</option>
-          <option value="2">2 testes</option>
-          <option value="3">3 testes</option>
-          <option value="4">4+ testes</option>
+          <option
+            v-for="opt in testCountOptions"
+            :key="opt.value"
+            :value="opt.value"
+          >
+            {{ opt.label }} {{ formatCount(opt.total, opt.filtered) }}
+          </option>
         </select>
       </div>
     </div>
@@ -283,8 +291,24 @@
                 class="filter-select"
               >
                 <option value="">Todos</option>
-                <option value="true">Apenas com bônus aplicado</option>
-                <option value="false">Apenas sem bônus</option>
+                <option value="true">
+                  Apenas com bônus aplicado
+                  {{
+                    formatCount(
+                      recurrenceTotals.totalTrue,
+                      recurrenceTotals.filteredTrue
+                    )
+                  }}
+                </option>
+                <option value="false">
+                  Apenas sem bônus
+                  {{
+                    formatCount(
+                      recurrenceTotals.totalFalse,
+                      recurrenceTotals.filteredFalse
+                    )
+                  }}
+                </option>
               </select>
             </div>
 
@@ -301,9 +325,14 @@
                 class="filter-select"
               >
                 <option value="">Todos os tipos</option>
-                <option value="same">Mesma perícia</option>
-                <option value="different">Perícias diferentes</option>
-                <option value="mixed">Perícias mistas</option>
+                <option
+                  v-for="skill in skillRequirementOptions"
+                  :key="skill.value"
+                  :value="skill.value"
+                >
+                  {{ skill.label }}
+                  {{ formatCount(skill.total, skill.filtered) }}
+                </option>
               </select>
             </div>
           </div>
@@ -560,6 +589,87 @@ const complexityOptions = computed(() => {
   }));
 });
 
+const rewardCurrencyOptions = computed(() => {
+  const totals = new Map<string, { total: number; filtered: number }>();
+
+  ["C$", "PO$"] as const;
+  ["C$", "PO$"].forEach((cur) => {
+    const total = props.services.filter((s) => s.value.currency === cur).length;
+    const filtered = getFilteredServicesForOption("rewardCurrency", cur).length;
+    totals.set(cur, { total, filtered });
+  });
+
+  return ["C$", "PO$"].map((cur) => ({
+    value: cur,
+    label: cur,
+    total: totals.get(cur)?.total || 0,
+    filtered: totals.get(cur)?.filtered || 0,
+  }));
+});
+
+const recurrenceTotals = computed(() => {
+  const totalTrue = props.services.filter(
+    (s) => s.value && s.value.recurrenceBonusAmount > 0
+  ).length;
+  const totalFalse = props.services.filter(
+    (s) => !s.value || s.value.recurrenceBonusAmount === 0
+  ).length;
+
+  const filteredTrue = getFilteredServicesForOption(
+    "hasRecurrence",
+    "true"
+  ).length;
+  const filteredFalse = getFilteredServicesForOption(
+    "hasRecurrence",
+    "false"
+  ).length;
+
+  return { totalTrue, totalFalse, filteredTrue, filteredFalse };
+});
+
+const skillRequirementOptions = computed(() => {
+  const values = ["same", "different", "mixed"] as const;
+  return values.map((v) => ({
+    value: v,
+    label:
+      v === "same"
+        ? "Mesma perícia"
+        : v === "different"
+          ? "Perícias diferentes"
+          : "Perícias mistas",
+    total: props.services.filter((s) => s.testStructure?.skillRequirement === v)
+      .length,
+    filtered: getFilteredServicesForOption("skillRequirement", v).length,
+  }));
+});
+
+const testCountOptions = computed(() => {
+  const totals = new Map<string, { total: number; filtered: number }>();
+  const options = ["1", "2", "3", "4"];
+  options.forEach((opt) => {
+    let total = 0;
+    if (opt === "4") {
+      total = props.services.filter(
+        (s) => s.testStructure.totalTests >= 4
+      ).length;
+    } else {
+      const n = parseInt(opt);
+      total = props.services.filter(
+        (s) => s.testStructure.totalTests === n
+      ).length;
+    }
+    const filtered = getFilteredServicesForOption("testCount", opt).length;
+    totals.set(opt, { total, filtered });
+  });
+
+  return options.map((opt) => ({
+    value: opt,
+    label: opt === "4" ? "4+ testes" : `${opt} teste${opt !== "1" ? "s" : ""}`,
+    total: totals.get(opt)?.total || 0,
+    filtered: totals.get(opt)?.filtered || 0,
+  }));
+});
+
 const contractorOptions = computed(() => {
   const contractorCounts = new Map<
     string,
@@ -683,6 +793,21 @@ const applyAllFilters = (
       }
     }
 
+    // Recorrência / Taxa de recorrência
+    if (filtersToApply.hasRecurrence) {
+      const serviceTyped = service as Service;
+      const serviceHasRecurrence = !!(
+        serviceTyped.value &&
+        typeof serviceTyped.value.recurrenceBonusAmount === "number" &&
+        serviceTyped.value.recurrenceBonusAmount > 0
+      );
+
+      if (filtersToApply.hasRecurrence === "true" && !serviceHasRecurrence)
+        return false;
+      if (filtersToApply.hasRecurrence === "false" && serviceHasRecurrence)
+        return false;
+    }
+
     // Prazo por tipo (mantido para compatibilidade)
     if (
       filtersToApply.deadlineType &&
@@ -793,6 +918,19 @@ const activeFilters = computed(() => {
       key: "hasDeadline",
       label,
     });
+  }
+
+  if (filters.value.hasRecurrence) {
+    let label = "Recorrência: ";
+    switch (filters.value.hasRecurrence) {
+      case "true":
+        label += "Com bônus";
+        break;
+      case "false":
+        label += "Sem bônus";
+        break;
+    }
+    active.push({ key: "hasRecurrence", label });
   }
 
   return active;
