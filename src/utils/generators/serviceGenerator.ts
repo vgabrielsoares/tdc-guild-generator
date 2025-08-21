@@ -54,6 +54,10 @@ import {
 } from "@/data/tables/service-objective-tables";
 import { SERVICE_NARRATIVE_TABLES } from "@/data/tables/service-narrative-tables";
 import {
+  ADDITIONAL_CHALLENGE_CHANCE_TABLE,
+  ADDITIONAL_CHALLENGE_TABLE,
+} from "@/data/tables/service-challenge-tables";
+import {
   SERVICE_SIGNED_RESOLUTION_TABLE,
   SERVICE_FAILURE_REASONS_TABLE,
   shouldCancelService,
@@ -559,6 +563,23 @@ export class ServiceGenerator {
     const complication = this.generateComplication();
     const rival = this.generateRival();
     const origin = this.generateOrigin();
+    // GERAÇÃO DE DESAFIO ADICIONAL
+    let additionalChallenge;
+    try {
+      const chanceResult = rollOnTable(ADDITIONAL_CHALLENGE_CHANCE_TABLE);
+      if (chanceResult.result.hasChallenge) {
+        const challengeResult = rollOnTable(ADDITIONAL_CHALLENGE_TABLE);
+        additionalChallenge = {
+          description: challengeResult.result.description,
+          hasChallenge: true,
+        };
+      } else {
+        additionalChallenge = { description: "", hasChallenge: false };
+      }
+    } catch (err) {
+      // Em caso de falha, não bloquear a geração do serviço
+      additionalChallenge = undefined;
+    }
 
     // CRIAÇÃO DO SERVIÇO
     const service: Service = {
@@ -582,6 +603,7 @@ export class ServiceGenerator {
       complication,
       rival,
       origin,
+      additionalChallenge,
     };
 
     return service;
