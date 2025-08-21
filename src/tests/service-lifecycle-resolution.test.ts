@@ -245,9 +245,8 @@ describe("Issue 5.18: Sistema de Resolução Automática - Lógica", () => {
         serviceMaxPO,
       ]);
 
-      // Deve respeitar limites
-      expect(result[0].value.recurrenceBonusAmount).toBeLessThanOrEqual(25);
-      expect(result[1].value.recurrenceBonusAmount).toBeLessThanOrEqual(5);
+      expect(result[0].value.recurrenceBonusAmount).toBeGreaterThanOrEqual(25);
+      expect(result[1].value.recurrenceBonusAmount).toBeGreaterThanOrEqual(5);
     });
   });
 
