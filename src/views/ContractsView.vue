@@ -18,24 +18,22 @@
           />
         </Tooltip>
       </h1>
-      <p class="text-lg text-gray-300 mb-8">
+      <p
+        class="text-lg text-gray-300 mb-8 flex items-center justify-center gap-2"
+      >
         Gerencie contratos da sede da guilda atual
+        <Tooltip
+          content="Sistema de quantidade baseado no tamanho da sede, funcionários e frequentadores da guilda."
+          title="Como funciona a geração"
+          position="auto"
+        >
+          <InfoButton
+            help-key="contract-quantity"
+            @open-help="handleOpenHelp"
+            button-class="text-gray-400 hover:text-amber-400"
+          />
+        </Tooltip>
       </p>
-      <div class="flex flex-col items-center justify-center">
-        <div class="flex items-center gap-2">
-          <Tooltip
-            content="Sistema de quantidade baseado no tamanho da sede, funcionários e frequentadores da guilda."
-            title="Como funciona a geração"
-            position="auto"
-          >
-            <InfoButton
-              help-key="contract-quantity"
-              @open-help="handleOpenHelp"
-              button-class="text-gray-400 hover:text-amber-400"
-            />
-          </Tooltip>
-        </div>
-      </div>
     </div>
 
     <!-- Info da Guilda Atual -->
