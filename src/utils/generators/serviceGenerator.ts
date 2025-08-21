@@ -64,6 +64,7 @@ import {
   SERVICE_COMPLEXITY_TABLE,
   createServiceTestStructure,
 } from "@/data/tables/service-difficulty-tables";
+import { applyRecurrenceBonus as applyRecurrenceBonusUtil } from "@/types/service";
 
 // ===== INTERFACES DE CONFIGURAÇÃO =====
 
@@ -239,7 +240,7 @@ export class ServiceGenerator {
    * Gera serviços aplicando redução por frequentadores, produzindo
    * serviços disponíveis + serviços aceitos por outros (com status apropriado)
    */
-  static generateServicesWithFrequentatorsReduction(
+  private static generateServicesWithFrequentatorsReduction(
     config: ServiceGenerationConfig,
     currentDate: GameDate
   ): Service[] {
@@ -353,7 +354,7 @@ export class ServiceGenerator {
     });
 
     if (shouldGetServiceRecurrenceBonus(outcome, failureReason)) {
-      baseService = this.applyRecurrenceBonus(baseService, 1);
+      baseService = applyRecurrenceBonusUtil(baseService);
     }
 
     // Se resolvido por outros
@@ -727,19 +728,23 @@ export class ServiceGenerator {
       rewardAmount = 5; // Fallback seguro
     }
 
-    // ETAPA 3: Calcular valor de recorrência
+    // ETAPA 3: Determinar moeda
+    const currency = rewardRoll.includes("PO$") ? "PO$" : "C$";
+
+    // ETAPA 4: Calcular valor de recorrência (valor 'por aplicação' vindo da tabela)
     let recurrenceBonusAmount = 0;
+    let recurrenceStepAmount = 0;
     try {
-      const bonusMatch = recurrenceBonus.match(/\+([0-9,]+)\s*C\$/);
-      if (bonusMatch) {
-        recurrenceBonusAmount = parseFloat(bonusMatch[1].replace(",", "."));
+      const bonusMatchC = recurrenceBonus.match(/\+([0-9,]+)\s*C\$/);
+      if (bonusMatchC) {
+        const stepInC = parseFloat(bonusMatchC[1].replace(",", "."));
+        recurrenceStepAmount = currency === "PO$" ? stepInC / 100 : stepInC;
+        recurrenceBonusAmount = 0;
       }
     } catch {
-      recurrenceBonusAmount = 0.5; // Fallback
+      recurrenceStepAmount = 0.5; // Fallback
+      recurrenceBonusAmount = 0; // Fallback
     }
-
-    // ETAPA 4: Determinar moeda
-    const currency = rewardRoll.includes("PO$") ? "PO$" : "C$";
 
     return {
       rewardRoll,
@@ -747,6 +752,7 @@ export class ServiceGenerator {
       currency,
       recurrenceBonus,
       recurrenceBonusAmount,
+      recurrenceStepAmount,
       difficulty,
       modifiers: {
         populationRelation: this.getPopulationRelationModifier(
@@ -1289,17 +1295,12 @@ export class ServiceGenerator {
    * @param timesPreviouslyFailed - Quantas vezes o serviço falhou antes (para recorrência)
    * @returns Valor final da recompensa
    */
-  public static calculateFinalReward(
-    service: Service,
-    timesPreviouslyFailed: number = 0
-  ): number {
+  public static calculateFinalReward(service: Service): number {
     let baseReward = service.value.rewardAmount;
 
-    // Aplicar taxa de recorrência se o serviço falhou antes
-    if (timesPreviouslyFailed > 0) {
-      const recurrenceBonus =
-        service.value.recurrenceBonusAmount * timesPreviouslyFailed;
-      baseReward += recurrenceBonus;
+    // Aplicar taxa de recorrência: usar o valor acumulado em service.value.recurrenceBonusAmount
+    if ((service.value.recurrenceBonusAmount || 0) > 0) {
+      baseReward += service.value.recurrenceBonusAmount;
     }
 
     // Se não há outcome (testes não concluídos), retornar base + recorrência
@@ -1318,32 +1319,6 @@ export class ServiceGenerator {
     }
 
     return Math.floor(finalReward);
-  }
-
-  /**
-   * Aplica taxa de recorrência a um serviço não resolvido
-   * Conforme especificação "Taxa de recorrência"
-   *
-   * @param service - Serviço original
-   * @param failureCount - Número de falhas consecutivas
-   * @returns Serviço com valor atualizado
-   */
-  public static applyRecurrenceBonus(
-    service: Service,
-    failureCount: number
-  ): Service {
-    if (failureCount <= 0) return service;
-
-    const totalBonus = service.value.recurrenceBonusAmount * failureCount;
-    const updatedValue = {
-      ...service.value,
-      rewardAmount: service.value.rewardAmount + totalBonus,
-    };
-
-    return {
-      ...service,
-      value: updatedValue,
-    };
   }
 
   /**
