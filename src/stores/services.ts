@@ -188,6 +188,25 @@ export const useServicesStore = defineStore("services", () => {
     saveServicesToStorage();
   };
 
+  /**
+   * Aplica taxa de recorrência a um serviço específico e persiste a alteração
+   */
+  const applyRecurrenceToService = (serviceId: string) => {
+    const index = services.value.findIndex((s) => s.id === serviceId);
+    if (index === -1) return null;
+
+    const updated = applyRecurrenceBonus(
+      services.value[index] as Service
+    ) as ServiceWithGuild;
+    // manter guildId e outros campos
+    services.value[index] = {
+      ...services.value[index],
+      ...updated,
+    } as ServiceWithGuild;
+    saveServicesToStorage();
+    return services.value[index];
+  };
+
   const getServicesForGuild = (guildId: string): ServiceWithGuild[] => {
     return services.value.filter((service) => service.guildId === guildId);
   };
@@ -724,5 +743,7 @@ export const useServicesStore = defineStore("services", () => {
     resetServiceTests,
     getServiceTestStructure,
     canStartTests,
+    // Recurrence
+    applyRecurrenceToService,
   };
 });
