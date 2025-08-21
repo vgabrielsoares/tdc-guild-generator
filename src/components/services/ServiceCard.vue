@@ -68,10 +68,22 @@
             :content="`Dificuldade ${service.difficulty} determina o ND dos testes necessários para completar este serviço`"
             :difficulty="service.difficulty"
           >
-            <span class="text-sm font-medium text-yellow-400 cursor-help">
+            <span
+              :class="['text-sm font-medium cursor-help', getDifficultyColor()]"
+            >
               {{ service.difficulty }}
             </span>
           </ServiceTooltip>
+        </div>
+
+        <!-- Complexidade -->
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-400">Complexidade:</span>
+          <span
+            :class="['text-sm font-medium cursor-help', getComplexityColor()]"
+          >
+            {{ service.complexity }}
+          </span>
         </div>
 
         <!-- Recompensa -->
@@ -198,7 +210,12 @@ import {
   ShieldCheckIcon,
 } from "@heroicons/vue/24/outline";
 import type { Service } from "@/types/service";
-import { ServiceStatus, ServiceContractorType } from "@/types/service";
+import {
+  ServiceStatus,
+  ServiceContractorType,
+  ServiceDifficulty,
+  ServiceComplexity,
+} from "@/types/service";
 import ServiceStatusComponent from "./ServiceStatus.vue";
 import ServiceTooltip from "./ServiceTooltip.vue";
 import Tooltip from "@/components/common/Tooltip.vue";
@@ -240,17 +257,70 @@ const isHighValue = computed(() => {
   return props.service.value.rewardAmount >= 20; // Valor arbitrário para "alto valor"
 });
 
-const isHighComplexity = computed(
-  () =>
-    props.service.complexity === "Extremamente complexa" ||
-    props.service.complexity === "Extremamente complexa e Direta"
-);
+const isHighComplexity = computed(() => {
+  const c = props.service?.complexity;
+  return (
+    c === ServiceComplexity.EXTREMAMENTE_COMPLEXA ||
+    c === ServiceComplexity.EXTREMAMENTE_COMPLEXA_E_DIRETA
+  );
+});
 
-const isEasyDifficulty = computed(
-  () =>
-    props.service.difficulty === "Muito Fácil (ND 10)" ||
-    props.service.difficulty === "Fácil (ND 14)"
-);
+const isEasyDifficulty = computed(() => {
+  const d = props.service?.difficulty;
+  return (
+    d === ServiceDifficulty.MUITO_FACIL ||
+    d === ServiceDifficulty.FACIL_ND14 ||
+    d === ServiceDifficulty.FACIL_ND15 ||
+    d === ServiceDifficulty.FACIL_ND16
+  );
+});
+
+function getDifficultyColor() {
+  const d = props.service?.difficulty;
+  if (!d) return "text-gray-400";
+
+  switch (d) {
+    case ServiceDifficulty.MUITO_FACIL:
+    case ServiceDifficulty.FACIL_ND14:
+    case ServiceDifficulty.FACIL_ND15:
+    case ServiceDifficulty.FACIL_ND16:
+      return "text-green-400";
+    case ServiceDifficulty.MEDIA_ND17:
+    case ServiceDifficulty.MEDIA_ND18:
+    case ServiceDifficulty.MEDIA_ND19:
+      return "text-yellow-400";
+    case ServiceDifficulty.DIFICIL_ND20:
+    case ServiceDifficulty.DIFICIL_ND21:
+    case ServiceDifficulty.DESAFIADOR_ND22:
+    case ServiceDifficulty.DESAFIADOR_ND23:
+      return "text-orange-400";
+    case ServiceDifficulty.MUITO_DIFICIL:
+      return "text-red-400";
+    default:
+      return "text-gray-400";
+  }
+}
+
+function getComplexityColor() {
+  const c = props.service?.complexity;
+  if (!c) return "text-gray-400";
+
+  switch (c) {
+    case ServiceComplexity.SIMPLES:
+    case ServiceComplexity.MODERADA_E_DIRETA:
+      return "text-green-400";
+    case ServiceComplexity.MODERADA:
+    case ServiceComplexity.COMPLEXA_E_DIRETA:
+      return "text-yellow-400";
+    case ServiceComplexity.COMPLEXA:
+    case ServiceComplexity.EXTREMAMENTE_COMPLEXA_E_DIRETA:
+      return "text-orange-400";
+    case ServiceComplexity.EXTREMAMENTE_COMPLEXA:
+      return "text-red-400";
+    default:
+      return "text-gray-400";
+  }
+}
 
 // Ícone do contratante
 const contractorIcon = computed(() => {
