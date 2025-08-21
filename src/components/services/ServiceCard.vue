@@ -15,9 +15,11 @@
             :contractor-type="contractorTypeLabel">
             <component :is="contractorIcon" class="w-5 h-5 text-blue-400" />
           </ServiceTooltip>
-          <h3 class="text-lg font-semibold text-gold-400">
-            {{ `Serviço #${service.id}` }}
-          </h3>
+          <Tooltip position="auto" title="Identificador do Serviço" :content="`ID completo: ${service.id}`">
+            <h3 class="text-lg font-semibold text-gold-400">
+              {{ `Serviço #${service.id.slice(-8).toUpperCase()}` }}
+            </h3>
+          </Tooltip>
           <InfoButton help-key="service-contractors" @open-help="$emit('open-help', 'service-contractors')"
             button-class="text-xs" />
         </div>
@@ -48,25 +50,35 @@
         <!-- Dificuldade -->
         <div class="flex items-center justify-between">
           <span class="text-sm text-gray-400">Dificuldade:</span>
-          <span class="text-sm font-medium text-yellow-400">
-            {{ service.difficulty }}
-          </span>
+          <ServiceTooltip 
+            :content="`Dificuldade ${service.difficulty} determina o ND dos testes necessários para completar este serviço`"
+            :difficulty="service.difficulty"
+          >
+            <span class="text-sm font-medium text-yellow-400 cursor-help">
+              {{ service.difficulty }}
+            </span>
+          </ServiceTooltip>
         </div>
 
         <!-- Recompensa -->
         <div class="flex items-center justify-between">
           <span class="text-sm text-gray-400">Recompensa:</span>
-          <div class="flex items-center gap-2">
-            <span class="text-sm font-medium text-green-400">
-              {{ (service.value?.rewardAmount || 0) + (service.value?.recurrenceBonusAmount || 0) }} {{
-                service.value?.currency }}
-            </span>
-            <span v-if="service.value?.recurrenceAppliedCount && service.value?.recurrenceAppliedCount > 0"
-              class="text-xs bg-green-800 text-green-100 px-2 py-0.5 rounded-full border border-green-700"
-              :title="`${service.value.recurrenceAppliedCount}x aplicação(s)`">
-              +{{ service.value.recurrenceBonusAmount }} {{ service.value.currency }}
-            </span>
-          </div>
+          <ServiceTooltip 
+            :content="`Recompensa total: ${(service.value?.rewardAmount || 0)} + ${(service.value?.recurrenceBonusAmount || 0)} de bônus${service.value?.recurrenceAppliedCount ? ` (${service.value.recurrenceAppliedCount}x recorrência)` : ''}`"
+            title="Breakdown da Recompensa"
+          >
+            <div class="flex items-center gap-2 cursor-help">
+              <span class="text-sm font-medium text-green-400">
+                {{ (service.value?.rewardAmount || 0) + (service.value?.recurrenceBonusAmount || 0) }} {{
+                  service.value?.currency }}
+              </span>
+              <span v-if="service.value?.recurrenceAppliedCount && service.value?.recurrenceAppliedCount > 0"
+                class="text-xs bg-green-800 text-green-100 px-2 py-0.5 rounded-full border border-green-700"
+                :title="`${service.value.recurrenceAppliedCount}x aplicação(s)`">
+                +{{ service.value.recurrenceBonusAmount }} {{ service.value.currency }}
+              </span>
+            </div>
+          </ServiceTooltip>
         </div>
 
         <!-- Prazo (se houver) -->
@@ -149,6 +161,9 @@ import {
 import type { Service } from "@/types/service";
 import { ServiceStatus, ServiceContractorType } from "@/types/service";
 import ServiceStatusComponent from "./ServiceStatus.vue";
+import ServiceTooltip from "./ServiceTooltip.vue";
+import Tooltip from "@/components/common/Tooltip.vue";
+import InfoButton from "@/components/common/InfoButton.vue";
 
 // Props
 interface Props {
