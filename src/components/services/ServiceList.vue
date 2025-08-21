@@ -116,7 +116,7 @@
     >
       <p class="text-xs text-gray-500">
         Mostrando {{ Math.min(itemsPerPage, filteredServices.length) }} de
-        {{ filteredServices.length }} serviços
+        {{ totalServices }} serviços
         {{ hasFilters ? "(filtrados)" : "" }}
       </p>
     </div>
@@ -130,6 +130,10 @@ import type { Service } from "@/types/service";
 import { ServiceStatus } from "@/types/service";
 import ServiceCard from "./ServiceCard.vue";
 import { useGuildStore } from "@/stores/guild";
+import { useServicesStore } from "@/stores/services";
+import type { Service as ServiceType } from "@/types/service";
+
+type ServiceWithGuild = ServiceType & { guildId: string };
 
 // Props
 interface Props {
@@ -176,8 +180,16 @@ const emit = defineEmits<{
   "page-change": [page: number];
 }>();
 
+const servicesStore = useServicesStore();
+const currentGuildId = computed(() => guildStore.currentGuild?.id || "");
+
 // Computed
-const totalServices = computed(() => props.services.length);
+const totalServices = computed(() => {
+  const guildServices = servicesStore.services.filter(
+    (s: ServiceWithGuild) => s.guildId === currentGuildId.value
+  );
+  return guildServices.length;
+});
 
 const filteredServices = computed(() => {
   // Se há um filtro de status ativo, aplica o filtro
@@ -199,19 +211,26 @@ const paginatedServices = computed(() => {
   return filteredServices.value.slice(start, end);
 });
 
-// Status filters para os botões rápidos
+// Status filters para os botões rápidos — calcular a partir dos serviços da guilda atual
 const statusFilters = computed(() => {
   const statusCounts = new Map<string, number>();
 
+  // Pegar serviços da guilda atual a partir do store (fonte canônica)
+  const guildServices = servicesStore.services.filter(
+    (s: ServiceWithGuild) => s.guildId === currentGuildId.value
+  );
+
   // Contar serviços por status
-  props.services.forEach((service) => {
+  guildServices.forEach((service: ServiceWithGuild) => {
     const count = statusCounts.get(service.status) || 0;
     statusCounts.set(service.status, count + 1);
   });
 
-  const filters = [{ value: "", label: "Todos", count: totalServices.value }];
+  const filters: { value: string; label: string; count: number }[] = [
+    { value: "", label: "Todos", count: guildServices.length },
+  ];
 
-  // Adicionar apenas status que existem
+  // Adicionar apenas status que possuem pelo menos um serviço nessa guilda
   Object.values(ServiceStatus).forEach((status) => {
     const count = statusCounts.get(status) || 0;
     if (count > 0) {
