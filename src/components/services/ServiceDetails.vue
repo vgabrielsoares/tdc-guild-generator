@@ -26,7 +26,6 @@
         </p>
       </div>
     </div>
-
     <!-- Descrição geral do serviço -->
     <div
       v-if="service.description"
@@ -71,12 +70,6 @@
             </span>
           </div>
           <div class="flex justify-between">
-            <span class="text-gray-400">Complexidade:</span>
-            <span :class="getComplexityColor()" class="font-medium">
-              {{ service.complexity }}
-            </span>
-          </div>
-          <div class="flex justify-between">
             <span class="text-gray-400">ND Base:</span>
             <span class="text-white font-medium">
               {{
@@ -84,6 +77,16 @@
                 extractNDFromDifficulty(service.difficulty)
               }}
             </span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-400">Complexidade:</span>
+            <span :class="getComplexityColor()" class="font-medium">
+              {{ service.complexity }}
+            </span>
+          </div>
+          <div class="flex justify-between mt-2">
+            <span class="text-gray-400">Multiplicador de Complexidade:</span>
+            <span class="text-white font-medium">x{{ complexityMultiplierDisplay }}</span>
           </div>
         </div>
       </div>
@@ -414,7 +417,7 @@ import type { GameDate } from "@/types/timeline";
 
 // Props
 interface Props {
-  service: Service | null;
+  service: Service;
 }
 
 const props = defineProps<Props>();
@@ -576,6 +579,10 @@ const getComplexityColor = () => {
       return "text-gray-400";
   }
 };
+
+const complexityMultiplierDisplay = computed(() => {
+  return props.service?.value?.complexityMultiplier || 1;
+});
 
 const getPaymentTypeLabel = () => {
   if (!props.service) return "";
