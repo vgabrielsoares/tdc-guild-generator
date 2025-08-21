@@ -282,6 +282,8 @@ export interface Service {
   rival?: ServiceRival;
   origin?: ServiceOrigin;
   additionalChallenge?: ServiceAdditionalChallenge;
+  // Palavras-chave de criatividade para inspirar variações no desafio
+  creativityKeywords?: { keyword: string }[];
 
   // Valores e recompensas
   value: ServiceValue;
@@ -673,6 +675,13 @@ export const ServiceSchema = z.object({
   rival: ServiceRivalSchema.optional(),
   origin: ServiceOriginSchema.optional(),
   additionalChallenge: ServiceAdditionalChallengeSchema.optional(),
+  creativityKeywords: z
+    .array(
+      z.object({
+        keyword: z.string().min(1).max(50),
+      })
+    )
+    .optional(),
 
   value: ServiceValueSchema,
   deadline: z.object({
