@@ -308,6 +308,40 @@
         </div>
       </div>
     </div>
+    <div
+      v-if="service.creativityKeywords && service.creativityKeywords.length"
+      class="bg-gray-800/50 rounded-lg p-6 mb-6"
+    >
+      <h3
+        class="text-lg font-semibold text-emerald-300 mb-4 flex items-center gap-2"
+      >
+        <LightBulbIcon class="w-5 h-5" />
+        Palavras-chave para criatividade
+        <ServiceTooltip
+          content="Palavras breves para inspirar cenas, ganchos ou elementos narrativos adicionais."
+          title="Criatividade"
+          :wide="true"
+        >
+          <InfoButton
+            help-key="service-creativity"
+            @open-help="$emit('open-help', 'service-creativity')"
+            button-class="text-xs"
+          />
+        </ServiceTooltip>
+      </h3>
+
+      <div class="space-y-2">
+        <div class="flex flex-wrap gap-2">
+          <span
+            v-for="(k, idx) in service.creativityKeywords"
+            :key="`kw-${idx}-${k.keyword}`"
+            class="px-3 py-1 bg-gray-700 text-gray-100 rounded-full text-sm"
+          >
+            {{ k.keyword }}
+          </span>
+        </div>
+      </div>
+    </div>
 
     <!-- Histórico de datas -->
     <div class="bg-gray-800/50 rounded-lg p-6 mb-6">
@@ -406,6 +440,7 @@ import {
   CalendarIcon,
   BookOpenIcon,
 } from "@heroicons/vue/24/outline";
+import { LightBulbIcon } from "@heroicons/vue/24/outline";
 import type { Service } from "@/types/service";
 import {
   ServiceStatus,
