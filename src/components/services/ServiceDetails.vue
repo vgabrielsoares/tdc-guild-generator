@@ -42,6 +42,15 @@
         <h3 class="text-lg font-semibold text-orange-300 mb-3 flex items-center gap-2">
           <SparklesIcon class="w-5 h-5" />
           Dificuldade
+          <ServiceTooltip 
+            content="A dificuldade determina a complexidade do serviço. Serviços mais difíceis exigem testes com ND mais altos, mas oferecem maior recompensa."
+            title="Sistema de Dificuldade"
+            :difficulty="service.difficulty"
+            :complexity="service.complexity"
+            :wide="true"
+          >
+            <InfoButton help-key="service-difficulty" @open-help="$emit('open-help', 'service-difficulty')" button-class="text-xs" />
+          </ServiceTooltip>
         </h3>
         <div class="space-y-2 text-sm">
           <div class="flex justify-between">
@@ -73,6 +82,14 @@
         <h3 class="text-lg font-semibold text-green-300 mb-3 flex items-center gap-2">
           <CurrencyDollarIcon class="w-5 h-5" />
           Recompensa
+          <ServiceTooltip 
+            content="A recompensa é calculada dinamicamente baseada no valor base, modificadores da guilda, e taxa de recorrência se o serviço não foi resolvido anteriormente."
+            title="Sistema de Recompensas"
+            hint="Serviços não resolvidos ganham bônus de recorrência!"
+            :wide="true"
+          >
+            <InfoButton help-key="service-rewards" @open-help="$emit('open-help', 'service-rewards')" button-class="text-xs" />
+          </ServiceTooltip>
         </h3>
         <ServiceValue v-if="service.value" :value="service.value" :show-details="true"
           :recurrence-count="service.value.recurrenceAppliedCount || 0" />
@@ -83,6 +100,14 @@
         <h3 class="text-lg font-semibold text-amber-300 mb-3 flex items-center gap-2">
           <ClockIcon class="w-5 h-5" />
           Termos
+          <ServiceTooltip 
+            content="Prazos podem ser arbitrários (flexíveis) ou ter janela específica. Pagamentos podem ser feitos antecipadamente na guilda ou diretamente com o contratante."
+            title="Prazos e Pagamentos"
+            hint="Alguns serviços não têm prazo definido!"
+            :wide="true"
+          >
+            <InfoButton help-key="service-terms" @open-help="$emit('open-help', 'service-terms')" button-class="text-xs" />
+          </ServiceTooltip>
         </h3>
         <div class="space-y-2 text-sm">
           <div v-if="service.deadline">
@@ -308,6 +333,8 @@ import {
 } from "@/types/service";
 import ServiceStatusComponent from "./ServiceStatus.vue";
 import ServiceValue from "./ServiceValue.vue";
+import ServiceTooltip from "./ServiceTooltip.vue";
+import InfoButton from "@/components/common/InfoButton.vue";
 import type { GameDate } from "@/types/timeline";
 
 // Props
@@ -325,6 +352,7 @@ const emit = defineEmits<{
   "reset-tests": [service: Service];
   complete: [service: Service];
   abandon: [service: Service];
+  "open-help": [key: string];
   close: [];
 }>();
 
