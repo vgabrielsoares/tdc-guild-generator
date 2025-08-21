@@ -29,6 +29,14 @@
       </button>
     </div>
 
+    <!-- Paginação (top) -->
+    <Pagination
+      v-if="props.showPagination && totalPages > 1"
+      :current-page="props.currentPage"
+      :total-pages="totalPages"
+      @page-change="goToPage"
+    />
+
     <!-- Lista de contratos -->
     <div v-if="filteredContracts.length > 0" class="space-y-3">
       <div
@@ -76,36 +84,19 @@
       <p class="text-gray-400">Gerando contratos...</p>
     </div>
 
-    <!-- Paginação -->
-    <div
-      v-if="totalPages > 1"
-      class="flex items-center justify-center gap-2 mt-6"
-    >
-      <button
-        @click="goToPage(currentPage - 1)"
-        :disabled="currentPage <= 1"
-        class="px-3 py-1 bg-gray-700 text-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600 transition-colors"
-      >
-        Anterior
-      </button>
-
-      <span class="px-3 py-1 text-gray-400">
-        {{ currentPage }} de {{ totalPages }}
-      </span>
-
-      <button
-        @click="goToPage(currentPage + 1)"
-        :disabled="currentPage >= totalPages"
-        class="px-3 py-1 bg-gray-700 text-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600 transition-colors"
-      >
-        Próxima
-      </button>
-    </div>
+    <!-- Paginação (bottom) -->
+    <Pagination
+      v-if="props.showPagination && totalPages > 1"
+      :current-page="props.currentPage"
+      :total-pages="totalPages"
+      @page-change="goToPage"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from "vue";
+import Pagination from "@/components/common/Pagination.vue";
 import type { Contract } from "@/types/contract";
 import { ContractStatus } from "@/types/contract";
 import { getStatusLabel } from "@/utils/status-labels";
@@ -122,6 +113,7 @@ interface Props {
   activeStatusFilter?: string;
   currentPage?: number;
   pageSize?: number;
+  showPagination?: boolean;
 }
 
 interface Emits {
@@ -144,6 +136,7 @@ const props = withDefaults(defineProps<Props>(), {
   activeStatusFilter: "",
   currentPage: 1,
   pageSize: 10,
+  showPagination: true,
 });
 
 const emit = defineEmits<Emits>();

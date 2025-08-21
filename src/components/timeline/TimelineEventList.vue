@@ -92,6 +92,14 @@
       </div>
     </div>
 
+    <!-- Paginação (top) -->
+    <Pagination
+      v-if="props.showPagination && totalPages > 1"
+      :current-page="props.currentPage"
+      :total-pages="totalPages"
+      @page-change="$emit('page-change', $event)"
+    />
+
     <!-- Lista de eventos -->
     <div class="max-h-96 overflow-y-auto">
       <div
@@ -109,7 +117,9 @@
 
       <div v-else class="divide-y divide-gray-700">
         <div
-          v-for="event in filteredEvents"
+          v-for="event in props.showPagination
+            ? paginatedEvents
+            : filteredEvents"
           :key="event.id"
           class="p-4 hover:bg-gray-750/50 transition-colors"
         >
@@ -180,20 +190,19 @@
       </div>
     </div>
 
-    <!-- Paginação (se necessário no futuro) -->
-    <div
-      v-if="filteredEvents.length > 0"
-      class="p-4 border-t border-gray-700 text-center"
-    >
-      <span class="text-sm text-gray-400">
-        Mostrando {{ filteredEvents.length }} de {{ events.length }} eventos
-      </span>
-    </div>
+    <!-- Paginação (bottom) -->
+    <Pagination
+      v-if="props.showPagination && totalPages > 1"
+      :current-page="props.currentPage"
+      :total-pages="totalPages"
+      @page-change="$emit('page-change', $event)"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
+import Pagination from "@/components/common/Pagination.vue";
 import { useTimeline } from "@/composables/useTimeline";
 import InfoButton from "@/components/common/InfoButton.vue";
 import Tooltip from "@/components/common/Tooltip.vue";
@@ -206,7 +215,21 @@ type FilterType = "all" | "contracts" | "services" | "members" | "notices";
 // Emits
 defineEmits<{
   "open-help": [key: string];
+  "page-change": [page: number];
 }>();
+
+// Props
+interface Props {
+  currentPage?: number;
+  itemsPerPage?: number;
+  showPagination?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  currentPage: 1,
+  itemsPerPage: 10,
+  showPagination: false,
+});
 
 // State
 const activeFilter = ref<FilterType>("all");
@@ -264,6 +287,19 @@ const filteredEvents = computed(() => {
     default:
       return sortedEvents;
   }
+});
+
+// Paginação da timeline
+const totalPages = computed(() => {
+  if (!props.showPagination) return 1;
+  return Math.ceil(filteredEvents.value.length / props.itemsPerPage);
+});
+
+const paginatedEvents = computed(() => {
+  if (!props.showPagination) return filteredEvents.value;
+  const start = (props.currentPage - 1) * props.itemsPerPage;
+  const end = start + props.itemsPerPage;
+  return filteredEvents.value.slice(start, end);
 });
 
 // Methods
