@@ -247,7 +247,8 @@ export function applyAutomaticResolution<T extends { guildId?: string }>(
   resolutionConfig: ResolutionConfig<T>,
   guildIdGetter: () => string | undefined,
   updateFunction: (updatedItems: T[]) => void,
-  saveFunction: () => void
+  saveFunction: () => void,
+  successToast?: (title: string, message: string) => void
 ): void {
   const targetItems = items.filter(resolutionConfig.statusFilter);
 
@@ -264,4 +265,9 @@ export function applyAutomaticResolution<T extends { guildId?: string }>(
 
   updateFunction(itemsWithGuild);
   saveFunction();
+
+  if (resolutionConfig.successMessage && successToast) {
+    const msg = resolutionConfig.successMessage(targetItems.length);
+    successToast(msg.title, msg.message);
+  }
 }
