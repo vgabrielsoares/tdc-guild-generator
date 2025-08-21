@@ -157,6 +157,7 @@
       @filter-status="handleStatusFilter"
       @clear-filters="handleClearFilters"
       @page-change="handlePageChange"
+      @open-help="handleOpenHelp"
     />
 
     <!-- Modal de Detalhes -->
@@ -229,6 +230,12 @@
         <FunnelIcon class="w-5 h-5" />
       </button>
     </div>
+    <!-- Modal de Ajuda -->
+    <HelpModal
+      :is-open="showHelpModal"
+      :help-key="currentHelpKey"
+      @close="showHelpModal = false"
+    />
   </div>
 </template>
 
@@ -262,6 +269,7 @@ import ServiceSkillTests from "@/components/services/ServiceSkillTests.vue";
 import ServiceTimeline from "@/components/services/ServiceTimeline.vue";
 import InfoButton from "@/components/common/InfoButton.vue";
 import Tooltip from "@/components/common/Tooltip.vue";
+import HelpModal from "@/components/common/HelpModal.vue";
 
 // Stores & Composables
 const servicesStore = useServicesStore();
@@ -283,6 +291,8 @@ const isGenerating = ref(false);
 const selectedService = ref<ServiceWithGuild | null>(null);
 const showTestsModal = ref(false);
 const serviceForTests = ref<ServiceWithGuild | null>(null);
+const showHelpModal = ref(false);
+const currentHelpKey = ref<string | undefined>(undefined);
 
 // Computed
 const guild = computed(() => guildStore.currentGuild);
@@ -464,9 +474,9 @@ const handlePageChange = (page: number) => {
 };
 
 const handleOpenHelp = (helpKey: string) => {
-  // Implementação da ajuda - placeholder por enquanto
-  // eslint-disable-next-line no-console
-  console.log("Help requested for:", helpKey);
+  // Abrir painel de ajuda compartilhado com a chave solicitada
+  currentHelpKey.value = helpKey;
+  showHelpModal.value = true;
 };
 
 const handleForceResolution = async () => {

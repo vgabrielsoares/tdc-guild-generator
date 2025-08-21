@@ -33,6 +33,14 @@
         </button>
       </div>
 
+      <!-- Paginação (top) -->
+      <Pagination
+        v-if="props.showPagination && totalPages > 1"
+        :current-page="props.currentPage"
+        :total-pages="totalPages"
+        @page-change="$emit('page-change', $event)"
+      />
+
       <!-- Lista de serviços -->
       <div v-if="filteredServices.length > 0" class="space-y-3">
         <div
@@ -83,31 +91,13 @@
       <p class="text-gray-400">Carregando serviços...</p>
     </div>
 
-    <!-- Paginação -->
-    <div
-      v-if="totalPages > 1"
-      class="flex items-center justify-center gap-2 pt-4"
-    >
-      <button
-        @click="$emit('page-change', currentPage - 1)"
-        :disabled="currentPage === 1"
-        class="px-3 py-1 bg-gray-700 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600 transition-colors"
-      >
-        Anterior
-      </button>
-
-      <span class="text-gray-400 text-sm">
-        Página {{ currentPage }} de {{ totalPages }}
-      </span>
-
-      <button
-        @click="$emit('page-change', currentPage + 1)"
-        :disabled="currentPage === totalPages"
-        class="px-3 py-1 bg-gray-700 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600 transition-colors"
-      >
-        Próxima
-      </button>
-    </div>
+    <!-- Paginação (bottom) -->
+    <Pagination
+      v-if="props.showPagination && totalPages > 1"
+      :current-page="props.currentPage"
+      :total-pages="totalPages"
+      @page-change="$emit('page-change', $event)"
+    />
 
     <!-- Informações de performance -->
     <div
@@ -125,6 +115,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
+import Pagination from "@/components/common/Pagination.vue";
 import { WrenchScrewdriverIcon } from "@heroicons/vue/24/outline";
 import type { Service } from "@/types/service";
 import { ServiceStatus } from "@/types/service";
@@ -148,6 +139,7 @@ interface Props {
   itemsPerPage?: number;
   emptyStateMessage?: string;
   showPerformanceInfo?: boolean;
+  showPagination?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -160,6 +152,7 @@ const props = withDefaults(defineProps<Props>(), {
   itemsPerPage: 10,
   emptyStateMessage: "Nenhum serviço disponível no momento.",
   showPerformanceInfo: false,
+  showPagination: true,
 });
 
 // Guilda atual
