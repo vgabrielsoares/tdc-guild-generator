@@ -150,6 +150,8 @@ export interface ServiceValue {
 
   // Modificadores aplicados (se houver)
   modifiers?: ServiceModifiers;
+  // Multiplicador aplicado pela complexidade do serviço (1, 1.5, 2, 3, ...)
+  complexityMultiplier?: number;
 }
 
 /**
@@ -554,6 +556,7 @@ export const ServiceValueSchema = z.object({
   recurrenceAppliedCount: z.number().int().min(0).optional(),
   difficulty: z.nativeEnum(ServiceDifficulty),
   modifiers: ServiceModifiersSchema,
+  complexityMultiplier: z.number().min(0).optional(),
 });
 
 /**
@@ -723,7 +726,9 @@ export const calculateFinalServiceReward = (service: Service): number => {
   // O valor final é a soma do valor base (rewardAmount) mais o bônus de recorrência acumulado
   const base = service.value.rewardAmount || 0;
   const recurrence = service.value.recurrenceBonusAmount || 0;
-  return Math.max(1, Math.floor(base + recurrence));
+  const complexityMult = service.value.complexityMultiplier || 1;
+  const total = Math.max(1, Math.floor((base + recurrence) * complexityMult));
+  return total;
 };
 
 /**
