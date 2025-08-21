@@ -6,22 +6,33 @@
       { 'border-blue-400/50': isHighValue },
       { 'border-orange-400/50': isHighComplexity },
       { 'border-green-400/50': isEasyDifficulty },
-    ]">
+    ]"
+  >
     <!-- Header com status e tipo de contratante -->
     <div class="p-4 border-b border-blue-700/50">
       <div class="flex items-start justify-between">
         <div class="flex items-center gap-2">
-          <ServiceTooltip :content="`Serviço solicitado por: ${contractorTypeLabel}`" :title="'Tipo de Contratante'"
-            :contractor-type="contractorTypeLabel">
+          <ServiceTooltip
+            :content="`Serviço solicitado por: ${contractorTypeLabel}`"
+            :title="'Tipo de Contratante'"
+            :contractor-type="contractorTypeLabel"
+          >
             <component :is="contractorIcon" class="w-5 h-5 text-blue-400" />
           </ServiceTooltip>
-          <Tooltip position="auto" title="Identificador do Serviço" :content="`ID completo: ${service.id}`">
+          <Tooltip
+            position="auto"
+            title="Identificador do Serviço"
+            :content="`ID completo: ${service.id}`"
+          >
             <h3 class="text-lg font-semibold text-gold-400">
               {{ `Serviço #${service.id.slice(-8).toUpperCase()}` }}
             </h3>
           </Tooltip>
-          <InfoButton help-key="service-contractors" @open-help="$emit('open-help', 'service-contractors')"
-            button-class="text-xs" />
+          <InfoButton
+            help-key="service-contractors"
+            @open-help="$emit('open-help', 'service-contractors')"
+            button-class="text-xs"
+          />
         </div>
         <ServiceStatusComponent :status="service.status" size="sm" />
       </div>
@@ -36,7 +47,10 @@
       </p>
 
       <!-- Descrição geral do serviço -->
-      <div v-if="service.description" class="mt-2 p-2 bg-blue-900/20 rounded border-l-2 border-blue-400/50">
+      <div
+        v-if="service.description"
+        class="mt-2 p-2 bg-blue-900/20 rounded border-l-2 border-blue-400/50"
+      >
         <p class="text-sm text-blue-100 leading-relaxed">
           {{ service.description }}
         </p>
@@ -50,7 +64,7 @@
         <!-- Dificuldade -->
         <div class="flex items-center justify-between">
           <span class="text-sm text-gray-400">Dificuldade:</span>
-          <ServiceTooltip 
+          <ServiceTooltip
             :content="`Dificuldade ${service.difficulty} determina o ND dos testes necessários para completar este serviço`"
             :difficulty="service.difficulty"
           >
@@ -63,26 +77,38 @@
         <!-- Recompensa -->
         <div class="flex items-center justify-between">
           <span class="text-sm text-gray-400">Recompensa:</span>
-          <ServiceTooltip 
-            :content="`Recompensa total: ${(service.value?.rewardAmount || 0)} + ${(service.value?.recurrenceBonusAmount || 0)} de bônus${service.value?.recurrenceAppliedCount ? ` (${service.value.recurrenceAppliedCount}x recorrência)` : ''}`"
+          <ServiceTooltip
+            :content="`Recompensa total: ${service.value?.rewardAmount || 0} + ${service.value?.recurrenceBonusAmount || 0} de bônus${service.value?.recurrenceAppliedCount ? ` (${service.value.recurrenceAppliedCount}x recorrência)` : ''}`"
             title="Breakdown da Recompensa"
           >
             <div class="flex items-center gap-2 cursor-help">
               <span class="text-sm font-medium text-green-400">
-                {{ (service.value?.rewardAmount || 0) + (service.value?.recurrenceBonusAmount || 0) }} {{
-                  service.value?.currency }}
+                {{
+                  (service.value?.rewardAmount || 0) +
+                  (service.value?.recurrenceBonusAmount || 0)
+                }}
+                {{ service.value?.currency }}
               </span>
-              <span v-if="service.value?.recurrenceAppliedCount && service.value?.recurrenceAppliedCount > 0"
+              <span
+                v-if="
+                  service.value?.recurrenceAppliedCount &&
+                  service.value?.recurrenceAppliedCount > 0
+                "
                 class="text-xs bg-green-800 text-green-100 px-2 py-0.5 rounded-full border border-green-700"
-                :title="`${service.value.recurrenceAppliedCount}x aplicação(s)`">
-                +{{ service.value.recurrenceBonusAmount }} {{ service.value.currency }}
+                :title="`${service.value.recurrenceAppliedCount}x aplicação(s)`"
+              >
+                +{{ service.value.recurrenceBonusAmount }}
+                {{ service.value.currency }}
               </span>
             </div>
           </ServiceTooltip>
         </div>
 
         <!-- Prazo (se houver) -->
-        <div v-if="service.deadline && service.deadline.value" class="flex items-center justify-between">
+        <div
+          v-if="service.deadline && service.deadline.value"
+          class="flex items-center justify-between"
+        >
           <span class="text-sm text-gray-400">Prazo:</span>
           <span class="text-sm font-medium text-orange-400">
             {{ service.deadline.value }}
@@ -96,53 +122,71 @@
       <div class="flex flex-wrap gap-2">
         <!-- Ações por status -->
         <template v-if="service.status === ServiceStatus.DISPONIVEL">
-          <button @click="$emit('accept', service)"
-            class="flex-1 px-3 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 transition-colors">
+          <button
+            @click="$emit('accept', service)"
+            class="flex-1 px-3 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 transition-colors"
+          >
             Aceitar Serviço
           </button>
           <!-- Ver Detalhes quando há apenas uma ação -->
-          <button @click="$emit('view-details', service)"
-            class="flex-1 px-3 py-2 bg-gray-600 text-white rounded text-sm font-medium hover:bg-gray-700 transition-colors">
+          <button
+            @click="$emit('view-details', service)"
+            class="flex-1 px-3 py-2 bg-gray-600 text-white rounded text-sm font-medium hover:bg-gray-700 transition-colors"
+          >
             Ver Detalhes
           </button>
         </template>
 
         <template v-else-if="service.status === ServiceStatus.ACEITO">
-          <button @click="$emit('start-tests', service)"
-            class="flex-1 px-3 py-2 bg-green-600 text-white rounded text-sm font-medium hover:bg-green-700 transition-colors">
+          <button
+            @click="$emit('start-tests', service)"
+            class="flex-1 px-3 py-2 bg-green-600 text-white rounded text-sm font-medium hover:bg-green-700 transition-colors"
+          >
             Iniciar Testes
           </button>
-          <button @click="$emit('abandon', service)"
-            class="flex-1 px-3 py-2 bg-red-600 text-white rounded text-sm font-medium hover:bg-red-700 transition-colors">
+          <button
+            @click="$emit('abandon', service)"
+            class="flex-1 px-3 py-2 bg-red-600 text-white rounded text-sm font-medium hover:bg-red-700 transition-colors"
+          >
             Abandonar
           </button>
           <!-- Ver Detalhes quando há múltiplas ações -->
-          <button @click="$emit('view-details', service)"
-            class="flex-1 px-3 py-2 bg-gray-600 text-white rounded text-sm font-medium hover:bg-gray-700 transition-colors">
+          <button
+            @click="$emit('view-details', service)"
+            class="flex-1 px-3 py-2 bg-gray-600 text-white rounded text-sm font-medium hover:bg-gray-700 transition-colors"
+          >
             Ver Detalhes
           </button>
         </template>
 
         <template v-else-if="service.status === ServiceStatus.EM_ANDAMENTO">
-          <button @click="$emit('continue-tests', service)"
-            class="flex-1 px-3 py-2 bg-amber-600 text-white rounded text-sm font-medium hover:bg-amber-700 transition-colors">
+          <button
+            @click="$emit('continue-tests', service)"
+            class="flex-1 px-3 py-2 bg-amber-600 text-white rounded text-sm font-medium hover:bg-amber-700 transition-colors"
+          >
             Continuar Testes
           </button>
-          <button @click="$emit('complete', service)"
-            class="px-3 py-2 bg-green-600 text-white rounded text-sm font-medium hover:bg-green-700 transition-colors">
+          <button
+            @click="$emit('complete', service)"
+            class="px-3 py-2 bg-green-600 text-white rounded text-sm font-medium hover:bg-green-700 transition-colors"
+          >
             Concluir
           </button>
           <!-- Ver Detalhes quando há múltiplas ações -->
-          <button @click="$emit('view-details', service)"
-            class="px-3 py-2 bg-gray-600 text-white rounded text-sm font-medium hover:bg-gray-700 transition-colors">
+          <button
+            @click="$emit('view-details', service)"
+            class="px-3 py-2 bg-gray-600 text-white rounded text-sm font-medium hover:bg-gray-700 transition-colors"
+          >
             Ver Detalhes
           </button>
         </template>
 
         <!-- Para outros status, Ver Detalhes ocupa todo o espaço -->
         <template v-else>
-          <button @click="$emit('view-details', service)"
-            class="w-full px-3 py-2 bg-gray-600 text-white rounded text-sm font-medium hover:bg-gray-700 transition-colors">
+          <button
+            @click="$emit('view-details', service)"
+            class="w-full px-3 py-2 bg-gray-600 text-white rounded text-sm font-medium hover:bg-gray-700 transition-colors"
+          >
             Ver Detalhes
           </button>
         </template>
@@ -244,9 +288,11 @@ const contractorTypeLabel = computed(() => {
 <style scoped>
 .service-card {
   /* Gradiente específico para diferenciar de contratos */
-  background: linear-gradient(135deg,
-      rgba(30, 58, 138, 0.4) 0%,
-      rgba(30, 64, 175, 0.3) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(30, 58, 138, 0.4) 0%,
+    rgba(30, 64, 175, 0.3) 100%
+  );
 }
 
 .service-card:hover {
