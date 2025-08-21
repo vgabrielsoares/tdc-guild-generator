@@ -43,32 +43,34 @@
 
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
         <div class="flex flex-col">
-          <span class="text-gray-400 uppercase tracking-wide text-xs"
+          <span class="text-gray-400 uppercase tracking-wide text-lg"
             >Sede</span
           >
-          <span class="text-white font-medium">{{ guild.structure.size }}</span>
+          <span class="text-white font-medium text-base">{{
+            guild.structure.size
+          }}</span>
         </div>
         <div class="flex flex-col">
-          <span class="text-gray-400 uppercase tracking-wide text-xs"
+          <span class="text-gray-400 uppercase tracking-wide text-lg"
             >Recursos</span
           >
-          <span class="text-white font-medium">{{
+          <span class="text-white font-medium text-base">{{
             guild.resources.level
           }}</span>
         </div>
         <div class="flex flex-col">
-          <span class="text-gray-400 uppercase tracking-wide text-xs"
+          <span class="text-gray-400 uppercase tracking-wide text-lg"
             >Rel. Governo</span
           >
-          <span class="text-white font-medium">{{
+          <span class="text-white font-medium text-base">{{
             guild.relations.government
           }}</span>
         </div>
         <div class="flex flex-col">
-          <span class="text-gray-400 uppercase tracking-wide text-xs"
+          <span class="text-gray-400 uppercase tracking-wide text-lg"
             >Rel. População</span
           >
-          <span class="text-white font-medium">{{
+          <span class="text-white font-medium text-base">{{
             guild.relations.population
           }}</span>
         </div>
