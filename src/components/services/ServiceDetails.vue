@@ -86,7 +86,9 @@
           </div>
           <div class="flex justify-between mt-2">
             <span class="text-gray-400">Multiplicador de Complexidade:</span>
-            <span class="text-white font-medium">x{{ complexityMultiplierDisplay }}</span>
+            <span class="text-white font-medium"
+              >x{{ complexityMultiplierDisplay }}</span
+            >
           </div>
         </div>
       </div>
@@ -293,7 +295,10 @@
         </div>
 
         <div
-          v-if="service.additionalChallenge"
+          v-if="
+            service.additionalChallenge &&
+            service.additionalChallenge.hasChallenge
+          "
           class="p-3 bg-purple-900/30 rounded-lg border-l-4 border-purple-400"
         >
           <h4 class="text-purple-300 font-medium mb-1">Desafio Adicional</h4>
@@ -634,7 +639,8 @@ const hasNarrativeElements = () => {
     props.service.origin ||
     props.service.complication ||
     props.service.rival ||
-    props.service.additionalChallenge
+    (props.service.additionalChallenge &&
+      props.service.additionalChallenge.hasChallenge)
   );
 };
 </script>
