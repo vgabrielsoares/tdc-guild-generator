@@ -103,6 +103,7 @@ import {
 } from '@heroicons/vue/24/outline'
 import { guildHelpData } from '@/data/help/guild-help'
 import { contractHelpData } from '@/data/help/contract-help'
+import { serviceHelpData } from '@/data/help/service-help'
 
 interface HelpSection {
   title: string
@@ -143,9 +144,11 @@ watch(() => [props.helpKey, props.isOpen] as const, async ([newKey, isOpen]) => 
     // Pequeno delay para simular carregamento
     await new Promise(resolve => setTimeout(resolve, 150))
 
-    // Carregar dados reais da ajuda (primeiro tentar contratos, depois guildas)
+    // Carregar dados reais da ajuda (primeiro tentar contratos, depois serviços, depois guildas)
     if (newKey in contractHelpData) {
       helpData.value = contractHelpData[newKey]
+    } else if (newKey in serviceHelpData) {
+      helpData.value = serviceHelpData[newKey]
     } else if (newKey in guildHelpData) {
       helpData.value = guildHelpData[newKey]
     } else {
