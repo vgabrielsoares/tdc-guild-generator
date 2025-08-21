@@ -19,6 +19,9 @@
                   <p class="text-md text-gray-400">
                     {{ contractorTypeLabel }} - {{ contract.contractorName || 'Nome não especificado' }}
                   </p>
+                  <p v-if="resolutionText" class="text-sm text-gray-400 italic mt-1">
+                    {{ resolutionText }}
+                  </p>
                 </div>
               </div>
               <div class="flex items-center gap-3">
@@ -660,7 +663,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import type { Contract } from '@/types/contract';
-import { ContractorType, ContractDifficulty, PaymentType } from '@/types/contract';
+import { ContractorType, ContractDifficulty, PaymentType, ContractStatus as ContractStatusEnum } from '@/types/contract';
 import { ContractGenerator } from '@/utils/generators/contractGenerator';
 import ContractStatus from './ContractStatus.vue';
 import ContractValue from './ContractValue.vue';
@@ -732,6 +735,27 @@ const contractorIcon = computed(() => {
 
 const contractorTypeLabel = computed(() => {
   return props.contract?.contractorType || 'Desconhecido';
+});
+
+// Texto explicando o tipo de resolução
+const resolutionText = computed(() => {
+  if (!props.contract) return '';
+
+  const reason = props.contract.takenByOthersInfo?.resolutionReason;
+  if (reason) return reason;
+
+  switch (props.contract.status) {
+    case ContractStatusEnum.RESOLVIDO_POR_OUTROS:
+      return 'O contrato foi resolvido por outros.';
+    case ContractStatusEnum.ACEITO_POR_OUTROS:
+      return 'Assinado por outros aventureiros.';
+    case ContractStatusEnum.QUEBRADO:
+      return 'O contrato quebrou antes da conclusão.';
+    case ContractStatusEnum.ANULADO:
+      return 'O contrato foi anulado.';
+    default:
+      return '';
+  }
 });
 
 const canAccept = computed(() => {

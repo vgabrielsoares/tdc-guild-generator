@@ -19,6 +19,9 @@
             {{ contractorTypeLabel }}
           </template>
         </p>
+        <p v-if="resolutionText" class="text-sm text-gray-400 italic mt-1">
+          {{ resolutionText }}
+        </p>
       </div>
     </div>
 
@@ -353,6 +356,27 @@ const contractorTypeLabel = computed(() => {
       return "Governo";
     default:
       return "Desconhecido";
+  }
+});
+
+// Texto explicando o tipo de resolução
+const resolutionText = computed(() => {
+  if (!props.service) return '';
+
+  const reason = props.service.takenByOthersInfo?.resolutionReason;
+  if (reason) return reason;
+
+  switch (props.service.status) {
+    case ServiceStatus.RESOLVIDO_POR_OUTROS:
+      return 'O serviço foi resolvido por outros.';
+    case ServiceStatus.ACEITO_POR_OUTROS:
+      return 'Assinado por outros aventureiros.';
+    case ServiceStatus.QUEBRADO:
+      return 'O serviço quebrou antes da conclusão.';
+    case ServiceStatus.ANULADO:
+      return 'O serviço foi anulado.';
+    default:
+      return '';
   }
 });
 
