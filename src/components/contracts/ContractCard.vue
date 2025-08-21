@@ -72,8 +72,8 @@
           <MapPinIcon class="w-4 h-4 text-amber-400" />
         </ContractTooltip>
         <span>{{ contract.location.name }}</span>
-        <span v-if="contract.location.description" class="text-md">
-          ({{ contract.location.description }})
+        <span v-if="contract.location.specification?.location" class="text-md">
+          ({{ contract.location.specification?.location }})
         </span>
         <InfoButton
           help-key="contract-locations"
