@@ -217,21 +217,6 @@ export const useTimelineStore = defineStore("timeline", () => {
       eventsRemaining,
     };
 
-    // Notificar sobre eventos processados
-    if (triggeredEvents.length > 0) {
-      // Only show toast for important events
-      const importantEvents = triggeredEvents.filter(
-        (e) => e.description && !e.description.toLowerCase().includes("rotina")
-      );
-
-      if (importantEvents.length > 0) {
-        success(
-          "Eventos processados",
-          `${importantEvents.length} evento(s) processados`
-        );
-      }
-    }
-
     // Notificar outros stores sobre a mudança de tempo
     notifyTimeAdvanceCallbacks(result);
 
@@ -268,13 +253,6 @@ export const useTimelineStore = defineStore("timeline", () => {
       triggeredEvents,
       eventsRemaining,
     };
-
-    if (triggeredEvents.length > 0) {
-      success(
-        "Eventos processados",
-        `${triggeredEvents.length} evento(s) foram processados ao avançar para ${formatGameDate(date)}`
-      );
-    }
 
     // Notificar outros stores sobre a mudança de tempo
     notifyTimeAdvanceCallbacks(result);

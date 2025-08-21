@@ -2005,11 +2005,25 @@ export function generateServiceObjective(objectiveType: ServiceObjectiveType): {
   let description: string;
 
   if (objectiveType === ServiceObjectiveType.SERVICOS_ESPECIFICOS) {
-    description = generateSpecificServiceDescription(
-      result.action,
-      result.target,
-      result.complication
-    );
+    // Tratamento especial quando for "Trabalho rural"
+    if (result.action === "Trabalho rural") {
+      const ruralType = rollOnTable(TRABALHO_RURAL_TABLE);
+      // description usa o subtipo (ex: "Irrigação para ...")
+      description = generateServiceDescription(
+        ruralType.result,
+        result.target,
+        result.complication,
+        "para"
+      );
+      // Ajustar o campo action para incluir o subtipo entre parênteses
+      result.action = `Trabalho rural (${ruralType.result})`;
+    } else {
+      description = generateSpecificServiceDescription(
+        result.action,
+        result.target,
+        result.complication
+      );
+    }
   } else if (objectiveType === ServiceObjectiveType.RELIGIOSO) {
     description = generateServiceDescription(
       result.action,
@@ -2369,11 +2383,7 @@ export function generateSpecificServiceDescription(
   let connector = "para";
   const actionLower = action.toLowerCase();
 
-  if (
-    actionLower.includes("limpar") ||
-    actionLower.includes("organizar") ||
-    actionLower.includes("pintar")
-  ) {
+  if (actionLower.includes("limpar") || actionLower.includes("pintar")) {
     connector = "em";
   } else if (
     actionLower.includes("cobrar") ||
@@ -2436,6 +2446,28 @@ export function generateEnhancedServiceObjective(
 
     case ServiceObjectiveType.CONSTRUIR_CRIAR_OU_REPARAR:
       description = `Construir/criar/reparar ${result.action.toLowerCase()} para ${result.target.toLowerCase()}, mas ${result.complication.toLowerCase()}`;
+      break;
+
+    case ServiceObjectiveType.SERVICOS_ESPECIFICOS:
+      // Tratar especificamente "Trabalho rural" para incluir subtipo
+      if (result.action === "Trabalho rural") {
+        const ruralType = rollOnTable(TRABALHO_RURAL_TABLE);
+        description = generateServiceDescription(
+          ruralType.result,
+          result.target,
+          result.complication,
+          "para"
+        );
+        // sobrescrever action para refletir o subtipo
+        result.action = `Trabalho rural (${ruralType.result})`;
+      } else {
+        // Usar a geração específica existente
+        description = generateSpecificServiceDescription(
+          result.action,
+          result.target,
+          result.complication
+        );
+      }
       break;
 
     default:

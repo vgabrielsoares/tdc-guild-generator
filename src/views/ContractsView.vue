@@ -142,11 +142,12 @@
       <!-- Lista de Contratos -->
       <ContractList
         :contracts="filteredContracts as Contract[]"
+        :all-contracts="contracts as Contract[]"
         :is-loading="isLoading"
         :show-actions="true"
-        :show-filters="false"
+        :show-filters="true"
         :can-generate="false"
-        :active-status-filter="null"
+        :active-status-filter="currentFilters.status"
         :current-page="currentPage"
         :page-size="pageSize"
         @accept="handleAcceptContract"
@@ -154,6 +155,7 @@
         @abandon="handleAbandonContract"
         @view-details="handleViewContractDetails"
         @page-change="handlePageChange"
+        @filter-status="handleQuickStatusFilter"
         @open-help="handleOpenHelp"
       />
     </template>
@@ -261,11 +263,7 @@ const guild = computed(() => guildStore.currentGuild);
 
 // Contratos filtrados com base nos filtros locais
 const filteredContracts = computed(() => {
-  // Sincronizar filtros locais com o store (com conversão de tipos adequada)
-  contractsStore.setFilter(
-    "status",
-    (currentFilters.value.status as ContractStatus | null) || null
-  );
+  // Sincronizar filtros locais com o store (exceto status — o status é aplicado por ContractList via eventos rápidos)
   contractsStore.setFilter(
     "difficulty",
     (currentFilters.value.difficulty as ContractDifficulty | null) || null
@@ -383,7 +381,27 @@ function handleFilterUpdate(
   value: string | number | boolean | null
 ) {
   currentFilters.value[filterKey] = value as never;
+  // Se for o filtro de status, aplica no store imediatamente (compatibilizando string vazia para null)
+  if (filterKey === "status") {
+    const statusString = value as string | null;
+    contractsStore.setFilter(
+      "status",
+      statusString ? (statusString as ContractStatus) : null
+    );
+  }
   currentPage.value = 1; // Reset para primeira página quando filtrar
+}
+
+// Handler dedicado para os filtros rápidos (aplica direto no store)
+function handleQuickStatusFilter(status: string | null) {
+  // Atualiza o estado local
+  currentFilters.value.status = status || "";
+  // Aplica no store imediatamente (null quando string vazia)
+  contractsStore.setFilter(
+    "status",
+    status ? (status as ContractStatus) : null
+  );
+  currentPage.value = 1;
 }
 
 function handleClearFilters() {
@@ -422,8 +440,6 @@ function handleCloseHelp() {
   showHelpModal.value = false;
   currentHelpKey.value = "";
 }
-
-
 
 // Métodos para integração com timeline
 function handleForceResolution() {

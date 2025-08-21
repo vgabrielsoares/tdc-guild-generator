@@ -1,8 +1,6 @@
 <template>
-  <div
-    v-if="service"
-    class="service-details bg-gray-900 text-white rounded-xl p-6 shadow-2xl border border-blue-700/30"
-  >
+  <div v-if="service"
+    class="service-details bg-gray-900 text-white rounded-xl p-6 shadow-2xl border border-blue-700/30">
     <!-- Header com Status e Título -->
     <div class="flex items-start justify-between mb-6">
       <div class="flex-1">
@@ -25,10 +23,7 @@
     </div>
 
     <!-- Descrição geral do serviço -->
-    <div
-      v-if="service.description"
-      class="mb-6 p-4 bg-blue-900/20 rounded-lg border-l-4 border-blue-400"
-    >
+    <div v-if="service.description" class="mb-6 p-4 bg-blue-900/20 rounded-lg border-l-4 border-blue-400">
       <h3 class="text-lg font-semibold text-blue-300 mb-2">
         Descrição do Serviço
       </h3>
@@ -41,9 +36,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
       <!-- Dificuldade e Complexidade -->
       <div class="bg-gray-800/50 rounded-lg p-4">
-        <h3
-          class="text-lg font-semibold text-orange-300 mb-3 flex items-center gap-2"
-        >
+        <h3 class="text-lg font-semibold text-orange-300 mb-3 flex items-center gap-2">
           <SparklesIcon class="w-5 h-5" />
           Dificuldade
         </h3>
@@ -74,25 +67,17 @@
 
       <!-- Recompensa -->
       <div class="bg-gray-800/50 rounded-lg p-4">
-        <h3
-          class="text-lg font-semibold text-green-300 mb-3 flex items-center gap-2"
-        >
+        <h3 class="text-lg font-semibold text-green-300 mb-3 flex items-center gap-2">
           <CurrencyDollarIcon class="w-5 h-5" />
           Recompensa
         </h3>
-        <ServiceValue
-          v-if="service.value"
-          :value="service.value"
-          :show-details="true"
-          :recurrence-count="0"
-        />
+        <ServiceValue v-if="service.value" :value="service.value" :show-details="true"
+          :recurrence-count="service.value.recurrenceAppliedCount || 0" />
       </div>
 
       <!-- Prazo e Pagamento -->
       <div class="bg-gray-800/50 rounded-lg p-4">
-        <h3
-          class="text-lg font-semibold text-amber-300 mb-3 flex items-center gap-2"
-        >
+        <h3 class="text-lg font-semibold text-amber-300 mb-3 flex items-center gap-2">
           <ClockIcon class="w-5 h-5" />
           Termos
         </h3>
@@ -111,9 +96,7 @@
 
     <!-- Objetivo -->
     <div v-if="service.objective" class="bg-gray-800/50 rounded-lg p-6 mb-6">
-      <h3
-        class="text-lg font-semibold text-gold-400 mb-4 flex items-center gap-2"
-      >
+      <h3 class="text-lg font-semibold text-gold-400 mb-4 flex items-center gap-2">
         <TagIcon class="w-5 h-5" />
         Objetivo
       </h3>
@@ -124,10 +107,7 @@
         </div>
 
         <!-- Detalhes específicos do objetivo -->
-        <div
-          v-if="service.objective.action"
-          class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm"
-        >
+        <div v-if="service.objective.action" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <div v-if="service.objective.action">
             <span class="text-gray-400">Ação:</span>
             <p class="text-blue-200">{{ service.objective.action }}</p>
@@ -145,20 +125,13 @@
     </div>
 
     <!-- Sistema de Testes -->
-    <div
-      v-if="service.testStructure"
-      class="bg-gray-800/50 rounded-lg p-6 mb-6"
-    >
-      <h3
-        class="text-lg font-semibold text-purple-300 mb-4 flex items-center gap-2"
-      >
+    <div v-if="service.testStructure" class="bg-gray-800/50 rounded-lg p-6 mb-6">
+      <h3 class="text-lg font-semibold text-purple-300 mb-4 flex items-center gap-2">
         <BeakerIcon class="w-5 h-5" />
         Sistema de Testes
       </h3>
 
-      <div
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4 text-sm"
-      >
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4 text-sm">
         <div>
           <span class="text-gray-400">Total de Testes:</span>
           <p class="text-white font-medium">
@@ -187,10 +160,8 @@
 
       <!-- Botão para sistema de testes -->
       <div v-if="canStartTests" class="flex gap-3">
-        <button
-          @click="handleStartTests"
-          class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors flex items-center gap-2"
-        >
+        <button @click="handleStartTests"
+          class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors flex items-center gap-2">
           <BeakerIcon class="w-4 h-4" />
           {{
             service.testStructure.tests.length > 0
@@ -199,60 +170,40 @@
           }}
         </button>
 
-        <button
-          v-if="service.testStructure.tests.length > 0"
-          @click="handleResetTests"
-          class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
-        >
+        <button v-if="service.testStructure.tests.length > 0" @click="handleResetTests"
+          class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
           Reiniciar Testes
         </button>
       </div>
     </div>
 
     <!-- Elementos Narrativos Adicionais -->
-    <div
-      v-if="hasNarrativeElements()"
-      class="bg-gray-800/50 rounded-lg p-6 mb-6"
-    >
-      <h3
-        class="text-lg font-semibold text-purple-300 mb-4 flex items-center gap-2"
-      >
+    <div v-if="hasNarrativeElements()" class="bg-gray-800/50 rounded-lg p-6 mb-6">
+      <h3 class="text-lg font-semibold text-purple-300 mb-4 flex items-center gap-2">
         <BookOpenIcon class="w-5 h-5" />
         Elementos Narrativos
       </h3>
       <div class="space-y-4">
-        <div
-          v-if="service.origin"
-          class="p-3 bg-blue-900/30 rounded-lg border-l-4 border-blue-400"
-        >
+        <div v-if="service.origin" class="p-3 bg-blue-900/30 rounded-lg border-l-4 border-blue-400">
           <h4 class="text-blue-300 font-medium mb-1">Origem do Problema</h4>
           <p class="text-gray-300 text-sm">{{ service.origin.description }}</p>
         </div>
 
-        <div
-          v-if="service.complication"
-          class="p-3 bg-orange-900/30 rounded-lg border-l-4 border-orange-400"
-        >
+        <div v-if="service.complication" class="p-3 bg-orange-900/30 rounded-lg border-l-4 border-orange-400">
           <h4 class="text-orange-300 font-medium mb-1">Complicação</h4>
           <p class="text-gray-300 text-sm">
             {{ service.complication.description }}
           </p>
         </div>
 
-        <div
-          v-if="service.rival"
-          class="p-3 bg-red-900/30 rounded-lg border-l-4 border-red-400"
-        >
+        <div v-if="service.rival" class="p-3 bg-red-900/30 rounded-lg border-l-4 border-red-400">
           <h4 class="text-red-300 font-medium mb-1">Rival</h4>
           <p class="text-gray-300 text-sm">
             {{ service.rival.action }} - {{ service.rival.motivation }}
           </p>
         </div>
 
-        <div
-          v-if="service.additionalChallenge"
-          class="p-3 bg-purple-900/30 rounded-lg border-l-4 border-purple-400"
-        >
+        <div v-if="service.additionalChallenge" class="p-3 bg-purple-900/30 rounded-lg border-l-4 border-purple-400">
           <h4 class="text-purple-300 font-medium mb-1">Desafio Adicional</h4>
           <p class="text-gray-300 text-sm">
             {{ service.additionalChallenge.description }}
@@ -263,9 +214,7 @@
 
     <!-- Histórico de datas -->
     <div class="bg-gray-800/50 rounded-lg p-6 mb-6">
-      <h3
-        class="text-lg font-semibold text-gold-400 mb-4 flex items-center gap-2"
-      >
+      <h3 class="text-lg font-semibold text-gold-400 mb-4 flex items-center gap-2">
         <CalendarIcon class="w-5 h-5" />
         Histórico
       </h3>
@@ -274,19 +223,19 @@
           <span class="text-gray-400">Criado em:</span>
           <span class="text-white ml-2">{{
             formatGameDate(service.createdAt)
-          }}</span>
+            }}</span>
         </div>
         <div v-if="service.acceptedAt">
           <span class="text-gray-400">Aceito em:</span>
           <span class="text-white ml-2">{{
             formatGameDate(service.acceptedAt)
-          }}</span>
+            }}</span>
         </div>
         <div v-if="service.completedAt">
           <span class="text-gray-400">Concluído em:</span>
           <span class="text-white ml-2">{{
             formatGameDate(service.completedAt)
-          }}</span>
+            }}</span>
         </div>
       </div>
     </div>
@@ -295,49 +244,37 @@
     <div class="flex flex-wrap gap-3 pt-4 border-t border-blue-700/30">
       <!-- Ações baseadas no status -->
       <template v-if="service.status === ServiceStatus.DISPONIVEL">
-        <button
-          @click="handleAccept"
-          class="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
-        >
+        <button @click="handleAccept"
+          class="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium">
           Aceitar Serviço
         </button>
       </template>
 
       <template v-else-if="service.status === ServiceStatus.ACEITO">
-        <button
-          @click="handleStartTests"
-          class="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors font-medium"
-        >
+        <button @click="handleStartTests"
+          class="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors font-medium">
           Iniciar Testes
         </button>
-        <button
-          @click="handleAbandon"
-          class="px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors font-medium"
-        >
+        <button @click="handleAbandon"
+          class="px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors font-medium">
           Abandonar
         </button>
       </template>
 
       <template v-else-if="service.status === ServiceStatus.EM_ANDAMENTO">
-        <button
-          @click="handleContinueTests"
-          class="px-6 py-3 bg-amber-600 text-white rounded-md hover:bg-amber-700 transition-colors font-medium"
-        >
+        <button @click="handleContinueTests"
+          class="px-6 py-3 bg-amber-600 text-white rounded-md hover:bg-amber-700 transition-colors font-medium">
           Continuar Testes
         </button>
-        <button
-          @click="handleComplete"
-          class="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors font-medium"
-        >
+        <button @click="handleComplete"
+          class="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors font-medium">
           Concluir Serviço
         </button>
       </template>
 
       <!-- Ação sempre disponível -->
-      <button
-        @click="$emit('close')"
-        class="px-6 py-3 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors font-medium ml-auto"
-      >
+      <button @click="$emit('close')"
+        class="px-6 py-3 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors font-medium ml-auto">
         Fechar
       </button>
     </div>
@@ -571,6 +508,7 @@ const hasNarrativeElements = () => {
 <style scoped>
 .service-details {
   /* Fundo sólido sem transparência */
-  background: #111827; /* gray-900 sólido */
+  background: #111827;
+  /* gray-900 sólido */
 }
 </style>

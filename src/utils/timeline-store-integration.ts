@@ -235,7 +235,7 @@ export function updateModuleTimestamp(timelineStore: TimelineStore): GameDate {
 export interface ResolutionConfig<T> {
   statusFilter: (item: T) => boolean;
   resolutionFunction: (items: T[]) => T[];
-  successMessage: (count: number) => { title: string; message: string };
+  successMessage?: (count: number) => { title: string; message: string };
 }
 
 /**
@@ -248,7 +248,7 @@ export function applyAutomaticResolution<T extends { guildId?: string }>(
   guildIdGetter: () => string | undefined,
   updateFunction: (updatedItems: T[]) => void,
   saveFunction: () => void,
-  successToast: (title: string, message: string) => void
+  successToast?: (title: string, message: string) => void
 ): void {
   const targetItems = items.filter(resolutionConfig.statusFilter);
 
@@ -266,8 +266,8 @@ export function applyAutomaticResolution<T extends { guildId?: string }>(
   updateFunction(itemsWithGuild);
   saveFunction();
 
-  const { title, message } = resolutionConfig.successMessage(
-    targetItems.length
-  );
-  successToast(title, message);
+  if (resolutionConfig.successMessage && successToast) {
+    const msg = resolutionConfig.successMessage(targetItems.length);
+    successToast(msg.title, msg.message);
+  }
 }

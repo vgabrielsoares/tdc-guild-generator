@@ -8,6 +8,7 @@ import type {
   ServiceObjective,
   ServiceComplication,
   ServiceRival,
+  ServiceFailureReason,
   ServiceOrigin,
 } from "@/types/service";
 import {
@@ -16,6 +17,7 @@ import {
   ServiceDeadlineType as DeadlineTypeEnum,
   ServiceComplexity,
   ServiceObjectiveType,
+  ServiceResolution,
   ServiceComplicationType,
   ServiceComplicationConsequence,
   ServiceRivalAction,
@@ -52,10 +54,17 @@ import {
 } from "@/data/tables/service-objective-tables";
 import { SERVICE_NARRATIVE_TABLES } from "@/data/tables/service-narrative-tables";
 import {
+  SERVICE_SIGNED_RESOLUTION_TABLE,
+  SERVICE_FAILURE_REASONS_TABLE,
+  shouldCancelService,
+  shouldGetServiceRecurrenceBonus,
+} from "@/data/tables/service-resolution-tables";
+import {
   SERVICE_DIFFICULTY_TABLE,
   SERVICE_COMPLEXITY_TABLE,
   createServiceTestStructure,
 } from "@/data/tables/service-difficulty-tables";
+import { applyRecurrenceBonus as applyRecurrenceBonusUtil } from "@/types/service";
 
 // ===== INTERFACES DE CONFIGURAÇÃO =====
 
@@ -143,9 +152,38 @@ export class ServiceGenerator {
         finalQuantity = Math.max(0, baseQuantity - reduction);
       }
 
+      // Calcular modificador de staff cedo (usado no metadata e ao retornar combinado)
+      const staffModifier = this.getStaffModifier(config.guild);
+
       // ETAPA 3: Gerar serviços individuais
       const services: Service[] = [];
       const notes: string[] = [];
+
+      // Se aplicamos reduções por frequentadores, precisamos gerar
+      // também os serviços "aceitos por outros" para manter
+      // compatibilidade com o fluxo dos contratos, delegamos a geração
+      // a uma função que calcula a versão com e sem redução e retorna
+      // a lista completa (disponíveis + aceitos por outros).
+      if (config.applyReductions !== false && config.quantity === undefined) {
+        const combined = this.generateServicesWithFrequentatorsReduction(
+          config,
+          config.currentDate
+        );
+
+        // combined já contém serviços disponíveis e os "taken by others"
+        return {
+          services: combined,
+          metadata: {
+            baseQuantity,
+            finalQuantity: combined.length,
+            reductionApplied,
+            guildSize: config.guild.structure.size,
+            staffModifier,
+            generatedAt: config.currentDate,
+            notes,
+          },
+        };
+      }
 
       for (let i = 0; i < finalQuantity; i++) {
         const serviceConfig: IndividualServiceConfig = {
@@ -166,7 +204,6 @@ export class ServiceGenerator {
       }
 
       // ETAPA 4: Metadados e informações da geração
-      const staffModifier = this.getStaffModifier(config.guild);
 
       if (reductionApplied > 0) {
         notes.push(
@@ -197,6 +234,159 @@ export class ServiceGenerator {
         `Falha na geração de serviços: ${error instanceof Error ? error.message : "Erro desconhecido"}`
       );
     }
+  }
+
+  /**
+   * Gera serviços aplicando redução por frequentadores, produzindo
+   * serviços disponíveis + serviços aceitos por outros (com status apropriado)
+   */
+  private static generateServicesWithFrequentatorsReduction(
+    config: ServiceGenerationConfig,
+    currentDate: GameDate
+  ): Service[] {
+    // Calcula quantidade base (sem aplicar redução de frequentadores)
+    const baseQuantity = this.calculateBaseQuantity({
+      guild: config.guild,
+      currentDate: config.currentDate,
+    });
+
+    // Calcula redução e contador final
+    const reduction = this.calculateVisitorReduction(config.guild);
+    const withReductionCount = Math.max(0, baseQuantity - reduction);
+    const takenByOthersCount = Math.max(0, baseQuantity - withReductionCount);
+
+    // Gera serviços disponíveis (depois da redução)
+    const availableServices: Service[] = [];
+    for (let i = 0; i < withReductionCount; i++) {
+      availableServices.push(
+        this.generateIndividualService({
+          guild: config.guild,
+          currentDate,
+          serviceIndex: i,
+          totalServices: withReductionCount,
+        })
+      );
+    }
+
+    // Gera serviços aceitos por outros
+    const takenServices: Service[] = [];
+    for (let i = 0; i < takenByOthersCount; i++) {
+      takenServices.push(
+        this.generateServiceTakenByOthers(config, currentDate)
+      );
+    }
+
+    return [...availableServices, ...takenServices];
+  }
+
+  /**
+   * Gera um serviço que foi aceito por outros aventureiros
+   * Usa as tabelas de "Resoluções para Serviços Firmados" e motivos
+   */
+  private static generateServiceTakenByOthers(
+    config: ServiceGenerationConfig,
+    currentDate: GameDate
+  ): Service {
+    // Rolar para ver o que aconteceu com o serviço aceito por outros
+    const outcomeRoll = rollDice({ notation: "1d20" }).result;
+    const outcomeEntry = SERVICE_SIGNED_RESOLUTION_TABLE.find(
+      (entry) => outcomeRoll >= entry.min && outcomeRoll <= entry.max
+    );
+
+    // Se não encontrar, gerar um serviço base e marcar como ACEITO_POR_OUTROS
+    if (!outcomeEntry) {
+      const base = this.generateIndividualService({
+        guild: config.guild,
+        currentDate,
+        serviceIndex: 0,
+        totalServices: 1,
+      });
+
+      return {
+        ...base,
+        status: ServiceStatusEnum.ACEITO_POR_OUTROS,
+        takenByOthersInfo: {
+          takenAt: currentDate,
+          canReturnToAvailable: true,
+        },
+      };
+    }
+
+    const outcome = outcomeEntry.result as ServiceResolution;
+
+    let failureReason: ServiceFailureReason | undefined;
+
+    // Se resultado for NAO_RESOLVIDO, rola motivo de falha
+    if (outcome === ServiceResolution.NAO_RESOLVIDO) {
+      const reasonRoll = rollDice({ notation: "1d20" }).result;
+      const reasonEntry = SERVICE_FAILURE_REASONS_TABLE.find(
+        (entry) => reasonRoll >= entry.min && reasonRoll <= entry.max
+      );
+      failureReason = reasonEntry?.result;
+    }
+
+    // Se motivo de falha indica cancelamento, retorna um serviços anulado
+    if (failureReason && shouldCancelService(failureReason)) {
+      const base = this.generateIndividualService({
+        guild: config.guild,
+        currentDate,
+        serviceIndex: 0,
+        totalServices: 1,
+      });
+
+      return {
+        ...base,
+        status: ServiceStatusEnum.ANULADO,
+        takenByOthersInfo: {
+          takenAt: currentDate,
+          resolutionReason: failureReason,
+          canReturnToAvailable: false,
+        },
+      };
+    }
+
+    // Gera um serviço base e aplica a taxa de recorrência
+    let baseService = this.generateIndividualService({
+      guild: config.guild,
+      currentDate,
+      serviceIndex: 0,
+      totalServices: 1,
+    });
+
+    if (shouldGetServiceRecurrenceBonus(outcome, failureReason)) {
+      baseService = applyRecurrenceBonusUtil(baseService);
+    }
+
+    // Se resolvido por outros
+    if (
+      outcome === ServiceResolution.RESOLVIDO ||
+      outcome === ServiceResolution.RESOLVIDO_COM_RESSALVAS
+    ) {
+      return {
+        ...baseService,
+        status: ServiceStatusEnum.RESOLVIDO_POR_OUTROS,
+        takenByOthersInfo: {
+          takenAt: currentDate,
+          estimatedResolutionDate: currentDate,
+          resolutionReason:
+            outcome === ServiceResolution.RESOLVIDO_COM_RESSALVAS
+              ? "Resolvido com ressalvas"
+              : undefined,
+          canReturnToAvailable: false,
+        },
+        completedAt: currentDate,
+      };
+    }
+
+    // Ou marca aceito por outros (pode retornar a ficar disponível)
+    return {
+      ...baseService,
+      status: ServiceStatusEnum.ACEITO_POR_OUTROS,
+      takenByOthersInfo: {
+        takenAt: currentDate,
+        canReturnToAvailable: true,
+      },
+    };
   }
 
   /**
@@ -538,19 +728,23 @@ export class ServiceGenerator {
       rewardAmount = 5; // Fallback seguro
     }
 
-    // ETAPA 3: Calcular valor de recorrência
+    // ETAPA 3: Determinar moeda
+    const currency = rewardRoll.includes("PO$") ? "PO$" : "C$";
+
+    // ETAPA 4: Calcular valor de recorrência (valor 'por aplicação' vindo da tabela)
     let recurrenceBonusAmount = 0;
+    let recurrenceStepAmount = 0;
     try {
-      const bonusMatch = recurrenceBonus.match(/\+([0-9,]+)\s*C\$/);
-      if (bonusMatch) {
-        recurrenceBonusAmount = parseFloat(bonusMatch[1].replace(",", "."));
+      const bonusMatchC = recurrenceBonus.match(/\+([0-9,]+)\s*C\$/);
+      if (bonusMatchC) {
+        const stepInC = parseFloat(bonusMatchC[1].replace(",", "."));
+        recurrenceStepAmount = currency === "PO$" ? stepInC / 100 : stepInC;
+        recurrenceBonusAmount = 0;
       }
     } catch {
-      recurrenceBonusAmount = 0.5; // Fallback
+      recurrenceStepAmount = 0.5; // Fallback
+      recurrenceBonusAmount = 0; // Fallback
     }
-
-    // ETAPA 4: Determinar moeda
-    const currency = rewardRoll.includes("PO$") ? "PO$" : "C$";
 
     return {
       rewardRoll,
@@ -558,6 +752,7 @@ export class ServiceGenerator {
       currency,
       recurrenceBonus,
       recurrenceBonusAmount,
+      recurrenceStepAmount,
       difficulty,
       modifiers: {
         populationRelation: this.getPopulationRelationModifier(
@@ -790,8 +985,8 @@ export class ServiceGenerator {
     return {
       type: ServiceObjectiveType.AUXILIAR_OU_CUIDAR,
       description: "Auxiliar ou cuidar",
-      action: "Auxiliar",
-      target: "pessoa local",
+      action: "Artesão",
+      target: "inventário de mercadorias",
       complication: "prazo é apertado",
     };
   }
@@ -802,39 +997,141 @@ export class ServiceGenerator {
   private static generateServiceDescription(
     objective: ServiceObjective
   ): string {
-    // Usar o enum como base, com ajustes mínimos para casos especiais
-    let mainVerb: string = objective.type;
+    // Helper para capitalizar a primeira letra (mantendo o resto)
+    const capitalizeFirst = (s: string) =>
+      s && s.length > 0 ? s[0].toUpperCase() + s.slice(1) : s;
 
-    // Ajustes específicos apenas quando necessário
+    // Normalizar componentes
+    const actionRaw = (objective.action || "").trim();
+    const targetRaw = (objective.target || "").trim();
+    const action = actionRaw.toLowerCase();
+    const target = targetRaw.toLowerCase();
+
+    // Preposições comuns para evitar duplicações
+    const leadingPreps = [
+      "para",
+      "em",
+      "na",
+      "no",
+      "de",
+      "do",
+      "da",
+      "dos",
+      "das",
+    ];
+
+    const startsWithPrep = (s: string) => {
+      if (!s) return false;
+      const lower = s.trim().toLowerCase();
+      return leadingPreps.some((p) => lower === p || lower.startsWith(p + " "));
+    };
+
+    const endsWithPrep = (s: string) => {
+      if (!s) return false;
+      return /\b(de|do|da|dos|das)$/i.test(s.trim());
+    };
+
+    // Decidir verbo principal (se for necessário) e conectivo
+    let mainVerb: string = objective.type;
+    const removeLeadingVerbForTypes = new Set<string>([
+      ServiceObjectiveType.SERVICOS_ESPECIFICOS,
+      ServiceObjectiveType.RELIGIOSO,
+    ]);
+
     if (objective.type === ServiceObjectiveType.EXTRAIR_RECURSOS) {
       mainVerb = "Extrair recursos de";
-    } else if (objective.type === ServiceObjectiveType.SERVICOS_ESPECIFICOS) {
-      mainVerb = "Executar";
-    } else if (objective.type === ServiceObjectiveType.RELIGIOSO) {
-      mainVerb = "Realizar";
     } else if (objective.type === ServiceObjectiveType.MULTIPLO) {
       mainVerb = "Executar";
     }
 
-    // Determinar conectivo baseado no tipo de objetivo
+    // Connector default
     let connector = "para";
-    const objectiveTypeLower = objective.type.toLowerCase();
+    if (objective.type === ServiceObjectiveType.CONSTRUIR_CRIAR_OU_REPARAR)
+      connector = "de";
+    if (objective.type === ServiceObjectiveType.RELIGIOSO) connector = "de";
 
-    // Usar "em" para contextos que indicam local/situação específicos
-    if (
-      objectiveTypeLower.includes("extrair") ||
-      objectiveTypeLower.includes("construir") ||
-      objectiveTypeLower.includes("religioso")
-    ) {
-      connector = "em";
+    const mainVerbEndsWithDe = /\bde$/i.test(mainVerb.trim());
+
+    // Construir descrição com boas heurísticas para preposições
+    let description = "";
+
+    if (removeLeadingVerbForTypes.has(objective.type)) {
+      // Começar pelo action capitalizado, sem verbo inicial
+      const lead = capitalizeFirst(action);
+      if (target) {
+        if (!startsWithPrep(target) && connector && !mainVerbEndsWithDe) {
+          description = `${lead} ${connector} ${target}`;
+        } else {
+          description = `${lead} ${target}`.trim();
+        }
+      } else {
+        description = lead;
+      }
+    } else if (objective.type === ServiceObjectiveType.AUXILIAR_OU_CUIDAR) {
+      // "Auxiliar ou cuidar de <action> [para <target>]" — evitar 'para em' quando target já tem preposição
+      const verb = mainVerb.trim();
+      if (target) {
+        if (startsWithPrep(target)) {
+          description = `${verb} de ${action} ${target}`
+            .replace(/\s+/g, " ")
+            .trim();
+        } else {
+          description = `${verb} de ${action} para ${target}`
+            .replace(/\s+/g, " ")
+            .trim();
+        }
+      } else {
+        description = `${verb} de ${action}`.trim();
+      }
+    } else {
+      // Caso geral
+      const verb = mainVerb.trim();
+      if (verb) {
+        if (mainVerbEndsWithDe) {
+          // Exemplo: "Extrair recursos de"
+          if (action && target) {
+            const actionWordCount = action.split(/\s+/).filter(Boolean).length;
+            const targetWordCount = target.split(/\s+/).filter(Boolean).length;
+
+            // Heurística: se action for uma única palavra (ex: 'especiaria') e target existir,
+            // inserir 'de' entre action e target: 'especiaria de pântano'.
+            // Se action tem múltiplas palavras e target é uma única palavra (ex: 'extrativismo animal' + 'submerso'),
+            // é provável que o target seja um adjetivo e não precise do 'de'.
+            if (!startsWithPrep(target) && !endsWithPrep(action)) {
+              if (actionWordCount === 1 && targetWordCount >= 1) {
+                description = `${verb} ${action} de ${target}`;
+              } else if (actionWordCount > 1 && targetWordCount === 1) {
+                description = `${verb} ${action} ${target}`;
+              } else {
+                description = `${verb} ${action} de ${target}`;
+              }
+            } else {
+              description = `${verb} ${action} ${target}`
+                .replace(/\s+/g, " ")
+                .trim();
+            }
+          } else {
+            description = `${verb} ${action} ${target}`
+              .replace(/\s+/g, " ")
+              .trim();
+          }
+        } else {
+          // Verb does not end with 'de'
+          if (action) {
+            description = `${verb} ${action}`;
+            if (target) {
+              if (!startsWithPrep(target) && connector)
+                description += ` ${connector} ${target}`;
+              else description += ` ${target}`;
+            }
+          } else {
+            description = `${action} ${connector} ${target}`.trim();
+          }
+        }
+      } else {
+        description = `${action} ${connector} ${target}`.trim();
+      }
     }
-
-    // Formatar componentes
-    const action = objective.action.toLowerCase(); // O que do resultado da tabela
-    const target = objective.target.toLowerCase(); // Para quem/onde
-
-    // Construir descrição base
-    let description = `${mainVerb} ${action} ${connector} ${target}`;
 
     // Adicionar complicação se houver
     if (objective.complication) {
@@ -842,7 +1139,7 @@ export class ServiceGenerator {
       description += `, mas ${complication}`;
     }
 
-    return description;
+    return description.replace(/\s+/g, " ").trim();
   }
 
   /**
@@ -864,10 +1161,10 @@ export class ServiceGenerator {
     };
 
     const baseTitle = titleMap[objective.type] || "Serviço";
-    
+
     // Adicionar contexto do alvo se disponível
     if (objective.target) {
-      const targetShort = objective.target.split(' ').slice(0, 2).join(' ');
+      const targetShort = objective.target.split(" ").slice(0, 2).join(" ");
       return `${baseTitle}: ${targetShort}`;
     }
 
@@ -998,17 +1295,12 @@ export class ServiceGenerator {
    * @param timesPreviouslyFailed - Quantas vezes o serviço falhou antes (para recorrência)
    * @returns Valor final da recompensa
    */
-  public static calculateFinalReward(
-    service: Service,
-    timesPreviouslyFailed: number = 0
-  ): number {
+  public static calculateFinalReward(service: Service): number {
     let baseReward = service.value.rewardAmount;
 
-    // Aplicar taxa de recorrência se o serviço falhou antes
-    if (timesPreviouslyFailed > 0) {
-      const recurrenceBonus =
-        service.value.recurrenceBonusAmount * timesPreviouslyFailed;
-      baseReward += recurrenceBonus;
+    // Aplicar taxa de recorrência: usar o valor acumulado em service.value.recurrenceBonusAmount
+    if ((service.value.recurrenceBonusAmount || 0) > 0) {
+      baseReward += service.value.recurrenceBonusAmount;
     }
 
     // Se não há outcome (testes não concluídos), retornar base + recorrência
@@ -1027,32 +1319,6 @@ export class ServiceGenerator {
     }
 
     return Math.floor(finalReward);
-  }
-
-  /**
-   * Aplica taxa de recorrência a um serviço não resolvido
-   * Conforme especificação "Taxa de recorrência"
-   *
-   * @param service - Serviço original
-   * @param failureCount - Número de falhas consecutivas
-   * @returns Serviço com valor atualizado
-   */
-  public static applyRecurrenceBonus(
-    service: Service,
-    failureCount: number
-  ): Service {
-    if (failureCount <= 0) return service;
-
-    const totalBonus = service.value.recurrenceBonusAmount * failureCount;
-    const updatedValue = {
-      ...service.value,
-      rewardAmount: service.value.rewardAmount + totalBonus,
-    };
-
-    return {
-      ...service,
-      value: updatedValue,
-    };
   }
 
   /**

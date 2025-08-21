@@ -20,8 +20,8 @@
             <div v-if="!isEditingName" class="flex items-center group">
               <button
                 @click="regenerateGuildName"
-                class="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-green-400 p-1 ml-1"
-                :disabled="guild.locked"
+                class="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-green-400 p-1 ml-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                :disabled="guildStore.isGenerating || guild?.locked"
                 title="Regenerar nome da guilda"
               >
                 <ArrowPathIcon class="w-4 h-4" />
@@ -31,7 +31,8 @@
               </h1>
               <button
                 @click="startEditingName"
-                class="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-amber-400 p-1"
+                class="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-amber-400 p-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                :disabled="guildStore.isGenerating || guild?.locked"
                 title="Editar nome da guilda"
               >
                 <PencilIcon class="w-4 h-4" />
@@ -55,20 +56,23 @@
                 @keyup.enter="saveGuildName"
                 @keyup.escape="cancelEditingName"
                 @blur="saveGuildName"
-                class="text-3xl font-bold text-amber-400 bg-gray-700 border border-amber-400 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-amber-500 flex-1"
+                class="text-3xl font-bold text-amber-400 bg-gray-700 border border-amber-400 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-amber-500 flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
                 maxlength="100"
+                :disabled="guildStore.isGenerating || guild?.locked"
               />
               <button
                 @click="saveGuildName"
-                class="ml-2 text-green-400 hover:text-green-300 p-1"
+                class="ml-2 text-green-400 hover:text-green-300 p-1 disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Salvar"
+                :disabled="guildStore.isGenerating || guild?.locked"
               >
                 <CheckIcon class="w-4 h-4" />
               </button>
               <button
                 @click="cancelEditingName"
-                class="ml-1 text-red-400 hover:text-red-300 p-1"
+                class="ml-1 text-red-400 hover:text-red-300 p-1 disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Cancelar"
+                :disabled="guildStore.isGenerating || guild?.locked"
               >
                 <XMarkIcon class="w-4 h-4" />
               </button>
@@ -561,6 +565,7 @@ const clearGuild = () => {
 // Funções de edição do nome
 const startEditingName = () => {
   if (!guild.value) return;
+  if (guildStore.isGenerating || guild.value.locked) return;
   editingGuildName.value = guild.value.name;
   isEditingName.value = true;
   // Focus no input após o próximo tick

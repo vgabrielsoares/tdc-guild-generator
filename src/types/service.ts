@@ -140,6 +140,10 @@ export interface ServiceValue {
   // Taxa de recorrência específica conforme tabela
   recurrenceBonus: string; // Ex: "+0,5 C$", "+1 C$", "+5 C$", "+25 C$"
   recurrenceBonusAmount: number; // Valor numérico do bônus
+  // Quanto aumenta a cada aplicação (valor por aplicação)
+  recurrenceStepAmount?: number;
+  // Quantas vezes a taxa de recorrência foi aplicada a este serviço
+  recurrenceAppliedCount?: number;
 
   // Dificuldade associada à recompensa
   difficulty: ServiceDifficulty; // ND específico da tabela
@@ -298,6 +302,14 @@ export interface Service {
   // Estado temporal
   isActive: boolean; // Se está sendo processado no timeline
   isExpired: boolean; // Se passou do prazo
+
+  // Informações para serviços aceitos por outros aventureiros
+  takenByOthersInfo?: {
+    takenAt: GameDate;
+    estimatedResolutionDate?: GameDate;
+    resolutionReason?: string;
+    canReturnToAvailable?: boolean;
+  };
 }
 
 // ===== INTERFACES PARA ELEMENTOS NARRATIVOS =====
@@ -537,7 +549,9 @@ export const ServiceValueSchema = z.object({
   rewardAmount: z.number().int().min(1).max(10000),
   currency: z.enum(["C$", "PO$"]),
   recurrenceBonus: z.string().min(1).max(20), // Ex: "+0,5 C$", "+5 C$"
-  recurrenceBonusAmount: z.number().min(0).max(100),
+  recurrenceBonusAmount: z.number().min(0).max(100000),
+  recurrenceStepAmount: z.number().min(0).max(100000).optional(),
+  recurrenceAppliedCount: z.number().int().min(0).optional(),
   difficulty: z.nativeEnum(ServiceDifficulty),
   modifiers: ServiceModifiersSchema,
 });
@@ -706,12 +720,10 @@ export const validateService = (data: unknown): Service => {
  * Calcula recompensa final considerando modificadores e bônus de recorrência
  */
 export const calculateFinalServiceReward = (service: Service): number => {
-  const { rewardAmount, recurrenceBonusAmount } = service.value;
-
-  // Soma simples: valor base + bônus de recorrência
-  const finalAmount = rewardAmount + recurrenceBonusAmount;
-
-  return Math.max(1, finalAmount);
+  // O valor final é a soma do valor base (rewardAmount) mais o bônus de recorrência acumulado
+  const base = service.value.rewardAmount || 0;
+  const recurrence = service.value.recurrenceBonusAmount || 0;
+  return Math.max(1, Math.floor(base + recurrence));
 };
 
 /**
@@ -746,20 +758,28 @@ export const isServiceExpired = (
  */
 export const applyRecurrenceBonus = (service: Service): Service => {
   const currentBonusAmount = service.value.recurrenceBonusAmount || 0;
+  const step =
+    typeof service.value.recurrenceStepAmount === "number"
+      ? service.value.recurrenceStepAmount
+      : service.value.currency === "C$"
+        ? 5
+        : 1;
 
-  // Incrementa bônus conforme regras (pode variar por dificuldade)
-  let newBonusAmount: number;
-  let newBonusText: string;
+  const newBonusAmount = currentBonusAmount + step;
+  const newRecurrenceAppliedCount =
+    (service.value.recurrenceAppliedCount || 0) + 1;
 
-  // Sistema baseado na moeda
-  if (service.value.currency === "C$") {
-    newBonusAmount = Math.min(currentBonusAmount + 5, 25); // Máximo +25 C$
-    newBonusText = `+${newBonusAmount} C$`;
-  } else {
-    // Para PO$, incremento menor mas mais valioso
-    newBonusAmount = Math.min(currentBonusAmount + 1, 5); // Máximo +5 PO$
-    newBonusText = `+${newBonusAmount} PO$`;
-  }
+  const currency = service.value.currency || "C$";
+  const formatForCurrency = (amt: number) => {
+    if (currency === "PO$") {
+      const r = Math.round((amt + Number.EPSILON) * 100) / 100;
+      const s = r.toFixed(2);
+      return s.replace(/\.00$/, "").replace(/(\.[0-9])0$/, "$1");
+    }
+    return Number.isInteger(amt) ? String(amt) : String(amt);
+  };
+
+  const newBonusText = `+${formatForCurrency(newBonusAmount)} ${currency}`;
 
   return {
     ...service,
@@ -767,6 +787,8 @@ export const applyRecurrenceBonus = (service: Service): Service => {
       ...service.value,
       recurrenceBonus: newBonusText,
       recurrenceBonusAmount: newBonusAmount,
+      recurrenceAppliedCount: newRecurrenceAppliedCount,
+      recurrenceStepAmount: service.value.recurrenceStepAmount,
     },
   };
 };

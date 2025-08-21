@@ -1,74 +1,79 @@
 <template>
   <div class="service-list space-y-4">
-    <!-- Header -->
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <WrenchScrewdriverIcon class="w-6 h-6 text-blue-400" />
-        <h3 class="text-xl font-semibold text-blue-400">Lista de Serviços</h3>
-        <span v-if="totalServices > 0" class="text-sm text-gray-400">
-          ({{ filteredServices.length }} de {{ totalServices }})
-        </span>
+    <!-- Lista de serviços e tudo relacionado só aparecem se houver guilda atual -->
+    <template v-if="hasCurrentGuild">
+      <!-- Header -->
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <WrenchScrewdriverIcon class="w-6 h-6 text-blue-400" />
+          <h3 class="text-xl font-semibold text-blue-400">Lista de Serviços</h3>
+          <span v-if="totalServices > 0" class="text-sm text-gray-400">
+            ({{ filteredServices.length }} de {{ totalServices }})
+          </span>
+        </div>
       </div>
-    </div>
 
-    <!-- Filtros rápidos -->
-    <div v-if="showFilters" class="flex flex-wrap gap-2">
-      <button
-        v-for="(status, index) in statusFilters"
-        :key="status.value || `all-${index}`"
-        @click="$emit('filter-status', status.value)"
-        :class="[
-          'px-3 py-1 rounded-full text-sm font-medium transition-colors',
-          activeStatusFilter === status.value
-            ? 'bg-blue-600 text-white'
-            : 'bg-gray-700 text-gray-300 hover:bg-gray-600',
-        ]"
-      >
-        {{ status.label }}
-        <span v-if="status.count > 0" class="ml-1"> ({{ status.count }}) </span>
-      </button>
-    </div>
-
-    <!-- Lista de serviços -->
-    <div v-if="filteredServices.length > 0" class="space-y-3">
-      <div
-        v-for="service in paginatedServices"
-        :key="service.id"
-        class="transition-all duration-200"
-      >
-        <ServiceCard
-          :service="service"
-          :show-actions="showActions"
-          @accept="handleAccept"
-          @start-tests="handleStartTests"
-          @continue-tests="handleContinueTests"
-          @complete="handleComplete"
-          @abandon="handleAbandon"
-          @view-details="handleViewDetails"
-          @open-help="$emit('open-help', $event)"
-        />
-      </div>
-    </div>
-
-    <!-- Estado vazio -->
-    <div v-else-if="!isLoading" class="text-center py-8">
-      <WrenchScrewdriverIcon class="w-16 h-16 text-gray-500 mx-auto mb-4" />
-      <h4 class="text-lg font-medium text-gray-400 mb-2">
-        Nenhum serviço encontrado
-      </h4>
-      <p class="text-gray-500 mb-4">
-        {{ emptyStateMessage }}
-      </p>
-      <div class="flex items-center justify-center gap-2">
+      <!-- Filtros rápidos -->
+      <div v-if="showFilters" class="flex flex-wrap gap-2">
         <button
-          v-if="hasFilters"
-          @click="$emit('clear-filters')"
-          class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+          v-for="(status, index) in statusFilters"
+          :key="status.value || `all-${index}`"
+          @click="$emit('filter-status', status.value)"
+          :class="[
+            'px-3 py-1 rounded-full text-sm font-medium transition-colors',
+            activeStatusFilter === status.value
+              ? 'bg-blue-600 text-white'
+              : 'bg-gray-700 text-gray-300 hover:bg-gray-600',
+          ]"
         >
-          Limpar Filtros
+          {{ status.label }}
+          <span v-if="status.count > 0" class="ml-1">
+            ({{ status.count }})
+          </span>
         </button>
       </div>
-    </div>
+
+      <!-- Lista de serviços -->
+      <div v-if="filteredServices.length > 0" class="space-y-3">
+        <div
+          v-for="service in paginatedServices"
+          :key="service.id"
+          class="transition-all duration-200"
+        >
+          <ServiceCard
+            :service="service"
+            :show-actions="showActions"
+            @accept="handleAccept"
+            @start-tests="handleStartTests"
+            @continue-tests="handleContinueTests"
+            @complete="handleComplete"
+            @abandon="handleAbandon"
+            @view-details="handleViewDetails"
+            @open-help="$emit('open-help', $event)"
+          />
+        </div>
+      </div>
+
+      <!-- Estado vazio -->
+      <div v-else-if="!isLoading" class="text-center py-8">
+        <WrenchScrewdriverIcon class="w-16 h-16 text-gray-500 mx-auto mb-4" />
+        <h4 class="text-lg font-medium text-gray-400 mb-2">
+          Nenhum serviço encontrado
+        </h4>
+        <p class="text-gray-500 mb-4">
+          {{ emptyStateMessage }}
+        </p>
+        <div class="flex items-center justify-center gap-2">
+          <button
+            v-if="hasFilters"
+            @click="$emit('clear-filters')"
+            class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+          >
+            Limpar Filtros
+          </button>
+        </div>
+      </div>
+    </template>
 
     <!-- Loading state -->
     <div v-else-if="isLoading" class="text-center py-8">
@@ -124,6 +129,7 @@ import { WrenchScrewdriverIcon } from "@heroicons/vue/24/outline";
 import type { Service } from "@/types/service";
 import { ServiceStatus } from "@/types/service";
 import ServiceCard from "./ServiceCard.vue";
+import { useGuildStore } from "@/stores/guild";
 
 // Props
 interface Props {
@@ -151,6 +157,10 @@ const props = withDefaults(defineProps<Props>(), {
   emptyStateMessage: "Nenhum serviço disponível no momento.",
   showPerformanceInfo: false,
 });
+
+// Guilda atual
+const guildStore = useGuildStore();
+const hasCurrentGuild = computed(() => !!guildStore.currentGuild);
 
 // Emits
 const emit = defineEmits<{
