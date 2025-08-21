@@ -78,16 +78,12 @@
         <div class="flex items-center justify-between">
           <span class="text-sm text-gray-400">Recompensa:</span>
           <ServiceTooltip
-            :content="`Recompensa total: ${service.value?.rewardAmount || 0} + ${service.value?.recurrenceBonusAmount || 0} de bônus${service.value?.recurrenceAppliedCount ? ` (${service.value.recurrenceAppliedCount}x recorrência)` : ''}`"
+            :content="`Valor base: ${service.value?.rewardAmount || 0} ${service.value?.currency} — Recorrência: ${recurrenceAppliedDisplay} ${service.value?.currency}${service.value?.recurrenceAppliedCount ? ` (${service.value.recurrenceAppliedCount}x)` : ''} — Multiplicador de complexidade: x${complexityMultiplierDisplay}`"
             title="Breakdown da Recompensa"
           >
             <div class="flex items-center gap-2 cursor-help">
-              <span class="text-sm font-medium text-green-400">
-                {{
-                  (service.value?.rewardAmount || 0) +
-                  (service.value?.recurrenceBonusAmount || 0)
-                }}
-                {{ service.value?.currency }}
+              <span class="text-sm font-medium text-yellow-300">
+                {{ finalReward }} {{ service.value?.currency }}
               </span>
               <span
                 v-if="
@@ -97,8 +93,7 @@
                 class="text-xs bg-green-800 text-green-100 px-2 py-0.5 rounded-full border border-green-700"
                 :title="`${service.value.recurrenceAppliedCount}x aplicação(s)`"
               >
-                +{{ service.value.recurrenceBonusAmount }}
-                {{ service.value.currency }}
+                +{{ recurrenceAppliedDisplay }} {{ service.value?.currency }}
               </span>
             </div>
           </ServiceTooltip>
@@ -208,6 +203,7 @@ import ServiceStatusComponent from "./ServiceStatus.vue";
 import ServiceTooltip from "./ServiceTooltip.vue";
 import Tooltip from "@/components/common/Tooltip.vue";
 import InfoButton from "@/components/common/InfoButton.vue";
+import { calculateFinalServiceReward } from "@/types/service";
 
 // Props
 interface Props {
@@ -269,6 +265,35 @@ const contractorIcon = computed(() => {
       return UserGroupIcon;
   }
 });
+
+const finalReward = computed(() => {
+  try {
+    return calculateFinalServiceReward(props.service as Service);
+  } catch {
+    return props.service.value?.rewardAmount || 0;
+  }
+});
+
+const complexityMultiplierDisplay = computed(() => {
+  return props.service.value?.complexityMultiplier || 1;
+});
+
+// Formata o valor da recorrência já multiplicado
+const recurrenceAppliedDisplay = computed(() => {
+  const total = props.service.value?.recurrenceBonusAmount || 0;
+  const mult = props.service.value?.complexityMultiplier || 1;
+  const currency = props.service.value?.currency || "";
+  return formatCurrency(total * mult, currency);
+});
+
+function formatCurrency(amount: number, currency: string) {
+  const rounded = Math.round((amount + Number.EPSILON) * 100) / 100;
+  if (currency === "PO$") {
+    const s = rounded.toFixed(2);
+    return s.replace(/\.00$/, "").replace(/(\.[0-9])0$/, "$1");
+  }
+  return Number.isInteger(rounded) ? String(rounded) : String(rounded);
+}
 
 // Label do tipo de contratante
 const contractorTypeLabel = computed(() => {
