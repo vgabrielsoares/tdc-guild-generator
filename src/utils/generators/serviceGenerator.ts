@@ -535,11 +535,18 @@ export class ServiceGenerator {
     // GERAÇÃO DE TIPO DE PAGAMENTO
     const paymentType = this.generatePaymentType();
 
-    // VALORES E RECOMPENSAS
-    const value = this.generateBasicValue(config.guild);
-
     // GERAÇÃO DE COMPLEXIDADE
     const complexity = this.generateServiceComplexity();
+
+    // Buscar multiplicador de complexidade na tabela
+    const complexityEntry = SERVICE_COMPLEXITY_TABLE.find(
+      (entry) => entry.result.complexity === complexity
+    );
+    const complexityMultiplier =
+      complexityEntry?.result.complexityMultiplier || 1;
+
+    // VALORES E RECOMPENSAS (aplicar multiplicador de complexidade)
+    const value = this.generateBasicValue(config.guild, complexityMultiplier);
 
     // GERAÇÃO DE ESTRUTURA DE TESTES
     const testStructure = createServiceTestStructure(
@@ -683,7 +690,10 @@ export class ServiceGenerator {
    * Gera valor completo do serviço com dificuldade e complexidade
    * Baseado nas tabelas "Dificuldade e Recompensas" e "Nível de Complexidade"
    */
-  private static generateBasicValue(guild: Guild): ServiceValue {
+  private static generateBasicValue(
+    guild: Guild,
+    complexityMultiplier: number = 1
+  ): ServiceValue {
     // ETAPA 1: Gerar dificuldade e recompensa (1d20)
     const difficultyResult = rollOnTable(SERVICE_DIFFICULTY_TABLE);
     const difficulty = difficultyResult.result.difficulty;
@@ -746,13 +756,23 @@ export class ServiceGenerator {
       recurrenceBonusAmount = 0; // Fallback
     }
 
+    // Aplicar multiplicador de complexidade à recompensa e à taxa de recorrência
+    const adjustedRewardAmount = Math.max(
+      1,
+      Math.floor(rewardAmount * complexityMultiplier)
+    );
+    const adjustedRecurrenceStep = Math.max(
+      0,
+      recurrenceStepAmount * complexityMultiplier
+    );
+
     return {
       rewardRoll,
-      rewardAmount,
+      rewardAmount: adjustedRewardAmount,
       currency,
       recurrenceBonus,
       recurrenceBonusAmount,
-      recurrenceStepAmount,
+      recurrenceStepAmount: adjustedRecurrenceStep,
       difficulty,
       modifiers: {
         populationRelation: this.getPopulationRelationModifier(
@@ -763,6 +783,7 @@ export class ServiceGenerator {
         ),
         staffCondition: this.getStaffModifier(guild),
       },
+      complexityMultiplier,
     };
   }
 
@@ -1303,6 +1324,10 @@ export class ServiceGenerator {
       baseReward += service.value.recurrenceBonusAmount;
     }
 
+    // Aplicar multiplicador de complexidade
+    const complexityMult = service.value.complexityMultiplier || 1;
+    baseReward = Math.max(1, Math.floor(baseReward * complexityMult));
+
     // Se não há outcome (testes não concluídos), retornar base + recorrência
     if (!service.testStructure.outcome) {
       return Math.floor(baseReward);
@@ -1315,7 +1340,8 @@ export class ServiceGenerator {
     if (service.testStructure.outcome.masterwork) {
       // Simular nova rolagem da recompensa base
       const bonusReward = this.rollServiceReward(service.value.rewardRoll);
-      finalReward = baseReward + bonusReward;
+      // masterwork: bônus também é afetado pelo multiplicador de complexidade
+      finalReward = baseReward + Math.floor(bonusReward * complexityMult);
     }
 
     return Math.floor(finalReward);
