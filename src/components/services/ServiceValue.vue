@@ -8,11 +8,9 @@
         </span>
 
         <!-- Indicador de taxa de recorrência aplicada -->
-        <span
-          v-if="hasRecurrenceBonus"
-          class="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full border border-green-200"
-        >
-          +{{ appliedBonusAmount }} {{ value.currency }}
+        <span v-if="hasRecurrenceBonus"
+          class="text-xs bg-green-800 text-green-100 px-2 py-0.5 rounded-full border border-green-700">
+          +{{ appliedTotalDisplay }} {{ value.currency }}
         </span>
       </div>
 
@@ -21,7 +19,7 @@
         <div class="text-xs text-gray-400">
           {{ value.rewardRoll }}
         </div>
-        <div v-if="hasRecurrenceBonus" class="text-xs text-green-600">
+        <div v-if="hasRecurrenceBonus" class="text-xs text-green-300">
           {{ recurrenceCount }}x bônus
         </div>
       </div>
@@ -31,8 +29,8 @@
     <div v-if="showDetails" class="mt-2 text-xs text-gray-500 space-y-1">
       <div>Valor base: {{ value.rewardAmount }} {{ value.currency }}</div>
       <div v-if="hasRecurrenceBonus">
-        Bônus por recorrência: {{ value.recurrenceBonus }} (aplicado
-        {{ recurrenceCount }}x)
+        Bônus por recorrência: +{{ recurrenceStepDisplay }} {{ value.currency }}
+        <span class="text-gray-400">(aplicado {{ recurrenceCount }}x)</span>
       </div>
       <div>Dificuldade: {{ difficultyLabel }}</div>
     </div>
@@ -54,29 +52,43 @@ const props = withDefaults(defineProps<Props>(), {
   recurrenceCount: 0,
 });
 
-// Valor atual (base + bônus de recorrência aplicado)
+// Valor atual (base + bônus acumulado)
 const currentValue = computed(() => {
-  const baseValue = props.value.rewardAmount;
-  const bonusPerApplication = props.value.recurrenceBonusAmount;
-  const totalBonus = bonusPerApplication * props.recurrenceCount;
-
-  return Math.round((baseValue + totalBonus) * 100) / 100; // Arredondar para 2 casas decimais
+  const base = props.value.rewardAmount || 0;
+  const bonus = props.value.recurrenceBonusAmount || 0;
+  return Math.round((base + bonus) * 100) / 100;
 });
 
-// Quantidade de bônus aplicada
-const appliedBonusAmount = computed(() => {
-  return (
-    Math.round(
-      props.value.recurrenceBonusAmount * props.recurrenceCount * 100
-    ) / 100
-  );
+// Valor base da taxa (por aplicação) formatado
+const recurrenceStepDisplay = computed(() => {
+  const step = props.value.recurrenceStepAmount || 0;
+  return formatCurrency(step, props.value.currency);
+});
+
+// Valor total aplicado (acumulado) formatado
+const appliedTotalDisplay = computed(() => {
+  const total = props.value.recurrenceBonusAmount || 0;
+  return formatCurrency(total, props.value.currency);
 });
 
 // Se tem bônus de recorrência aplicado
-const hasRecurrenceBonus = computed(() => props.recurrenceCount > 0);
+const hasRecurrenceBonus = computed(() => {
+  const count = props.recurrenceCount || props.value.recurrenceAppliedCount || 0;
+  return count > 0;
+});
 
 // Label da dificuldade
 const difficultyLabel = computed(() => {
   return props.value.difficulty.split(" (")[0];
 });
+
+// Helper de formatação simples: PO$ pode ter casas decimais, C$ normalmente inteiro
+function formatCurrency(amount: number, currency: string) {
+  const rounded = Math.round((amount + Number.EPSILON) * 100) / 100;
+  if (currency === "PO$") {
+    const s = rounded.toFixed(2);
+    return s.replace(/\.00$/, "").replace(/(\.[0-9])0$/, "$1");
+  }
+  return Number.isInteger(rounded) ? String(rounded) : String(rounded);
+}
 </script>
