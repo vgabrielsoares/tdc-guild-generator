@@ -56,6 +56,7 @@ import { SERVICE_NARRATIVE_TABLES } from "@/data/tables/service-narrative-tables
 import {
   ADDITIONAL_CHALLENGE_CHANCE_TABLE,
   ADDITIONAL_CHALLENGE_TABLE,
+  generateRandomKeywords,
 } from "@/data/tables/service-challenge-tables";
 import {
   SERVICE_SIGNED_RESOLUTION_TABLE,
@@ -581,6 +582,14 @@ export class ServiceGenerator {
       additionalChallenge = undefined;
     }
 
+    // geração de palavras-chave
+    let creativityKeywords: { keyword: string }[] | undefined = undefined;
+    try {
+      creativityKeywords = generateRandomKeywords();
+    } catch (err) {
+      creativityKeywords = undefined;
+    }
+
     // CRIAÇÃO DO SERVIÇO
     const service: Service = {
       id: serviceId,
@@ -604,6 +613,7 @@ export class ServiceGenerator {
       rival,
       origin,
       additionalChallenge,
+      creativityKeywords,
     };
 
     return service;
