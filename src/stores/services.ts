@@ -500,7 +500,6 @@ export const useServicesStore = defineStore("services", () => {
     const result = ServiceGenerator.generateServices({
       guild: currentGuild.value,
       currentDate: timelineStore.currentGameDate,
-      quantity: 1,
       applyReductions: true,
     });
 
