@@ -245,6 +245,7 @@ export interface Contract {
     clauseRolls?: number[];
     antagonistRoll?: number;
     rewardRollBonus?: number; // Bônus aplicado à rolagem de recompensa
+    previousFinalGoldReward?: number; // Valor final anterior (em PO$) antes de aplicar bônus de retorno/ajuste
   };
 }
 

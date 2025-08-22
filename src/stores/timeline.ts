@@ -118,15 +118,34 @@ export const useTimelineStore = defineStore("timeline", () => {
   // Actions
 
   /**
-   * Define a guilda atual e carrega/cria sua timeline
+   * Define a guilda atual e carrega sua timeline (se existir)
    */
   function setCurrentGuild(guildId: string): void {
     currentGuildId.value = guildId;
+  }
+
+  /**
+   * Inicializa manualmente a timeline para a guilda atual
+   */
+  function initializeTimelineForCurrentGuild(
+    startDate?: GameDate
+  ): GuildTimeline | null {
+    if (!currentGuildId.value) {
+      warning("Erro", "Nenhuma guilda ativa para inicializar timeline");
+      return null;
+    }
 
     // Criar timeline se não existir
-    if (!timelines.value[guildId]) {
-      createTimelineForGuild(guildId);
+    if (!timelines.value[currentGuildId.value]) {
+      const timeline = createTimelineForGuild(currentGuildId.value, startDate);
+      success(
+        "Timeline Inicializada",
+        "Timeline da guilda foi criada com sucesso"
+      );
+      return timeline;
     }
+
+    return timelines.value[currentGuildId.value];
   }
 
   /**
@@ -198,21 +217,6 @@ export const useTimelineStore = defineStore("timeline", () => {
       eventsRemaining,
     };
 
-    // Notificar sobre eventos processados
-    if (triggeredEvents.length > 0) {
-      // Only show toast for important events
-      const importantEvents = triggeredEvents.filter(
-        (e) => e.description && !e.description.toLowerCase().includes("rotina")
-      );
-
-      if (importantEvents.length > 0) {
-        success(
-          "Eventos processados",
-          `${importantEvents.length} evento(s) processados`
-        );
-      }
-    }
-
     // Notificar outros stores sobre a mudança de tempo
     notifyTimeAdvanceCallbacks(result);
 
@@ -249,13 +253,6 @@ export const useTimelineStore = defineStore("timeline", () => {
       triggeredEvents,
       eventsRemaining,
     };
-
-    if (triggeredEvents.length > 0) {
-      success(
-        "Eventos processados",
-        `${triggeredEvents.length} evento(s) foram processados ao avançar para ${formatGameDate(date)}`
-      );
-    }
 
     // Notificar outros stores sobre a mudança de tempo
     notifyTimeAdvanceCallbacks(result);
@@ -408,6 +405,7 @@ export const useTimelineStore = defineStore("timeline", () => {
 
     // Actions
     setCurrentGuild,
+    initializeTimelineForCurrentGuild,
     createTimelineForGuild,
     removeTimelineForGuild,
     advanceOneDay,

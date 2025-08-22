@@ -43,15 +43,15 @@ Os dados usados em 'Quantidade e Prazos' é equivalente à estrutura da sede da 
 | ----- | --------------------- |
 | 1-4   | 1d4 serviços          |
 | 5-6   | 1d4+1 serviços        |
-| 7-9   | 1d4+2 serviços        |
-| 10    | 1d6+1 serviços        |
-| 11    | 1d6+2 serviços        |
-| 12-13 | 2d4 serviços          |
-| 14-16 | 2d4+1 serviços        |
-| 17-18 | 3d4 serviços          |
-| 19    | 4d4 serviços          |
-| 20    | 4d4+1 serviços        |
-| 21+   | 5d6 serviços          |
+| 7-9   | 1d6+2 serviços        |
+| 10    | 1d8+1 serviços        |
+| 11    | 2d6+2 serviços        |
+| 12-13 | 4d4+2 serviços        |
+| 14-16 | 4d6+1 serviços        |
+| 17-18 | 5d6 serviços          |
+| 19    | 6d6 serviços          |
+| 20    | 5d8+1 serviços        |
+| 21+   | 5d10 serviços         |
 
 #### Redução por Frequentadores
 
@@ -60,12 +60,12 @@ De acordo com aqueles que frequentam a guilda, a quantidade de serviços dispon�
 | Frequentadores      | Redução                             |
 | ------------------- | ----------------------------------- |
 | Vazia               | Todos os serviços estão disponíveis |
-| Quase deserta       | -1 serviço                          |
-| Pouco movimentada   | -1d4 serviços                       |
-| Nem muito nem pouco | -1d6+1 serviços                     |
-| Muito frequentada   | -2d4 serviços                       |
-| Abarrotada          | -2d4+2 serviços                     |
-| Lotada              | -3d4 serviços                       |
+| Quase deserta       | -1d4 serviços                       |
+| Pouco movimentada   | -1d6 serviços                       |
+| Nem muito nem pouco | -1d8+1 serviços                     |
+| Muito frequentada   | -1d12+1 serviços                    |
+| Abarrotada          | -2d6+2 serviços                     |
+| Lotada              | -3d6+1 serviços                     |
 
 > **Nota**: Caso o saldo fique negativo, retire o valor dos próximos serviços rolados.
 
@@ -222,16 +222,16 @@ Role nas tabelas abaixo para descobrir em quantos dias você poderá gerar novos
 
 | 1d20  | Novos serviços |
 | ----- | -------------- |
-| 1-4   | 1 semana       |
-| 5-8   | 2 semanas      |
+| 1-4   | 1d4 meses      |
+| 5-8   | 2d4+1 semanas  |
 | 9-10  | 1d4+1 semanas  |
-| 11-12 | 2d6 dias       |
-| 13-14 | 4d6 dias       |
-| 15    | 2d4+1 semanas  |
-| 16    | 1 mês          |
-| 17-18 | 2 meses        |
-| 19    | 1d4 meses      |
-| 20    | 2d4+1 meses    |
+| 11-12 | 1 mês          |
+| 13-14 | 2d6 dias       |
+| 15    | 1 semana       |
+| 16    | 2d4 dias       |
+| 17-18 | 1d8 dias       |
+| 19    | 1d6 dias       |
+| 20    | 1d4 dias       |
 
 ## Gerador de Serviços
 
@@ -1028,22 +1028,22 @@ Eventualmente os desafios ficarão repetitivos já que essa tabela será muito u
 
 A ideia dos serviços é que eles sejam resolvidos com perícias ou com a criatividade do jogador. Em todo caso, a dificuldade pautaria o ND das perícias, mas caso não tenha nenhuma, use a dificuldade como base para criar os rivais ou a raiz do problema. Tenha bom-senso e boa sorte.
 
-### Tabela de Dificuldade e Recompensas
+#### Tabela de Dificuldade e Recompensas
 
 | 1d20  | Dificuldade           | Recompensa     | Taxa de recorrência |
 | ----- | --------------------- | -------------- | ------------------- |
-| 1     | Muito Fácil (ND 10)   | 1d6 C$         | +0,5 C$             |
-| 2-3   | Fácil (ND 14)         | 3d4 C$         | +1 C$               |
-| 4-6   | Fácil (ND 15)         | 3d6 C$         | +2 C$               |
-| 7     | Fácil (ND 16)         | 3d8 C$         | +3 C$               |
-| 8-12  | Média (ND 17)         | 5d6 C$         | +5 C$               |
-| 13    | Média (ND 18)         | (1d3+1)\*10 C$ | +6 C$               |
-| 14    | Média (ND 19)         | (1d4+1)\*10 C$ | +7 C$               |
-| 15-16 | Difícil (ND 20)       | 3d4\*10 C$     | +10 C$              |
-| 17    | Difícil (ND 21)       | 4d4\*10 C$     | +12 C$              |
-| 18    | Desafiador (ND 22)    | 4d6\*10 C$     | +15 C$              |
-| 19    | Desafiador (ND 23)    | 4d8\*10 C$     | +17 C$              |
-| 20    | Muito Difícil (ND 25) | 2d4+1 PO$      | +25 C$              |
+| 1     | Muito Fácil (ND 10)   | 3d6 C$         | +3 C$               |
+| 2-3   | Fácil (ND 14)         | 3d8 C$         | +5 C$               |
+| 4-6   | Fácil (ND 15)         | 5d6 C$         | +6 C$               |
+| 7     | Fácil (ND 16)         | (1d3+1)\*10 C$ | +7 C$               |
+| 8-12  | Média (ND 17)         | (1d4+1)\*10 C$ | +10 C$              |
+| 13    | Média (ND 18)         | 3d4\*10 C$     | +12 C$              |
+| 14    | Média (ND 19)         | 4d4\*10 C$     | +15 C$              |
+| 15-16 | Difícil (ND 20)       | 4d6\*10 C$     | +20 C$              |
+| 17    | Difícil (ND 21)       | 4d8\*10 C$     | +25 C$              |
+| 18    | Desafiador (ND 22)    | 1d6 PO$        | +50 C$              |
+| 19    | Desafiador (ND 23)    | 2d6 PO$        | +75 C$              |
+| 20    | Muito Difícil (ND 25) | 3d6 PO$        | +1 PO$              |
 
 > **Lembrete:** 100 C$ = 1 PO$
 
@@ -1051,15 +1051,17 @@ A ideia dos serviços é que eles sejam resolvidos com perícias ou com a criati
 
 O nível de complexidade de um serviço é determinado pela quantidade de testes necessários e pela dificuldade de cada um deles. Serviços mais complexos abrem margem para vários possíveis resultados e formas de abordagem, enquanto serviços mais simples tendem a ser mais previsíveis.
 
-| 1d20  | Nível de Complexidade          |
-| ----- | ------------------------------ |
-| 1-10  | Simples                        |
-| 11-12 | Moderada e Direta              |
-| 13-15 | Moderada                       |
-| 16    | Complexa e Direta              |
-| 17-18 | Complexa                       |
-| 19    | Extremamente complexa e Direta |
-| 20    | Extremamente complexa          |
+| 1d20  | Nível de Complexidade          | Recompensa |
+| ----- | ------------------------------ | ---------- |
+| 1-10  | Simples                        | x1         |
+| 11-12 | Moderada e Direta              | x1.5       |
+| 13-15 | Moderada                       | x1.5       |
+| 16    | Complexa e Direta              | x2         |
+| 17-18 | Complexa                       | x2         |
+| 19    | Extremamente complexa e Direta | x3         |
+| 20    | Extremamente complexa          | x3         |
+
+Multiplique a recompensa e a taxa de recorrência de acordo com a complexidade do serviço.
 
 #### Simples
 
