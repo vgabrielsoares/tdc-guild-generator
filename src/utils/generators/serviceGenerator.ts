@@ -788,23 +788,16 @@ export class ServiceGenerator {
       recurrenceBonusAmount = 0; // Fallback
     }
 
-    // Aplicar multiplicador de complexidade à recompensa e à taxa de recorrência
-    const adjustedRewardAmount = Math.max(
-      1,
-      Math.floor(rewardAmount * complexityMultiplier)
-    );
-    const adjustedRecurrenceStep = Math.max(
-      0,
-      recurrenceStepAmount * complexityMultiplier
-    );
+    const baseRewardAmount = Math.max(1, Math.floor(rewardAmount));
+    const baseRecurrenceStep = Math.max(0, recurrenceStepAmount);
 
     return {
       rewardRoll,
-      rewardAmount: adjustedRewardAmount,
+      rewardAmount: baseRewardAmount,
       currency,
       recurrenceBonus,
       recurrenceBonusAmount,
-      recurrenceStepAmount: adjustedRecurrenceStep,
+      recurrenceStepAmount: baseRecurrenceStep,
       difficulty,
       modifiers: {
         populationRelation: this.getPopulationRelationModifier(
