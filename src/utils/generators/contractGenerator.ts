@@ -1394,10 +1394,103 @@ export class ContractGenerator {
       context: `Especificação ${category}`,
     });
 
+    // Helper: texto gatilho para carga secreta
+    const SECRET_TRIGGER_TEXT = "Role novamente, mas a carga é secreta";
+
+    // Resolve uma entrada de especificação que seja o gatilho de carga secreta
+    // Faz re-rolagens (tratando também casos de "role duas vezes" na re-rolagem)
+    const resolveSecretEntry = (): {
+      target: string;
+      description: string;
+    } => {
+      const maxAttempts = 10;
+      let attempts = 0;
+
+      while (attempts < maxAttempts) {
+        attempts++;
+
+        // Usar multi-roll para permitir que a re-rolagem trate "role duas vezes"
+        const reroll = handleMultipleRolls({
+          table: specTable,
+          shouldRollAgain: (r: {
+            target: string;
+            description: string;
+            rollTwice?: boolean;
+          }) => shouldRollTwiceForSpecification(r),
+          context: `Especificação ${category} (Carga Secreta)`,
+          maxUniqueResults: 2,
+        });
+
+        // Filtrar quaisquer resultados que ainda sejam o gatilho secreto
+        const filtered = reroll.results.filter(
+          (r: { target: string; description: string; rollTwice?: boolean }) =>
+            r.target !== SECRET_TRIGGER_TEXT
+        );
+
+        if (filtered.length === 0) {
+          // tentou, mas só obteve novamente o gatilho secreto; tentar de novo
+          continue;
+        }
+
+        // Se houver múltiplos resultados (re-rolagem produziu "role duas vezes"), combinar como antes
+        if (filtered.length > 1) {
+          const combinedTarget = filtered
+            .map(
+              (
+                spec: {
+                  target: string;
+                  description: string;
+                  rollTwice?: boolean;
+                },
+                index: number
+              ) => (index === 0 ? spec.target : spec.target.toLowerCase())
+            )
+            .join(", além disso ");
+
+          const combinedDescription = filtered
+            .map(
+              (
+                spec: {
+                  target: string;
+                  description: string;
+                  rollTwice?: boolean;
+                },
+                index: number
+              ) =>
+                index === 0 ? spec.description : spec.description.toLowerCase()
+            )
+            .join(". Além disso, ");
+
+          return {
+            target: `${combinedTarget} (Carga Secreta)`,
+            description: `${combinedDescription} (Carga Secreta)`,
+          };
+        }
+
+        // Resultado único resolvido
+        const resolved = filtered[0];
+        return {
+          target: `${resolved.target} (Carga Secreta)`,
+          description: `${resolved.description} (Carga Secreta)`,
+        };
+      }
+
+      // Fallback caso não consiga resolver em tentativas: retornar um placeholder
+      return {
+        target: `Carga desconhecida (Carga Secreta)`,
+        description: `Carga secreta não identificada`,
+      };
+    };
+
     // Se temos múltiplas especificações (resultado de "role duas vezes")
     if (specResult.results.length > 1) {
-      // Processar todas as especificações retornadas
-      const specifications = specResult.results;
+      // Processar todas as especificações retornadas, tratando gatilho secreto
+      const specifications = specResult.results.map((spec) => {
+        if (spec.target === SECRET_TRIGGER_TEXT) {
+          return resolveSecretEntry();
+        }
+        return { target: spec.target, description: spec.description };
+      });
 
       // Combinar targets e descrições
       const combinedTarget = specifications
@@ -1418,8 +1511,13 @@ export class ContractGenerator {
       };
     }
 
-    // Especificação única
-    return specResult.results[0];
+    // Especificação única - verificar se é o gatilho secreto
+    const singleSpec = specResult.results[0];
+    if (singleSpec.target === SECRET_TRIGGER_TEXT) {
+      return resolveSecretEntry();
+    }
+
+    return singleSpec;
   }
 
   /**

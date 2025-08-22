@@ -43,15 +43,15 @@ Os dados usados em 'Quantidade e Prazos' é equivalente à estrutura da sede da 
 | ----- | --------------------- |
 | 1-4   | 1d4 serviços          |
 | 5-6   | 1d4+1 serviços        |
-| 7-9   | 1d4+2 serviços        |
-| 10    | 1d6+1 serviços        |
-| 11    | 1d6+2 serviços        |
-| 12-13 | 2d4 serviços          |
-| 14-16 | 2d4+1 serviços        |
-| 17-18 | 3d4 serviços          |
-| 19    | 4d4 serviços          |
-| 20    | 4d4+1                 |
-| 21+   | 5d6 serviços          |
+| 7-9   | 1d6+2 serviços        |
+| 10    | 1d8+1 serviços        |
+| 11    | 2d6+2 serviços        |
+| 12-13 | 4d4+2 serviços        |
+| 14-16 | 4d6+1 serviços        |
+| 17-18 | 5d6 serviços          |
+| 19    | 6d6 serviços          |
+| 20    | 5d8+1 serviços        |
+| 21+   | 5d10 serviços         |
 
 #### Redução por Frequentadores
 
@@ -60,12 +60,12 @@ De acordo com aqueles que frequentam a guilda, a quantidade de serviços dispon�
 | Frequentadores      | Redução                             |
 | ------------------- | ----------------------------------- |
 | Vazia               | Todos os serviços estão disponíveis |
-| Quase deserta       | -1 serviço                          |
-| Pouco movimentada   | -1d4 serviços                       |
-| Nem muito nem pouco | -1d6+1 serviços                     |
-| Muito frequentada   | -2d4 serviços                       |
-| Abarrotada          | -2d4+2 serviços                     |
-| Lotada              | -3d4 serviços                       |
+| Quase deserta       | -1d4 serviços                       |
+| Pouco movimentada   | -1d6 serviços                       |
+| Nem muito nem pouco | -1d8+1 serviços                     |
+| Muito frequentada   | -1d12+1 serviços                    |
+| Abarrotada          | -2d6+2 serviços                     |
+| Lotada              | -3d6+1 serviços                     |
 
 > **Nota**: Caso o saldo fique negativo, retire o valor dos próximos serviços rolados.
 
@@ -77,18 +77,20 @@ Enquanto alguns prazos são puramente arbitrários, outros possuem uma janela de
 
 > Use o bom o senso para determinar fatores como a arbitrariedade do prazo e a flexibilidade do contratante.
 
-| 1d20   | Prazo         |
-| ------ | ------------- |
-| 1      | 1d4 dias      |
-| 2      | 3 dias        |
-| 3      | 1d4+2 dias    |
-| 4      | 1d6+1 dias    |
-| 5      | 1d8+2 dias    |
-| 6      | 1d12+2 dias   |
-| 7-8    | 1 semana      |
-| 9      | 1d4+1 semanas |
-| 10     | 1d20+2 dias   |
-| 11-20+ | Sem prazo     |
+| 1d20  | Prazo         |
+| ----- | ------------- |
+| 1     | 1d4 dias      |
+| 2     | 3 dias        |
+| 3     | 1d4+2 dias    |
+| 4     | 1d6+1 dias    |
+| 5     | 1d8+2 dias    |
+| 6     | 1d12+2 dias   |
+| 7-8   | 1 semana      |
+| 9     | 1d4+1 semanas |
+| 10    | 1d20+2 dias   |
+| 11-20 | Sem prazo     |
+
+> Os prazos de conclusão não usam os dados por tipo de assentamento.
 
 ## Concluindo um Serviço
 
@@ -99,6 +101,20 @@ Em seguida o serviço deve ser apresentado na sede da guilda da qual foi origina
 Nem sempre a recompensa será inteiramente em ouro, mas a guilda faz questão de que a taxa de cada serviço seja paga em ouro. Às vezes a recompensa poderá ser retirada diretamente com o contratante, junto a um documento emitido pela guilda. Na maioria dos assentamentos, falhar ao pagar os serviços, as taxas e as tributações, é considerado uma infração gravíssima à lei e sentenças fortes podem ser aplicadas a um contratante mal intencionado ou picareta.
 
 Use o bom senso para determinar quais contratantes têm condições de deixar, antecipadamente, a recompensa com a guilda e quais não têm. Esse pode ser um fator determinante para os jogadores decidirem, ou não, assinar um contrato. Você pode escolher também não fazer isso e deixar os dados decidirem.
+
+### Tipo de Pagamento
+
+Os contratantes podem optar por fazer um pagamento antecipado à guilda, garantindo assim que a recompensa será disponibilizada assim que o serviço for concluído. Esse pagamento pode ser total ou parcial, dependendo do acordo entre as partes.
+
+#### Tabela de Tipo de Pagamento
+
+| 1d20  | Tipo de Pagamento                                       |
+| ----- | ------------------------------------------------------- |
+| 1-10  | Pagamento em PO$ direto com contratante                 |
+| 11-14 | Metade com a guilda, metade com o contratante           |
+| 15    | Metade com a guilda, metade, em bens, com o contratante |
+| 16    | Em materiais, bens ou serviços do contratante           |
+| 17-20 | Pagamento total na guilda em PO$                        |
 
 ## Conclusões Automáticas de Serviços
 
@@ -206,16 +222,16 @@ Role nas tabelas abaixo para descobrir em quantos dias você poderá gerar novos
 
 | 1d20  | Novos serviços |
 | ----- | -------------- |
-| 1-4   | 1 semana       |
-| 5-8   | 2 semanas      |
+| 1-4   | 1d4 meses      |
+| 5-8   | 2d4+1 semanas  |
 | 9-10  | 1d4+1 semanas  |
-| 11-12 | 2d6 dias       |
-| 13-14 | 4d6 dias       |
-| 15    | 2d4+1 semanas  |
-| 16    | 1 mês          |
-| 17-18 | 2 meses        |
-| 19    | 1d4 meses      |
-| 20    | 2d4+1 meses    |
+| 11-12 | 1 mês          |
+| 13-14 | 2d6 dias       |
+| 15    | 1 semana       |
+| 16    | 2d4 dias       |
+| 17-18 | 1d8 dias       |
+| 19    | 1d6 dias       |
+| 20    | 1d4 dias       |
 
 ## Gerador de Serviços
 
@@ -299,119 +315,244 @@ O objetivo define a natureza fundamental do que deve ser realizado no serviço. 
 
 Role nas tabelas correspondentes ao resultado do Tipo de Objetivo.
 
-Como as tabelas possuem três colunas, role um dado para cada coluna e una os resultados.
+Como as tabelas possuem três colunas, role um dado para cada coluna e una os resultados das rolagens respectivas.
 
 > **Exemplo:** Caso os resultados de Treinar ou Ensinar forem 3, 5 e 2, a descrição seria: "Treinar ou ensinar a arte do combate para crianças órfãs, mas o conhecimento será usado contra você."
 
-<!-- TODO: transformar os d6 em d10 ou d20 -->
-<!-- TODO: atualizar o exemplo caso seus resultados mudem -->
-
 ###### Treinar ou Ensinar
 
-| 1d6 | Treinar ou ensinar   | Para...                      | Mas...                                    |
-| --- | -------------------- | ---------------------------- | ----------------------------------------- |
-| 1   | Uma nova língua      | Uma besta                    | Contra a vontade/discorda de tudo         |
-| 2   | Uma perícia          | Um humanoide nada habilidoso | O conhecimento será usado contra você     |
-| 3   | A arte do combate    | Um humanoide hostil          | Trauma sobre o que será ensinado          |
-| 4   | Arcanismo/magias     | Prole desinteressada         | Você não sabe nada sobre o assunto        |
-| 5   | Boas maneiras        | Para crianças órfãs          | O treinado tem dificuldade de aprendizado |
-| 6   | Conhecimentos gerais | Combatentes                  | O conhecimento é proibido no local        |
+| d20 | Treinar ou ensinar         | Para...                      | Mas...                                                         |
+| --- | -------------------------- | ---------------------------- | -------------------------------------------------------------- |
+| 1   | Uma nova língua            | Uma besta                    | Contra a vontade/discorda de tudo                              |
+| 2   | Uma perícia                | Um humanoide nada habilidoso | O conhecimento será usado contra você                          |
+| 3   | A arte do combate          | Um humanoide hostil          | Trauma sobre o que será ensinado                               |
+| 4   | Arcanismo/magias           | Criança desinteressada       | O ambiente é cheio de distrações                               |
+| 5   | Boas maneiras              | Para crianças órfãs          | O treinado tem dificuldade de aprendizado                      |
+| 6   | Conhecimentos gerais       | Combatentes                  | O conhecimento é proibido no local                             |
+| 7   | Técnicas de sobrevivência  | Um grupo de viajantes        | O ambiente dificulta o aprendizado                             |
+| 8   | Música ou arte             | Um aprendiz entusiasmado     | O material disponível é inadequado                             |
+| 9   | Etiqueta profissional      | Um comerciante inexperiente  | O treinado é muito distraído                                   |
+| 10  | Uso de ferramentas simples | Um grupo de trabalhadores    | O tempo para ensinar é muito curto                             |
+| 11  | Culinária básica           | Um grupo de idosos           | Ingredientes ou utensílios estão em falta                      |
+| 12  | Jardinagem ou cultivo      | Crianças curiosas            | O treinado tenta ensinar de volta, mas de forma errada         |
+| 13  | Primeiros socorros         | Um animal de estimação       | O aprendiz faz perguntas demais e atrasa tudo                  |
+| 14  | Contar histórias           | Um grupo de forasteiros      | O treinado prefere outro método                                |
+| 15  | Escrever e ler             | Um aprendiz adulto           | O aprendiz tem bloqueio ou vergonha                            |
+| 16  | Negociação e barganha      | Um grupo de mercadores       | O treinado questiona a utilidade do que está aprendendo        |
+| 17  | Cuidar de animais          | Um camponês inexperiente     | O resultado é melhor do que o esperado (mas causa inveja)      |
+| 18  | Empreendedorismo           | Um grupo religioso           | O treinado se apega demais ao instrutor                        |
+| 19  | Técnicas de limpeza        | Um grupo de jovens           | O conhecimento ensinado entra em conflito com crenças pessoais |
+| 20  | Jogos e esportes simples   | Um grupo de crianças         | O treinado espera recompensas extras para se dedicar           |
 
 ###### Recrutar
 
-| d6  | Recrutar                     | Para...                 | Mas...                                 |
-| --- | ---------------------------- | ----------------------- | -------------------------------------- |
-| 1   | Combatentes                  | Contrato específico     | Vai contra os princípios do recrutado  |
-| 2   | Conjurador experiente        | Explorar terras remotas | O recrutado é fundamental              |
-| 3   | Especialista                 | Localizar um artefato   | Não há boas escolhas                   |
-| 4   | Aristocrata de menor nobreza | Um sindicato/associação | O recrutado não entende a língua local |
-| 5   | Trabalhador braçal           | Fazer um acordo         | O recrutado não tem interesse          |
-| 6   | Uma bruxa                    | Trabalhar em um evento  | Mas só aceita veneno como pagamento    |
+| d20 | Recrutar                     | Para...                       | Mas...                                             |
+| --- | ---------------------------- | ----------------------------- | -------------------------------------------------- |
+| 1   | Combatentes                  | Contrato específico           | Vai contra os princípios do recrutado              |
+| 2   | Conjurador experiente        | Explorar terras remotas       | O recrutado é fundamental                          |
+| 3   | Especialista                 | Localizar um artefato         | Não há boas escolhas                               |
+| 4   | Aristocrata de menor nobreza | Um sindicato/associação       | O recrutado não entende a língua local             |
+| 5   | Trabalhador braçal           | Fazer um acordo               | O recrutado não tem interesse                      |
+| 6   | Uma bruxa                    | Trabalhar em um evento        | O recrutado não gosta de trabalhar com outros      |
+| 7   | Curandeiro                   | Cobrir ausência temporária    | O local é insalubre                                |
+| 8   | Artesão                      | Cuidar de feridos             | O prazo é apertado                                 |
+| 9   | Mensageiro                   | Reforçar uma equipe existente | O recrutado é emocionalmente instável              |
+| 10  | Músico                       | Produzir itens simples        | O recrutado tem uma condição de saúde debilitante  |
+| 11  | Cozinheiro                   | Preparar refeições            | O recrutado exige condições especiais para aceitar |
+| 12  | Guardião                     | Entregar correspondências     | O local é mal frequentado                          |
+| 13  | Instrutor                    | Ensinar uma habilidade        | Exige discrição absoluta                           |
+| 14  | Agricultor                   | Ajudar na colheita            | O clima não colabora                               |
+| 15  | Navegador                    | Ajudar em campanha social     | Pode atrair atenção indesejada                     |
+| 16  | Bibliotecário                | Pequena reforma               | Exige a aprovação de uma autoridade local          |
+| 17  | Pintor                       | Proteger um local             | Depende de um item ou ferramenta específica        |
+| 18  | Alfaiate                     | Animar uma celebração         | O recrutado tem uma agenda oculta                  |
+| 19  | Pedreiro                     | Guiar uma caravana            | Ferramentas estão danificadas                      |
+| 20  | Voluntário                   | Supervisionar tarefa delicada | O recrutado tem outros compromissos                |
 
 ###### Curar ou Recuperar
 
-| d6  | Curar ou recuperar               | De...                 | Mas...                                  |
-| --- | -------------------------------- | --------------------- | --------------------------------------- |
-| 1   | Doença contagiosa                | Bestas enfermas       | O afetado não colabora                  |
-| 2   | Lesão/doença/cicatriz            | Humanoide amargurado  | Tem outra doença que atrapalha          |
-| 3   | Moral e respeito/reputação/honra | Crianças debilitadas  | Não existe cura/não tem jeito           |
-| 4   | Bugiganga que criou vida         | Um engenhoqueiro      | Cria-se um laço sentimental muito forte |
-| 5   | O psicológico                    | Velhos bisbilhoteiros | O problema passa para quem o resolveu   |
-| 6   | Um vício                         | Criatura hostil       | Outro especialista discorda de você     |
+| d20 | Curar ou recuperar              | De...                    | Mas...                                               |
+| --- | ------------------------------- | ------------------------ | ---------------------------------------------------- |
+| 1   | Doença contagiosa               | Bestas enfermas          | O afetado não colabora                               |
+| 2   | Lesão/doença/cicatriz           | Humanoide amargurado     | Tem outra doença que atrapalha                       |
+| 3   | Moral/reputação                 | Crianças debilitadas     | Não existe cura/não tem jeito                        |
+| 4   | Bugiganga que criou vida        | Um engenhoqueiro         | Cria-se um laço sentimental muito forte              |
+| 5   | O psicológico                   | Velhos bisbilhoteiros    | O problema passa para quem o resolveu                |
+| 6   | Um vício                        | Criatura hostil          | Outro especialista discorda de você                  |
+| 7   | Fadiga extrema                  | Trabalhadores exaustos   | Precisa ser realizado em um local específico         |
+| 8   | Perda de memória                | Um ancião                | Requer a aprovação de uma autoridade local           |
+| 9   | Medo irracional                 | Um aprendiz              | Precisa ser realizado durante um evento específico   |
+| 10  | Falta de motivação              | Um grupo de jovens       | O ambiente é desestimulante                          |
+| 11  | Pequenas feridas                | Crianças brincalhonas    | Depende de um item ou ferramenta específica          |
+| 12  | Ressaca                         | Um grupo de festeiros    | Exige um sacrifício simbólico ou literal             |
+| 13  | Rouquidão                       | Um bardo                 | Pode causar uma mudança temporária de personalidade. |
+| 14  | Dificuldade de aprendizado      | Um estudante             | O método não funciona                                |
+| 15  | Dores crônicas                  | Um trabalhador           | O trabalho exige esforço contínuo                    |
+| 16  | Falta de apetite                | Um animal de estimação   | O paciente fica obcecado por quem o ajudou           |
+| 17  | Insônia                         | Um comerciante           | Precisa ser feito em segredo                         |
+| 18  | Venenos ou toxinas              | Um grupo de aventureiros | Já tentou antes e desenvolveu resistência            |
+| 19  | Visão, audição ou outro sentido | Um idoso                 | O paciente mente sobre seus sintomas                 |
+| 20  | Falta de fé                     | Um religioso             | O líder local desaprova a ajuda                      |
 
 ###### Negociar ou Coagir
 
-| d6  | Negociar ou coagir | Para...                          | Mas...                                  |
-| --- | ------------------ | -------------------------------- | --------------------------------------- |
-| 1   | Mercadores locais  | Assinar um contrato              | Isso afetará seus familiares            |
-| 2   | Um nobre poderoso  | Vender suas terras               | Por ganância do contratante             |
-| 3   | Plebeu miserável   | Flexibilizar um acerto de contas | A contra-proposta é desleal             |
-| 4   | Aventureiros       | Desocuparem um local             | O assentamento sofrerá com isso         |
-| 5   | Criatura hostil    | Para espalhar informação falsa   | Humanoides irão pôr sua vida em risco   |
-| 6   | Religioso          | Para distribuir riquezas         | Começam a achar que você é um criminoso |
+| d20 | Negociar ou coagir     | Para...                                   | Mas...                                          |
+| --- | ---------------------- | ----------------------------------------- | ----------------------------------------------- |
+| 1   | Mercadores locais      | Assinar um contrato                       | Isso afetará seus familiares                    |
+| 2   | Um nobre poderoso      | Vender suas terras                        | Por ganância do contratante                     |
+| 3   | Plebeu miserável       | Flexibilizar um acerto de contas          | A contra-proposta é desleal                     |
+| 4   | Aventureiros           | Desocuparem um local                      | O assentamento sofrerá com isso                 |
+| 5   | Criatura hostil        | Espalhar informação (falsa ou não)        | Humanoides irão pôr sua vida em risco           |
+| 6   | Religioso              | Distribuir riquezas                       | Começam a achar que você é um criminoso         |
+| 7   | Artesão                | Reduzir preços                            | O contratante tem segundas intenções            |
+| 8   | Crianças               | Evitar um conflito iminente               | O contratante não revelou todos os detalhes     |
+| 9   | Guardas                | Ignorar uma infração                      | O alvo está sendo vigiado por um terceiro       |
+| 10  | Comerciante itinerante | Obter apoio financeiro ou político        | Insiste em selar o pacto com um beijo           |
+| 11  | Grupo de artistas      | Fornecer informações privilegiadas        | O alvo é hostil                                 |
+| 12  | Pescadores             | Compartilhar técnicas                     | Segredos de família estão em jogo               |
+| 13  | Estudantes             | Aceitar novas regras                      | Pode ser visto como um ato de traição           |
+| 14  | Caçadores              | Abandonar uma tradição prejudicial        | Só aceita se resolver um problema dele primeiro |
+| 15  | Um grupo de idosos     | Participar de evento                      | O alvo acredita que isso é um teste de lealdade |
+| 16  | Um mago                | Evitar espalhar informação (falsa ou não) | O contratante exige uma identidade falsa        |
+| 17  | Um grupo de turistas   | Respeitar costumes locais                 | Não entendem a língua                           |
+| 18  | Um sindicato           | Aceitar acordo                            | O alvo não pode tomar decisões sozinho          |
+| 19  | Um rival comercial     | Fazer uma parceria                        | Desconfia das intenções                         |
+| 20  | Um grupo de jovens     | Participar de campanha social             | Acham a causa desinteressante                   |
 
 ###### Auxiliar ou Cuidar
 
-| d6  | Auxiliar ou cuidar    | Em que?                   | Mas...                                |
-| --- | --------------------- | ------------------------- | ------------------------------------- |
-| 1   | Orfanato              | Na colheita               | O contratante não pode pagar          |
-| 2   | Plebeu trabalhador    | Em uma infestação         | Tudo está comprometido                |
-| 3   | Ordem religiosa       | A combater a fome         | Os recursos são insuficientes         |
-| 4   | Instituição de ofício | Assuntos burocráticos     | Não contaram toda a verdade           |
-| 5   | Governo local         | Abater e preparar animais | A interferência de bestas atrapalha   |
-| 6   | Turistas/forasteiros  | Gerenciar estabelecimento | Você descobre um esquema de corrupção |
+| d20 | Auxiliar ou cuidar    | Em que?                        | Mas...                                         |
+| --- | --------------------- | ------------------------------ | ---------------------------------------------- |
+| 1   | Orfanato              | Na colheita                    | O responsável principal está ausente           |
+| 2   | Plebeu trabalhador    | Em uma infestação              | Tudo está comprometido                         |
+| 3   | Ordem religiosa       | Distribuir mantimentos         | Os recursos são insuficientes                  |
+| 4   | Instituição de ofício | Assuntos burocráticos          | Não contaram toda a verdade                    |
+| 5   | Governo local         | Abater e preparar animais      | A interferência de bestas atrapalha            |
+| 6   | Turistas/forasteiros  | Gerenciar estabelecimento      | Você descobre um esquema de corrupção          |
+| 7   | Crianças              | Cuidar de jardins ou estufas   | Há uma importante inspeção surpresa            |
+| 8   | Idosos                | Consertar estruturas simples   | O clima não é adequado                         |
+| 9   | Estudantes            | Preparar para provas           | Recursos foram danificados por um acidente     |
+| 10  | Comerciantes          | Inventário de mercadorias      | Uma pessoa-chave insiste em mudar o plano      |
+| 11  | Animais de estimação  | Banho (e/ou tosa)              | O contratante exige discrição absoluta         |
+| 12  | Grupo de aventureiros | Planejar viagem                | Exige ferramentas específicas                  |
+| 13  | Artistas              | Alimentar animais              | Há resistência a mudanças                      |
+| 14  | Agricultores          | No plantio                     | É preciso seguir regras excessivamente rígidas |
+| 15  | Pescadores            | Limpar equipamentos            | Ferramentas estão degradadas                   |
+| 16  | Grupo de jovens       | Organizar evento cultural      | Precisa feito em horários específicos          |
+| 17  | Professores           | Corrigir provas                | Deve ser feito sem contato direto com o alvo   |
+| 18  | Voluntários           | Limpar e reorganizar um espaço | A demanda é maior que o esperado               |
+| 19  | Taberneiro            | Ensaiar apresentação           | O alvo está em constante deslocamento          |
+| 20  | Refugiados            | Resolver disputa               | O alvo exige discrição absoluta                |
 
 ###### Extrair Recursos
 
-| d6  | Extrair recursos     | De...                      | Mas...                                   |
-| --- | -------------------- | -------------------------- | ---------------------------------------- |
-| 1   | Mineral metálico     | Ambiente selvagem          | É muito mais trabalhoso                  |
-| 2   | Extrativismo vegetal | Local condenado/abandonado | O caminho é tortuoso                     |
-| 3   | Extrativismo animal  | Natureza linda e intocada  | A extração destrói completamente o local |
-| 4   | Mineral não metálico | Local profano/sagrado      | Exige ferramentas caras e específicas    |
-| 5   | Especiarias          | Abismo/submerso            | O local/ação é nojenta e humilhante      |
-| 6   | Componentes mágicos  | Outro plano                | O local está infestado/ocupado           |
+| d20   | Extrair recursos            | De...                      | Mas...                                 |
+| ----- | --------------------------- | -------------------------- | -------------------------------------- |
+| 1-2   | Mineral metálico            | Poço                       | O local está infestado/ocupado         |
+| 3-5   | Extrativismo vegetal        | Local condenado/abandonado | Exige ferramentas caras e específicas  |
+| 6-8   | Extrativismo animal         | Clareira                   | Clima adverso dificulta                |
+| 9-12  | Material comum              | Ambiente selvagem          | O acesso é perigoso                    |
+| 13-14 | Especiaria                  | Caverna                    | O local é instável                     |
+| 15    | Componente mágico           | Ruínas antigas             | O local/ação é nojenta e/ou humilhante |
+| 16    | Plantas medicinais          | Abismo/ravina              | Ambiente de condição extrema           |
+| 17-18 | Mineral não-metálico        | Pântano                    | O cheiro é insuportável                |
+| 19    | Cogumelos                   | Covil                      | Há veneno ou toxinas                   |
+| 20    | Role duas vezes e use ambos | Submerso                   | O local é protegido por encantos       |
 
-> **Exemplos de minerais metálicos:** ferro, alumínio, manganês, magnésio, cobre, cromo, mercúrio, chumbo, estanho, ouro, prata e urânio
+> **Exemplos de minerais metálicos:** ferro, alumínio, manganês, magnésio, cobre, cromo, mercúrio, chumbo, estanho, ouro, prata, níquel, zinco e urânio
 >
-> **Exemplos de minerais não metálicos:** argila, pedra, pedras preciosas e semi-preciosas, cloreto de sódio, enxofre, fosfatos, nitratos, areia, cascalho, amianto, água, petróleo e carvão mineral
+> **Exemplos de extrativismo vegetal:** frutos, madeira, raízes, folhas, flores, sementes, resinas, óleos, fibras, turfa, carvão e cascas
 >
-> **Exemplos de extrativismo vegetal:** frutos, madeira e raízes
+> **Exemplos de extrativismo animal:** caça, pesca, ovos, mel, couro, lã, leite, cera e penas
 >
-> **Exemplos de extrativismo animal:** Caça e pesca
+> **Exemplos de materiais comuns:** pedra, água, barro, terra, madeira, carvão vegetal, cogumelos e petróleo
+>
+> **Exemplos de especiarias:** ervas aromáticas, temperos, flores raras e sementes exóticas
+>
+> **Exemplos de componentes mágicos:** materiais de feitiços, cristais mágicos e outros
+>
+> **Exemplos de minerais não-metálicos:** sal, enxofre, fosfatos, nitratos, quartzo, argila, gesso, calcário, granito, mármore, areia, cascalho, amianto, carvão mineral, pedras preciosas e semi-preciosas
+>
+> **Exemplos de ambientes selvagens:** florestas, montanhas, desertos, bosques, cavernas, vales, pântanos, rios, desertos, campos, lagos, cachoeiras e planícies
+>
+> Pode ser interessante fazer uma tabela com os conteúdos desses exemplos e decidir o recurso específico através de uma rolagem.
 
 ###### Construir, Criar ou Reparar
 
-| d6  | Construir, criar ou reparar      | Para...                 | Mas...                                |
-| --- | -------------------------------- | ----------------------- | ------------------------------------- |
-| 1   | Local histórico                  | Instituição de caridade | Recursos adquiridos de maneira ilegal |
-| 2   | Item específico e mundano        | Nobre poderoso          | Roubam os materiais/ferramentas       |
-| 3   | Ponte/aqueduto/barco             | Líder local             | Outro especialista discorda de você   |
-| 4   | Torre/fortaleza/muralha/proteção | Adepto religioso/arcano | O serviço deve ser perfeito           |
-| 5   | Estabelecimento/moradia          | Um marinheiro/corsário  | O local é afastado e inóspito         |
-| 6   | Um relacionamento                | Uma organização         | Deve ser feito em segredo/escondido   |
+| d20 | Construir, criar ou reparar      | Para...                 | Mas...                                                     |
+| --- | -------------------------------- | ----------------------- | ---------------------------------------------------------- |
+| 1   | Construção histórica             | Instituição de caridade | Recursos adquiridos de maneira ilegal                      |
+| 2   | Estrada                          | Nobre poderoso          | Roubam os materiais/ferramentas                            |
+| 3   | Ponte                            | Líder local             | Outro especialista discorda de você                        |
+| 4   | Torre/fortaleza/muralha/proteção | Adepto religioso/arcano | O serviço deve ser perfeito                                |
+| 5   | Estabelecimento/moradia          | Um marinheiro/corsário  | O local é afastado e inóspito                              |
+| 6   | Um relacionamento                | Uma organização         | Deve ser feito em segredo/escondido                        |
+| 7   | Ferramenta agrícola              | Agricultor              | O material é de baixa qualidade                            |
+| 8   | Instrumento musical              | Grupo de artistas       | Medidas erradas foram passadas                             |
+| 9   | Roupas/uniformes                 | Escola local            | O clima atrapalha o trabalho                               |
+| 10  | Brinquedos                       | Crianças                | O espaço disponível é menor do que o planejado             |
+| 11  | Poço ou cisterna                 | Comunidade local        | O projeto precisa seguir normas rígidas                    |
+| 12  | Mural ou pintura                 | Governo                 | O contratante exige personalização exclusiva               |
+| 13  | Veículo                          | Comerciante itinerante  | O trabalho será supervisionado por um avaliador rigoroso   |
+| 14  | Estátua                          | Templo local            | O local é compartilhado com outros grupos                  |
+| 15  | Jardim                           | Casa de idosos          | O projeto deve ser silencioso durante a execução           |
+| 16  | Aqueduto                         | Pescador                | O contratante exige documentação detalhada do processo     |
+| 17  | Ferramenta de ofício             | Taverneiro              | O trabalho precisa agradar várias partes em desacordo      |
+| 18  | Barco                            | Hospital/Enfermaria     | Há pressa excessiva para entrega                           |
+| 19  | Mobília                          | Viajantes               | É necessário reutilizar peças/partes/materiais velhos      |
+| 20  | Armas/Armaduras                  | Mercado local           | Um detalhe estético é mais importante que a funcionalidade |
 
 ###### Serviços Específicos
 
-| d6  | Serviços específicos          | De...                          | Mas...                                 |
-| --- | ----------------------------- | ------------------------------ | -------------------------------------- |
-| 1   | Limpar construção/local       | Um nobre soberbo               | Há uma cláusula adicional biruta       |
-| 2   | Cobrar impostos/dívidas       | Um humanoide ranzinza          | Deve ser feito durante a madrugada     |
-| 3   | Criar/ajudar em um evento     | Um mercador                    | Um humanoide insiste em te atrapalhar  |
-| 4   | Desmentir boatos/fofocas      | Plebeu enfermo                 | Você está constantemente sendo vigiado |
-| 5   | Traduzir/transcrever material | Uma criatura muito desconfiada | O prazo é muito curto                  |
-| 6   | Trabalho rural                | Um criminoso/mafioso           | Vai contra a moral e os bons costumes  |
+| d20 | Serviços específicos                   | De...                          | Mas...                                               |
+| --- | -------------------------------------- | ------------------------------ | ---------------------------------------------------- |
+| 1   | Limpar construção/local                | Um nobre soberbo               | Alguém tenta constantemente dar ordens conflitantes  |
+| 2   | Cobrar impostos/dívidas                | Um humanoide ranzinza          | Deve ser feito durante a madrugada                   |
+| 3   | Criar/ajudar em um evento              | Um mercador                    | Um humanoide insiste em te atrapalhar                |
+| 4   | Desmentir boatos/fofocas               | Um grupo de guardas            | Você está constantemente sendo vigiado               |
+| 5   | Traduzir/transcrever material          | Uma criatura muito desconfiada | local é de difícil acesso                            |
+| 6   | Trabalho rural                         | Um criminoso/mafioso           | Vai contra a moral e os bons costumes                |
+| 7   | Organizar arquivos/livros              | Um estudioso                   | Muitos recursos estão danificados                    |
+| 8   | Pintar estrutura                       | Um comerciante                 | Recursos são de má qualidade                         |
+| 9   | Consertar instrumento musical          | Um artista local               | Itens necessários estão espalhados por vários locais |
+| 10  | Preparar refeição comunitária          | Um grupo de voluntários        | Recursos são insuficientes                           |
+| 11  | Ajudar em mudança                      | Uma família                    | Um visitante inesperado altera os planos             |
+| 12  | Cuidar de jardim                       | Um idoso                       | Criaturas estão doentes                              |
+| 13  | Realizar inventário/catalogar coleções | Um colecionar excêntrico       | Exige transporte de itens frágeis                    |
+| 14  | Entregar correspondência ou pacotes    | Um grupo de artesões           | O espaço é pequeno                                   |
+| 15  | Fazer reparos em móveis                | Um taverneiro                  | Exige que não haja desperdício                       |
+| 16  | Ajudar em feira                        | Um camponês                    | O tempo está instável                                |
+| 17  | Preparar decoração                     | Um grupo religioso             | O material é frágil                                  |
+| 18  | Ajudar em campanha                     | Um curandeiro                  | Depende de autorização prévia                        |
+| 19  | Supervisionar transporte de carga      | Um grupo de crianças           | Exige uso de uniforme específico                     |
+| 20  | Cuidar de mascote                      | Um grupo de jovens aprendizes  | Há uma criatura hiperativa                           |
 
-###### Trabalho Rural (d6)
+###### Trabalho Rural (d20)
 
-| d6  | Tipo de trabalho    |
-| --- | ------------------- |
-| 1   | Pecuária            |
-| 2   | Lavoura             |
-| 3   | Lavoura             |
-| 4   | Produtos florestais |
-| 5   | Pecuária            |
-| 6   | Extrativismo        |
+Quando o resultado for 'Trabalho rural', role na seguinte tabela:
+
+| d20 | Tipo de trabalho              |
+| --- | ----------------------------- |
+| 1   | Pecuária                      |
+| 2   | Lavoura                       |
+| 3   | Horticultura                  |
+| 4   | Produtos florestais           |
+| 5   | Apicultura                    |
+| 6   | Extrativismo                  |
+| 7   | Avicultura                    |
+| 8   | Irrigação                     |
+| 9   | Cuidar do Esterco/Adubo       |
+| 10  | Plantio de mudas              |
+| 11  | Colheita                      |
+| 12  | Manutenção de cercas          |
+| 13  | Controle de pragas            |
+| 14  | Semeadura                     |
+| 15  | Limpeza de pastos             |
+| 16  | Ordenha                       |
+| 17  | Transporte de produtos rurais |
+| 18  | Seleção de sementes           |
+| 19  | Cuidado de viveiros           |
+| 20  | Reflorestamento               |
 
 > **Produtos Florestais:** são todos aqueles que podem ser extraídos da floresta, que não seja a madeira. Exemplos: óleos, frutos, sementes, folhas, raízes, cascas, resinas e ervas
 >
@@ -419,14 +560,28 @@ Como as tabelas possuem três colunas, role um dado para cada coluna e una os re
 
 ###### Religioso
 
-| d6  | Religioso                     | O que/quem?          | Mas...                             |
+| d20 | Religioso                     | O que/quem?          | Mas...                             |
 | --- | ----------------------------- | -------------------- | ---------------------------------- |
-| 1   | Ressuscitar                   | Um herói ancestral   | Envolve um ritual macabro          |
-| 2   | Converter/purificar           | Toda uma vila/culto  | Lendas locais preveem uma tragédia |
+| 1   | Pregar em praça pública       | Um herói ancestral   | Envolve um ritual macabro          |
+| 2   | Converter/purificar           | Toda uma vila/culto  | Rumores preveem uma tragédia       |
 | 3   | Retirar maldição              | Um condenado         | Há uma maldição                    |
 | 4   | Ministrar um evento religioso | Artefato mágico vivo | O líder local desaprova            |
 | 5   | Fazer um exorcismo            | Nobre poderoso       | Cultistas te observam              |
 | 6   | Administrar um templo         | Outros aventureiros  | Um charlatão tenta se aproveitar   |
+| 7   | Organizar procissão           | Comunidade local     | O clima está ruim                  |
+| 8   | Preparar oferenda             | Divindade menor      | Um falso profeta surge             |
+| 9   | Ensinar cânticos              | Crianças do vilarejo | Símbolos religiosos foram roubados |
+| 10  | Restaurar altar               | Templo antigo        | O local é de difícil acesso        |
+| 11  | Abençoar colheita             | Agricultores         | Recursos são considerados impuros  |
+| 12  | Realizar batismo              | Grupo de jovens      | Ofende outra religião/divindade    |
+| 13  | Preparar festival             | Besta Sagrada        | O evento coincide com outro        |
+| 14  | Mediar disputa religiosa      | Nobres menores       | O contratante esconde informações  |
+| 15  | Escrever sermão               | Sacerdote            | O ritual exige silêncio absoluto   |
+| 16  | Traduzir texto sagrado        | Estudioso            | Há divisão por rivalidade          |
+| 17  | Cuidar de relíquia            | Ordem religiosa      | O evento é alvo de sabotagem       |
+| 18  | Organizar retiro espiritual   | Grupo de fiéis       | O local é afastado                 |
+| 19  | Preparar casamento            | Líder Religioso      | O evento precisa ser secreto       |
+| 20  | Ajudar em enterro             | Festival Tradicional | Atrai curiosos indesejados         |
 
 ### A Raiz do Problema
 
@@ -436,33 +591,53 @@ Use a tabela para determinar a origem e inspire-se para criar motivações e obs
 
 #### Origem do Problema
 
-| 1d20  | Raiz do problema                      |
-| ----- | ------------------------------------- |
-| 1-2   | Tradição/conflito familiar            |
-| 3-5   | Corrupção no governo local            |
-| 6     | Aproveitador/charlatão                |
-| 7-12  | Algo mundano, corriqueiro ou natural  |
-| 13-14 | O local/ambiente é desagradável       |
-| 15    | Sociedade Secreta buscando um tesouro |
-| 16-17 | Criaturas de fora do assentamento     |
-| 18    | Seres de outro plano                  |
-| 19    | Ordem religiosa com boas intenções    |
-| 20    | A morte de um humanoide importante    |
+| d20 | Raiz do problema                          |
+| --- | ----------------------------------------- |
+| 1   | Tradição/conflito familiar                |
+| 2   | Corrupção no governo local                |
+| 3   | Aproveitador/charlatão                    |
+| 4   | Algo mundano, corriqueiro ou natural      |
+| 5   | Antiga promessa não cumprida              |
+| 6   | Falta de comunicação entre grupos         |
+| 7   | Criaturas de fora do assentamento         |
+| 8   | Desinformação ou boatos espalhados        |
+| 9   | Ordem religiosa com boas intenções        |
+| 10  | Escassez de recursos essenciais           |
+| 11  | Peste ou doença contagiosa                |
+| 12  | Profecia (possivelmente mal interpretada) |
+| 13  | Falta de mão-de-obra                      |
+| 14  | Interferência de feiticeiro/eremita       |
+| 15  | Fenômeno natural incomum                  |
+| 16  | Espionagem política                       |
+| 17  | Mudança repentina de liderança local      |
+| 18  | Disputa por território ou recursos        |
+| 19  | Evento sazonal inesperado                 |
+| 20  | A morte de um humanoide importante        |
 
 #### Complicador Adicional
 
-| 1d20  | E...                               |
-| ----- | ---------------------------------- |
-| 1-5   | Um pouco de azar                   |
-| 6     | Um mal entendido                   |
-| 7     | Intervenção divina                 |
-| 8-11  | Ganância                           |
-| 12-13 | A quebra de uma maldição           |
-| 14    | Um romance interrompido            |
-| 15-16 | Traição/chantagem/dívida           |
-| 17    | O sumiço de um importante artefato |
-| 18-19 | Conflito entre facções             |
-| 20    | Evento climático/desastre natural  |
+| d20 | E...                               |
+| --- | ---------------------------------- |
+| 1   | Um pouco de azar                   |
+| 2   | Um mal entendido                   |
+| 3   | Intervenção divina                 |
+| 4   | Ganância                           |
+| 5   | A quebra de uma maldição           |
+| 6   | Um romance interrompido            |
+| 7   | Traição                            |
+| 8   | O sumiço de um importante artefato |
+| 9   | Conflito entre facções             |
+| 10  | Chantagem                          |
+| 11  | Dívida                             |
+| 12  | Um atraso inesperado               |
+| 13  | Pressão do tempo                   |
+| 14  | Uma visita surpresa                |
+| 15  | Incompetência                      |
+| 16  | Acidente inesperado                |
+| 17  | Excesso de burocracia              |
+| 18  | Interferência externa              |
+| 19  | Mudança de planos                  |
+| 20  | Evento climático/desastre natural  |
 
 ### Complicações do Serviço
 
@@ -479,18 +654,32 @@ Utilize as tabelas para determinar se haverá complicações, quais serão e sua
 
 #### Tipos de Complicações
 
-| 1d6 | Complicações                           |
-| --- | -------------------------------------- |
-| 1   | Governo local desaprova                |
-| 2   | Facção criminosa quer se aproveitar    |
-| 3   | Ordem religiosa/arcana interessada     |
-| 4   | Um rival do contratante fica enciumado |
-| 5   | Instituição de ofício afetada          |
-| 6   | Humanoides hostis                      |
+| d20 | Complicações                            |
+| --- | --------------------------------------- |
+| 1   | Governo local desaprova                 |
+| 2   | Facção criminosa quer se aproveitar     |
+| 3   | Ordem religiosa/arcana interessada      |
+| 4   | Um rival do contratante fica enciumado  |
+| 5   | Instituição de ofício afetada           |
+| 6   | Humanoides hostis                       |
+| 7   | Evento local interfere no cronograma    |
+| 8   | Animal ou mascote atrapalha             |
+| 9   | Grupo de moradores se opõe              |
+| 10  | Aliado do contratante discorda          |
+| 11  | Autoridade exige supervisão extra       |
+| 12  | Erro burocrático atrasa o andamento     |
+| 13  | Grupo rival tenta sabotar discretamente |
+| 14  | Acidente causa danos leves              |
+| 15  | Boato negativo se espalha               |
+| 16  | Fiscal inesperado aparece               |
+| 17  | Competidor oferece serviço mais barato  |
+| 18  | Terceiros ocupam o local                |
+| 19  | Pedido de alteração de última hora      |
+| 20  | Role duas vezes e use ambos             |
 
 #### Consequências das Complicações
 
-| 1d6 | E...                                           |
+| d20 | E...                                           |
 | --- | ---------------------------------------------- |
 | 1   | Entrará com medidas legais                     |
 | 2   | Manipulará as coisas por baixo dos panos       |
@@ -498,6 +687,20 @@ Utilize as tabelas para determinar se haverá complicações, quais serão e sua
 | 4   | Complicará sua vida caso seja bem-sucedido     |
 | 5   | Abusará de seu poder para conseguir o que quer |
 | 6   | Usarão de violência para te impedir            |
+| 7   | Contratante exigirá retrabalho                 |
+| 8   | Terá que negociar uma solução alternativa      |
+| 9   | Dará ordens contraditórias                     |
+| 10  | Reclamações de terceiros                       |
+| 11  | Sumirá com documentos essenciais               |
+| 12  | Fiscalização extra                             |
+| 13  | Vazará informações confidenciais               |
+| 14  | Exigirá compensação simbólica                  |
+| 15  | Contratará concorrentes para atrapalhar        |
+| 16  | Tentará atrasar o pagamento indefinidamente    |
+| 17  | Espalhará fofocas sobre sua competência        |
+| 18  | Fará exigências fora do escopo original        |
+| 19  | Contratante exige garantia adicional           |
+| 20  | Role duas vezes e use ambos                    |
 
 ### Rivais
 
@@ -529,18 +732,25 @@ Role nas tabelas para definir se há rivais envolvidos, suas ações e motivaç�
 
 #### Motivação do Rival
 
-| 1d20 | Mas...                              |
-| ---- | ----------------------------------- |
-| 1-2  | Faz isso por amor                   |
-| 3-5  | Se atrapalha todo                   |
-| 6-13 | Faz isso porque precisa             |
-| 14   | Faz isso pelas crianças             |
-| 15   | Se arrepende                        |
-| 16   | Desaparece depois disso             |
-| 17   | No fundo gosta, e faz isso por você |
-| 18   | Faz isso porque te odeia            |
-| 19   | Faz isso contra a vontade dele      |
-| 20   | Na verdade é o contratante          |
+| 1d20 | Mas...                                 |
+| ---- | -------------------------------------- |
+| 1    | Faz isso por amor                      |
+| 2    | Se atrapalha todo                      |
+| 3-5  | Faz isso porque precisa                |
+| 6    | Busca reconhecimento                   |
+| 7-8  | Busca uma recompensa pessoal           |
+| 9    | Está seguindo ordens de terceiros      |
+| 10   | Faz isso por pura diversão             |
+| 11   | Faz isso por vingança                  |
+| 12   | Está sob influência mágica ou mental   |
+| 13   | Está tentando evitar um desastre maior |
+| 14   | Faz isso pelas crianças                |
+| 15   | Se arrepende                           |
+| 16   | Desaparece depois disso                |
+| 17   | No fundo gosta, e faz isso por você    |
+| 18   | Faz isso porque te odeia               |
+| 19   | Faz isso contra a vontade dele         |
+| 20   | Na verdade é o contratante             |
 
 ### Desafio Adicional
 
@@ -664,9 +874,9 @@ Use-os para surpreender os jogadores e enriquecer a narrativa, adaptando-os ao c
 
 Eventualmente os desafios ficarão repetitivos já que essa tabela será muito usada. Pensando nisso role 1d6 palavras aleatórias de diferentes tabelas e tente incorporá-las criativamente ao desafio ou serviço.
 
-##### Conjunto 7 (d10)
+##### Conjunto 7 (d20)
 
-| d10 | Palavra-chave |
+| d20 | Palavra-chave |
 | --- | ------------- |
 | 1   | Bêbado        |
 | 2   | Dragão        |
@@ -678,10 +888,20 @@ Eventualmente os desafios ficarão repetitivos já que essa tabela será muito u
 | 8   | Monge         |
 | 9   | Ladino        |
 | 10  | Cavalo        |
+| 11  | Sereia        |
+| 12  | Chave         |
+| 13  | Armadura      |
+| 14  | Taverna       |
+| 15  | Gato          |
+| 16  | Poço          |
+| 17  | Cego          |
+| 18  | Corda         |
+| 19  | Sombra        |
+| 20  | Relógio       |
 
-##### Conjunto 8 (d10)
+##### Conjunto 8 (d20)
 
-| d10 | Palavra-chave |
+| d20 | Palavra-chave |
 | --- | ------------- |
 | 1   | Amor          |
 | 2   | Raiva         |
@@ -693,10 +913,20 @@ Eventualmente os desafios ficarão repetitivos já que essa tabela será muito u
 | 8   | Frio          |
 | 9   | Avareza       |
 | 10  | Medo          |
+| 11  | Esperança     |
+| 12  | Orgulho       |
+| 13  | Ciúme         |
+| 14  | Coragem       |
+| 15  | Saudade       |
+| 16  | Paciência     |
+| 17  | Culpa         |
+| 18  | Surpresa      |
+| 19  | Tédio         |
+| 20  | Ansiedade     |
 
-##### Conjunto 9 (d10)
+##### Conjunto 9 (d20)
 
-| d10 | Palavra-chave |
+| d20 | Palavra-chave |
 | --- | ------------- |
 | 1   | Sujo          |
 | 2   | Esqueleto     |
@@ -708,10 +938,20 @@ Eventualmente os desafios ficarão repetitivos já que essa tabela será muito u
 | 8   | Pedra         |
 | 9   | Armadilha     |
 | 10  | Ponte         |
+| 11  | Poeira        |
+| 12  | Corrente      |
+| 13  | Ossos         |
+| 14  | Lama          |
+| 15  | Túnel         |
+| 16  | Grito         |
+| 17  | Fenda         |
+| 18  | Mofo          |
+| 19  | Areia         |
+| 20  | Caverna       |
 
-##### Conjunto 10 (d10)
+##### Conjunto 10 (d20)
 
-| d10 | Palavra-chave |
+| d20 | Palavra-chave |
 | --- | ------------- |
 | 1   | Prato         |
 | 2   | Fogo          |
@@ -723,10 +963,20 @@ Eventualmente os desafios ficarão repetitivos já que essa tabela será muito u
 | 8   | Poção         |
 | 9   | Cajado        |
 | 10  | Buraco        |
+| 11  | Véu           |
+| 12  | Máscara       |
+| 13  | Espelho       |
+| 14  | Selo          |
+| 15  | Círculo       |
+| 16  | Medalhão      |
+| 17  | Sino          |
+| 18  | Tinta         |
+| 19  | Relíquia      |
+| 20  | Escada        |
 
-##### Conjunto 11 (d10)
+##### Conjunto 11 (d20)
 
-| d10 | Palavra-chave |
+| d20 | Palavra-chave |
 | --- | ------------- |
 | 1   | Esposa        |
 | 2   | Garrafa       |
@@ -738,10 +988,20 @@ Eventualmente os desafios ficarão repetitivos já que essa tabela será muito u
 | 8   | Álcool        |
 | 9   | Espada        |
 | 10  | Chão          |
+| 11  | Sapato        |
+| 12  | Chapéu        |
+| 13  | Cinto         |
+| 14  | Tapete        |
+| 15  | Vela          |
+| 16  | Balde         |
+| 17  | Porta         |
+| 18  | Toalha        |
+| 19  | Banco         |
+| 20  | Escada        |
 
-##### Conjunto 12 (d10)
+##### Conjunto 12 (d20)
 
-| d10 | Palavra-chave |
+| d20 | Palavra-chave |
 | --- | ------------- |
 | 1   | Morte         |
 | 2   | Bosque        |
@@ -753,68 +1013,118 @@ Eventualmente os desafios ficarão repetitivos já que essa tabela será muito u
 | 8   | Masmorra      |
 | 9   | Viagem        |
 | 10  | Exploração    |
+| 11  | Segredo       |
+| 12  | Portal        |
+| 13  | Relíquia      |
+| 14  | Caminho       |
+| 15  | Estrela       |
+| 16  | Véu           |
+| 17  | Névoa         |
+| 18  | Ilha          |
+| 19  | Caverna       |
+| 20  | Horizonte     |
 
 ### Dificuldade e Recompensa
 
 A ideia dos serviços é que eles sejam resolvidos com perícias ou com a criatividade do jogador. Em todo caso, a dificuldade pautaria o ND das perícias, mas caso não tenha nenhuma, use a dificuldade como base para criar os rivais ou a raiz do problema. Tenha bom-senso e boa sorte.
 
-### Tabela de Dificuldade e Recompensas
+#### Tabela de Dificuldade e Recompensas
 
-<!-- TODO: ajustar a dificuldade e as recompensas abaixo -->
+| 1d20  | Dificuldade           | Recompensa     | Taxa de recorrência |
+| ----- | --------------------- | -------------- | ------------------- |
+| 1     | Muito Fácil (ND 10)   | 3d6 C$         | +3 C$               |
+| 2-3   | Fácil (ND 14)         | 3d8 C$         | +5 C$               |
+| 4-6   | Fácil (ND 15)         | 5d6 C$         | +6 C$               |
+| 7     | Fácil (ND 16)         | (1d3+1)\*10 C$ | +7 C$               |
+| 8-12  | Média (ND 17)         | (1d4+1)\*10 C$ | +10 C$              |
+| 13    | Média (ND 18)         | 3d4\*10 C$     | +12 C$              |
+| 14    | Média (ND 19)         | 4d4\*10 C$     | +15 C$              |
+| 15-16 | Difícil (ND 20)       | 4d6\*10 C$     | +20 C$              |
+| 17    | Difícil (ND 21)       | 4d8\*10 C$     | +25 C$              |
+| 18    | Desafiador (ND 22)    | 1d6 PO$        | +50 C$              |
+| 19    | Desafiador (ND 23)    | 2d6 PO$        | +75 C$              |
+| 20    | Muito Difícil (ND 25) | 3d6 PO$        | +1 PO$              |
 
-| 1d20  | Dificuldade | Recompensa   | Taxa de recorrência |
-| ----- | ----------- | ------------ | ------------------- |
-| 1-2   | ND 10       | 2d4+2 PC     | +4 Peças de cobre   |
-| 3-4   | ND 11       | 3d4+3 PC     | +6 Peças de cobre   |
-| 5     | ND 12       | 1d4\*2 PP    | +2 Peças de prata   |
-| 6     | ND 13       | 2d4+2 PP     | +4 Peças de prata   |
-| 7-9   | ND 14       | 3d4+2 PP     | +4 Peças de prata   |
-| 10-13 | ND 15       | 1d4\*2 PO    | +6 Peças de prata   |
-| 14-15 | ND 16       | 2d4\*2 PO    | +2 Peças de ouro    |
-| 16-17 | ND 17       | 1d6+2 \*3 PO | +4 Peças de ouro    |
-| 18    | ND 18       | 2d6+2 \*4 PO | +6 Peças de ouro    |
-| 19    | ND 19       | 3d6+3 \*5 PO | +7 Peças de ouro    |
-| 20    | ND 20       | 4d6+4 \*6 PO | +8 Peças de ouro    |
+> **Lembrete:** 100 C$ = 1 PO$
 
 ### Nível de Complexidade
 
-| 1d20  | Nível                 |
-| ----- | --------------------- |
-| 1-10  | Simples               |
-| 11-15 | Complicada            |
-| 16-18 | Complexa              |
-| 19-20 | Extremamente complexa |
+O nível de complexidade de um serviço é determinado pela quantidade de testes necessários e pela dificuldade de cada um deles. Serviços mais complexos abrem margem para vários possíveis resultados e formas de abordagem, enquanto serviços mais simples tendem a ser mais previsíveis.
+
+| 1d20  | Nível de Complexidade          | Recompensa |
+| ----- | ------------------------------ | ---------- |
+| 1-10  | Simples                        | x1         |
+| 11-12 | Moderada e Direta              | x1.5       |
+| 13-15 | Moderada                       | x1.5       |
+| 16    | Complexa e Direta              | x2         |
+| 17-18 | Complexa                       | x2         |
+| 19    | Extremamente complexa e Direta | x3         |
+| 20    | Extremamente complexa          | x3         |
+
+Multiplique a recompensa e a taxa de recorrência de acordo com a complexidade do serviço.
 
 #### Simples
 
-Um único teste de perícia.
+Apenas um único teste de perícia com a ND padrão é necessário. Uma falha resulta em um serviço mal feito. Um sucesso resulta em um serviço bem feito.
 
-#### Complicada
+#### Moderada e Direta
 
-Dois testes com a mesma ND. Os testes têm que ser da mesma perícia.
+São necessários dois testes com a mesma ND. Os testes são da mesma perícia.
 
 - **0 Sucessos**: Fracasso total, -1 de renome adicional
 - **1 Sucesso**: Serviço mal feito porém ainda recebe a recompensa
 - **2 Sucessos**: O serviço foi concluído com êxito
 
-#### Complexa
+#### Moderada
 
-Três testes, um com a ND padrão, um com -1 de ND e outro com +1 de ND. Use três perícias diferentes.
+São necessários dois testes com a mesma ND. Os testes têm que ser de perícias diferentes.
 
-- **0 Sucessos**: Fracasso total, -1 de renome adicional, -2 nos testes do próximo serviço
-- **1 Sucesso**: Fracasso parcial, -1 de renome adicional, -1 nos testes do próximo serviço, receba metade da recompensa
+- **0 Sucessos**: Fracasso total, -1 de renome adicional
+- **1 Sucesso**: Serviço mal feito porém ainda recebe a recompensa
+- **2 Sucessos**: O serviço foi concluído com êxito
+
+#### Complexa e Direta
+
+Três testes, um com a ND padrão, um com -1 de ND e outro com +1 de ND. Os testes são de duas perícias diferentes ou menos.
+
+- **0 Sucessos**: Fracasso total, -1 de renome adicional
+- **1 Sucesso**: Fracasso parcial, -1 de renome adicional, receba metade da recompensa
 - **2 Sucessos**: Serviço mal feito porém ainda recebe a recompensa
 - **3 Sucessos**: O serviço foi concluído com êxito
 
-#### Extremamente Complexa
+#### Complexa
 
-Cinco testes, dois com a ND padrão, dois com +1 de ND e outro com +2 de ND. As perícias podem se repetir ou não.
+Três testes, um com a ND padrão, um com -1 de ND e outro com +1 de ND. Os testes têm que ser de perícias diferentes.
 
-- **0 Sucessos**: Fracasso total, -5 de renome adicional, desvantagem e -5 nos testes do próximo serviço
-- **1 Sucesso**: Fracasso parcial, -3 de renome adicional, -5 nos testes do próximo serviço
-- **2 Sucessos**: Serviço mal feito, receba metade da recompensa, -2 nos testes do próximo serviço
+- **0 Sucessos**: Fracasso total, -1 de renome adicional
+- **1 Sucesso**: Fracasso parcial, -1 de renome adicional, receba metade da recompensa
+- **2 Sucessos**: Serviço mal feito porém ainda recebe a recompensa
+- **3 Sucessos**: O serviço foi concluído com êxito
+
+#### Extremamente Complexa e Direta
+
+Cinco testes, um com a ND padrão, um com +1 de ND, um com +2 de ND, um com -1 de ND e um com -2 de ND. Os testes são de três perícias diferentes ou menos.
+
+- **0 Sucessos**: Fracasso total, -3 de renome adicional
+- **1 Sucesso**: Fracasso parcial, -2 de renome adicional
+- **2 Sucessos**: Serviço mal feito, receba metade da recompensa
 - **3 Sucessos**: Serviço mal feito porém ainda recebe a recompensa
 - **4 Sucessos**: O serviço foi concluído com êxito
-- **5 Sucessos**: Trabalho primoroso, +1 de renome adicional, +1 nos testes do próximo serviço, role novamente a recompensa e some à recompensa inicial
+- **5 Sucessos**: Trabalho primoroso, +1 de renome adicional, role novamente a recompensa e some à recompensa inicial
+
+#### Extremamente Complexa
+
+Cinco testes, um com a ND padrão, um com +1 de ND, um com +2 de ND, um com -1 de ND e um com -2 de ND. Os testes têm que ser de perícias diferentes.
+
+- **0 Sucessos**: Fracasso total, -5 de renome adicional
+- **1 Sucesso**: Fracasso parcial, -3 de renome adicional
+- **2 Sucessos**: Serviço mal feito, receba metade da recompensa
+- **3 Sucessos**: Serviço mal feito porém ainda recebe a recompensa
+- **4 Sucessos**: O serviço foi concluído com êxito
+- **5 Sucessos**: Trabalho primoroso, +1 de renome adicional, role novamente a recompensa e some à recompensa inicial
+
+> **Lembrete:** Todo serviço mal feito incide em uma penalidade de -1 de renome ao jogador
+>
+> **Dica:** Trabalhe com o jogador para decidir quais habilidades e perícias se encaixam melhor nos testes do serviço
 
 ---

@@ -20,12 +20,12 @@ Apesar dos resultados das gerações, no geral, serem genéricos o bastante para
   - [Pré-requisitos](#pré-requisitos)
   - [Clonando o Repositório](#clonando-o-repositório)
   - [Instalação das Dependências](#instalação-das-dependências)
-  - [Configuração do Ambiente](#️-configuração-do-ambiente)
-  - [Executando o Projeto](#🏃‍♂️-executando-o-projeto)
+  - [Configuração do Ambiente](#configuração-do-ambiente)
+  - [Executando o Projeto](#executando-o-projeto)
   - [Executando Testes](#executando-testes)
   - [Comandos de Desenvolvimento](#comandos-de-desenvolvimento)
   - [Estrutura de Pastas para Desenvolvimento](#estrutura-de-pastas-para-desenvolvimento)
-  - [Solução de Problemas](#solução-de-problemas)
+  - [Solução de Problemas de Desenvolvimento](#solução-de-problemas-de-desenvolvimento)
 - [Workflow de Desenvolvimento](#workflow-de-desenvolvimento)
 - [Métricas de Desenvolvimento](#métricas-de-desenvolvimento)
 - [Obtendo Ajuda](#obtendo-ajuda)
@@ -33,18 +33,18 @@ Apesar dos resultados das gerações, no geral, serem genéricos o bastante para
 - [Progressive Web App (PWA)](#progressive-web-app-pwa)
   - [O que é uma PWA?](#o-que-é-uma-pwa)
   - [Como Instalar](#como-instalar)
-  - [Funcionalidades Offline](#🔧-funcionalidades-offline)
+  - [Funcionalidades Offline](#funcionalidades-offline)
   - [Atualizações Automáticas](#atualizações-automáticas)
   - [Configurações Avançadas](#configurações-avançadas)
   - [Compatibilidade](#compatibilidade)
-  - [Solução de Problemas](#solução-de-problemas-1)
+  - [Solução de Problemas](#solução-de-problemas)
   - [Dicas de Uso](#dicas-de-uso)
   - [Utilitários](#utilitários)
 - [Arquitetura e Performance](#arquitetura-e-performance)
   - [Considerações de Performance](#considerações-de-performance)
   - [Segurança e Validação](#segurança-e-validação)
 - [Sistema de Geração](#sistema-de-geração)
-  - [Exemplo de Geração](#exemplo-de-geraçao)
+  - [Exemplo de Geração](#exemplo-de-geração)
 - [Público-Alvo](#público-alvo)
 - [Como Usar](#como-usar)
   - [Acesso Web](#acesso-web)
@@ -53,6 +53,7 @@ Apesar dos resultados das gerações, no geral, serem genéricos o bastante para
 ## Funcionalidades
 
 ### Geração de Guildas
+
 - **Estrutura física**: Tamanho, características e localização da sede
 - **Recursos financeiros**: De débito a abundantes, com modificadores
 - **Relações**: Com governo local e população
@@ -60,27 +61,32 @@ Apesar dos resultados das gerações, no geral, serem genéricos o bastante para
 - **Frequentadores**: Movimentação e impacto nos recursos
 
 ### Sistema de Contratos
+
 - **Geração automática**: Baseada no tamanho da sede e recursos
 - **Valores dinâmicos**: Sistema de experiência e recompensas em ouro
 - **Modificadores**: Distância, relações e dificuldade
 - **Prazos**: De 1 dia a contratos sem prazo definido
 
 ### Serviços da Guilda
+
 - **Tipos variados**: Treinar, recrutar, curar, negociar, construir
 - **Contratantes**: Povo, instituições ou governo
 - **Pagamentos alternativos**: Animais, terras, favores, mapas
 
 ### Membros Contratáveis
+
 - **Níveis de experiência**: Novatos, Iniciados, Sentinelas, Veteranos, Mata-contratos
 - **Características únicas**: Equipamentos, defeitos, façanhas
 - **Livro de registros**: Sistema de disponibilidade local
 
 ### Mural de Avisos
+
 - **Avisos diversos**: Execuções, procurados, eventos, comércio
 - **Contratos benevolentes**: Com pagamentos alternativos
 - **Divulgações**: Festivais, competições, apresentações
 
 ### Sistema de Renome
+
 - **Progressão individual**: Baseada em contratos e serviços concluídos
 - **Benefícios escalonados**: Acomodação, itens mágicos, privilégios
 - **Títulos**: Novato → Iniciado → Sentinela → Veterano → Mata-contrato
@@ -88,6 +94,7 @@ Apesar dos resultados das gerações, no geral, serem genéricos o bastante para
 ## Stack Tecnológica
 
 ### Frontend
+
 - **Framework**: Vue.js 3 com Composition API
 - **Build Tool**: Vite para desenvolvimento e build otimizado
 - **Linguagem**: TypeScript para tipagem forte
@@ -98,6 +105,7 @@ Apesar dos resultados das gerações, no geral, serem genéricos o bastante para
 - **Animações**: Vue Transition + CSS Animations
 
 ### Utilitários e Qualidade
+
 - **Validação**: Zod para validação de tipos em runtime
 - **Formatação**: Prettier para formatação consistente
 - **Linting**: ESLint para qualidade de código
@@ -144,19 +152,21 @@ npm install
 yarn install
 ```
 
-### ⚙️ Configuração do Ambiente
+### Configuração do Ambiente
 
 O projeto não requer variáveis de ambiente específicas para desenvolvimento local. Todas as configurações necessárias já estão incluídas nos arquivos de configuração.
 
 **Arquivos de configuração importantes:**
+
 - `vite.config.ts` - Configuração do Vite e PWA
 - `tailwind.config.js` - Configuração do Tailwind CSS
 - `tsconfig.json` - Configuração do TypeScript
 - `vitest.config.ts` - Configuração dos testes
 
-### 🏃‍♂️ Executando o Projeto
+### Executando o Projeto
 
 #### Desenvolvimento
+
 ```bash
 # Inicia o servidor de desenvolvimento
 npm run dev
@@ -166,12 +176,14 @@ npm run dev
 ```
 
 O servidor de desenvolvimento oferece:
+
 - ✅ **Hot Module Replacement (HMR)** - Recarregamento instantâneo
 - ✅ **TypeScript** em tempo real
 - ✅ **Tailwind CSS** com rebuild automático
 - ✅ **PWA** funcional em desenvolvimento
 
 #### Build de Produção
+
 ```bash
 # Compila o projeto para produção
 npm run build
@@ -232,9 +244,10 @@ src/
 └── tests/           # Testes unitários
 ```
 
-### Solução de Problemas
+### Solução de Problemas de Desenvolvimento
 
 #### **Erro de dependências**
+
 ```bash
 # Limpa cache do npm e reinstala
 rm -rf node_modules package-lock.json
@@ -242,12 +255,14 @@ npm install
 ```
 
 #### **Erro de TypeScript**
+
 ```bash
 # Verifica tipos sem emitir arquivos
 npx vue-tsc --noEmit --watch
 ```
 
 #### **Problemas de PWA em desenvolvimento**
+
 - A PWA funciona melhor após um build (`npm run build` + `npm run preview`)
 - Service Workers podem ser limpos em DevTools → Application → Storage
 
@@ -276,6 +291,7 @@ npx vue-tsc --noEmit --watch
 - **Issues**: [GitHub Issues](https://github.com/vgabrielsoares/generator-guild/issues)
 
 ### Funcionalidades PWA
+
 - **Instalável** em dispositivos móveis e desktop
 - **Funcionamento offline** com Service Workers
 - **Cache inteligente** de recursos
@@ -299,32 +315,37 @@ Uma PWA combina o melhor da web com a experiência de aplicativos nativos:
 ### Como Instalar
 
 #### **No Desktop (Chrome, Edge, Firefox)**
+
 1. Acesse o aplicativo no navegador
 2. Procure pelo ícone de "Instalar" (➕) na barra de endereços
 3. Clique em **"Instalar Gerador de Guildas"**
 4. O aplicativo será adicionado ao menu Iniciar/Applications
 
 **Ou use o prompt automático:**
+
 - Um banner aparecerá automaticamente oferecendo a instalação
 - Clique em **"Instalar"** quando aparecer
 
 #### **No Android (Chrome, Samsung Internet)**
+
 1. Abra o aplicativo no navegador
 2. Toque no menu (⋮) e selecione **"Adicionar à tela inicial"**
 3. Confirme tocando em **"Adicionar"**
 4. O ícone aparecerá na sua tela inicial
 
 **Ou use o prompt automático:**
+
 - Um banner "Adicionar à tela inicial" aparecerá
 - Toque em **"Adicionar"**
 
 #### **No iOS (Safari)**
+
 1. Abra o aplicativo no Safari
-2. Toque no botão Compartilhar (📤)
+2. Toque no botão Compartilhar
 3. Role para baixo e toque em **"Adicionar à Tela de Início"**
 4. Toque em **"Adicionar"** para confirmar
 
-### 🔧 Funcionalidades Offline
+### Funcionalidades Offline
 
 Mesmo sem internet, você pode:
 
@@ -332,9 +353,9 @@ Mesmo sem internet, você pode:
 ✅ **Usar contratos salvos em cache**  
 ✅ **Consultar membros e dados já carregados**  
 ✅ **Acessar o sistema de renome**  
-✅ **Navegar entre todas as seções**  
+✅ **Navegar entre todas as seções**
 
-**📡 Indicador de Status**: Um indicador visual mostra quando você está offline
+**Indicador de Status**: Um indicador visual mostra quando você está offline
 
 ### Atualizações Automáticas
 
@@ -346,46 +367,54 @@ Mesmo sem internet, você pode:
 ### Configurações Avançadas
 
 #### **Gerenciamento de Cache**
+
 O aplicativo armazena automaticamente:
+
 - Recursos estáticos (CSS, JS, imagens)
 - Dados de guildas geradas
 - Configurações do usuário
 - Tabelas de RPG
 
 #### **Sincronização de Dados**
+
 - Dados são sincronizados automaticamente quando online
 - Mudanças offline são aplicadas na próxima conexão
 - Backup automático no navegador
 
 #### **Limpeza de Cache**
+
 Para limpar todos os dados armazenados:
+
 1. Vá em Configurações do navegador
 2. Procure por "Dados do site" ou "Armazenamento"
 3. Encontre "Gerador de Guildas" e limpe os dados
 
 ### Compatibilidade
 
-| Dispositivo | Navegador | Instalação | Offline |
-|-------------|-----------|------------|---------|
-| 💻 **Desktop** | Chrome, Edge | ✅ | ✅ |
-| 💻 **Desktop** | Firefox | ✅ | ✅ |
-| 📱 **Android** | Chrome, Samsung | ✅ | ✅ |
-| 🍎 **iOS** | Safari | ✅ | ✅ |
-| 📱 **Mobile** | Outros | ⚠️ Limitado | ✅ |
+| Dispositivo    | Navegador       | Instalação  | Offline |
+| -------------- | --------------- | ----------- | ------- |
+| 💻 **Desktop** | Chrome, Edge    | ✅          | ✅      |
+| 💻 **Desktop** | Firefox         | ✅          | ✅      |
+| 📱 **Android** | Chrome, Samsung | ✅          | ✅      |
+| 🍎 **iOS**     | Safari          | ✅          | ✅      |
+| 📱 **Mobile**  | Outros          | ⚠️ Limitado | ✅      |
 
 ### Solução de Problemas
 
 #### **"Não consigo instalar o app"**
+
 - Certifique-se de estar usando um navegador compatível
 - Verifique se tem espaço suficiente no dispositivo
 - Tente atualizar o navegador
 
 #### **"O app não funciona offline"**
+
 - Acesse o app online pelo menos uma vez
 - Aguarde o download completo dos recursos
 - Verifique se o Service Worker está ativo
 
 #### **"Não recebo atualizações"**
+
 - Conecte-se à internet
 - Recarregue a página (F5 ou puxar para baixo)
 - Limpe o cache se necessário
@@ -393,19 +422,21 @@ Para limpar todos os dados armazenados:
 ### Dicas de Uso
 
 **Para melhor experiência:**
+
 - Instale o app para acesso mais rápido
 - Use offline durante sessões de RPG sem internet
 - Configure atalhos da tela inicial para funções favoritas
 - Mantenha o app atualizado para novos recursos
 
 **Para RPG:**
+
 - Gere guildas antes da sessão (funciona offline)
 - Use os atalhos rápidos para acessar contratos e avisos
 - Aproveite o modo offline durante jogos sem conexão
 - Adeque os resultados às suas campanhas, personalizando as gerações
 
-
 ### Utilitários
+
 - **Sistema de dados robusto** com validação Zod
 - **Exportação** para CSV e PDF
 - **Armazenamento local** para persistência
@@ -414,6 +445,7 @@ Para limpar todos os dados armazenados:
 ## Arquitetura e Performance
 
 ### Considerações de Performance
+
 - **Lazy Loading**: Componentes carregados sob demanda
 - **Virtual Scrolling**: Para listas grandes de contratos/membros
 - **Memoização**: Cache de resultados de gerações complexas
@@ -421,6 +453,7 @@ Para limpar todos os dados armazenados:
 - **Chunking**: Divisão do bundle para carregamento otimizado
 
 ### Segurança e Validação
+
 - **Zod Schemas**: Validação de tipos em runtime
 - **Input Sanitization**: Limpeza de inputs do usuário
 - **CSP Headers**: Política de segurança de conteúdo
@@ -436,6 +469,7 @@ O gerador utiliza um sistema complexo de tabelas probabilísticas que considera:
 - **Características especiais**: Eventos únicos e modificadores especiais
 
 ### Exemplo de Geração
+
 1. **Sede**: Uma guilda com sede "Grande" (12m x 12m) em uma Cidadela
 2. **Recursos**: Suficientes (+1 em várias tabelas)
 3. **Relação com população**: Muito boa (+5 recompensa)
@@ -452,9 +486,11 @@ O gerador utiliza um sistema complexo de tabelas probabilísticas que considera:
 ## Como Usar
 
 ### Acesso Web
+
 Simplesmente acesse o aplicativo no seu navegador - funciona imediatamente em qualquer dispositivo!
 
 ### Instalação como App
+
 1. **Desktop**: Clique no ícone ➕ na barra de endereços
 2. **Android**: Toque em "Adicionar à tela inicial" quando o banner aparecer
 3. **iOS**: Safari → Compartilhar → "Adicionar à Tela de Início"
