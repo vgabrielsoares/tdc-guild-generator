@@ -1032,6 +1032,7 @@ export const useContractsStore = defineStore("contracts", () => {
     contract.generationData = {
       ...contract.generationData,
       rewardRollBonus: currentBonusTotal,
+      previousFinalGoldReward: previousValue,
     };
 
     // Atualizar a descrição do contrato para mostrar o reajuste
