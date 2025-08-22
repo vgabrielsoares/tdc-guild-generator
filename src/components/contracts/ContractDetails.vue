@@ -434,6 +434,22 @@
               <div class="mb-6">
                 <ContractValue :value="contract.value" :difficulty="contract.difficulty"
                   :contractor-type="contract.contractorType" :payment-type="contract.paymentType" size="lg" />
+
+                <!-- Mostrar valor original e valor com bônus quando o contrato foi reajustado -->
+                <div
+                  v-if="contract.generationData?.previousFinalGoldReward !== undefined && contract.generationData.previousFinalGoldReward !== contract.value.finalGoldReward"
+                  class="mt-4 p-3 bg-gray-800/40 rounded-lg border-l-4 border-amber-500/30 text-sm">
+                  <div class="flex items-center justify-between text-gray-400">
+                    <div>Valor original:</div>
+                    <div class="text-white font-medium">{{
+                      formatCurrency(contract.generationData.previousFinalGoldReward) }} PO$
+                    </div>
+                  </div>
+                  <div class="flex items-center justify-between mt-2">
+                    <div class="text-amber-300">Valor com bônus:</div>
+                    <div class="text-amber-100 font-bold">{{ formatCurrency(contract.value.finalGoldReward) }} PO$</div>
+                  </div>
+                </div>
               </div>
 
               <!-- Termos de Pagamento -->
@@ -820,6 +836,12 @@ const distanceDetails = computed(() => {
 
 function closeModal() {
   emit('close');
+}
+
+// Helper local para formatar valores monetários no componente
+function formatCurrency(value: number | undefined | null): string {
+  if (value === undefined || value === null || Number.isNaN(value)) return '—';
+  return Number(value).toFixed(1).toString();
 }
 
 function handleAccept() {
