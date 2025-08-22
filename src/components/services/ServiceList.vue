@@ -177,12 +177,18 @@ const servicesStore = useServicesStore();
 const currentGuildId = computed(() => guildStore.currentGuild?.id || "");
 
 // Computed
-// Fonte canônica: serviços do store filtrados pela guilda atual
-const guildServices = computed(() =>
-  servicesStore.services.filter(
+// quando `props.services` for fornecida (por exemplo, filtros aplicados pelo parent),
+// use-a diretamente; caso contrário, fallback para os serviços do store
+const guildServices = computed(() => {
+  // Se o parent forneceu explicitamente a lista (mesmo que vazia), respeitamos isso.
+  if (props.services && Array.isArray(props.services)) {
+    return props.services as ServiceWithGuild[];
+  }
+
+  return servicesStore.services.filter(
     (s: ServiceWithGuild) => s.guildId === currentGuildId.value
-  )
-);
+  );
+});
 
 const totalServices = computed(() => guildServices.value.length);
 

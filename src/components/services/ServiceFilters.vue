@@ -1038,7 +1038,11 @@ const clearAllFilters = () => {
 
 // Emit filters
 const emitFilters = () => {
-  const payload = { ...filters.value };
+  const payloadEntries = Object.entries(filters.value).filter(
+    ([, v]) => v !== "" && v !== null && v !== undefined
+  );
+
+  const payload = Object.fromEntries(payloadEntries) as Partial<ServiceFilters>;
   emit("update:filters", payload);
   emit("filtered", filteredServicesForComponent.value);
 };
