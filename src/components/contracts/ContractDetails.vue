@@ -4,657 +4,690 @@
       leave-active-class="transition-opacity duration-300" enter-from-class="opacity-0" leave-to-class="opacity-0">
       <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75"
         @click="closeModal">
-        <Transition enter-active-class="transition-all duration-300" leave-active-class="transition-all duration-300"
-          enter-from-class="opacity-0 transform scale-95" leave-to-class="opacity-0 transform scale-95">
-          <div v-if="isOpen && contract" @click.stop
-            class="relative bg-gray-800 rounded-lg shadow-xl border border-gray-600 max-w-4xl w-full max-h-[90vh] overflow-hidden">
-            <!-- Header -->
-            <div class="flex items-center justify-between p-6 border-b border-gray-600">
-              <div class="flex items-center gap-3">
+        <div v-if="isOpen && contract" @click.stop
+          class="contract-details bg-gray-900 text-white rounded-xl p-6 shadow-2xl border border-amber-700/30 max-w-4xl w-full max-h-[90vh] overflow-auto relative">
+          <!-- Header -->
+          <div class="flex items-start justify-between mb-6">
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-2">
+                <ContractStatus :status="contract.status" size="lg" />
                 <component :is="contractorIcon" class="w-6 h-6 text-amber-400" />
-                <div>
-                  <h3 class="text-xl font-semibold text-amber-400">
-                    {{ contract.title || `Contrato ${contract.id.slice(0, 8)}` }}
-                  </h3>
-                  <p class="text-md text-gray-400">
-                    {{ contractorTypeLabel }} - {{ contract.contractorName || 'Nome não especificado' }}
-                  </p>
-                  <p v-if="resolutionText" class="text-sm text-gray-400 italic mt-1">
-                    {{ resolutionText }}
-                  </p>
-                </div>
               </div>
-              <div class="flex items-center gap-3">
-                <ContractStatus :status="contract.status" size="md" />
-                <button @click="closeModal"
-                  class="text-gray-400 hover:text-white transition-colors duration-200 p-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  <XMarkIcon class="w-5 h-5" />
-                </button>
-              </div>
+              <h2 class="text-2xl font-bold text-white mb-2">
+                {{ contract.title || `Contrato #${contract.id.slice(-8).toUpperCase()}` }}
+              </h2>
+              <p class="text-gray-300 mb-2">
+                {{ contractorTypeLabel }} - {{ contract.contractorName || 'Nome não especificado' }}
+              </p>
+              <p v-if="resolutionText" class="text-sm text-gray-400 italic mt-1">
+                {{ resolutionText }}
+              </p>
             </div>
+            <button @click="closeModal"
+              class="text-gray-400 hover:text-white transition-colors duration-200 p-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <XMarkIcon class="w-5 h-5" />
+            </button>
+          </div>
+
+          <!-- Content -->
+          <div class="relative space-y-6">
 
             <!-- Painel de Ajuda -->
-            <div class="px-6">
-              <ContractHelpPanel :is-open="showHelpPanel" :help-key="currentHelpKey" @close="handleCloseHelp" />
-            </div>
-
-            <!-- Content -->
-            <div class="p-6 overflow-y-auto max-h-[calc(90vh-180px)]">
-              <div class="space-y-6">
-
-                <!-- Descrição -->
-                <section v-if="contract.description">
-                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Descrição</h4>
-                  <div class="text-gray-300 leading-relaxed whitespace-pre-line"
-                    v-html="formatMarkdown(contract.description)"></div>
-                </section>
-
-                <!-- 1. Objetivo -->
-                <section v-if="contract.objective">
-                  <div class="flex items-center gap-2 mb-2">
-                    <h4 class="text-lg font-semibold text-amber-400">Objetivo</h4>
-                    <InfoButton help-key="contract-objectives" @open-help="handleOpenHelp('contract-objectives')"
-                      button-class="text-xs" />
-                  </div>
-                  <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
-                    <div class="flex items-center gap-2 mb-2">
-                      <ContractTooltip :content="getObjectiveTooltip(contract.objective.category)"
-                        :title="'Categoria do Objetivo'">
-                        <XCircleIcon class="w-5 h-5 text-amber-400" />
-                      </ContractTooltip>
-                      <span class="font-medium text-white">{{ getCategoryDisplayName(contract.objective.category)
-                      }}</span>
-                    </div>
-                    <p class="text-gray-300 mb-2">{{ contract.objective.description }}</p>
-
-                    <!-- Especificação do objetivo -->
-                    <div v-if="contract.objective.specificObjective"
-                      class="mt-3 p-3 bg-gray-800 rounded border border-gray-500">
-                      <div class="text-sm text-gray-400 mb-1">
-                        <strong>Especificação:</strong>
-                      </div>
-                      <p class="text-gray-200">{{ contract.objective.specificObjective }}</p>
-                    </div>
-                  </div>
-                </section>
-
-                <!-- 1.5. Contratante Inusitado -->
-                <section v-if="contract.unusualContractor?.isUnusual">
-                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Contratante Inusitado</h4>
-                  <div class="bg-purple-900/20 rounded-lg p-4 border border-purple-500/30">
-                    <div class="flex items-center gap-2 mb-2">
-                      <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span class="font-medium text-white">Figura Excêntrica</span>
-                    </div>
-                    <p class="text-gray-300 mb-3">{{ contract.unusualContractor.description }}</p>
-
-                    <!-- Palavras-chave temáticas -->
-                    <div
-                      v-if="contract.unusualContractor.themeKeywords && contract.unusualContractor.themeKeywords.length > 0"
-                      class="mt-3 p-3 bg-purple-800/20 rounded border border-purple-500/20">
-                      <div class="text-sm text-purple-300 mb-2">
-                        <strong>Palavras-chave para criatividade:</strong>
-                      </div>
-                      <div class="flex flex-wrap gap-2">
-                        <span v-for="keyword in contract.unusualContractor.themeKeywords"
-                          :key="`${keyword.set}-${keyword.keyword}`"
-                          class="inline-block bg-purple-700/30 text-purple-200 px-2 py-1 rounded text-sm border border-purple-500/20">
-                          {{ keyword.keyword }}
-                        </span>
-                      </div>
-                      <div class="text-xs text-purple-400 mt-2">
-                        <InformationCircleIcon class="w-3 h-3 inline mr-1" />
-                        Use essas palavras-chave para inspirar características únicas, motivações, aparência ou
-                        maneirismos do contratante.
-                      </div>
-                    </div>
-                  </div>
-                </section>
-
-                <!-- 2. Localidade -->
-                <section v-if="contract.location">
-                  <div class="flex items-center gap-2 mb-2">
-                    <h4 class="text-lg font-semibold text-amber-400">Localidade</h4>
-                    <InfoButton help-key="contract-locations" @open-help="handleOpenHelp('contract-locations')"
-                      button-class="text-xs" />
-                  </div>
-                  <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
-                    <div class="flex items-center gap-2 mb-2">
-                      <ContractTooltip :content="getLocationTooltip()" :title="'Local da Missão'">
-                        <MapPinIcon class="w-5 h-5 text-amber-400" />
-                      </ContractTooltip>
-                      <span class="font-medium text-white">{{ contract.location.name }}</span>
-                    </div>
-
-                    <!-- Especificação da localidade -->
-                    <div v-if="contract.location.specification"
-                      class="mt-3 p-3 bg-gray-800 rounded border border-gray-500">
-                      <div class="text-md text-gray-400 mb-1">
-                        <strong>Localização específica:</strong>
-                      </div>
-                      <p class="text-gray-200 mb-1">{{ contract.location.specification.location }}</p>
-                      <div
-                        v-if="contract.location.specification.description !== contract.location.specification.location"
-                        class="text-sm text-gray-300">
-                        → {{ contract.location.specification.description }}
-                      </div>
-                    </div>
-
-                    <!-- Distrito específico -->
-                    <div v-if="contract.location.district" class="mt-3 p-3 bg-gray-800 rounded border border-gray-500">
-                      <div class="text-md text-gray-400 mb-1">
-                        <strong>Distrito:</strong>
-                      </div>
-                      <p class="text-gray-200">
-                        {{ contract.location.district.primary.name }}
-                        <span v-if="contract.location.district.secondary"> e {{
-                          contract.location.district.secondary.name }}</span>
-                      </p>
-                    </div>
-
-                    <!-- Importância do local -->
-                    <div v-if="contract.location.importance && contract.location.importance.type !== 'nenhuma'"
-                      class="mt-3 p-3 bg-gray-800 rounded border border-gray-500">
-                      <div class="text-md text-gray-400 mb-1">
-                        <strong>Importância:</strong>
-                      </div>
-                      <p class="text-gray-200 mb-1">{{ contract.location.importance.name }}</p>
-                      <div v-if="contract.location.importance.description !== contract.location.importance.name"
-                        class="text-sm text-gray-300">
-                        → {{ contract.location.importance.description }}
-                      </div>
-                    </div>
-
-                    <!-- Peculiaridade do local -->
-                    <div v-if="contract.location.peculiarity && contract.location.peculiarity.type !== 'nenhuma'"
-                      class="mt-3 p-3 bg-gray-800 rounded border border-gray-500">
-                      <div class="text-md text-gray-400 mb-1">
-                        <strong>Peculiaridade:</strong>
-                      </div>
-                      <p class="text-gray-200 mb-1">{{ contract.location.peculiarity.name }}</p>
-                      <div v-if="contract.location.peculiarity.description !== contract.location.peculiarity.name"
-                        class="text-sm text-gray-300">
-                        → {{ contract.location.peculiarity.description }}
-                      </div>
-                    </div>
-                  </div>
-                </section>
-
-                <!-- 3. Distância -->
-                <section v-if="contract.generationData.distanceRoll">
-                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Distância</h4>
-                  <div class="bg-blue-900/20 rounded-lg p-4 border border-blue-500/30">
-                    <div class="flex items-center gap-2 mb-2">
-                      <MapPinIcon class="w-5 h-5 text-blue-400" />
-                      <span class="font-medium text-white">{{ distanceDetails?.description || 'Distância não especificada' }}</span>
-                    </div>
-                    <div v-if="distanceDetails?.hexagons || distanceDetails?.kilometers" class="mt-4">
-                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Hexágonos -->
-                        <div>
-                          <div class="flex justify-center md:justify-middle">
-                            <span class="text-gray-400 font-medium">Hexágonos</span>
-                          </div>
-                          <div class="flex justify-center md:justify-middle mt-1">
-                            <span class="text-gray-300 text-lg font-semibold">
-                              <template v-if="distanceDetails?.hexagons">
-                                <template v-if="distanceDetails.hexagons.min === distanceDetails.hexagons.max">
-                                  {{ distanceDetails.hexagons.min }} hexágono{{ distanceDetails.hexagons.min > 1 ? 's' :
-                                    '' }}
-                                </template>
-                                <template v-else>
-                                  {{ distanceDetails.hexagons.min }}-{{ distanceDetails.hexagons.max }} hexágonos
-                                </template>
-                              </template>
-                              <template v-else>
-                                —
-                              </template>
-                            </span>
-                          </div>
-                        </div>
-                        <!-- Distância aproximada -->
-                        <div>
-                          <div class="flex justify-center md:justify-middle">
-                            <span class="text-gray-400 font-medium">Distância aproximada</span>
-                          </div>
-                          <div class="flex justify-center md:justify-middle mt-1">
-                            <span class="text-gray-300 text-lg font-semibold">
-                              <template v-if="distanceDetails?.kilometers">
-                                <template v-if="distanceDetails.kilometers.min === distanceDetails.kilometers.max">
-                                  {{ distanceDetails.kilometers.min }} km
-                                </template>
-                                <template v-else>
-                                  {{ distanceDetails.kilometers.min }}-{{ distanceDetails.kilometers.max }} km
-                                </template>
-                              </template>
-                              <template v-else>
-                                —
-                              </template>
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="text-sm text-gray-400 mt-3 pt-2 border-t border-blue-500/20">
-                      <div class="flex items-center gap-1">
-                        <InformationCircleIcon class="w-3 h-3" />
-                        <span>1 hexágono = 9,5 km (6 milhas)</span>
-                      </div>
-                    </div>
-                  </div>
-                </section>
-
-                <!-- 4. Antagonista -->
-                <section>
-                  <div class="flex items-center gap-2 mb-2">
-                    <h4 class="text-lg font-semibold text-amber-400">Antagonista</h4>
-                    <InfoButton help-key="contract-antagonists" @open-help="handleOpenHelp('contract-antagonists')"
-                      button-class="text-xs" />
-                  </div>
-                  <div class="bg-red-900/20 rounded-lg p-4 border border-red-500/30">
-                    <div class="flex items-center gap-2 mb-2">
-                      <ContractTooltip :content="getAntagonistTooltip()" :title="'Oposição do Contrato'">
-                        <UserMinusIcon class="w-5 h-5 text-red-400" />
-                      </ContractTooltip>
-                      <span class="font-medium text-white">{{ contract.antagonist.specificType }}</span>
-                      <span class="text-sm text-red-300 bg-red-800/50 px-2 py-1 rounded">
-                        {{ getCategoryDisplayName(contract.antagonist.category) }}
-                      </span>
-                    </div>
-                    <p class="text-gray-300 text-md">{{ contract.antagonist.description }}</p>
-                  </div>
-                </section>
-
-                <!-- 5. Complicações -->
-                <section v-if="contract.complications?.length">
-                  <div class="flex items-center gap-2 mb-2">
-                    <h4 class="text-lg font-semibold text-amber-400">Complicações</h4>
-                    <InfoButton help-key="contract-complications" @open-help="handleOpenHelp('contract-complications')"
-                      button-class="text-xs" />
-                  </div>
-                  <div class="space-y-3">
-                    <div v-for="complication in contract.complications" :key="complication.category"
-                      class="bg-orange-900/20 rounded-lg p-4 border border-orange-500/30">
-                      <div class="flex items-center gap-2 mb-2">
-                        <ContractTooltip :content="getComplicationTooltip()" :title="'Complicação da Missão'">
-                          <ExclamationCircleIcon class="w-5 h-5 text-orange-400" />
-                        </ContractTooltip>
-                        <span class="font-medium text-white">{{ complication.specificDetail }}</span>
-                        <span class="text-sm text-orange-300 bg-orange-800/50 px-2 py-1 rounded">
-                          {{ getCategoryDisplayName(complication.category) }}
-                        </span>
-                      </div>
-                      <p class="text-gray-300 text-md">{{ complication.description }}</p>
-                    </div>
-                  </div>
-                </section>
-
-                <!-- 6. Aliados -->
-                <section v-if="contract.allies?.length">
-                  <div class="flex items-center gap-2 mb-2">
-                    <h4 class="text-lg font-semibold text-amber-400">Aliados Potenciais</h4>
-                    <InfoButton help-key="contract-allies" @open-help="handleOpenHelp('contract-allies')"
-                      button-class="text-xs" />
-                  </div>
-                  <div class="space-y-3">
-                    <div v-for="ally in contract.allies" :key="ally.name"
-                      class="bg-green-900/20 rounded-lg p-4 border border-green-500/30">
-                      <div class="flex items-center gap-2 mb-2">
-                        <ContractTooltip :content="getAllyTooltip()" :title="'Aliado Potencial'">
-                          <UserPlusIcon class="w-5 h-5 text-green-400" />
-                        </ContractTooltip>
-                        <span class="font-medium text-white">{{ ally.name }}</span>
-                        <span class="text-sm text-green-300 bg-green-800/50 px-2 py-1 rounded">
-                          {{ getCategoryDisplayName(ally.category) }}
-                        </span>
-                      </div>
-                      <p class="text-gray-300 text-md mb-2">{{ ally.description }}</p>
-
-                      <!-- Detalhes específicos do aliado -->
-                      <div class="mt-3 p-3 bg-gray-800 rounded border border-gray-500">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                          <div>
-                            <div class="text-gray-400 mb-1">
-                              <strong>Tipo específico:</strong>
-                            </div>
-                            <p class="text-gray-200">{{ ally.specificType }}</p>
-                          </div>
-                          <div>
-                            <div class="text-gray-400 mb-1">
-                              <strong>Quando aparece:</strong>
-                            </div>
-                            <p class="text-gray-200">{{ getTimingDisplayName(ally.timing) }}</p>
-                          </div>
-
-                          <!-- Nível de poder para aventureiros -->
-                          <div v-if="ally.powerLevel !== undefined" class="md:col-span-2">
-                            <div class="text-gray-400 mb-1">
-                              <strong>Nível de Ameaça:</strong>
-                            </div>
-                            <p class="text-gray-200">NA {{ ally.powerLevel }}</p>
-                          </div>
-
-                          <!-- Características para monstruosidades -->
-                          <div v-if="ally.characteristics?.length" class="md:col-span-2">
-                            <div class="text-gray-400 mb-1">
-                              <strong>Características especiais:</strong>
-                            </div>
-                            <ul class="text-gray-200 space-y-1">
-                              <li v-for="characteristic in ally.characteristics" :key="characteristic"
-                                class="flex items-start gap-2">
-                                <span class="text-green-400 mt-0.5">•</span>
-                                <span>{{ characteristic }}</span>
-                              </li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </section>
-
-                <!-- 7. Reviravoltas -->
-                <section v-if="contract.twists?.length">
-                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Reviravoltas</h4>
-                  <div class="space-y-3">
-                    <div v-for="twist in contract.twists" :key="twist.description"
-                      class="bg-purple-900/20 rounded-lg p-4 border border-purple-500/30">
-                      <div class="flex items-center gap-2 mb-2">
-                        <FaceSmileIcon class="w-5 h-5 text-purple-400" />
-                        <span class="font-medium text-white">Reviravolta</span>
-                        <span v-if="twist.who" class="text-sm text-purple-300 bg-purple-800/50 px-2 py-1 rounded">
-                          {{ twist.who }}
-                        </span>
-                      </div>
-                      <p class="text-gray-300 text-sm mb-1">{{ twist.description }}</p>
-                      <div v-if="twist.what" class="text-sm text-purple-200">
-                        <strong>Revelação:</strong> {{ twist.what }}
-                      </div>
-                    </div>
-                  </div>
-                </section>
-
-                <!-- 8. Consequências Severas -->
-                <section v-if="contract.severeConsequences?.length">
-                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Consequências por Falha</h4>
-                  <div class="space-y-3">
-                    <div v-for="consequence in contract.severeConsequences" :key="consequence.description"
-                      class="bg-red-900/20 rounded-lg p-4 border border-red-500/30">
-                      <div class="flex items-center gap-2 mb-2">
-                        <ShieldExclamationIcon class="w-5 h-5 text-red-400" />
-                        <span class="font-medium text-white">{{ consequence.category }}</span>
-                        <span class="text-sm text-red-300 bg-red-800/50 px-2 py-1 rounded">
-                          Consequência Severa
-                        </span>
-                      </div>
-                      <p class="text-gray-300 text-sm mb-2">{{ consequence.description }}</p>
-
-                      <!-- Detalhes específicos da consequência -->
-                      <div class="mt-3 p-3 bg-gray-800 rounded border border-gray-500">
-                        <div class="space-y-3 text-sm">
-                          <div>
-                            <div class="text-gray-400 mb-1">
-                              <strong>Consequência específica:</strong>
-                            </div>
-                            <p class="text-gray-200">{{ consequence.specificConsequence }}</p>
-                          </div>
-
-                          <div>
-                            <div class="text-gray-400 mb-1">
-                              <strong>Impacto nos contratados:</strong>
-                            </div>
-                            <p class="text-gray-200">{{ consequence.affectsContractors }}</p>
-                          </div>
-
-                          <!-- Efeito adicional se existir -->
-                          <div v-if="consequence.additionalEffect">
-                            <div class="text-gray-400 mb-1">
-                              <strong>Efeito adicional:</strong>
-                            </div>
-                            <p class="text-gray-200">{{ consequence.additionalEffect }}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </section>
-
-                <!-- 9. Pagamento -->
-                <section>
-                  <div class="flex items-center gap-2 mb-2">
-                    <h4 class="text-lg font-semibold text-amber-400">Pagamento</h4>
-                    <InfoButton help-key="contract-payment" @open-help="handleOpenHelp('contract-payment')"
-                      button-class="text-xs" />
-                  </div>
-                  <ContractValue :value="contract.value" :difficulty="contract.difficulty"
-                    :contractor-type="contract.contractorType" :payment-type="contract.paymentType" size="lg" />
-
-                  <!-- Recompensas e Incentivos -->
-                  <section v-if="contract.additionalRewards?.length">
-                    <h4 class="text-lg font-semibold text-amber-400 mb-2 flex items-center gap-2">
-                      <GiftIcon class="w-5 h-5" />
-                      Recompensas e Incentivos
-                    </h4>
-                    <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
-                      <div class="space-y-3">
-                        <div v-for="reward in contract.additionalRewards" :key="reward.specificReward"
-                          class="flex items-start gap-3 p-3 rounded-lg border"
-                          :class="reward.isPositive ? 'bg-green-900/20 border-green-600/30' : 'bg-red-900/20 border-red-600/30'">
-                          <div class="flex-shrink-0 mt-0.5">
-                            <CheckCircleIcon v-if="reward.isPositive" class="w-5 h-5 text-green-400" />
-                            <ExclamationTriangleIcon v-else class="w-5 h-5 text-red-400" />
-                          </div>
-                          <div class="flex-1">
-                            <div class="font-medium text-white mb-1">{{ getCategoryDisplayName(reward.category) }}</div>
-                            <div class="text-sm text-gray-300">{{ reward.specificReward }}</div>
-                            <div v-if="reward.description && reward.description !== reward.specificReward"
-                              class="text-sm text-gray-400 mt-1">{{ reward.description }}</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </section>
-
-                  <!-- Penalidades e Multas -->
-                  <section v-if="contract.penalty">
-                    <h4 class="text-lg font-semibold text-red-400 mb-2 flex items-center gap-2">
-                      <ExclamationTriangleIcon class="w-5 h-5" />
-                      Penalidade Aplicada
-                    </h4>
-                    <div class="bg-red-900/20 rounded-lg p-4 border border-red-600/30">
-                      <div class="flex items-start gap-3">
-                        <div class="flex-shrink-0 mt-0.5">
-                          <XCircleIcon class="w-6 h-6 text-red-400" />
-                        </div>
-                        <div class="flex-1">
-                          <div class="font-medium text-red-200 mb-2">Multa por Quebra de Contrato</div>
-                          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                              <div class="text-sm text-gray-400 mb-1">Valor da Multa:</div>
-                              <div class="text-lg font-bold text-red-300">
-                                {{ contract.penalty.amount }} PO
-                              </div>
-                            </div>
-                            <div>
-                              <div class="text-sm text-gray-400 mb-1">Data da Aplicação:</div>
-                              <div class="text-sm text-gray-200">
-                                {{ formatGameDate(contract.penalty.appliedAt) }}
-                              </div>
-                            </div>
-                          </div>
-                          <div class="mt-3">
-                            <div class="text-sm text-gray-400 mb-1">Motivo:</div>
-                            <div class="text-sm text-red-200 bg-red-900/30 p-2 rounded border border-red-600/20">
-                              {{ contract.penalty.reason }}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </section>
-
-                  <!-- Prazo e Tipo de Pagamento -->
-                  <div class="mt-4">
-                    <h5 class="font-medium text-white mb-2">Prazo e Tipo de Pagamento</h5>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
-                        <h6 class="font-medium text-white mb-2 flex items-center gap-2">
-                          <ClockIcon class="w-5 h-5 text-amber-400" />
-                          Prazo
-                        </h6>
-                        <div class="space-y-1 text-md">
-                          <div class="flex justify-between">
-                            <span class="text-gray-400">Tipo:</span>
-                            <span class="text-white">{{ contract.deadline.type }}</span>
-                          </div>
-                          <div v-if="contract.deadline.value" class="flex justify-between">
-                            <span class="text-gray-400">Tempo:</span>
-                            <span class="text-white">{{ contract.deadline.value }}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
-                        <h6 class="font-medium text-white mb-2 flex items-center gap-2">
-                          <CurrencyDollarIcon class="w-5 h-5 text-amber-400" />
-                          Tipo de Pagamento
-                        </h6>
-                        <div class="text-md">
-                          <div class="text-gray-300">{{ getPaymentTypeDescription(contract.paymentType) }}</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </section>
-
-                <!-- Pré-requisitos e Cláusulas -->
-                <section v-if="contract.prerequisites?.length || contract.clauses?.length">
-                  <div class="flex items-center gap-2 mb-2">
-                    <h4 class="text-lg font-semibold text-amber-400">Requisitos e Condições</h4>
-                    <InfoButton help-key="contract-requirements" @open-help="handleOpenHelp('contract-requirements')"
-                      button-class="text-xs" />
-                  </div>
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div v-if="contract.prerequisites?.length"
-                      class="bg-gray-700 rounded-lg p-4 border border-gray-600">
-                      <h5 class="font-medium text-white mb-2 flex items-center gap-2">
-                        <ContractTooltip :content="getPrerequisiteTooltip()" :title="'Pré-requisitos do Contrato'">
-                          <ExclamationTriangleIcon class="w-5 h-5 text-yellow-400" />
-                        </ContractTooltip>
-                        Pré-requisitos
-                      </h5>
-                      <ul class="text-md text-gray-300 space-y-1">
-                        <li v-for="prerequisite in contract.prerequisites" :key="prerequisite"
-                          class="flex items-start gap-2">
-                          <span class="text-yellow-400 mt-0.5">•</span>
-                          <span>{{ prerequisite }}</span>
-                        </li>
-                      </ul>
-                    </div>
-
-                    <div v-if="contract.clauses?.length" class="bg-gray-700 rounded-lg p-4 border border-gray-600">
-                      <h5 class="font-medium text-white mb-2 flex items-center gap-2">
-                        <ContractTooltip :content="getClauseTooltip()" :title="'Cláusulas Especiais'">
-                          <DocumentTextIcon class="w-5 h-5 text-blue-400" />
-                        </ContractTooltip>
-                        Cláusulas Especiais
-                      </h5>
-                      <ul class="text-md text-gray-300 space-y-1">
-                        <li v-for="clause in contract.clauses" :key="clause" class="flex items-start gap-2">
-                          <span class="text-blue-400 mt-0.5">•</span>
-                          <span>{{ clause }}</span>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </section>
-
-                <!-- Palavras-chave temáticas do contrato -->
-                <section v-if="contract.themeKeywords && contract.themeKeywords.length > 0">
-                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Palavras-chave Temáticas</h4>
-                  <div class="bg-indigo-900/20 rounded-lg p-4 border border-indigo-500/30">
-                    <div class="flex items-center gap-2 mb-3">
-                      <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                      </svg>
-                      <span class="font-medium text-white">Inspiração Criativa</span>
-                    </div>
-
-                    <div class="flex flex-wrap gap-2 mb-3">
-                      <span v-for="keyword in contract.themeKeywords"
-                        :key="`contract-${keyword.set}-${keyword.keyword}`"
-                        class="inline-block bg-indigo-700/30 text-indigo-200 px-3 py-1 rounded-full text-sm border border-indigo-500/20">
-                        {{ keyword.keyword }}
-                      </span>
-                    </div>
-
-                    <div class="text-xs text-indigo-400">
-                      <InformationCircleIcon class="w-3 h-3 inline mr-1" />
-                      Use essas palavras-chave para inspirar elementos criativos, atmosfera, temas e desenvolvimento do
-                      contrato como um
-                      todo.
-                    </div>
-                  </div>
-                </section>
-
-                <!-- Informações de Debug (se habilitado) -->
-                <section v-if="showDebugInfo" class="border-t border-gray-600 pt-4">
-                  <h4 class="text-lg font-semibold text-amber-400 mb-2">Informações de Geração</h4>
-                  <div class="bg-gray-900 rounded-lg p-4 border border-gray-700">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm font-mono">
-                      <div>
-                        <div class="text-gray-400">ID: {{ contract.id }}</div>
-                        <div class="text-gray-400">Criado: {{ formatDate(contract.createdAt) }}</div>
-                        <div v-if="contract.completedAt" class="text-gray-400">
-                          Concluído: {{ formatDate(contract.completedAt) }}
-                        </div>
-                      </div>
-                      <div v-if="contract.generationData">
-                        <div class="text-gray-400">Rolagem Base: {{ contract.generationData.baseRoll }}</div>
-                        <div class="text-gray-400">Tipo Assentamento: {{ contract.generationData.settlementType || 'N/A'
-                        }}</div>
-                      </div>
-                    </div>
-                  </div>
-                </section>
+            <div v-if="showHelpPanel" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/90">
+              <div
+                class="bg-gray-800 border border-amber-400 p-6 rounded-lg max-w-2xl w-full max-h-[80vh] overflow-auto">
+                <ContractHelpPanel :is-open="showHelpPanel" :help-key="currentHelpKey" @close="handleCloseHelp" />
               </div>
             </div>
 
-            <!-- Footer com ações -->
-            <div class="flex items-center justify-between p-6 border-t border-gray-600 bg-gray-750">
-              <div class="flex items-center gap-2 text-sm text-gray-400">
+            <!-- Descrição -->
+            <section v-if="contract.description"
+              class="mb-6 p-4 bg-amber-900/20 rounded-lg border-l-4 border-amber-400">
+              <h3 class="text-lg font-semibold text-amber-300 mb-2">
+                Descrição do Contrato
+              </h3>
+              <p class="text-amber-100 leading-relaxed" v-html="formatMarkdown(contract.description)"></p>
+            </section>
+
+            <!-- 1. Objetivo -->
+            <section v-if="contract.objective" class="bg-gray-800/50 rounded-lg p-6 mb-6">
+              <h3 class="text-lg font-semibold text-amber-300 mb-4 flex items-center gap-2">
+                <XCircleIcon class="w-5 h-5" />
+                Objetivo
+                <InfoButton help-key="contract-objectives" @open-help="handleOpenHelp('contract-objectives')"
+                  button-class="text-xs" />
+              </h3>
+              <div>
+                <div class="flex items-center gap-2 mb-3">
+                  <ContractTooltip :content="getObjectiveTooltip(contract.objective.category)"
+                    :title="'Categoria do Objetivo'">
+                    <span
+                      class="inline-block bg-amber-700/30 text-amber-200 px-3 py-1 rounded-full text-sm border border-amber-500/20">
+                      {{ getCategoryDisplayName(contract.objective.category) }}
+                    </span>
+                  </ContractTooltip>
+                </div>
+                <p class="text-white mb-4">{{ contract.objective.description }}</p>
+
+                <!-- Especificação do objetivo -->
+                <div v-if="contract.objective.specificObjective"
+                  class="mt-3 p-4 bg-amber-900/20 rounded-lg border-l-4 border-amber-500/40">
+                  <div class="text-amber-300 font-medium mb-1">
+                    Especificação
+                  </div>
+                  <p class="text-white text-sm">{{ contract.objective.specificObjective }}</p>
+                </div>
+              </div>
+            </section>
+
+            <!-- 1.5. Contratante Inusitado -->
+            <section v-if="contract.unusualContractor?.isUnusual" class="bg-gray-800/50 rounded-lg p-6 mb-6">
+              <h3 class="text-lg font-semibold text-purple-300 mb-3 flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Contratante Inusitado
+              </h3>
+              <p class="text-white mb-4">{{ contract.unusualContractor.description }}</p>
+
+              <!-- Palavras-chave temáticas -->
+              <div
+                v-if="contract.unusualContractor.themeKeywords && contract.unusualContractor.themeKeywords.length > 0"
+                class="mt-3 p-4 bg-purple-900/20 rounded-lg border-l-4 border-purple-500/40">
+                <div class="text-purple-300 font-medium mb-2">
+                  Palavras-chave para criatividade
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <span v-for="keyword in contract.unusualContractor.themeKeywords"
+                    :key="`${keyword.set}-${keyword.keyword}`"
+                    class="inline-block bg-purple-700/30 text-purple-200 px-3 py-1 rounded-full text-sm">
+                    {{ keyword.keyword }}
+                  </span>
+                </div>
+                <div class="text-xs text-purple-400 mt-3">
+                  <InformationCircleIcon class="w-3 h-3 inline mr-1" />
+                  Use essas palavras-chave para inspirar características únicas, motivações, aparência ou
+                  maneirismos do contratante.
+                </div>
+              </div>
+            </section>
+
+            <!-- 2. Localidade -->
+            <section v-if="contract.location" class="bg-gray-800/50 rounded-lg p-6 mb-6">
+              <h3 class="text-lg font-semibold text-green-300 mb-3 flex items-center gap-2">
+                <MapPinIcon class="w-5 h-5" />
+                Localidade
+                <InfoButton help-key="contract-locations" @open-help="handleOpenHelp('contract-locations')"
+                  button-class="text-xs" />
+              </h3>
+
+              <div class="space-y-4">
+                <div class="flex items-center">
+                  <ContractTooltip :content="getLocationTooltip()" :title="'Local da Missão'">
+                    <span
+                      class="inline-block bg-green-700/30 text-green-200 px-3 py-1 rounded-full text-sm border border-green-500/20">
+                      {{ contract.location.name }}
+                    </span>
+                  </ContractTooltip>
+                </div>
+
+                <!-- Especificação da localidade -->
+                <div v-if="contract.location.specification"
+                  class="p-4 bg-green-900/20 rounded-lg border-l-4 border-green-500/40">
+                  <div class="text-green-300 font-medium mb-1">
+                    Localização específica
+                  </div>
+                  <p class="text-white mb-1">{{ contract.location.specification.location }}</p>
+                  <div v-if="contract.location.specification.description !== contract.location.specification.location"
+                    class="text-sm text-gray-300 mt-1">
+                    → {{ contract.location.specification.description }}
+                  </div>
+                </div>
+
+                <!-- Distrito específico -->
+                <div v-if="contract.location.district"
+                  class="p-4 bg-green-900/20 rounded-lg border-l-4 border-green-500/40">
+                  <div class="text-green-300 font-medium mb-1">
+                    Distrito
+                  </div>
+                  <p class="text-white">
+                    {{ contract.location.district.primary.name }}
+                    <span v-if="contract.location.district.secondary"> e {{
+                      contract.location.district.secondary.name }}</span>
+                  </p>
+                </div>
+
+                <!-- Importância do local -->
+                <div v-if="contract.location.importance && contract.location.importance.type !== 'nenhuma'"
+                  class="p-4 bg-green-900/20 rounded-lg border-l-4 border-green-500/40">
+                  <div class="text-green-300 font-medium mb-1">
+                    Importância
+                  </div>
+                  <p class="text-white mb-1">{{ contract.location.importance.name }}</p>
+                  <div v-if="contract.location.importance.description !== contract.location.importance.name"
+                    class="text-sm text-gray-300 mt-1">
+                    → {{ contract.location.importance.description }}
+                  </div>
+                </div>
+
+                <!-- Peculiaridade do local -->
+                <div v-if="contract.location.peculiarity && contract.location.peculiarity.type !== 'nenhuma'"
+                  class="p-4 bg-green-900/20 rounded-lg border-l-4 border-green-500/40">
+                  <div class="text-green-300 font-medium mb-1">
+                    Peculiaridade
+                  </div>
+                  <p class="text-white mb-1">{{ contract.location.peculiarity.name }}</p>
+                  <div v-if="contract.location.peculiarity.description !== contract.location.peculiarity.name"
+                    class="text-sm text-gray-300 mt-1">
+                    → {{ contract.location.peculiarity.description }}
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- 3. Distância -->
+            <section v-if="contract.generationData.distanceRoll" class="bg-gray-800/50 rounded-lg p-6 mb-6">
+              <h3 class="text-lg font-semibold text-blue-300 mb-3 flex items-center gap-2">
+                <MapPinIcon class="w-5 h-5" />
+                Distância
+              </h3>
+              <div class="space-y-4">
+                <div class="flex items-center">
+                  <span
+                    class="inline-block bg-blue-700/30 text-blue-200 px-3 py-1 rounded-full text-sm border border-blue-500/20">
+                    {{ distanceDetails?.description || 'Distância não especificada' }}
+                  </span>
+                </div>
+
+                <div v-if="distanceDetails?.hexagons || distanceDetails?.kilometers"
+                  class="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-blue-900/20 rounded-lg border-l-4 border-blue-500/40">
+                  <!-- Hexágonos -->
+                  <div>
+                    <div class="text-blue-300 font-medium mb-2">Hexágonos</div>
+                    <div class="text-white text-xl font-bold">
+                      <template v-if="distanceDetails?.hexagons">
+                        <template v-if="distanceDetails.hexagons.min === distanceDetails.hexagons.max">
+                          {{ distanceDetails.hexagons.min }} hexágono{{ distanceDetails.hexagons.min > 1 ? 's' : '' }}
+                        </template>
+                        <template v-else>
+                          {{ distanceDetails.hexagons.min }}-{{ distanceDetails.hexagons.max }} hexágonos
+                        </template>
+                      </template>
+                      <template v-else>—</template>
+                    </div>
+                  </div>
+
+                  <!-- Distância aproximada -->
+                  <div>
+                    <div class="text-blue-300 font-medium mb-2">Distância aproximada</div>
+                    <div class="text-white text-xl font-bold">
+                      <template v-if="distanceDetails?.kilometers">
+                        <template v-if="distanceDetails.kilometers.min === distanceDetails.kilometers.max">
+                          {{ distanceDetails.kilometers.min }} km
+                        </template>
+                        <template v-else>
+                          {{ distanceDetails.kilometers.min }}-{{ distanceDetails.kilometers.max }} km
+                        </template>
+                      </template>
+                      <template v-else>—</template>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="text-sm text-blue-400 mt-2 flex items-center gap-1">
+                  <InformationCircleIcon class="w-4 h-4" />
+                  <span>1 hexágono = 9,5 km (6 milhas)</span>
+                </div>
+              </div>
+            </section>
+
+            <!-- 4. Antagonista -->
+            <section class="bg-gray-800/50 rounded-lg p-6 mb-6">
+              <h3 class="text-lg font-semibold text-red-300 mb-3 flex items-center gap-2">
+                <UserMinusIcon class="w-5 h-5" />
+                Antagonista
+                <InfoButton help-key="contract-antagonists" @open-help="handleOpenHelp('contract-antagonists')"
+                  button-class="text-xs" />
+              </h3>
+              <div class="p-4 bg-red-900/20 rounded-lg border-l-4 border-red-500/40">
+                <div class="flex items-center flex-wrap gap-2 mb-3">
+                  <span class="font-medium text-white">{{ contract.antagonist.specificType }}</span>
+                  <ContractTooltip :content="getAntagonistTooltip()" :title="'Oposição do Contrato'">
+                    <span
+                      class="inline-block bg-red-700/30 text-red-200 px-3 py-1 rounded-full text-sm border border-red-500/20">
+                      {{ getCategoryDisplayName(contract.antagonist.category) }}
+                    </span>
+                  </ContractTooltip>
+                </div>
+                <p class="text-white">{{ contract.antagonist.description }}</p>
+              </div>
+            </section>
+
+            <!-- 5. Complicações -->
+            <section v-if="contract.complications?.length" class="bg-gray-800/50 rounded-lg p-6 mb-6">
+              <h3 class="text-lg font-semibold text-orange-300 mb-3 flex items-center gap-2">
+                <ExclamationCircleIcon class="w-5 h-5" />
+                Complicações
+                <InfoButton help-key="contract-complications" @open-help="handleOpenHelp('contract-complications')"
+                  button-class="text-xs" />
+              </h3>
+              <div class="space-y-4">
+                <div v-for="complication in contract.complications" :key="complication.category"
+                  class="p-4 bg-orange-900/20 rounded-lg border-l-4 border-orange-500/40">
+                  <div class="flex items-center flex-wrap gap-2 mb-3">
+                    <span class="font-medium text-white">{{ complication.specificDetail }}</span>
+                    <ContractTooltip :content="getComplicationTooltip()" :title="'Complicação da Missão'">
+                      <span
+                        class="inline-block bg-orange-700/30 text-orange-200 px-3 py-1 rounded-full text-sm border border-orange-500/20">
+                        {{ getCategoryDisplayName(complication.category) }}
+                      </span>
+                    </ContractTooltip>
+                  </div>
+                  <p class="text-white">{{ complication.description }}</p>
+                </div>
+              </div>
+            </section>
+
+            <!-- 6. Aliados -->
+            <section v-if="contract.allies?.length" class="bg-gray-800/50 rounded-lg p-6 mb-6">
+              <h3 class="text-lg font-semibold text-green-300 mb-3 flex items-center gap-2">
+                <UserPlusIcon class="w-5 h-5" />
+                Aliados Potenciais
+                <InfoButton help-key="contract-allies" @open-help="handleOpenHelp('contract-allies')"
+                  button-class="text-xs" />
+              </h3>
+              <div class="space-y-4">
+                <div v-for="ally in contract.allies" :key="ally.name"
+                  class="p-4 bg-green-900/20 rounded-lg border-l-4 border-green-500/40">
+                  <div class="flex items-center flex-wrap gap-2 mb-3">
+                    <span class="font-medium text-white">{{ ally.name }}</span>
+                    <ContractTooltip :content="getAllyTooltip()" :title="'Aliado Potencial'">
+                      <span
+                        class="inline-block bg-green-700/30 text-green-200 px-3 py-1 rounded-full text-sm border border-green-500/20">
+                        {{ getCategoryDisplayName(ally.category) }}
+                      </span>
+                    </ContractTooltip>
+                  </div>
+                  <p class="text-white mb-4">{{ ally.description }}</p>
+
+                  <!-- Detalhes específicos do aliado -->
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3 text-sm">
+                    <div>
+                      <div class="text-green-300 font-medium mb-1">
+                        Tipo específico
+                      </div>
+                      <p class="text-white">{{ ally.specificType }}</p>
+                    </div>
+                    <div>
+                      <div class="text-green-300 font-medium mb-1">
+                        Quando aparece
+                      </div>
+                      <p class="text-white">{{ getTimingDisplayName(ally.timing) }}</p>
+                    </div>
+
+                    <!-- Nível de poder para aventureiros -->
+                    <div v-if="ally.powerLevel !== undefined" class="md:col-span-2">
+                      <div class="text-green-300 font-medium mb-1">
+                        Nível de Ameaça
+                      </div>
+                      <p class="text-white">NA {{ ally.powerLevel }}</p>
+                    </div>
+
+                    <!-- Características para monstruosidades -->
+                    <div v-if="ally.characteristics?.length" class="md:col-span-2">
+                      <div class="text-green-300 font-medium mb-2">
+                        Características especiais
+                      </div>
+                      <ul class="text-white space-y-1">
+                        <li v-for="characteristic in ally.characteristics" :key="characteristic"
+                          class="flex items-start gap-2">
+                          <span class="text-green-400 mt-0.5">•</span>
+                          <span>{{ characteristic }}</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- 7. Reviravoltas -->
+            <section v-if="contract.twists?.length" class="bg-gray-800/50 rounded-lg p-6 mb-6">
+              <h3 class="text-lg font-semibold text-purple-300 mb-3 flex items-center gap-2">
+                <FaceSmileIcon class="w-5 h-5" />
+                Reviravoltas
+              </h3>
+              <div class="space-y-4">
+                <div v-for="twist in contract.twists" :key="twist.description"
+                  class="p-4 bg-purple-900/20 rounded-lg border-l-4 border-purple-500/40">
+                  <div class="flex items-center flex-wrap gap-2 mb-3">
+                    <span class="font-medium text-white">Reviravolta</span>
+                    <span v-if="twist.who"
+                      class="inline-block bg-purple-700/30 text-purple-200 px-3 py-1 rounded-full text-sm border border-purple-500/20">
+                      {{ twist.who }}
+                    </span>
+                  </div>
+                  <p class="text-white mb-3">{{ twist.description }}</p>
+                  <div v-if="twist.what" class="p-2 bg-purple-800/30 rounded-lg text-purple-100 mt-2">
+                    <strong>Revelação:</strong> {{ twist.what }}
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- 8. Consequências Severas -->
+            <section v-if="contract.severeConsequences?.length" class="bg-gray-800/50 rounded-lg p-6 mb-6">
+              <h3 class="text-lg font-semibold text-red-300 mb-3 flex items-center gap-2">
+                <ShieldExclamationIcon class="w-5 h-5" />
+                Consequências por Falha
+              </h3>
+              <div class="space-y-4">
+                <div v-for="consequence in contract.severeConsequences" :key="consequence.description"
+                  class="p-4 bg-red-900/20 rounded-lg border-l-4 border-red-500/40">
+                  <div class="flex items-center flex-wrap gap-2 mb-3">
+                    <span class="font-medium text-white">{{ consequence.category }}</span>
+                    <span
+                      class="inline-block bg-red-700/30 text-red-200 px-3 py-1 rounded-full text-sm border border-red-500/20">
+                      Consequência Severa
+                    </span>
+                  </div>
+                  <p class="text-white mb-4">{{ consequence.description }}</p>
+
+                  <!-- Detalhes específicos da consequência -->
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+                    <div class="md:col-span-2">
+                      <div class="text-red-300 font-medium mb-1">
+                        Consequência específica
+                      </div>
+                      <p class="text-white">{{ consequence.specificConsequence }}</p>
+                    </div>
+
+                    <div class="md:col-span-2">
+                      <div class="text-red-300 font-medium mb-1">
+                        Impacto nos contratados
+                      </div>
+                      <p class="text-white">{{ consequence.affectsContractors }}</p>
+                    </div>
+
+                    <!-- Efeito adicional se existir -->
+                    <div v-if="consequence.additionalEffect" class="md:col-span-2">
+                      <div class="text-red-300 font-medium mb-1">
+                        Efeito adicional
+                      </div>
+                      <p class="text-white">{{ consequence.additionalEffect }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- 9. Pagamento -->
+            <section class="bg-gray-800/50 rounded-lg p-6 mb-6">
+              <h3 class="text-lg font-semibold text-amber-300 mb-4 flex items-center gap-2">
+                <CurrencyDollarIcon class="w-5 h-5" />
+                Pagamento
+                <InfoButton help-key="contract-payment" @open-help="handleOpenHelp('contract-payment')"
+                  button-class="text-xs" />
+              </h3>
+
+              <div class="mb-6">
+                <ContractValue :value="contract.value" :difficulty="contract.difficulty"
+                  :contractor-type="contract.contractorType" :payment-type="contract.paymentType" size="lg" />
+              </div>
+
+              <!-- Termos de Pagamento -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div class="p-4 bg-amber-900/20 rounded-lg border-l-4 border-amber-500/40">
+                  <h4 class="text-amber-300 font-medium mb-2 flex items-center gap-2">
+                    <ClockIcon class="w-4 h-4" />
+                    Prazo
+                  </h4>
+                  <div class="space-y-2">
+                    <div v-if="contract.deadline.value" class="flex justify-between">
+                      <span class="text-gray-400">Tempo:</span>
+                      <span class="text-white">{{ contract.deadline.value }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="p-4 bg-amber-900/20 rounded-lg border-l-4 border-amber-500/40">
+                  <h4 class="text-amber-300 font-medium mb-2 flex items-center gap-2">
+                    <CurrencyDollarIcon class="w-4 h-4" />
+                    Tipo de Pagamento
+                  </h4>
+                  <div class="text-white">
+                    {{ getPaymentTypeDescription(contract.paymentType) }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Recompensas e Incentivos -->
+              <div v-if="contract.additionalRewards?.length" class="mb-6">
+                <h4 class="text-lg font-semibold text-green-300 mb-3 flex items-center gap-2">
+                  <GiftIcon class="w-5 h-5" />
+                  Recompensas e Incentivos
+                </h4>
+                <div class="space-y-3">
+                  <div v-for="reward in contract.additionalRewards" :key="reward.specificReward" class="p-4 rounded-lg"
+                    :class="reward.isPositive ? 'bg-green-900/20 border-l-4 border-green-500/40' : 'bg-red-900/20 border-l-4 border-red-500/40'">
+                    <div class="flex items-start gap-3">
+                      <div class="flex-shrink-0 mt-1">
+                        <CheckCircleIcon v-if="reward.isPositive" class="w-5 h-5 text-green-400" />
+                        <ExclamationTriangleIcon v-else class="w-5 h-5 text-red-400" />
+                      </div>
+                      <div class="flex-1">
+                        <div class="font-medium" :class="reward.isPositive ? 'text-green-300' : 'text-red-300'">
+                          {{ getCategoryDisplayName(reward.category) }}
+                        </div>
+                        <div class="text-white mt-1">{{ reward.specificReward }}</div>
+                        <div v-if="reward.description && reward.description !== reward.specificReward"
+                          class="text-gray-300 text-sm mt-1">{{ reward.description }}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Penalidades e Multas -->
+              <div v-if="contract.penalty">
+                <h4 class="text-lg font-semibold text-red-300 mb-3 flex items-center gap-2">
+                  <ExclamationTriangleIcon class="w-5 h-5" />
+                  Penalidade Aplicada
+                </h4>
+                <div class="p-4 bg-red-900/20 rounded-lg border-l-4 border-red-500/40">
+                  <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0 mt-0.5">
+                      <XCircleIcon class="w-6 h-6 text-red-400" />
+                    </div>
+                    <div class="flex-1">
+                      <div class="text-red-300 font-medium mb-3">Multa por Quebra de Contrato</div>
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <div class="text-sm text-gray-400 mb-1">Valor da Multa:</div>
+                          <div class="text-xl font-bold text-red-300">
+                            {{ contract.penalty.amount }} PO$
+                          </div>
+                        </div>
+                        <div>
+                          <div class="text-sm text-gray-400 mb-1">Data da Aplicação:</div>
+                          <div class="text-lg text-white">
+                            {{ formatGameDate(contract.penalty.appliedAt) }}
+                          </div>
+                        </div>
+                      </div>
+                      <div class="mt-3">
+                        <div class="text-sm text-gray-400 mb-1">Motivo:</div>
+                        <div class="text-white p-3 bg-red-900/30 rounded-lg">
+                          {{ contract.penalty.reason }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Pré-requisitos e Cláusulas -->
+            <section v-if="contract.prerequisites?.length || contract.clauses?.length"
+              class="bg-gray-800/50 rounded-lg p-6 mb-6">
+              <h3 class="text-lg font-semibold text-amber-300 mb-4 flex items-center gap-2">
+                <DocumentTextIcon class="w-5 h-5" />
+                Requisitos e Condições
+                <InfoButton help-key="contract-requirements" @open-help="handleOpenHelp('contract-requirements')"
+                  button-class="text-xs" />
+              </h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div v-if="contract.prerequisites?.length"
+                  class="p-4 bg-yellow-900/20 rounded-lg border-l-4 border-yellow-500/40">
+                  <div class="flex items-center gap-2 mb-3">
+                    <h4 class="text-yellow-300 font-medium">
+                      <ContractTooltip :content="getPrerequisiteTooltip()" :title="'Pré-requisitos do Contrato'">
+                        <div class="flex items-center gap-1">
+                          <ExclamationTriangleIcon class="w-4 h-4" />
+                          Pré-requisitos
+                        </div>
+                      </ContractTooltip>
+                    </h4>
+                  </div>
+                  <ul class="text-white space-y-2">
+                    <li v-for="prerequisite in contract.prerequisites" :key="prerequisite"
+                      class="flex items-start gap-2">
+                      <span class="text-yellow-400 mt-0.5">•</span>
+                      <span>{{ prerequisite }}</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div v-if="contract.clauses?.length"
+                  class="p-4 bg-blue-900/20 rounded-lg border-l-4 border-blue-500/40">
+                  <div class="flex items-center gap-2 mb-3">
+                    <h4 class="text-blue-300 font-medium">
+                      <ContractTooltip :content="getClauseTooltip()" :title="'Cláusulas Especiais'">
+                        <div class="flex items-center gap-1">
+                          <DocumentTextIcon class="w-4 h-4" />
+                          Cláusulas Especiais
+                        </div>
+                      </ContractTooltip>
+                    </h4>
+                  </div>
+                  <ul class="text-white space-y-2">
+                    <li v-for="clause in contract.clauses" :key="clause" class="flex items-start gap-2">
+                      <span class="text-blue-400 mt-0.5">•</span>
+                      <span>{{ clause }}</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+
+            <!-- Palavras-chave temáticas do contrato -->
+            <section v-if="contract.themeKeywords && contract.themeKeywords.length > 0"
+              class="bg-gray-800/50 rounded-lg p-6 mb-6">
+              <h3 class="text-lg font-semibold text-indigo-300 mb-3 flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                </svg>
+                Palavras-chave para criatividade
+              </h3>
+              <div class="space-y-4">
+                <div class="flex flex-wrap gap-2 mb-3">
+                  <span v-for="keyword in contract.themeKeywords" :key="`contract-${keyword.set}-${keyword.keyword}`"
+                    class="inline-block bg-indigo-700/30 text-indigo-200 px-3 py-1 rounded-full text-sm">
+                    {{ keyword.keyword }}
+                  </span>
+                </div>
+
+                <div class="text-indigo-400 flex items-center gap-1 text-sm">
+                  <InformationCircleIcon class="w-4 h-4" />
+                  Use essas palavras-chave para inspirar elementos criativos, atmosfera, temas e desenvolvimento do
+                  contrato como um todo.
+                </div>
+              </div>
+            </section>
+
+            <!-- Informações de Debug (se habilitado) -->
+            <section v-if="showDebugInfo" class="bg-gray-800/50 rounded-lg p-6 mb-6 border-t border-amber-700/30 pt-4">
+              <h3 class="text-lg font-semibold text-amber-300 mb-3 flex items-center gap-2">
+                <InformationCircleIcon class="w-5 h-5" />
+                Informações de Geração
+              </h3>
+              <div class="p-4 bg-gray-900/80 rounded-lg">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm font-mono">
+                  <div>
+                    <div class="text-amber-300 mb-1">ID:</div>
+                    <div class="text-gray-300">{{ contract.id }}</div>
+                    <div class="text-amber-300 mt-3 mb-1">Criado:</div>
+                    <div class="text-gray-300">{{ formatDate(contract.createdAt) }}</div>
+                    <div v-if="contract.completedAt">
+                      <div class="text-amber-300 mt-3 mb-1">Concluído:</div>
+                      <div class="text-gray-300">{{ formatDate(contract.completedAt) }}</div>
+                    </div>
+                  </div>
+                  <div v-if="contract.generationData">
+                    <div class="text-amber-300 mb-1">Rolagem Base:</div>
+                    <div class="text-gray-300">{{ contract.generationData.baseRoll }}</div>
+                    <div class="text-amber-300 mt-3 mb-1">Tipo Assentamento:</div>
+                    <div class="text-gray-300">{{ contract.generationData.settlementType || 'N/A' }}</div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Histórico de Datas -->
+            <section class="bg-gray-800/50 rounded-lg p-6 mb-6">
+              <h3 class="text-lg font-semibold text-amber-300 mb-3 flex items-center gap-2">
+                <ClockIcon class="w-5 h-5" />
+                Histórico
+              </h3>
+              <div class="space-y-2 text-sm">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <div class="text-gray-400">Criado em:</div>
+                    <div class="text-white">{{ formatGameDate({ day: 1, month: 1, year: 2025 }) }}</div>
+                  </div>
+                  <div v-if="contract.acceptedAt">
+                    <div class="text-gray-400">Aceito em:</div>
+                    <div class="text-white">{{ formatGameDate({ day: 5, month: 1, year: 2025 }) }}</div>
+                  </div>
+                  <div v-if="contract.completedAt">
+                    <div class="text-gray-400">Concluído em:</div>
+                    <div class="text-white">{{ formatGameDate({ day: 10, month: 1, year: 2025 }) }}</div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Ações -->
+            <div class="flex flex-wrap gap-3 pt-4 border-t border-amber-700/30">
+              <div class="flex items-center gap-2 text-sm text-amber-300 mr-auto">
                 <InformationCircleIcon class="w-4 h-4" />
                 <span>{{ getDifficultyDescription(contract.difficulty) }}</span>
               </div>
 
-              <div class="flex gap-3">
-                <button v-if="canAccept" @click="handleAccept"
-                  class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition-colors">
-                  Aceitar Contrato
-                </button>
+              <button v-if="canAccept" @click="handleAccept"
+                class="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors font-medium">
+                Aceitar Contrato
+              </button>
 
-                <button v-if="canComplete" @click="handleComplete"
-                  class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors">
-                  Marcar como Concluído
-                </button>
+              <button v-if="canComplete" @click="handleComplete"
+                class="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium">
+                Marcar como Concluído
+              </button>
 
-                <button v-if="canAbandon" @click="handleAbandon"
-                  class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition-colors">
-                  Abandonar
-                </button>
+              <button v-if="canAbandon" @click="handleAbandon"
+                class="px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors font-medium">
+                Abandonar
+              </button>
 
-                <button @click="closeModal"
-                  class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded transition-colors">
-                  Fechar
-                </button>
-              </div>
+              <button @click="closeModal"
+                class="px-6 py-3 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors font-medium">
+                Fechar
+              </button>
             </div>
           </div>
-        </Transition>
+        </div>
       </div>
     </Transition>
   </Teleport>
