@@ -645,15 +645,17 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <div class="text-gray-400">Criado em:</div>
-                    <div class="text-white">{{ formatGameDate({ day: 1, month: 1, year: 2025 }) }}</div>
+                    <div class="text-white">{{ formatCreatedDisplay() }}</div>
                   </div>
-                  <div v-if="contract.acceptedAt">
+
+                  <div v-if="contract.acceptedAt || contract.takenByOthersInfo?.takenAt">
                     <div class="text-gray-400">Aceito em:</div>
-                    <div class="text-white">{{ formatGameDate({ day: 5, month: 1, year: 2025 }) }}</div>
+                    <div class="text-white">{{ formatAcceptedDisplay() }}</div>
                   </div>
-                  <div v-if="contract.completedAt">
+
+                  <div v-if="contract.completedAt || contract.takenByOthersInfo?.estimatedResolutionDate">
                     <div class="text-gray-400">Concluído em:</div>
-                    <div class="text-white">{{ formatGameDate({ day: 10, month: 1, year: 2025 }) }}</div>
+                    <div class="text-white">{{ formatCompletedDisplay() }}</div>
                   </div>
                 </div>
               </div>
@@ -962,14 +964,23 @@ function getDifficultyDescription(difficulty: ContractDifficulty): string {
   }
 }
 
-function formatDate(date: Date): string {
+function formatDate(date: Date | string | number): string {
+  // Aceita Date, string ou number. Retorna '—' para valores inválidos.
+  if (!date) return '—';
+  let d: Date;
+  if (date instanceof Date) d = date;
+  else if (typeof date === 'string' || typeof date === 'number') d = new Date(date);
+  else return '—';
+
+  if (Number.isNaN(d.getTime())) return '—';
+
   return new Intl.DateTimeFormat('pt-BR', {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit'
-  }).format(date);
+  }).format(d);
 }
 
 function formatGameDate(gameDate: { day: number; month: number; year: number }): string {
@@ -1052,6 +1063,41 @@ function handleOpenHelp(helpKey: string) {
 function handleCloseHelp() {
   showHelpPanel.value = false;
   currentHelpKey.value = '';
+}
+
+// Helpers para exibir as datas reais no histórico (usa GameDate quando disponível)
+function formatCreatedDisplay(): string {
+  if (!props.contract) return '—';
+  try {
+    return formatDate(props.contract.createdAt as Date | string | number);
+  } catch (e) {
+    return '—';
+  }
+}
+
+function formatAcceptedDisplay(): string {
+  if (!props.contract) return '—';
+  const c = props.contract as Contract;
+  if (c.acceptedAt && typeof c.acceptedAt === 'object' && 'day' in c.acceptedAt) {
+    return formatGameDate(c.acceptedAt as { day: number; month: number; year: number });
+  }
+  if (c.takenByOthersInfo?.takenAt) {
+    return formatGameDate(c.takenByOthersInfo.takenAt as { day: number; month: number; year: number });
+  }
+  // Se houver acceptedAt como Date/string
+  const raw = (c as unknown as { acceptedAt?: unknown }).acceptedAt;
+  if (raw) return formatDate(raw as Date | string | number);
+  return '—';
+}
+
+function formatCompletedDisplay(): string {
+  if (!props.contract) return '—';
+  const c = props.contract as Contract;
+  if (c.takenByOthersInfo?.estimatedResolutionDate) {
+    return formatGameDate(c.takenByOthersInfo.estimatedResolutionDate as { day: number; month: number; year: number });
+  }
+  if (c.completedAt) return formatDate(c.completedAt as Date | string | number);
+  return '—';
 }
 </script>
 
