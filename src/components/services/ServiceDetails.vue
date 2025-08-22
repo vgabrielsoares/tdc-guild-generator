@@ -26,7 +26,6 @@
         </p>
       </div>
     </div>
-
     <!-- Descrição geral do serviço -->
     <div
       v-if="service.description"
@@ -71,12 +70,6 @@
             </span>
           </div>
           <div class="flex justify-between">
-            <span class="text-gray-400">Complexidade:</span>
-            <span :class="getComplexityColor()" class="font-medium">
-              {{ service.complexity }}
-            </span>
-          </div>
-          <div class="flex justify-between">
             <span class="text-gray-400">ND Base:</span>
             <span class="text-white font-medium">
               {{
@@ -84,6 +77,18 @@
                 extractNDFromDifficulty(service.difficulty)
               }}
             </span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-400">Complexidade:</span>
+            <span :class="getComplexityColor()" class="font-medium">
+              {{ service.complexity }}
+            </span>
+          </div>
+          <div class="flex justify-between mt-2">
+            <span class="text-gray-400">Multiplicador de Complexidade:</span>
+            <span class="text-white font-medium"
+              >x{{ complexityMultiplierDisplay }}</span
+            >
           </div>
         </div>
       </div>
@@ -290,13 +295,50 @@
         </div>
 
         <div
-          v-if="service.additionalChallenge"
+          v-if="
+            service.additionalChallenge &&
+            service.additionalChallenge.hasChallenge
+          "
           class="p-3 bg-purple-900/30 rounded-lg border-l-4 border-purple-400"
         >
           <h4 class="text-purple-300 font-medium mb-1">Desafio Adicional</h4>
           <p class="text-gray-300 text-sm">
             {{ service.additionalChallenge.description }}
           </p>
+        </div>
+      </div>
+    </div>
+    <div
+      v-if="service.creativityKeywords && service.creativityKeywords.length"
+      class="bg-gray-800/50 rounded-lg p-6 mb-6"
+    >
+      <h3
+        class="text-lg font-semibold text-emerald-300 mb-4 flex items-center gap-2"
+      >
+        <LightBulbIcon class="w-5 h-5" />
+        Palavras-chave para criatividade
+        <ServiceTooltip
+          content="Palavras breves para inspirar cenas, ganchos ou elementos narrativos adicionais."
+          title="Criatividade"
+          :wide="true"
+        >
+          <InfoButton
+            help-key="service-creativity"
+            @open-help="$emit('open-help', 'service-creativity')"
+            button-class="text-xs"
+          />
+        </ServiceTooltip>
+      </h3>
+
+      <div class="space-y-2">
+        <div class="flex flex-wrap gap-2">
+          <span
+            v-for="(k, idx) in service.creativityKeywords"
+            :key="`kw-${idx}-${k.keyword}`"
+            class="px-3 py-1 bg-gray-700 text-gray-100 rounded-full text-sm"
+          >
+            {{ k.keyword }}
+          </span>
         </div>
       </div>
     </div>
@@ -398,6 +440,7 @@ import {
   CalendarIcon,
   BookOpenIcon,
 } from "@heroicons/vue/24/outline";
+import { LightBulbIcon } from "@heroicons/vue/24/outline";
 import type { Service } from "@/types/service";
 import {
   ServiceStatus,
@@ -414,7 +457,7 @@ import type { GameDate } from "@/types/timeline";
 
 // Props
 interface Props {
-  service: Service | null;
+  service: Service;
 }
 
 const props = defineProps<Props>();
@@ -577,6 +620,10 @@ const getComplexityColor = () => {
   }
 };
 
+const complexityMultiplierDisplay = computed(() => {
+  return props.service?.value?.complexityMultiplier || 1;
+});
+
 const getPaymentTypeLabel = () => {
   if (!props.service) return "";
 
@@ -627,7 +674,8 @@ const hasNarrativeElements = () => {
     props.service.origin ||
     props.service.complication ||
     props.service.rival ||
-    props.service.additionalChallenge
+    (props.service.additionalChallenge &&
+      props.service.additionalChallenge.hasChallenge)
   );
 };
 </script>

@@ -68,26 +68,34 @@
             :content="`Dificuldade ${service.difficulty} determina o ND dos testes necessários para completar este serviço`"
             :difficulty="service.difficulty"
           >
-            <span class="text-sm font-medium text-yellow-400 cursor-help">
+            <span
+              :class="['text-sm font-medium cursor-help', getDifficultyColor()]"
+            >
               {{ service.difficulty }}
             </span>
           </ServiceTooltip>
+        </div>
+
+        <!-- Complexidade -->
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-400">Complexidade:</span>
+          <span
+            :class="['text-sm font-medium cursor-help', getComplexityColor()]"
+          >
+            {{ service.complexity }}
+          </span>
         </div>
 
         <!-- Recompensa -->
         <div class="flex items-center justify-between">
           <span class="text-sm text-gray-400">Recompensa:</span>
           <ServiceTooltip
-            :content="`Recompensa total: ${service.value?.rewardAmount || 0} + ${service.value?.recurrenceBonusAmount || 0} de bônus${service.value?.recurrenceAppliedCount ? ` (${service.value.recurrenceAppliedCount}x recorrência)` : ''}`"
+            :content="`Valor base: ${service.value?.rewardAmount || 0} ${service.value?.currency} — Recorrência: ${recurrenceAppliedDisplay} ${service.value?.currency}${service.value?.recurrenceAppliedCount ? ` (${service.value.recurrenceAppliedCount}x)` : ''} — Multiplicador de complexidade: x${complexityMultiplierDisplay}`"
             title="Breakdown da Recompensa"
           >
             <div class="flex items-center gap-2 cursor-help">
-              <span class="text-sm font-medium text-green-400">
-                {{
-                  (service.value?.rewardAmount || 0) +
-                  (service.value?.recurrenceBonusAmount || 0)
-                }}
-                {{ service.value?.currency }}
+              <span class="text-sm font-medium text-yellow-300">
+                {{ finalReward }} {{ service.value?.currency }}
               </span>
               <span
                 v-if="
@@ -97,8 +105,7 @@
                 class="text-xs bg-green-800 text-green-100 px-2 py-0.5 rounded-full border border-green-700"
                 :title="`${service.value.recurrenceAppliedCount}x aplicação(s)`"
               >
-                +{{ service.value.recurrenceBonusAmount }}
-                {{ service.value.currency }}
+                +{{ recurrenceAppliedDisplay }} {{ service.value?.currency }}
               </span>
             </div>
           </ServiceTooltip>
@@ -203,11 +210,17 @@ import {
   ShieldCheckIcon,
 } from "@heroicons/vue/24/outline";
 import type { Service } from "@/types/service";
-import { ServiceStatus, ServiceContractorType } from "@/types/service";
+import {
+  ServiceStatus,
+  ServiceContractorType,
+  ServiceDifficulty,
+  ServiceComplexity,
+} from "@/types/service";
 import ServiceStatusComponent from "./ServiceStatus.vue";
 import ServiceTooltip from "./ServiceTooltip.vue";
 import Tooltip from "@/components/common/Tooltip.vue";
 import InfoButton from "@/components/common/InfoButton.vue";
+import { calculateFinalServiceReward } from "@/types/service";
 
 // Props
 interface Props {
@@ -244,17 +257,70 @@ const isHighValue = computed(() => {
   return props.service.value.rewardAmount >= 20; // Valor arbitrário para "alto valor"
 });
 
-const isHighComplexity = computed(
-  () =>
-    props.service.complexity === "Extremamente complexa" ||
-    props.service.complexity === "Extremamente complexa e Direta"
-);
+const isHighComplexity = computed(() => {
+  const c = props.service?.complexity;
+  return (
+    c === ServiceComplexity.EXTREMAMENTE_COMPLEXA ||
+    c === ServiceComplexity.EXTREMAMENTE_COMPLEXA_E_DIRETA
+  );
+});
 
-const isEasyDifficulty = computed(
-  () =>
-    props.service.difficulty === "Muito Fácil (ND 10)" ||
-    props.service.difficulty === "Fácil (ND 14)"
-);
+const isEasyDifficulty = computed(() => {
+  const d = props.service?.difficulty;
+  return (
+    d === ServiceDifficulty.MUITO_FACIL ||
+    d === ServiceDifficulty.FACIL_ND14 ||
+    d === ServiceDifficulty.FACIL_ND15 ||
+    d === ServiceDifficulty.FACIL_ND16
+  );
+});
+
+function getDifficultyColor() {
+  const d = props.service?.difficulty;
+  if (!d) return "text-gray-400";
+
+  switch (d) {
+    case ServiceDifficulty.MUITO_FACIL:
+    case ServiceDifficulty.FACIL_ND14:
+    case ServiceDifficulty.FACIL_ND15:
+    case ServiceDifficulty.FACIL_ND16:
+      return "text-green-400";
+    case ServiceDifficulty.MEDIA_ND17:
+    case ServiceDifficulty.MEDIA_ND18:
+    case ServiceDifficulty.MEDIA_ND19:
+      return "text-yellow-400";
+    case ServiceDifficulty.DIFICIL_ND20:
+    case ServiceDifficulty.DIFICIL_ND21:
+    case ServiceDifficulty.DESAFIADOR_ND22:
+    case ServiceDifficulty.DESAFIADOR_ND23:
+      return "text-orange-400";
+    case ServiceDifficulty.MUITO_DIFICIL:
+      return "text-red-400";
+    default:
+      return "text-gray-400";
+  }
+}
+
+function getComplexityColor() {
+  const c = props.service?.complexity;
+  if (!c) return "text-gray-400";
+
+  switch (c) {
+    case ServiceComplexity.SIMPLES:
+    case ServiceComplexity.MODERADA_E_DIRETA:
+      return "text-green-400";
+    case ServiceComplexity.MODERADA:
+    case ServiceComplexity.COMPLEXA_E_DIRETA:
+      return "text-yellow-400";
+    case ServiceComplexity.COMPLEXA:
+    case ServiceComplexity.EXTREMAMENTE_COMPLEXA_E_DIRETA:
+      return "text-orange-400";
+    case ServiceComplexity.EXTREMAMENTE_COMPLEXA:
+      return "text-red-400";
+    default:
+      return "text-gray-400";
+  }
+}
 
 // Ícone do contratante
 const contractorIcon = computed(() => {
@@ -269,6 +335,35 @@ const contractorIcon = computed(() => {
       return UserGroupIcon;
   }
 });
+
+const finalReward = computed(() => {
+  try {
+    return calculateFinalServiceReward(props.service as Service);
+  } catch {
+    return props.service.value?.rewardAmount || 0;
+  }
+});
+
+const complexityMultiplierDisplay = computed(() => {
+  return props.service.value?.complexityMultiplier || 1;
+});
+
+// Formata o valor da recorrência já multiplicado
+const recurrenceAppliedDisplay = computed(() => {
+  const total = props.service.value?.recurrenceBonusAmount || 0;
+  const mult = props.service.value?.complexityMultiplier || 1;
+  const currency = props.service.value?.currency || "";
+  return formatCurrency(total * mult, currency);
+});
+
+function formatCurrency(amount: number, currency: string) {
+  const rounded = Math.round((amount + Number.EPSILON) * 100) / 100;
+  if (currency === "PO$") {
+    const s = rounded.toFixed(2);
+    return s.replace(/\.00$/, "").replace(/(\.[0-9])0$/, "$1");
+  }
+  return Number.isInteger(rounded) ? String(rounded) : String(rounded);
+}
 
 // Label do tipo de contratante
 const contractorTypeLabel = computed(() => {

@@ -1051,15 +1051,17 @@ A ideia dos serviços é que eles sejam resolvidos com perícias ou com a criati
 
 O nível de complexidade de um serviço é determinado pela quantidade de testes necessários e pela dificuldade de cada um deles. Serviços mais complexos abrem margem para vários possíveis resultados e formas de abordagem, enquanto serviços mais simples tendem a ser mais previsíveis.
 
-| 1d20  | Nível de Complexidade          |
-| ----- | ------------------------------ |
-| 1-10  | Simples                        |
-| 11-12 | Moderada e Direta              |
-| 13-15 | Moderada                       |
-| 16    | Complexa e Direta              |
-| 17-18 | Complexa                       |
-| 19    | Extremamente complexa e Direta |
-| 20    | Extremamente complexa          |
+| 1d20  | Nível de Complexidade          | Recompensa |
+| ----- | ------------------------------ | ---------- |
+| 1-10  | Simples                        | x1         |
+| 11-12 | Moderada e Direta              | x1.5       |
+| 13-15 | Moderada                       | x1.5       |
+| 16    | Complexa e Direta              | x2         |
+| 17-18 | Complexa                       | x2         |
+| 19    | Extremamente complexa e Direta | x3         |
+| 20    | Extremamente complexa          | x3         |
+
+Multiplique a recompensa e a taxa de recorrência de acordo com a complexidade do serviço.
 
 #### Simples
 

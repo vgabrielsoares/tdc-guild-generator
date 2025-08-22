@@ -4,12 +4,14 @@
       <div class="flex items-center gap-2">
         <!-- Valor atual -->
         <span class="text-white font-medium text-lg">
-          {{ currentValue }} {{ value.currency }}
+          {{ adjustedCurrentValueDisplay }} {{ value.currency }}
         </span>
 
         <!-- Indicador de taxa de recorrência aplicada -->
-        <span v-if="hasRecurrenceBonus"
-          class="text-xs bg-green-800 text-green-100 px-2 py-0.5 rounded-full border border-green-700">
+        <span
+          v-if="hasRecurrenceBonus"
+          class="text-xs bg-green-800 text-green-100 px-2 py-0.5 rounded-full border border-green-700"
+        >
           +{{ appliedTotalDisplay }} {{ value.currency }}
         </span>
       </div>
@@ -21,6 +23,9 @@
         </div>
         <div v-if="hasRecurrenceBonus" class="text-xs text-green-300">
           {{ recurrenceCount }}x bônus
+        </div>
+        <div class="text-xs text-gray-300 mt-1">
+          Multiplicador: x{{ complexityMultiplier }}
         </div>
       </div>
     </div>
@@ -52,34 +57,44 @@ const props = withDefaults(defineProps<Props>(), {
   recurrenceCount: 0,
 });
 
-// Valor atual (base + bônus acumulado)
-const currentValue = computed(() => {
-  const base = props.value.rewardAmount || 0;
-  const bonus = props.value.recurrenceBonusAmount || 0;
-  return Math.round((base + bonus) * 100) / 100;
-});
-
 // Valor base da taxa (por aplicação) formatado
 const recurrenceStepDisplay = computed(() => {
   const step = props.value.recurrenceStepAmount || 0;
-  return formatCurrency(step, props.value.currency);
+  const mult = props.value.complexityMultiplier || 1;
+  return formatCurrency(step * mult, props.value.currency);
 });
 
 // Valor total aplicado (acumulado) formatado
 const appliedTotalDisplay = computed(() => {
   const total = props.value.recurrenceBonusAmount || 0;
-  return formatCurrency(total, props.value.currency);
+  const mult = props.value.complexityMultiplier || 1;
+  return formatCurrency(total * mult, props.value.currency);
 });
 
 // Se tem bônus de recorrência aplicado
 const hasRecurrenceBonus = computed(() => {
-  const count = props.recurrenceCount || props.value.recurrenceAppliedCount || 0;
+  const count =
+    props.recurrenceCount || props.value.recurrenceAppliedCount || 0;
   return count > 0;
 });
 
 // Label da dificuldade
 const difficultyLabel = computed(() => {
   return props.value.difficulty.split(" (")[0];
+});
+
+const complexityMultiplier = computed(
+  () => props.value.complexityMultiplier || 1
+);
+
+const adjustedCurrentValueDisplay = computed(() => {
+  const base = props.value.rewardAmount || 0;
+  const bonus = props.value.recurrenceBonusAmount || 0;
+  const mult = props.value.complexityMultiplier || 1;
+  return formatCurrency(
+    Math.round((base + bonus) * mult * 100) / 100,
+    props.value.currency
+  );
 });
 
 // Helper de formatação simples: PO$ pode ter casas decimais, C$ normalmente inteiro

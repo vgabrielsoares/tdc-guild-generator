@@ -54,6 +54,11 @@ import {
 } from "@/data/tables/service-objective-tables";
 import { SERVICE_NARRATIVE_TABLES } from "@/data/tables/service-narrative-tables";
 import {
+  ADDITIONAL_CHALLENGE_CHANCE_TABLE,
+  ADDITIONAL_CHALLENGE_TABLE,
+  generateRandomKeywords,
+} from "@/data/tables/service-challenge-tables";
+import {
   SERVICE_SIGNED_RESOLUTION_TABLE,
   SERVICE_FAILURE_REASONS_TABLE,
   shouldCancelService,
@@ -535,11 +540,18 @@ export class ServiceGenerator {
     // GERAÇÃO DE TIPO DE PAGAMENTO
     const paymentType = this.generatePaymentType();
 
-    // VALORES E RECOMPENSAS
-    const value = this.generateBasicValue(config.guild);
-
     // GERAÇÃO DE COMPLEXIDADE
     const complexity = this.generateServiceComplexity();
+
+    // Buscar multiplicador de complexidade na tabela
+    const complexityEntry = SERVICE_COMPLEXITY_TABLE.find(
+      (entry) => entry.result.complexity === complexity
+    );
+    const complexityMultiplier =
+      complexityEntry?.result.complexityMultiplier || 1;
+
+    // VALORES E RECOMPENSAS (aplicar multiplicador de complexidade)
+    const value = this.generateBasicValue(config.guild, complexityMultiplier);
 
     // GERAÇÃO DE ESTRUTURA DE TESTES
     const testStructure = createServiceTestStructure(
@@ -552,6 +564,31 @@ export class ServiceGenerator {
     const complication = this.generateComplication();
     const rival = this.generateRival();
     const origin = this.generateOrigin();
+    // GERAÇÃO DE DESAFIO ADICIONAL
+    let additionalChallenge;
+    try {
+      const chanceResult = rollOnTable(ADDITIONAL_CHALLENGE_CHANCE_TABLE);
+      if (chanceResult.result.hasChallenge) {
+        const challengeResult = rollOnTable(ADDITIONAL_CHALLENGE_TABLE);
+        additionalChallenge = {
+          description: challengeResult.result.description,
+          hasChallenge: true,
+        };
+      } else {
+        additionalChallenge = { description: "", hasChallenge: false };
+      }
+    } catch (err) {
+      // Em caso de falha, não bloquear a geração do serviço
+      additionalChallenge = undefined;
+    }
+
+    // geração de palavras-chave
+    let creativityKeywords: { keyword: string }[] | undefined = undefined;
+    try {
+      creativityKeywords = generateRandomKeywords();
+    } catch (err) {
+      creativityKeywords = undefined;
+    }
 
     // CRIAÇÃO DO SERVIÇO
     const service: Service = {
@@ -575,6 +612,8 @@ export class ServiceGenerator {
       complication,
       rival,
       origin,
+      additionalChallenge,
+      creativityKeywords,
     };
 
     return service;
@@ -683,7 +722,10 @@ export class ServiceGenerator {
    * Gera valor completo do serviço com dificuldade e complexidade
    * Baseado nas tabelas "Dificuldade e Recompensas" e "Nível de Complexidade"
    */
-  private static generateBasicValue(guild: Guild): ServiceValue {
+  private static generateBasicValue(
+    guild: Guild,
+    complexityMultiplier: number = 1
+  ): ServiceValue {
     // ETAPA 1: Gerar dificuldade e recompensa (1d20)
     const difficultyResult = rollOnTable(SERVICE_DIFFICULTY_TABLE);
     const difficulty = difficultyResult.result.difficulty;
@@ -746,13 +788,23 @@ export class ServiceGenerator {
       recurrenceBonusAmount = 0; // Fallback
     }
 
+    // Aplicar multiplicador de complexidade à recompensa e à taxa de recorrência
+    const adjustedRewardAmount = Math.max(
+      1,
+      Math.floor(rewardAmount * complexityMultiplier)
+    );
+    const adjustedRecurrenceStep = Math.max(
+      0,
+      recurrenceStepAmount * complexityMultiplier
+    );
+
     return {
       rewardRoll,
-      rewardAmount,
+      rewardAmount: adjustedRewardAmount,
       currency,
       recurrenceBonus,
       recurrenceBonusAmount,
-      recurrenceStepAmount,
+      recurrenceStepAmount: adjustedRecurrenceStep,
       difficulty,
       modifiers: {
         populationRelation: this.getPopulationRelationModifier(
@@ -763,6 +815,7 @@ export class ServiceGenerator {
         ),
         staffCondition: this.getStaffModifier(guild),
       },
+      complexityMultiplier,
     };
   }
 
@@ -1303,6 +1356,10 @@ export class ServiceGenerator {
       baseReward += service.value.recurrenceBonusAmount;
     }
 
+    // Aplicar multiplicador de complexidade
+    const complexityMult = service.value.complexityMultiplier || 1;
+    baseReward = Math.max(1, Math.floor(baseReward * complexityMult));
+
     // Se não há outcome (testes não concluídos), retornar base + recorrência
     if (!service.testStructure.outcome) {
       return Math.floor(baseReward);
@@ -1315,7 +1372,8 @@ export class ServiceGenerator {
     if (service.testStructure.outcome.masterwork) {
       // Simular nova rolagem da recompensa base
       const bonusReward = this.rollServiceReward(service.value.rewardRoll);
-      finalReward = baseReward + bonusReward;
+      // masterwork: bônus também é afetado pelo multiplicador de complexidade
+      finalReward = baseReward + Math.floor(bonusReward * complexityMult);
     }
 
     return Math.floor(finalReward);

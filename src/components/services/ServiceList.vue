@@ -114,7 +114,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, watch } from "vue";
 import Pagination from "@/components/common/Pagination.vue";
 import { WrenchScrewdriverIcon } from "@heroicons/vue/24/outline";
 import type { Service } from "@/types/service";
@@ -177,32 +177,61 @@ const servicesStore = useServicesStore();
 const currentGuildId = computed(() => guildStore.currentGuild?.id || "");
 
 // Computed
-const totalServices = computed(() => {
-  const guildServices = servicesStore.services.filter(
+// Fonte canônica: serviços do store filtrados pela guilda atual
+const guildServices = computed(() =>
+  servicesStore.services.filter(
     (s: ServiceWithGuild) => s.guildId === currentGuildId.value
-  );
-  return guildServices.length;
-});
+  )
+);
 
+const totalServices = computed(() => guildServices.value.length);
+
+// Filtrar usando a lista canônica (garante consistência entre contagens e filtros)
 const filteredServices = computed(() => {
-  // Se há um filtro de status ativo, aplica o filtro
   if (props.activeStatusFilter) {
-    return props.services.filter(
+    return guildServices.value.filter(
       (service) => service.status === props.activeStatusFilter
     );
   }
-  return props.services;
+  return guildServices.value;
 });
 
 const totalPages = computed(() => {
-  return Math.ceil(filteredServices.value.length / props.itemsPerPage);
+  return Math.max(
+    1,
+    Math.ceil(filteredServices.value.length / props.itemsPerPage)
+  );
 });
 
+// Página efetiva (clamp): evita slices fora do intervalo quando o parent não resetou a página
+const effectivePage = computed(() =>
+  Math.min(Math.max(1, props.currentPage), totalPages.value)
+);
+
 const paginatedServices = computed(() => {
-  const start = (props.currentPage - 1) * props.itemsPerPage;
+  const start = (effectivePage.value - 1) * props.itemsPerPage;
   const end = start + props.itemsPerPage;
   return filteredServices.value.slice(start, end);
 });
+
+// Se o effectivePage difere do prop currentPage, notifica o parent para manter a UI consistente
+watch(
+  () => effectivePage.value,
+  (page) => {
+    if (page !== props.currentPage) {
+      emit("page-change", page);
+    }
+  },
+  { immediate: false }
+);
+
+// Quando um filtro rápido é ativado, é desejável voltar para a primeira página
+watch(
+  () => props.activeStatusFilter,
+  (newVal, oldVal) => {
+    if (newVal !== oldVal) emit("page-change", 1);
+  }
+);
 
 // Status filters para os botões rápidos — calcular a partir dos serviços da guilda atual
 const statusFilters = computed(() => {

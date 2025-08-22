@@ -23,6 +23,7 @@ interface DifficultyResult {
  * Define estrutura completa conforme especificações do markdown
  */
 interface ComplexityResult {
+  complexityMultiplier?: number;
   complexity: ServiceComplexity;
   testCount: number;
   skillRequirement: "same" | "different" | "mixed";
@@ -179,6 +180,7 @@ export const SERVICE_COMPLEXITY_TABLE: TableEntry<ComplexityResult>[] = [
     min: 1,
     max: 10,
     result: {
+      complexityMultiplier: 1,
       complexity: ServiceComplexity.SIMPLES,
       testCount: 1,
       skillRequirement: "same",
@@ -203,6 +205,7 @@ export const SERVICE_COMPLEXITY_TABLE: TableEntry<ComplexityResult>[] = [
     min: 11,
     max: 12,
     result: {
+      complexityMultiplier: 1.5,
       complexity: ServiceComplexity.MODERADA_E_DIRETA,
       testCount: 2,
       skillRequirement: "same",
@@ -227,6 +230,7 @@ export const SERVICE_COMPLEXITY_TABLE: TableEntry<ComplexityResult>[] = [
     min: 13,
     max: 15,
     result: {
+      complexityMultiplier: 1.5,
       complexity: ServiceComplexity.MODERADA,
       testCount: 2,
       skillRequirement: "different",
@@ -251,6 +255,7 @@ export const SERVICE_COMPLEXITY_TABLE: TableEntry<ComplexityResult>[] = [
     min: 16,
     max: 16,
     result: {
+      complexityMultiplier: 2,
       complexity: ServiceComplexity.COMPLEXA_E_DIRETA,
       testCount: 3,
       skillRequirement: "mixed", // Duas perícias diferentes ou menos
@@ -281,6 +286,7 @@ export const SERVICE_COMPLEXITY_TABLE: TableEntry<ComplexityResult>[] = [
     min: 17,
     max: 18,
     result: {
+      complexityMultiplier: 2,
       complexity: ServiceComplexity.COMPLEXA,
       testCount: 3,
       skillRequirement: "different",
@@ -310,6 +316,7 @@ export const SERVICE_COMPLEXITY_TABLE: TableEntry<ComplexityResult>[] = [
     min: 19,
     max: 19,
     result: {
+      complexityMultiplier: 3,
       complexity: ServiceComplexity.EXTREMAMENTE_COMPLEXA_E_DIRETA,
       testCount: 5,
       skillRequirement: "mixed", // Três perícias diferentes ou menos
@@ -350,6 +357,7 @@ export const SERVICE_COMPLEXITY_TABLE: TableEntry<ComplexityResult>[] = [
     min: 20,
     max: 20,
     result: {
+      complexityMultiplier: 3,
       complexity: ServiceComplexity.EXTREMAMENTE_COMPLEXA,
       testCount: 5,
       skillRequirement: "different",
