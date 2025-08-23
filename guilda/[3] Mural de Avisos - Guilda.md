@@ -92,11 +92,11 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 >
 > Na tabela de "Pagamento alternativo" role 1d20 simples, independente do tamanho do assentamento.
 
-## Especificações por Tipo de Aviso
+### Especificações por Tipo de Aviso
 
-### Proposta Comercial
+#### Proposta Comercial
 
-#### Tipo de Proposta
+##### Tipo de Proposta
 
 | 1d20  | Proposta comercial                 |
 | ----- | ---------------------------------- |
@@ -111,7 +111,7 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 19    | Troca por arte ou pedras preciosas |
 | 20    | Troca por item mágico              |
 
-#### O que?
+##### O que?
 
 | 1d20  | O que?            |
 | ----- | ----------------- |
@@ -126,7 +126,7 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 19    | Engenhoca         |
 | 20    | Item mágico       |
 
-#### Quem?
+##### Quem?
 
 | 1d20  | Quem?                |
 | ----- | -------------------- |
@@ -141,9 +141,9 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 18    | Criança despreparada |
 | 19-20 | Combatente           |
 
-### Divulgação
+#### Divulgação
 
-#### Tipo de Divulgação
+##### Tipo de Divulgação
 
 | 1d20  | Divulgação                              |
 | ----- | --------------------------------------- |
@@ -158,7 +158,7 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 19    | Evento esportivo/competição             |
 | 20    | Festividades/eventos triviais           |
 
-#### De Quem?
+##### De Quem?
 
 | 1d20  | De quem?                 |
 | ----- | ------------------------ |
@@ -173,9 +173,9 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 19    | Humanoides hostis        |
 | 20    | Aventureiros             |
 
-### Execução
+#### Execução
 
-#### Quem Será Executado
+##### Quem Será Executado
 
 | 1d20  | Execução              |
 | ----- | --------------------- |
@@ -190,7 +190,7 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 19    | Inocente              |
 | 20    | 1d4 aventureiros      |
 
-#### Motivo
+##### Motivo
 
 | 1d20  | Motivo                          |
 | ----- | ------------------------------- |
@@ -205,7 +205,7 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 19    | Conter uma calamidade           |
 | 20    | Uso indevido de magia           |
 
-#### Modo de Execução
+##### Modo de Execução
 
 | 1d20  | Modo de execução                |
 | ----- | ------------------------------- |
@@ -220,18 +220,18 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 19    | Jogado no covil de uma criatura |
 | 20    | Magia                           |
 
-### Cartaz de Procurado
+#### Cartaz de Procurado
 
-#### Tipo de Procurado
+##### Tipo de Procurado
 
 | 1d20 | Cartaz de procurado   |
 | ---- | --------------------- |
 | 1-7  | Inocente desaparecido |
 | 8-20 | Condenado fugitivo    |
 
-#### Inocente Desaparecido
+##### Inocente Desaparecido
 
-##### Quem Desapareceu
+###### Quem Desapareceu
 
 | 1d20  | Inocente desaparecido  |
 | ----- | ---------------------- |
@@ -246,7 +246,7 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 19    | Criatura carismática   |
 | 20    | Aventureiro            |
 
-##### Visto pela Última Vez
+###### Visto pela Última Vez
 
 | 1d20  | Visto pela última vez       |
 | ----- | --------------------------- |
@@ -261,7 +261,7 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 17    | Construção do governo local |
 | 18-20 | No trabalho                 |
 
-##### Características I
+###### Características I
 
 | 1d20  | Características I         |
 | ----- | ------------------------- |
@@ -276,7 +276,7 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 17    | O melhor em uma atividade |
 | 18-20 | Doente e fraco            |
 
-##### Características II
+###### Características II
 
 | 1d20  | Características II |
 | ----- | ------------------ |
@@ -288,10 +288,10 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 9-10  | Azarado            |
 | 11    | Amizade selvagem   |
 | 12-14 | Atrapalhado        |
-| 15-16 | Orfão              |
+| 15-16 | Órfão              |
 | 17-20 | Deformidade        |
 
-##### Peculiaridade
+###### Peculiaridade
 
 | 1d20  | Peculiaridade               |
 | ----- | --------------------------- |
@@ -306,7 +306,7 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 18-19 | Estranhamente familiar      |
 | 20    | Declarado morto             |
 
-##### Recompensa
+###### Recompensa
 
 | 1d20  | Recompensa |
 | ----- | ---------- |
@@ -321,9 +321,9 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 19    | 3d6 PO$    |
 | 20    | 3d6+5 PO$  |
 
-#### Condenado Fugitivo
+##### Condenado Fugitivo
 
-##### Raça do Condenado
+###### Raça do Condenado
 
 | 1d100 | Raça          |
 | ----- | ------------- |
@@ -445,7 +445,7 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 46-90  | Da rocha        |
 | 91-100 | Das profundezas |
 
-##### Motivo da Infâmia
+###### Motivo da Infâmia
 
 | 1d20  | Motivo da infâmia                   |
 | ----- | ----------------------------------- |
@@ -460,7 +460,7 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 19    | Crime ambiental                     |
 | 20    | Role duas vezes e use ambos         |
 
-##### Periculosidade
+###### Periculosidade
 
 | 1d20  | Periculosidade   |
 | ----- | ---------------- |
@@ -475,7 +475,7 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 19    | Crítica          |
 | 20    | Perigo mortal    |
 
-##### Peculiaridades
+###### Peculiaridades
 
 | 1d20  | Peculiaridades                       |
 | ----- | ------------------------------------ |
@@ -490,7 +490,7 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 19    | Licantropia                          |
 | 20    | Traços notáveis                      |
 
-##### Características
+###### Características
 
 | 1d20  | Características               |
 | ----- | ----------------------------- |
@@ -505,7 +505,7 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 18-19 | Poliglota                     |
 | 20    | Amaldiçoado                   |
 
-##### Recompensa por Periculosidade
+###### Recompensa por Periculosidade
 
 | Periculosidade   | Recompensa |
 | ---------------- | ---------- |
@@ -520,7 +520,7 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | Crítica          | 200 PO$    |
 | Perigo mortal    | 300 PO$    |
 
-##### Traços Notáveis
+###### Traços Notáveis
 
 | 1d20  | Traços notáveis       |
 | ----- | --------------------- |
@@ -541,9 +541,9 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 > - Uma criatura com nível de periculosidade "Alta" ou maior, sempre será procurada "viva ou morta"
 > - Periculosidade não foi pensado para ser usado como mecânica (ND) para calcular um desafio, mas sim como os habitantes se sentem ou são de fato ameaçados por aquele criminoso, às vezes um plebeu com uma informação que pode destruir todo um reino teria periculosidade altíssima por exemplo.
 
-### Proposta de Caçada
+#### Proposta de Caçada
 
-#### Tipo de Caçada
+##### Tipo de Caçada
 
 | 1d20  | Proposta de caçada                    |
 | ----- | ------------------------------------- |
@@ -558,7 +558,7 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 18-19 | Os raptores de humanoides, que são... |
 | 20    | Inimigo mortal de um...               |
 
-#### Especificação da Criatura
+##### Especificação da Criatura
 
 | 1d20  | Especificação           |
 | ----- | ----------------------- |
@@ -573,7 +573,7 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 18    | Gnoll                   |
 | 19-20 | Besta selvagem/atroz    |
 
-#### Local
+##### Local
 
 | 1d20  | Local                 |
 | ----- | --------------------- |
@@ -588,7 +588,7 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 17-19 | Subterrâneo           |
 | 20    | Templo                |
 
-#### Peculiaridade
+##### Peculiaridade da Caça
 
 | 1d20  | Peculiaridade                      |
 | ----- | ---------------------------------- |
@@ -603,7 +603,7 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 18-19 | Imunidade a condição adicional     |
 | 20    | Ação lendária                      |
 
-#### Característica I
+##### Característica I
 
 | 1d20  | Característica I                     |
 | ----- | ------------------------------------ |
@@ -618,7 +618,7 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 19    | Uma categoria de tamanho acima       |
 | 20    | Peculiaridade adicional              |
 
-#### Característica II
+##### Característica II
 
 | 1d20  | Característica II               |
 | ----- | ------------------------------- |
@@ -633,7 +633,7 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 17-18 | Paranoico                       |
 | 19-20 | Tem crias/filhotes              |
 
-#### Vantagem em Testes
+##### Vantagem em Testes
 
 | 1d20  | Vantagem em testes               |
 | ----- | -------------------------------- |
@@ -650,16 +650,16 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 
 > **Nota**: Role o tesouro individual apropriado (Livro do Mestre, pag. 136) e quantas vezes for preciso de acordo com a quantidade conhecida de caças, o resultado será a recompensa pela caçada.
 
-#### Reviravoltas
+##### Reviravoltas
 
-##### Há uma Reviravolta?
+###### Há uma Reviravolta?
 
 | 1d20  | Há uma reviravolta? |
 | ----- | ------------------- |
 | 1-16  | Não                 |
 | 17-20 | Sim                 |
 
-##### Tipos de Reviravoltas
+###### Tipos de Reviravoltas
 
 | 1d20  | Reviravoltas                       |
 | ----- | ---------------------------------- |
@@ -674,7 +674,7 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 16-19 | Informações são omitidas           |
 | 20    | Foi uma luta suspeitamente fácil   |
 
-### Aviso dos Habitantes
+#### Aviso dos Habitantes
 
 | 1d20  | Aviso dos habitantes                          |
 | ----- | --------------------------------------------- |
@@ -689,9 +689,9 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 14    | Boato sobre uma organização                   |
 | 15-20 | Notícias relevantes para os habitantes locais |
 
-### Pronunciamento
+#### Pronunciamento
 
-#### Tipo de Pronunciamento
+##### Tipo de Pronunciamento
 
 | 1d20  | Pronunciamento                                  |
 | ----- | ----------------------------------------------- |
@@ -706,9 +706,9 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 19    | Nova organização importante para o assentamento |
 | 20    | Condecoração                                    |
 
-#### Peculiaridade
+##### Peculiaridade do Pronunciamento
 
-| 1d20  | Peculiaridade                              |
+| 1d20  | Peculiaridade do Pronunciamento            |
 | ----- | ------------------------------------------ |
 | 1     | A mensagem está codificada                 |
 | 2-3   | Selo de uma família/clã de renome          |
