@@ -2,6 +2,8 @@
 
 Todo jogo medieval tem o clássico mural de avisos. Aqui ele é administrado pela guilda. É um bom lugar para se informar de festivais, feriados, pronunciamentos que você tenha perdido, cartazes de procurado e até alguns contratos e serviços mais beneficentes.
 
+> **Nota**: Em assentamentos maiores você pode colocar mais de um mural que podem ter as mesmas informações, ou não. Mas tenha em mente que a guilda é quem administra esses murais (apesar de algumas criaturas tentarem frequentemente burlar isso) e só esse fato pode gerar, por exemplo, coisas como: ter avisos do interesse da guilda no mural da praça principal, e os que a guilda julga menos importantes em murais mais mal localizados.
+
 ## Modificadores por Tamanho do Assentamento
 
 | Tamanho                    | Modificador |
@@ -21,11 +23,11 @@ Todo jogo medieval tem o clássico mural de avisos. Aqui ele é administrado pel
 | 14-16  | Mais ou menos, -2d20         |
 | 17-20+ | Sim                          |
 
-> **Nota**: Em assentamentos maiores você pode colocar mais de um mural que podem ter as mesmas informações, ou não. Mas tenha em mente que a guilda é quem administra esses murais (apesar de algumas criaturas tentarem frequentemente burlar isso) e só esse fato pode gerar, por exemplo, coisas como: ter avisos do interesse da guilda no mural da praça principal, e os que a guilda julga menos importantes em murais mais mal localizados.
+> Aplique os modificadores como reduções na tabela "Por Tamanho de Assentamento"
 
 ## Dados por Tamanho
 
-Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guilda.
+Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guilda. Essa é a quantidade de avisos no mural.
 
 ### Por Tamanho do Assentamento
 
@@ -64,14 +66,20 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | ----- | -------------------- |
 | 1     | Nada                 |
 | 2-6   | Aviso dos habitantes |
-| 7-9   | 1d4 serviços         |
-| 10-11 | Proposta comercial   |
-| 12-13 | Divulgação           |
+| 7-8   | 1d4 serviços         |
+| 9-10  | Proposta comercial   |
+| 11-13 | Divulgação           |
 | 14    | Proposta de caçada   |
-| 15    | Cartaz de procurado  |
-| 16-18 | 1d4 contratos        |
+| 15-16 | Cartaz de procurado  |
+| 17-18 | 1d4 contratos        |
 | 19    | Execução             |
 | 20    | Pronunciamento       |
+
+> Em "Avisos dos habitantes", role novamente, mas o aviso foi feito pelos habitantes, e não pela guilda.
+>
+> **Nota sobre Contratos e Serviços**: Contratos e serviços do mural de avisos serão sempre de criaturas que não têm como pagar. Role a tabela de "Pagamento alternativo" para saber as condições de pagamento do contratante. Considere a recompensa sempre 1/3 da original.
+>
+> Na tabela de "Pagamento alternativo" role 1d20 simples, independente do tamanho do assentamento.
 
 ### Pagamento Alternativo
 
@@ -88,10 +96,6 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 18-19 | Equivalente em especiarias     |
 | 20    | Objetos valiosos               |
 
-> **Nota sobre Contratos e Serviços**: Contratos e serviços do mural de avisos serão sempre de criaturas que não têm como pagar. Role a tabela de "Pagamento alternativo" para saber as condições de pagamento do contratante. Considere a recompensa sempre 1/3 da original.
->
-> Na tabela de "Pagamento alternativo" role 1d20 simples, independente do tamanho do assentamento.
-
 ### Especificações por Tipo de Aviso
 
 #### Proposta Comercial
@@ -103,10 +107,10 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 1-5   | Compra                             |
 | 6-10  | Venda                              |
 | 11    | Leiloa                             |
-| 12-13 | Troca por serviços                 |
-| 14    | Troca por favores                  |
-| 15    | Troca por informações              |
-| 16-17 | Troca por comida                   |
+| 12-14 | Troca por serviços                 |
+| 15    | Troca por favores                  |
+| 16    | Troca por informações              |
+| 17    | Troca por comida                   |
 | 18    | Troca por comodidade               |
 | 19    | Troca por arte ou pedras preciosas |
 | 20    | Troca por item mágico              |
@@ -115,12 +119,13 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 
 | 1d20  | O que?            |
 | ----- | ----------------- |
-| 1-5   | Partes de animais |
+| 1-3   | Partes de animais |
 | 6-8   | Serviços          |
-| 9-12  | Animais rurais    |
-| 13    | Poções mágicas    |
-| 14    | Objetos de arte   |
-| 15-16 | Especiarias       |
+| 9-11  | Animais rurais    |
+| 12    | Poções mágicas    |
+| 13    | Objetos de arte   |
+| 14-15 | Especiarias       |
+| 16    | Armas             |
 | 17    | Proteção          |
 | 18    | Bênçãos e orações |
 | 19    | Engenhoca         |
@@ -301,8 +306,8 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 5     | Familiar de um antigo herói |
 | 6-7   | Vida secreta                |
 | 8-12  | Nenhuma                     |
-| 13-15 | Magia envolvida             |
-| 16-17 | Não é desse plano           |
+| 13-16 | Magia envolvida             |
+| 17    | Não é desse plano           |
 | 18-19 | Estranhamente familiar      |
 | 20    | Declarado morto             |
 
@@ -322,128 +327,6 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 20    | 3d6+5 PO$  |
 
 ##### Condenado Fugitivo
-
-###### Raça do Condenado
-
-| 1d100 | Raça          |
-| ----- | ------------- |
-| 1     | Aasimar       |
-| 2-12  | Anão          |
-| 13-21 | Elfo          |
-| 22    | Gith          |
-| 23-25 | Gnomo         |
-| 26-30 | Halfling      |
-| 31    | Bugbear       |
-| 32-34 | Goblin        |
-| 35    | Hobgoblin     |
-| 36    | Kobold        |
-| 37    | Orc           |
-| 38-39 | Tiefling      |
-| 40    | Draconato     |
-| 41    | Firbolg       |
-| 42-43 | Golias        |
-| 44    | Meio-elfo     |
-| 45    | Meio-orc      |
-| 46-90 | Humano        |
-| 91    | Centauro      |
-| 92    | Kenku         |
-| 93    | Povo-lagarto  |
-| 94    | Tabaxi        |
-| 95    | Tritão        |
-| 96    | Bullywug      |
-| 97    | Homem-chacal  |
-| 98    | Vedalken      |
-| 99    | Simic híbrido |
-| 100   | Biruta        |
-
-###### Sub-raças Específicas
-
-**Birutas (1d100)**
-
-| 1d100  | Sub-raça    |
-| ------ | ----------- |
-| 1-5    | Genasi      |
-| 6-12   | Minotauro   |
-| 13-29  | Yuan-ti     |
-| 30-49  | Kuo-Toa     |
-| 50-59  | Loxodon     |
-| 60-69  | Povo do mar |
-| 70-73  | Thri-kreen  |
-| 74-79  | Leonin      |
-| 80-86  | Aarakocra   |
-| 87-89  | Tortle      |
-| 90-98  | Sátiro      |
-| 99-100 | Meio-dragão |
-
-**Genasi (1d100)**
-
-| 1d100  | Sub-raça |
-| ------ | -------- |
-| 1-25   | Ar       |
-| 26-50  | Terra    |
-| 51-75  | Fogo     |
-| 76-100 | Água     |
-
-**Halfling (1d100)**
-
-| 1d100  | Sub-raça  |
-| ------ | --------- |
-| 1-50   | Pés-leves |
-| 51-100 | Robusto   |
-
-**Tiefling (1d100)**
-
-| 1d100  | Linhagem     |
-| ------ | ------------ |
-| 1-12   | Asmodeus     |
-| 13-23  | Belzebu      |
-| 24-34  | Dispater     |
-| 35-45  | Fierna       |
-| 46-56  | Glacia       |
-| 57-67  | Levisto      |
-| 68-78  | Mamou        |
-| 79-89  | Mefistófeles |
-| 90-100 | Zariel       |
-
-**Elfo (1d100)**
-
-| 1d100  | Sub-raça  |
-| ------ | --------- |
-| 1-14   | Drow      |
-| 15-30  | Eladrin   |
-| 31-70  | Alto elfo |
-| 71-100 | Floresta  |
-
-**Aasimar (1d100)**
-
-| 1d100  | Sub-raça |
-| ------ | -------- |
-| 1-33   | Caído    |
-| 34-67  | Protetor |
-| 68-100 | Flagelo  |
-
-**Gith (1d100)**
-
-| 1d100  | Sub-raça  |
-| ------ | --------- |
-| 1-50   | Githyanki |
-| 51-100 | Githzerai |
-
-**Anão (1d100)**
-
-| 1d100  | Sub-raça |
-| ------ | -------- |
-| 1-45   | Colina   |
-| 46-90  | Montanha |
-| 91-100 | Duergar  |
-
-**Gnomo (1d100)**
-
-| 1d100  | Sub-raça        |
-| ------ | --------------- |
-| 1-45   | Da floresta     |
-| 46-90  | Da rocha        |
-| 91-100 | Das profundezas |
 
 ###### Motivo da Infâmia
 
@@ -721,6 +604,175 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 18-19 | Requisitado pelo líder local               |
 | 20    | Fonte não confiável                        |
 
+### Especificações de Espécie
+
+Sempre que uma pessoa for mencionada no quadro de avisos, determine sua espécie usando a tabela abaixo.
+
+#### Espécies
+
+| d100  | Espécie                 |
+| ----- | ----------------------- |
+| 1     | Infernal (Alshayatin)   |
+| 2     | Anão (Dvergar)          |
+| 3     | Centauro (Rhesymeirch)  |
+| 4     | Elfo (Caolduine)        |
+| 5     | Animalesco (Ffyrnig)    |
+| 6     | Glasnee                 |
+| 7     | Gnomo (T'zuk)           |
+| 8     | Halfling (Haneru)       |
+| 9     | Humano                  |
+| 10    | Khargi                  |
+| 11    | Meio-Sangue             |
+| 12    | Hobgoblin (Muremure)    |
+| 13    | Dracônico (Nolddraig)   |
+| 14    | Alados (Ogadain)        |
+| 15    | Orc (Meehun)            |
+| 16    | Tritão (Mowason)        |
+| 17    | Construto               |
+| 18    | Goblin (Umusobi)        |
+| 19    | Duende                  |
+| 20    | Fada (Teglwyth)         |
+| 22    | Harpia                  |
+| 23    | Bugbear (Inyamanswa)    |
+| 24    | Firbolg (Mnoprei)       |
+| 25    | Sátiro                  |
+| 26    | Sereia (Siren)          |
+| 27    | Gigante                 |
+| 28    | Gweld                   |
+| 29    | Urgani (Homem-planta)   |
+| 30    | Moogani (Homem-fungo)   |
+| 30    | Gazarai (Elementais)    |
+| 98-99 | Vampiro (role de novo)  |
+| 100   | Semideus (role de novo) |
+
+> Se o resultado for semideus duas vezes (a primeira e a rolagem para a especificação de um semideus), então o resultado é uma divindade.
+>
+> Se o resultado for vampiro duas vezes, então o resultado é um vampiro verdadeiro.
+
+##### Sub-raças das Espécies
+
+As espécies a seguir têm vários tipos e sub-raças. Role para decidir qual o tipo da criatura mencionada no aviso.
+
+###### Centauro
+
+| d100   | Sub-raça    |
+| ------ | ----------- |
+| 1-50   | Meirchgywir |
+| 51-100 | Unegui      |
+
+###### Elfo
+
+| d100   | Sub-raça                  |
+| ------ | ------------------------- |
+| 1-16   | An'Lusan (Floresta)       |
+| 17-32  | An'Geal (Neve)            |
+| 33-48  | An'Ghrian (Deserto)       |
+| 49-64  | An'Dubh (Caverna)         |
+| 65-80  | An'Uisgeach (Água)        |
+| 81-96  | An'Aard (Montanha)        |
+| 97-100 | Mestiço (Role duas vezes) |
+
+###### Animalesco
+
+| d100  | Sub-raça       |
+| ----- | -------------- |
+| 1-7   | Anfíbio        |
+| 8-11  | Artiodáctilo   |
+| 12-18 | Ave            |
+| 19-26 | Canídeo        |
+| 27-28 | Elefantídeo    |
+| 29-36 | Felídeo        |
+| 37-43 | Leporídeo      |
+| 44-46 | Marsupial      |
+| 47-48 | Perissodáctilo |
+| 49-51 | Primata        |
+| 51-58 | Réptil         |
+| 59-66 | Roedor         |
+| 67-73 | Ursídeo        |
+| 74-80 | Inseto         |
+| 81-82 | Mustelídeo     |
+| 83-85 | Peixe          |
+| 86    | Quiróptero     |
+| 87-88 | Hiena          |
+| 89-91 | Herpestídeo    |
+| 92    | Cetáceo        |
+| 93    | Pinnípede      |
+| 94-95 | Procionídeo    |
+| 96    | Xenartro       |
+| 97    | Sirênio        |
+| 98    | Monotremado    |
+| 99    | Aracnídeo      |
+| 100   | Cefalópode     |
+
+###### Meio-sangue
+
+| d100  | Sub-raça                     |
+| ----- | ---------------------------- |
+| 1-5   | Infernal (Alshayatin)        |
+| 6-9   | Anão (Dvergar)               |
+| 9-11  | Centauro (Rhesymeirch)       |
+| 12-20 | Elfo (Caolduine)             |
+| 21-24 | Animalesco (Role a sub-raça) |
+| 25-32 | Glasnee                      |
+| 33-35 | Gnomo (T'zuk)                |
+| 36-38 | Halfling (Haneru)            |
+| 39-41 | Khargi                       |
+| 42-44 | Hobgoblin (Muremure)         |
+| 45-47 | Dracônico (Nolddraig)        |
+| 48-53 | Alados (Ogadain)             |
+| 54-62 | Orc (Meehun)                 |
+| 63    | Tritão (Mowason)             |
+| 64-69 | Goblin (Umusobi)             |
+| 70    | Duende                       |
+| 71-72 | Fada (Teglwyth)              |
+| 73-77 | Harpia                       |
+| 78-80 | Bugbear (Inyamanswa)         |
+| 81-83 | Firbolg (Mnoprei)            |
+| 84-86 | Sátiro                       |
+| 87-92 | Sereia (Siren)               |
+| 93-94 | Gigante                      |
+| 95-96 | Gweld                        |
+| 97-98 | Gazarai (Elementais)         |
+| 99    | Vampiro                      |
+| 100   | Divindade                    |
+
+###### Dracônico
+
+| d100 | Sub-raça           |
+| ---- | ------------------ |
+| 1    | Amarelo (Ácido)    |
+| 1    | Azul (Elétrico)    |
+| 1    | Branco (Frio)      |
+| 1    | Cinza (Vento)      |
+| 1    | Dourado (Mental)   |
+| 1    | Laranja (Sonoro)   |
+| 1    | Prateado (Místico) |
+| 1    | Preto (Necrótico)  |
+| 1    | Verde (Veneno)     |
+| 100  | Vermelho (Fogo)    |
+
+###### Construto
+
+###### Urgani
+
+| d100   | Sub-raça       |
+| ------ | -------------- |
+| 1-25   | Angiospérmicas |
+| 26-50  | Gimnospermas   |
+| 51-75  | Pteridófitas   |
+| 76-100 | Briófitas      |
+
+###### Moogani
+
+| d100   | Sub-raça      |
+| ------ | ------------- |
+| 1-25   | Ascomycota    |
+| 26-50  | Basidiomycota |
+| 51-75  | Glomeromycota |
+| 76-100 | Zygomycota    |
+
+###### Gazarai
+
 ## Renovação do Mural
 
 ### Quando Novos Avisos Serão Fixados
@@ -781,6 +833,8 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | Contratos            | -4          |
 | Pronunciamento       | -8          |
 
-> **Nota**: Execuções são retiradas logo após acontecerem. Pode ser bem chato, mas fica mais coerente se for rolado individualmente para cada aviso.
+> **Nota**: Execuções são retiradas logo após acontecerem.
+>
+> Pode ser bem chato, mas fica mais coerente se for rolado individualmente para cada aviso.
 
 ---
