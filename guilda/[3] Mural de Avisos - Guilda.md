@@ -612,36 +612,36 @@ Sempre que uma pessoa for mencionada no quadro de avisos, determine sua espécie
 
 | d100  | Espécie                 |
 | ----- | ----------------------- |
-| 1     | Infernal (Alshayatin)   |
-| 2     | Anão (Dvergar)          |
-| 3     | Centauro (Rhesymeirch)  |
-| 4     | Elfo (Caolduine)        |
-| 5     | Animalesco (Ffyrnig)    |
-| 6     | Glasnee                 |
-| 7     | Gnomo (T'zuk)           |
-| 8     | Halfling (Haneru)       |
-| 9     | Humano                  |
-| 10    | Khargi                  |
-| 11    | Meio-Sangue             |
-| 12    | Hobgoblin (Muremure)    |
-| 13    | Dracônico (Nolddraig)   |
-| 14    | Alados (Ogadain)        |
-| 15    | Orc (Meehun)            |
-| 16    | Tritão (Mowason)        |
-| 17    | Construto               |
-| 18    | Goblin (Umusobi)        |
-| 19    | Duende                  |
-| 20    | Fada (Teglwyth)         |
-| 22    | Harpia                  |
-| 23    | Bugbear (Inyamanswa)    |
-| 24    | Firbolg (Mnoprei)       |
-| 25    | Sátiro                  |
-| 26    | Sereia (Siren)          |
-| 27    | Gigante                 |
-| 28    | Gweld                   |
-| 29    | Urgani (Homem-planta)   |
-| 30    | Moogani (Homem-fungo)   |
-| 30    | Gazarai (Elementais)    |
+| 1-3   | Infernal (Alshayatin)   |
+| 4-9   | Anão (Dvergar)          |
+| 10-11 | Centauro (Rhesymeirch)  |
+| 12-17 | Elfo (Caolduine)        |
+| 18-23 | Animalesco (Ffyrnig)    |
+| 24-26 | Glasnee                 |
+| 27-30 | Gnomo (T'zuk)           |
+| 31-33 | Halfling (Haneru)       |
+| 34-39 | Humano                  |
+| 40-41 | Khargi                  |
+| 42-43 | Meio-Sangue             |
+| 44-46 | Hobgoblin (Muremure)    |
+| 47-50 | Dracônico (Nolddraig)   |
+| 51-53 | Alados (Ogadain)        |
+| 54-59 | Orc (Meehun)            |
+| 60-61 | Tritão (Mowason)        |
+| 62    | Construto               |
+| 63-68 | Goblin (Umusobi)        |
+| 69    | Duende                  |
+| 70-71 | Fada (Teglwyth)         |
+| 72-73 | Harpia                  |
+| 74-76 | Bugbear (Inyamanswa)    |
+| 77-79 | Firbolg (Mnoprei)       |
+| 80-83 | Sátiro                  |
+| 84    | Sereia (Siren)          |
+| 85-88 | Gigante                 |
+| 89-90 | Gweld                   |
+| 91-93 | Urgani (Homem-planta)   |
+| 94-95 | Moogani (Homem-fungo)   |
+| 96-97 | Gazarai (Elementais)    |
 | 98-99 | Vampiro (role de novo)  |
 | 100   | Semideus (role de novo) |
 
@@ -738,20 +738,33 @@ As espécies a seguir têm vários tipos e sub-raças. Role para decidir qual o 
 
 ###### Dracônico
 
-| d100 | Sub-raça           |
-| ---- | ------------------ |
-| 1    | Amarelo (Ácido)    |
-| 1    | Azul (Elétrico)    |
-| 1    | Branco (Frio)      |
-| 1    | Cinza (Vento)      |
-| 1    | Dourado (Mental)   |
-| 1    | Laranja (Sonoro)   |
-| 1    | Prateado (Místico) |
-| 1    | Preto (Necrótico)  |
-| 1    | Verde (Veneno)     |
-| 100  | Vermelho (Fogo)    |
+| d100   | Sub-raça           |
+| ------ | ------------------ |
+| 1-10   | Amarelo (Ácido)    |
+| 11-20  | Azul (Elétrico)    |
+| 21-30  | Branco (Frio)      |
+| 31-40  | Cinza (Vento)      |
+| 41-50  | Dourado (Mental)   |
+| 51-60  | Laranja (Sonoro)   |
+| 61-70  | Prateado (Místico) |
+| 71-80  | Preto (Necrótico)  |
+| 81-90  | Verde (Veneno)     |
+| 91-100 | Vermelho (Fogo)    |
 
 ###### Construto
+
+| d100   | Sub-raça |
+| ------ | -------- |
+| 1-10   | Pedra    |
+| 11-20  | Barro    |
+| 21-30  | Vidro    |
+| 31-40  | Arcano   |
+| 41-50  | Metal    |
+| 51-60  | Argila   |
+| 61-70  | Carne    |
+| 71-80  | Cristal  |
+| 81-90  | Quartzo  |
+| 91-100 | Objeto   |
 
 ###### Urgani
 
@@ -772,6 +785,19 @@ As espécies a seguir têm vários tipos e sub-raças. Role para decidir qual o 
 | 76-100 | Zygomycota    |
 
 ###### Gazarai
+
+| d100   | Sub-raça |
+| ------ | -------- |
+| 1-10   | Fogo     |
+| 11-20  | Água     |
+| 21-30  | Terra    |
+| 31-40  | Ar       |
+| 41-50  | Raio     |
+| 51-60  | Místico  |
+| 61-70  | Gelo     |
+| 71-80  | Planta   |
+| 81-90  | Luz      |
+| 91-100 | Metal    |
 
 ## Renovação do Mural
 
