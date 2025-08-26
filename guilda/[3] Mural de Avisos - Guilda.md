@@ -75,8 +75,6 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 19    | Execução             |
 | 20    | Pronunciamento       |
 
-> Em "Avisos dos habitantes", role novamente, mas o aviso foi feito pelos habitantes, e não pela guilda.
->
 > **Nota sobre Contratos e Serviços**: Contratos e serviços do mural de avisos serão sempre de criaturas que não têm como pagar. Role a tabela de "Pagamento alternativo" para saber as condições de pagamento do contratante. Considere a recompensa sempre 1/3 da original.
 >
 > Na tabela de "Pagamento alternativo" role 1d20 simples, independente do tamanho do assentamento.
@@ -99,6 +97,8 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 ### Especificações por Tipo de Aviso
 
 #### Proposta Comercial
+
+Anúncios de compra, venda ou troca de mercadorias, muitas vezes acompanhados de promessas tentadoras ou pechinchas.
 
 ##### Tipo de Proposta
 
@@ -148,6 +148,8 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 
 #### Divulgação
 
+Chamados públicos para festas, reuniões, comércios, sermões ou qualquer evento que reúna a comunidade.
+
 ##### Tipo de Divulgação
 
 | 1d20  | Divulgação                              |
@@ -179,6 +181,8 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 20    | Aventureiros             |
 
 #### Execução
+
+Notificações sombrias anunciando a data e o local da punição de condenados, servindo de exemplo para os demais.
 
 ##### Quem Será Executado
 
@@ -226,6 +230,8 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 20    | Magia                           |
 
 #### Cartaz de Procurado
+
+Retratos ou descrições de criminosos, foragidos, e inocentes geralmente com uma recompensa pela captura.
 
 ##### Tipo de Procurado
 
@@ -426,6 +432,8 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 
 #### Proposta de Caçada
 
+Solicitações em busca de auxílio contra feras, monstros ou ameaças que assolam a região.
+
 ##### Tipo de Caçada
 
 | 1d20  | Proposta de caçada                    |
@@ -585,6 +593,8 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 
 #### Aviso dos Habitantes
 
+Mensagens simples deixadas pelo povo, pedindo ajuda, relatando problemas ou compartilhando novidades locais.
+
 | 1d20  | Aviso dos habitantes                          |
 | ----- | --------------------------------------------- |
 | 1     | Rumor sobre perigos próximos                  |
@@ -599,6 +609,8 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 15-20 | Notícias relevantes para os habitantes locais |
 
 #### Pronunciamento
+
+Comunicados oficiais emitidos por autoridades, sejam decretos, leis, avisos de guerra ou tributos a serem pagos.
 
 ##### Tipo de Pronunciamento
 
@@ -671,9 +683,9 @@ Sempre que uma pessoa for mencionada no quadro de avisos, determine sua espécie
 | 98-99 | Vampiro (role de novo)  |
 | 100   | Semideus (role de novo) |
 
-> Se o resultado for semideus duas vezes (a primeira e a rolagem para a especificação de um semideus), então o resultado é uma divindade.
+> Se o resultado for "semideus" duas vezes (a primeira e a rolagem para a especificação de um semideus), então o resultado é uma divindade.
 >
-> Se o resultado for vampiro duas vezes, então o resultado é um vampiro verdadeiro.
+> Se o resultado for "vampiro" duas vezes, então o resultado é um vampiro verdadeiro.
 
 ##### Sub-raças das Espécies
 
@@ -759,7 +771,7 @@ As espécies a seguir têm vários tipos e sub-raças. Role para decidir qual o 
 | 93-94 | Gigante                      |
 | 95-96 | Gweld                        |
 | 97-98 | Gazarai (Elementais)         |
-| 99    | Vampiro                      |
+| 99    | Vampiro Verdadeiro           |
 | 100   | Divindade                    |
 
 ###### Dracônico
@@ -885,8 +897,8 @@ As espécies a seguir têm vários tipos e sub-raças. Role para decidir qual o 
 | Contratos            | -4          |
 | Pronunciamento       | -8          |
 
-> **Nota**: Execuções são retiradas logo após acontecerem.
+> Pode ser bem trabalhoso, mas fica mais coerente se as resoluções forem roladas individualmente para cada aviso.
 >
-> Pode ser bem chato, mas fica mais coerente se for rolado individualmente para cada aviso.
+> **Nota**: Execuções são retiradas logo após acontecerem.
 
 ---
