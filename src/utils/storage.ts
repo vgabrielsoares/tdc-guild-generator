@@ -72,3 +72,12 @@ export function removeFromStorage(key: string): void {
     console.error("[STORAGE] Failed to remove from storage:", error);
   }
 }
+
+// Export helpers for adapters to reuse the same serialization logic
+export function serializeData(value: unknown): string {
+  return JSON.stringify(value, dateReplacer);
+}
+
+export function deserializeData<T>(text: string): T {
+  return JSON.parse(text, dateReviver) as T;
+}
