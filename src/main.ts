@@ -4,6 +4,7 @@ import router from "./router";
 
 import App from "./App.vue";
 import "./assets/css/main.css";
+import { initDatabase } from "@/utils/database-manager";
 
 const app = createApp(App);
 
@@ -11,6 +12,22 @@ app.use(createPinia());
 app.use(router);
 
 app.mount("#app");
+
+// initialize database (non-blocking, but report errors)
+void (async () => {
+  try {
+    await initDatabase({ autoBackup: true, retry: 1 });
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.log("[DB] Initialized");
+    }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error("[DB] Initialization failed", e);
+    // dispatch event so UI can react if needed
+    document.dispatchEvent(new CustomEvent("db-init-failed", { detail: { error: e } }));
+  }
+})();
 
 // logging utility for service worker
 const logSW = {
