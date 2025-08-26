@@ -411,10 +411,17 @@ describe("Issue 3.4 - Guild Store Complete", () => {
         settlementType: SettlementType.ALDEIA,
       });
 
-      expect(localStorageMock.setItem).toHaveBeenCalledWith(
-        "guild-store",
-        expect.any(String)
-      );
+      // useStorage saves with a debounce (200ms). Wait a bit before asserting.
+      await new Promise((resolve) => setTimeout(resolve, 250));
+
+      expect(localStorageMock.setItem).toHaveBeenCalled();
+      // adapter may prefix keys (e.g. "settings:guild-store"); assert a call used the guild-store suffix
+      const calls = (localStorageMock.setItem as any).mock.calls as any[];
+      expect(
+        calls.some(
+          (c: any[]) => typeof c[0] === "string" && c[0].endsWith("guild-store")
+        )
+      ).toBe(true);
     });
 
     it("should load state from localStorage", async () => {
@@ -425,11 +432,13 @@ describe("Issue 3.4 - Guild Store Complete", () => {
       });
 
       // Simular que os dados estão no localStorage
-      localStorageMock.getItem.mockReturnValue(JSON.stringify({
-        currentGuild: store1.currentGuild,
-        guildHistory: store1.guildHistory,
-        lastConfig: null
-      }));
+      localStorageMock.getItem.mockReturnValue(
+        JSON.stringify({
+          currentGuild: store1.currentGuild,
+          guildHistory: store1.guildHistory,
+          lastConfig: null,
+        })
+      );
 
       // Create new store instance to test loading (automaticamente carrega do storage)
       const store2 = useGuildStore();
