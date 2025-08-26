@@ -22,3 +22,8 @@ export function getAdapter(): StorageAdapter {
   adapter = createAdapterPlaceholder();
   return adapter!;
 }
+
+// Test helper: clear cached adapter so tests can change environment (indexedDB vs localStorage)
+export function clearAdapter() {
+  adapter = undefined;
+}
