@@ -57,27 +57,21 @@ export const useGuildStore = defineStore("guild", () => {
       const guild = storage.data.value.currentGuild;
       if (!guild) return null;
 
-      // Validar e corrigir a data se necessário
-      if (guild.createdAt && !(guild.createdAt instanceof Date)) {
-        try {
-          const correctedGuild = {
-            ...guild,
-            createdAt: new Date(guild.createdAt),
-          };
-          // Atualizar o storage com a guilda corrigida
-          storage.data.value.currentGuild = correctedGuild;
-          return correctedGuild;
-        } catch {
-          const correctedGuild = {
-            ...guild,
-            createdAt: new Date(),
-          };
-          storage.data.value.currentGuild = correctedGuild;
-          return correctedGuild;
+      // Validate the stored guild using Zod helper. If invalid, remove it.
+      try {
+        const valid = createGuild(guild);
+        // createGuild coerces/validates dates according to schema, so ensure storage has normalized value
+        if (valid !== guild) {
+          storage.data.value.currentGuild = valid;
         }
+        return valid;
+      } catch (err) {
+        // invalid data persisted. clear it to avoid runtime errors
+        // eslint-disable-next-line no-console
+        console.warn("Invalid stored currentGuild removed:", err);
+        storage.data.value.currentGuild = null;
+        return null;
       }
-
-      return guild;
     },
     set: (value) => {
       storage.data.value.currentGuild = value;
@@ -86,17 +80,32 @@ export const useGuildStore = defineStore("guild", () => {
 
   const guildHistory = computed({
     get: () => {
-      // retornar diretamente o storage, apenas com validação básica
       const storedGuilds = storage.data.value.guildHistory;
 
-      // Filtrar apenas guildas com problemas críticos (IDs ou nomes ausentes)
-      const validGuilds = storedGuilds.filter((guild) => {
-        return guild && guild.id && guild.name;
-      });
+      // validate each guild using Zod. keep only valid entries
+      const validGuilds: Guild[] = [];
+      for (const g of storedGuilds) {
+        try {
+          const vg = createGuild(g);
+          validGuilds.push(vg);
+        } catch (err) {
+          // drop invalid entry
+          // eslint-disable-next-line no-console
+          console.warn("Dropping invalid guild from history:", err);
+        }
+      }
 
-      // Atualizar o storage apenas se removemos guildas inválidas
+      // Update storage only if we removed/normalized entries
       if (validGuilds.length !== storedGuilds.length) {
         storage.data.value.guildHistory = validGuilds;
+      } else {
+        // Even if lengths match, some entries might have been normalized by createGuild
+        for (let i = 0; i < validGuilds.length; i++) {
+          if (validGuilds[i] !== storedGuilds[i]) {
+            storage.data.value.guildHistory = validGuilds;
+            break;
+          }
+        }
       }
 
       return validGuilds;
@@ -709,35 +718,14 @@ export const useGuildStore = defineStore("guild", () => {
   // Importar guilda do JSON
   async function importGuild(jsonData: string): Promise<boolean> {
     try {
-      const guildData = JSON.parse(jsonData, dateReviver);
+      const parsed = JSON.parse(jsonData, dateReviver);
+      // Use createGuild to validate and coerce the imported data
+      const valid = createGuild(parsed);
 
-      // Validação mais flexível para importação
-      if (
-        guildData &&
-        typeof guildData === "object" &&
-        guildData.id &&
-        guildData.name &&
-        guildData.structure &&
-        guildData.relations &&
-        guildData.staff &&
-        guildData.visitors &&
-        guildData.resources &&
-        guildData.settlementType
-      ) {
-        // Garantir que createdAt seja uma data válida
-        if (!guildData.createdAt) {
-          guildData.createdAt = new Date();
-        } else if (!(guildData.createdAt instanceof Date)) {
-          guildData.createdAt = new Date(guildData.createdAt);
-        }
+      currentGuild.value = valid;
+      addToHistory(valid);
 
-        currentGuild.value = guildData as Guild;
-        addToHistory(guildData as Guild);
-
-        return true;
-      }
-
-      return false;
+      return true;
     } catch (err) {
       // eslint-disable-next-line no-console
       console.warn("Failed to import guild:", err);
