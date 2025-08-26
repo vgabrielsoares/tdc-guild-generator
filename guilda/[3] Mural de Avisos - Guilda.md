@@ -420,9 +420,9 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 
 > **Notas Importantes**:
 >
-> - Criaturas com nível de periculosidade "Altíssima" ou maior, serão procuradas, pelo menos, em todos os assentamentos que tenham uma sede da guilda
+> - Criaturas com nível de periculosidade "Altíssima" ou maior, serão procuradas, pelo menos, em todos os assentamentos que tenham uma sede da guilda.
 > - Uma criatura com nível de periculosidade "Alta" ou maior, sempre será procurada "viva ou morta"
-> - Periculosidade não foi pensado para ser usado como mecânica (ND) para calcular um desafio, mas sim como os habitantes se sentem ou são de fato ameaçados por aquele criminoso, às vezes um plebeu com uma informação que pode destruir todo um reino teria periculosidade altíssima por exemplo.
+> - Periculosidade não foi pensado para ser usado como mecânica (NA) para calcular um desafio, mas sim como os habitantes se sentem ou são de fato ameaçados por aquele criminoso, às vezes um plebeu com uma informação que pode destruir todo um reino teria periculosidade altíssima por exemplo.
 
 #### Proposta de Caçada
 
@@ -433,103 +433,123 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 | 1-3   | Um bando de...                        |
 | 4     | Um único e poderoso...                |
 | 5     | Um conjurador e seu...                |
-| 6-7   | Um casal de...                        |
-| 8-9   | O líder e seus lacaios...             |
-| 10-13 | Um covil de...                        |
-| 14-16 | Uma seita que cultua...               |
-| 17    | Uma lâmia e seu companheiro...        |
+| 6     | Um casal de...                        |
+| 7-9   | O líder e seus lacaios...             |
+| 10-12 | Um covil de...                        |
+| 13    | Uma seita que cultua...               |
+| 14-15 | Vingar vítimas de...                  |
+| 16-17 | Rastrear e capturar...                |
 | 18-19 | Os raptores de humanoides, que são... |
 | 20    | Inimigo mortal de um...               |
 
 ##### Especificação da Criatura
 
-| 1d20  | Especificação           |
-| ----- | ----------------------- |
-| 1     | Troglodita              |
-| 2     | Vampiro                 |
-| 3-4   | Licantropo/homem-chacal |
-| 5-10  | Monstruosidade bestial  |
-| 11-12 | Diabo ou demônio        |
-| 13-14 | Criatura corrompida     |
-| 15    | Gosma                   |
-| 16-17 | Morto-vivo incorpóreo   |
-| 18    | Gnoll                   |
-| 19-20 | Besta selvagem/atroz    |
+| 1d20  | Especificação   |
+| ----- | --------------- |
+| 1     | Amaldiçoados    |
+| 2     | Construtos      |
+| 3     | Demônios        |
+| 4-5   | Draconídeos     |
+| 6-10  | Fauna           |
+| 11    | Gigantes        |
+| 12-16 | Humanoides      |
+| 17-18 | Monstruosidades |
+| 19    | Mortos-Vivos    |
+| 20    | Celestiais      |
 
 ##### Local
 
 | 1d20  | Local                 |
 | ----- | --------------------- |
-| 1-3   | Floresta              |
-| 4-6   | Assentamento          |
-| 7     | Deserto               |
-| 8     | Construção abandonada |
-| 9     | Montanhas/colinas     |
-| 10-13 | Caverna               |
-| 14    | Cemitério             |
-| 15-16 | Pântano               |
-| 17-19 | Subterrâneo           |
-| 20    | Templo                |
+| 1-4   | Floresta              |
+| 5     | Assentamento          |
+| 6     | Deserto               |
+| 7-9   | Construção abandonada |
+| 10    | Montanhas/colinas     |
+| 11    | Caverna               |
+| 12    | Pântano               |
+| 13-15 | Planície              |
+| 16    | Subterrâneo           |
+| 17-18 | Litoral               |
+| 19    | Subaquático           |
+| 20    | Mar-Aberto            |
 
 ##### Peculiaridade da Caça
 
-| 1d20  | Peculiaridade                      |
-| ----- | ---------------------------------- |
-| 1-3   | Nenhuma                            |
-| 4-5   | +2 em seu maior atributo           |
-| 6-7   | +2 DV                              |
-| 8-9   | Vantagem em teste                  |
-| 10-11 | +4 DV                              |
-| 12    | +6 DV                              |
-| 13-15 | Ataque adicional                   |
-| 16-17 | Imunidade a tipo de dano adicional |
-| 18-19 | Imunidade a condição adicional     |
-| 20    | Ação lendária                      |
+| 1d20  | Peculiaridade                                   |
+| ----- | ----------------------------------------------- |
+| 1-3   | Nenhuma                                         |
+| 4-5   | +1 em seu maior atributo                        |
+| 6     | +1 de Deslocamento                              |
+| 7-8   | +8 PV                                           |
+| 9     | +1d20 em um teste                               |
+| 10    | +16 PV                                          |
+| 11    | +2 de Deslocamento                              |
+| 12    | +24 PV                                          |
+| 13-14 | Ataque adicional                                |
+| 15-16 | Resistência Aprimorada a tipo de dano adicional |
+| 17    | Imunidade a tipo de dano adicional              |
+| 18    | RD 3 a qualquer dano                            |
+| 19    | Ação lendária                                   |
+| 20    | Role duas vezes e use ambos                     |
 
-##### Característica I
+##### Característica I da Caça
 
-| 1d20  | Característica I                     |
-| ----- | ------------------------------------ |
-| 1-4   | Armadura natural - +2 CA             |
-| 5-6   | Regeneração de troll                 |
-| 7-9   | Margem de crítico: 19-20             |
-| 10    | Luta por mais 2 turnos após a morte  |
-| 11    | Possui um item mágico                |
-| 12-14 | Resistência a tipo de dano adicional |
-| 15-16 | Presença aterradora CD 12            |
-| 17-18 | Não pode ser surpreendido            |
-| 19    | Uma categoria de tamanho acima       |
-| 20    | Peculiaridade adicional              |
+| 1d20 | Característica I                    |
+| ---- | ----------------------------------- |
+| 1-3  | Nenhuma                             |
+| 4-5  | +1 de Defesa                        |
+| 6    | +1d20 em um teste de resistência    |
+| 7    | +1 de Margem de crítico             |
+| 8    | Luta por mais 2 turnos após a morte |
+| 9-12 | Possui um item mágico               |
+| 13   | Imunidade a condição adicional      |
+| 14   | +2 de Defesa                        |
+| 15   | +2 de Margem de crítico             |
+| 16   | Não pode ser surpreendido           |
+| 17   | Uma categoria de tamanho acima      |
+| 18   | +1d20 em testes de ataque           |
+| 19   | Peculiaridade adicional             |
+| 20   | Role duas vezes e use ambos         |
 
-##### Característica II
+##### Característica II da Caça
 
-| 1d20  | Característica II               |
-| ----- | ------------------------------- |
-| 1-2   | Coloração rara/exótica          |
-| 3-4   | Protagonista de uma lenda local |
-| 5-6   | Odor exótico                    |
-| 7-8   | Não para de grunir              |
-| 9-12  | Veterano                        |
-| 13-14 | Rituais de sacrifício           |
-| 15    | Inteligência acima do normal    |
-| 16    | Marcas rúnicas                  |
-| 17-18 | Paranoico                       |
-| 19-20 | Tem crias/filhotes              |
+| 1d20 | Característica II               |
+| ---- | ------------------------------- |
+| 1-5  | Nenhuma                         |
+| 6    | Coloração rara/exótica          |
+| 7    | Já foi caçado outra vez         |
+| 8    | Não possui medo ou dúvida       |
+| 9    | Quase não deixa rastros         |
+| 10   | Sofre com uma deformidade       |
+| 11   | Protagonista de uma lenda local |
+| 12   | Odor exótico                    |
+| 13   | Veterano Experiente             |
+| 14   | Está doente ou ferido           |
+| 15   | Possui aliados                  |
+| 16   | Inteligência acima do normal    |
+| 17   | Marcas rúnicas                  |
+| 18   | Paranoico                       |
+| 19   | Tem crias/filhotes              |
+| 20   | Role duas vezes e use ambos     |
 
-##### Vantagem em Testes
+##### Vantagem em Testes da Caça
 
-| 1d20  | Vantagem em testes               |
-| ----- | -------------------------------- |
-| 1     | De resistência que é proficiente |
-| 2-3   | De perícia com maior bônus       |
-| 4-5   | De um dos ataques                |
-| 6     | Que teria desvantagem            |
-| 7     | Que envolvam seu maior atributo  |
-| 8-9   | Que envolvam seu menor atributo  |
-| 10-14 | À sua escolha, mas só uma vez    |
-| 15-16 | De resistência contra magia      |
-| 17-18 | De percepção                     |
-| 19-20 | De iniciativa                    |
+| 1d20  | Vantagem em testes                              |
+| ----- | ----------------------------------------------- |
+| 1-4   | Nenhum                                          |
+| 5-6   | +1d20 em um teste de resistência                |
+| 7-8   | +1d20 no teste perícia com maior bônus          |
+| 9-10  | +1d20 em um dos ataques                         |
+| 11-12 | +1d20 em testes que envolvam seu maior atributo |
+| 13-14 | +1d20 em testes que envolvam seu menor atributo |
+| 15-16 | +2d20 em testes de resistência contra magia     |
+| 17-18 | +2d20 em testes de percepção                    |
+| 19-20 | +2d20 em testes de iniciativa                   |
+
+##### Recompensa da Caçada
+
+<!-- TODO: estruturar tabela de recompensas -->
 
 > **Nota**: Role o tesouro individual apropriado (Livro do Mestre, pag. 136) e quantas vezes for preciso de acordo com a quantidade conhecida de caças, o resultado será a recompensa pela caçada.
 
@@ -544,18 +564,24 @@ Role o dado de acordo com o tamanho do assentamento, e adicionalmente, o da guil
 
 ###### Tipos de Reviravoltas
 
-| 1d20  | Reviravoltas                       |
-| ----- | ---------------------------------- |
-| 1-2   | A criatura é uma velha conhecida   |
-| 3     | A criatura era falsa               |
-| 4-5   | Tudo era uma maldição              |
-| 6     | A criatura já estava morta         |
-| 7-8   | O contratante quer isso capturado  |
-| 9-12  | O contratante é o culpado por tudo |
-| 13    | A criatura é inofensiva            |
-| 14-15 | Era uma armadilha                  |
-| 16-19 | Informações são omitidas           |
-| 20    | Foi uma luta suspeitamente fácil   |
+| 1d20  | Reviravoltas                           |
+| ----- | -------------------------------------- |
+| 1     | O alvo é um velho conhecido            |
+| 2     | Era o alvo errado                      |
+| 3     | O contratante foi caçado no meio tempo |
+| 4-5   | O alvo caça o grupo de volta           |
+| 6     | O alvo era falso                       |
+| 7     | Tudo era uma maldição                  |
+| 8     | O alvo já estava morto                 |
+| 9     | O contratante é o culpado por tudo     |
+| 10    | A recompensa não é o esperado          |
+| 11    | Há outros caçadores                    |
+| 12    | Há quem queira proteger o alvo         |
+| 13    | O alvo é inofensivo                    |
+| 14-15 | Era uma armadilha                      |
+| 16-18 | Informações são omitidas               |
+| 19    | Foi uma luta suspeitamente fácil       |
+| 20    | Role duas vezes e use ambos            |
 
 #### Aviso dos Habitantes
 
