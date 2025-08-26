@@ -1,5 +1,7 @@
 import type { StorageAdapter } from "@/utils/storage-adapter";
 import { serializeData, deserializeData } from "@/utils/storage";
+import { getInitialStores } from "@/utils/database-migrations";
+import { applyMigrations } from "@/utils/database-migrations";
 
 const DB_NAME = "guild-generator-db";
 const DB_VERSION = 1;
@@ -7,22 +9,34 @@ const DB_VERSION = 1;
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, DB_VERSION);
-    req.onupgradeneeded = () => {
+    req.onupgradeneeded = (ev) => {
       const db = req.result;
-      // Create generic stores if they don't exist. Specific migrations should adjust schema.
-      if (!db.objectStoreNames.contains("guilds"))
-        db.createObjectStore("guilds", { keyPath: "id" });
-      if (!db.objectStoreNames.contains("contracts"))
-        db.createObjectStore("contracts", { keyPath: "id" });
-      if (!db.objectStoreNames.contains("services"))
-        db.createObjectStore("services", { keyPath: "id" });
-      if (!db.objectStoreNames.contains("timeline"))
-        db.createObjectStore("timeline", {
-          keyPath: "id",
-          autoIncrement: true,
-        });
-      if (!db.objectStoreNames.contains("settings"))
-        db.createObjectStore("settings", { keyPath: "key" });
+      const stores = getInitialStores();
+      stores.forEach((s) => {
+        if (!db.objectStoreNames.contains(s.name)) {
+          const store = db.createObjectStore(s.name, {
+            keyPath: s.keyPath || "id",
+          });
+          if (Array.isArray(s.indices)) {
+            s.indices.forEach((idx: string) => {
+              try {
+                store.createIndex(idx, idx, { unique: false });
+              } catch (e) {
+                // ignore if index exists or invalid
+              }
+            });
+          }
+        }
+      });
+      // Apply programmatic migrations if any
+      const verEvent = ev as IDBVersionChangeEvent;
+      const oldV =
+        typeof verEvent.oldVersion === "number" ? verEvent.oldVersion : 0;
+      const newV =
+        typeof verEvent.newVersion === "number"
+          ? verEvent.newVersion
+          : DB_VERSION;
+      applyMigrations(db, oldV, newV || DB_VERSION);
     };
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
