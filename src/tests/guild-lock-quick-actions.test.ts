@@ -23,12 +23,12 @@ describe("Guild Lock Quick Actions", () => {
     store.addToHistory(guild);
 
     // 3. Bloquear a guilda
-    const toggleSuccess1 = store.toggleGuildLock(guild.id);
+    const toggleSuccess1 = await store.toggleGuildLock(guild.id);
     expect(toggleSuccess1).toBe(true);
     expect(store.currentGuild?.locked).toBe(true);
 
     // 4. Desbloquear a guilda
-    const toggleSuccess2 = store.toggleGuildLock(guild.id);
+    const toggleSuccess2 = await store.toggleGuildLock(guild.id);
     expect(toggleSuccess2).toBe(true);
     expect(store.currentGuild?.locked).toBe(false);
   });
@@ -43,7 +43,7 @@ describe("Guild Lock Quick Actions", () => {
     expect(guild.locked).toBe(false);
 
     // 2. Tentar bloquear sem salvar no histórico deve falhar
-    const toggleSuccess = store.toggleGuildLock(guild.id);
+    const toggleSuccess = await store.toggleGuildLock(guild.id);
     expect(toggleSuccess).toBe(false);
     expect(store.currentGuild?.locked).toBe(false);
   });
@@ -57,7 +57,7 @@ describe("Guild Lock Quick Actions", () => {
     store.addToHistory(guild);
 
     // 2. Bloquear a guilda atual
-    store.toggleGuildLock(guild.id);
+    await store.toggleGuildLock(guild.id);
     expect(store.currentGuild?.locked).toBe(true);
 
     // 3. Verificar que o histórico também foi atualizado
@@ -74,7 +74,7 @@ describe("Guild Lock Quick Actions", () => {
     store.addToHistory(guild);
 
     // 2. Bloquear guilda
-    store.toggleGuildLock(guild.id);
+    await store.toggleGuildLock(guild.id);
     expect(store.currentGuild?.locked).toBe(true);
 
     // 3. Regeneração de frequentadores deve funcionar mesmo bloqueada
@@ -86,9 +86,9 @@ describe("Guild Lock Quick Actions", () => {
     await expect(store.regenerateCurrentGuild()).rejects.toThrow("locked");
   });
 
-  it("should handle toggle when guild is not found", () => {
+  it("should handle toggle when guild is not found", async () => {
     // Tentar alternar lock de uma guilda inexistente
-    const result = store.toggleGuildLock("non-existent-id");
+    const result = await store.toggleGuildLock("non-existent-id");
     expect(result).toBe(false);
   });
 
@@ -103,7 +103,7 @@ describe("Guild Lock Quick Actions", () => {
     store.addToHistory(guild);
 
     // 3. Bloquear via current guild
-    store.toggleGuildLock(guild.id);
+    await store.toggleGuildLock(guild.id);
     expect(store.currentGuild?.locked).toBe(true);
 
     // 4. Verificar que o histórico também foi atualizado
@@ -118,7 +118,7 @@ describe("Guild Lock Quick Actions", () => {
     expect(store.currentGuild?.locked).toBe(true);
 
     // 7. Desbloquear via current guild
-    store.toggleGuildLock(guild.id);
+    await store.toggleGuildLock(guild.id);
     expect(store.currentGuild?.locked).toBe(false);
 
     // 8. Verificar que o histórico foi atualizado novamente
@@ -141,7 +141,7 @@ describe("Guild Lock Quick Actions", () => {
     expect(isInHistory).toBe(false);
 
     // 3. Tentar bloquear deve falhar
-    const lockResult = store.toggleGuildLock(guild.id);
+    const lockResult = await store.toggleGuildLock(guild.id);
     expect(lockResult).toBe(false);
     expect(store.currentGuild?.locked).toBe(false);
 
@@ -149,7 +149,7 @@ describe("Guild Lock Quick Actions", () => {
     store.addToHistory(guild);
 
     // 5. Agora deve ser possível bloquear
-    const lockResult2 = store.toggleGuildLock(guild.id);
+    const lockResult2 = await store.toggleGuildLock(guild.id);
     expect(lockResult2).toBe(true);
     expect(store.currentGuild?.locked).toBe(true);
   });
