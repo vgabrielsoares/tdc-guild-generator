@@ -154,37 +154,44 @@ export function useGuildStorage(): {
         CURRENT_GUILD_KEY
       );
       if (currentId) {
-        const g = await adapter.get<Record<string, unknown> | Guild | null>(
-          "guilds",
-          currentId
-        );
-        if (g) {
-          try {
-            // If currentGuild already exists in-memory (e.g. generated during startup), prefer it
-            if (
-              data.value.currentGuild &&
-              data.value.currentGuild.id === currentId
-            ) {
-              // keep in-memory
-            } else {
-              data.value.currentGuild = createGuild(g as unknown);
-            }
-          } catch (_) {
-            // fallback: try extract .value
+        // First, try to restore from the in-memory/merged guildHistory
+        try {
+          const found = (data.value.guildHistory || []).find(
+            (g) => g.id === currentId
+          );
+          if (found && !data.value.currentGuild) {
+            data.value.currentGuild = createGuild(found as unknown);
+          }
+        } catch {
+          // ignore and continue to try adapter.get below
+        }
+
+        // If we still don't have the currentGuild, try fetching the guild row directly
+        // from the adapter (preferred when available).
+        if (!data.value.currentGuild) {
+          const g = await adapter.get<Record<string, unknown> | Guild | null>(
+            "guilds",
+            currentId
+          );
+          if (g) {
             try {
-              const rec = g as Record<string, unknown>;
-              if (rec.value) {
-                if (
-                  data.value.currentGuild &&
-                  data.value.currentGuild.id === currentId
-                ) {
-                  // keep in-memory
-                } else {
-                  data.value.currentGuild = createGuild(rec.value as unknown);
-                }
+              // If a currentGuild was set in-memory by another store (e.g. timeline)
+              // during startup, prefer the in-memory value and do not overwrite it.
+              if (!data.value.currentGuild) {
+                data.value.currentGuild = createGuild(g as unknown);
               }
-            } catch (err) {
-              // ignore
+            } catch (_) {
+              // fallback: try extract .value
+              try {
+                const rec = g as Record<string, unknown>;
+                if (rec.value) {
+                  if (!data.value.currentGuild) {
+                    data.value.currentGuild = createGuild(rec.value as unknown);
+                  }
+                }
+              } catch (err) {
+                // ignore
+              }
             }
           }
         }

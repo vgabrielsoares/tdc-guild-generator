@@ -491,7 +491,7 @@ export const useGuildStore = defineStore("guild", () => {
     }
   }
 
-  function removeFromHistory(guildId: string): boolean {
+  async function removeFromHistory(guildId: string): Promise<boolean> {
     const guild = guildStorage.data.value.guildHistory.find(
       (g) => g.id === guildId
     );
@@ -499,6 +499,15 @@ export const useGuildStore = defineStore("guild", () => {
     // Não permitir remoção se a guilda estiver bloqueada
     if (guild?.locked) {
       return false;
+    }
+
+    // Não permitir remoção se existir uma timeline ativa para esta guilda
+    try {
+      const { useTimelineStore } = await import("./timeline");
+      const timelineStore = useTimelineStore();
+      if (timelineStore.currentGuildId === guildId) return false;
+    } catch {
+      // ignore if timeline store can't be resolved
     }
 
     const initialLength = guildStorage.data.value.guildHistory.length;
@@ -584,6 +593,18 @@ export const useGuildStore = defineStore("guild", () => {
     const guild = guildStorage.data.value.guildHistory[guildIndex];
 
     if (guild.locked) {
+      // If trying to unlock, ensure there isn't an active timeline for this guild
+      try {
+        const { useTimelineStore } = await import("./timeline");
+        const timelineStore = useTimelineStore();
+        const active = timelineStore.currentGuildId;
+        if (active === guildId) {
+          // do not allow unlocking while timeline is active
+          return false;
+        }
+      } catch {
+        // ignore import errors and proceed with original checks
+      }
       // Verificar se existe dados de contratos para esta guilda diretamente no localStorage
       const contractsStorageKey = "contracts-store-v2";
       try {
