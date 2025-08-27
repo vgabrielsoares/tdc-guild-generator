@@ -1,6 +1,7 @@
 import { ref, watch } from "vue";
 import type { Ref } from "vue";
 import { useStorageAdapter } from "@/composables/useStorageAdapter";
+import { serializeData, deserializeData } from "@/utils/storage";
 import type { Contract, GuildContracts } from "@/types/contract";
 import { ContractSchema } from "@/types/contract";
 import { DBContractSchema } from "@/utils/database-schema";
@@ -145,6 +146,56 @@ export function useContractsStorage() {
 
       data.value.guildContracts = guildContracts;
 
+      // If no rows were found in the 'contracts' store, try to recover from a
+      // persisted snapshot in settings (robustness for older clients / partial writes)
+      if (Object.keys(guildContracts).length === 0) {
+        try {
+          const snapshot = await adapter.get<Record<string, unknown> | null>(
+            "settings",
+            "contracts-store-v2"
+          );
+          if (snapshot && typeof snapshot === "object") {
+            const maybeGuilds = (snapshot as Record<string, unknown>)
+              .guildContracts as Record<string, unknown> | undefined;
+            if (maybeGuilds) {
+              const recovered: Record<string, GuildContracts> = {};
+              for (const gid of Object.keys(maybeGuilds)) {
+                try {
+                  const entry = maybeGuilds[gid] as unknown as Record<
+                    string,
+                    unknown
+                  >;
+                  recovered[gid] = {
+                    guildId: gid,
+                    contracts: (entry.contracts || []) as Contract[],
+                    lastUpdate: entry.lastUpdate
+                      ? new Date(String(entry.lastUpdate))
+                      : new Date(),
+                    generationCount:
+                      typeof entry.generationCount === "number"
+                        ? (entry.generationCount as number)
+                        : entry.contracts &&
+                            Array.isArray(entry.contracts) &&
+                            (entry.contracts as unknown[]).length > 0
+                          ? 1
+                          : 0,
+                  };
+                } catch {
+                  // skip malformed
+                }
+              }
+              if (Object.keys(recovered).length > 0)
+                data.value.guildContracts = recovered;
+            }
+            const cur = (snapshot as Record<string, unknown>).currentGuildId as
+              | string
+              | undefined;
+            if (cur) data.value.currentGuildId = cur;
+          }
+        } catch (e) {
+          // ignore
+        }
+      }
       // load currentGuildId from settings store (backward compatibility)
       try {
         const cur = await adapter.get<string | null>(
@@ -219,12 +270,16 @@ export function useContractsStorage() {
             // ensure each contract is stored in 'contracts' store
             for (const c of entry.contracts) {
               try {
+                // Clone contract into a plain object to avoid storing Vue proxies/reactive internals
+                const plain = deserializeData<Record<string, unknown>>(
+                  serializeData(c)
+                );
                 await adapter.put("contracts", c.id, {
                   id: c.id,
                   guildId: gid,
-                  value: c,
+                  value: plain,
                   status: c.status,
-                  createdAt: c.createdAt ?? new Date(),
+                  createdAt: (c as Contract).createdAt ?? new Date(),
                 });
               } catch (e) {
                 // eslint-disable-next-line no-console
@@ -263,6 +318,49 @@ export function useContractsStorage() {
     }
   }
 
+  // Persist a single guild's contracts immediately and return when done
+  async function persistGuildContracts(guildId: string) {
+    try {
+      const entry = data.value.guildContracts[guildId];
+      if (!entry) return;
+      for (const c of entry.contracts) {
+        try {
+          const plain = deserializeData<Record<string, unknown>>(
+            serializeData(c)
+          );
+          await adapter.put("contracts", c.id, {
+            id: c.id,
+            guildId: guildId,
+            value: plain,
+            status: c.status,
+            createdAt: (c as Contract).createdAt ?? new Date(),
+          });
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.warn(
+            "failed to persist contract (persistGuildContracts)",
+            c.id,
+            e
+          );
+        }
+      }
+      // Also persist a snapshot for quick recovery (legacy compatibility / robust reload)
+      try {
+        await adapter.put("settings", "contracts-store-v2", {
+          guildContracts: data.value.guildContracts,
+          currentGuildId: data.value.currentGuildId,
+          globalLastUpdate: data.value.globalLastUpdate,
+        });
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.warn("failed to persist contracts snapshot", e);
+      }
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn("persistGuildContracts failed", e);
+    }
+  }
+
   // reset: clear all contracts (used by tests)
   async function reset() {
     data.value = { ...DEFAULT };
@@ -292,5 +390,6 @@ export function useContractsStorage() {
     reset,
     migrateLegacyIfNeeded,
     deleteGuildContracts,
+    persistGuildContracts,
   };
 }
