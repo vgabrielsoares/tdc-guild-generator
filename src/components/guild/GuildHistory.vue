@@ -161,34 +161,13 @@ const loadGuild = (guildId: string) => {
   }
 };
 
-const toggleLock = (guildId: string) => {
-  const guild = guildStore.guildHistory.find(g => g.id === guildId);
-  // Se a guilda está tentando ser desbloqueada, verificar se tem contratos
-  if (guild?.locked) {
-    // Verificar se existe dados de contratos para esta guilda diretamente no localStorage
-    const contractsStorageKey = 'contracts-store-v2';
-    const contractsData = localStorage.getItem(contractsStorageKey);
+const toggleLock = async (guildId: string) => {
+  // Capture previous locked state to show appropriate feedback on failure
+  const prevGuild = guildStore.guildHistory.find(g => g.id === guildId);
+  const wasLocked = !!prevGuild?.locked;
 
-    if (contractsData) {
-      try {
-        const parsedData = JSON.parse(contractsData);
-        const guildContracts = parsedData.guildContracts?.[guildId];
+  const success = await guildStore.toggleGuildLock(guildId);
 
-        if (guildContracts && guildContracts.generationCount > 0) {
-          toast.warning(
-            'Esta guilda já está em uso e não pode ser desbloqueada.',
-            'Desbloqueio não permitido'
-          );
-          return;
-        }
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.warn('Erro ao verificar contratos da guilda:', error);
-      }
-    }
-  }
-
-  const success = guildStore.toggleGuildLock(guildId);
   if (success) {
     const updatedGuild = guildStore.guildHistory.find(g => g.id === guildId);
     if (updatedGuild?.locked) {
@@ -196,16 +175,17 @@ const toggleLock = (guildId: string) => {
     } else {
       toast.success('Guilda desbloqueada');
     }
+    return;
+  }
+
+  // Toggle failed — if we tried to unlock an in-use guild, show specific warning
+  if (wasLocked) {
+    toast.warning(
+      'Esta guilda já está em uso e não pode ser desbloqueada.',
+      'Desbloqueio não permitido'
+    );
   } else {
-    // Se o toggle falhou, mostrar mensagem específica dependendo do estado
-    if (guild?.locked) {
-      toast.warning(
-        'Esta guilda já está em uso e não pode ser desbloqueada.',
-        'Desbloqueio não permitido'
-      );
-    } else {
-      toast.error('Erro ao alterar bloqueio da guilda');
-    }
+    toast.error('Erro ao alterar bloqueio da guilda');
   }
 };
 
