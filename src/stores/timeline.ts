@@ -122,6 +122,61 @@ export const useTimelineStore = defineStore("timeline", () => {
    */
   function setCurrentGuild(guildId: string): void {
     currentGuildId.value = guildId;
+
+    // Also attempt to notify the guild store so the 'currentGuild' is set and persisted.
+    // Use dynamic import to avoid circular dependency at module load time.
+    void (async () => {
+      try {
+        const [{ useGuildStore }, { useStorageAdapter }] = await Promise.all([
+          import("./guild"),
+          import("@/composables/useStorageAdapter"),
+        ]);
+
+        const guildStore = useGuildStore();
+        // If the guild is already present in history, load it into currentGuild
+        const inHistory = guildStore.guildHistory.some((g) => g.id === guildId);
+        if (inHistory) {
+          guildStore.loadGuildFromHistory(guildId);
+          // Ensure it's locked when the timeline is active
+          void guildStore.toggleGuildLock(guildId);
+          return;
+        }
+
+        // Fallback: try to fetch the guild directly from persistent storage and add to history
+        const adapter = useStorageAdapter();
+        try {
+          const rec = await adapter.get<Record<string, unknown> | null>(
+            "guilds",
+            guildId
+          );
+          if (rec) {
+            // rec may be { value: Guild } or raw Guild
+            let candidate: unknown = rec;
+            if (
+              rec &&
+              typeof rec === "object" &&
+              (rec as Record<string, unknown>).value
+            ) {
+              candidate = (rec as Record<string, unknown>).value;
+            }
+            const { createGuild } = await import("@/types/guild");
+            try {
+              const guildObj = createGuild(candidate as unknown);
+              guildStore.addToHistory(guildObj);
+              guildStore.setCurrentGuild(guildObj);
+              // lock it
+              void guildStore.toggleGuildLock(guildId);
+            } catch (e) {
+              // ignore parse errors
+            }
+          }
+        } catch (e) {
+          // ignore adapter errors
+        }
+      } catch {
+        // ignore any errors to avoid breaking timeline creation
+      }
+    })();
   }
 
   /**
@@ -165,6 +220,9 @@ export const useTimelineStore = defineStore("timeline", () => {
     };
 
     timelines.value[guildId] = timeline;
+
+    // Set this guild as current timeline/guild so UI and other stores sync
+    currentGuildId.value = guildId;
 
     // Ao criar a timeline pela primeira vez, marcar a guilda como bloqueada
     // automaticamente para evitar que o usuário regenere partes que deveriam
