@@ -166,6 +166,35 @@ export const useTimelineStore = defineStore("timeline", () => {
 
     timelines.value[guildId] = timeline;
 
+    // Ao criar a timeline pela primeira vez, marcar a guilda como bloqueada
+    // automaticamente para evitar que o usuário regenere partes que deveriam
+    // permanecer estáveis após a inicialização da timeline. Usamos import
+    // dinâmico para evitar import circulares entre stores.
+    import("./guild")
+      .then(({ useGuildStore }) => {
+        try {
+          const guildStore = useGuildStore();
+          // Se a guilda já estiver no histórico e desbloqueada, aplicar lock
+          const inHistory = guildStore.guildHistory.some(
+            (g) => g.id === guildId
+          );
+          const alreadyLocked = guildStore.guildHistory.some(
+            (g) => g.id === guildId && g.locked
+          );
+
+          if (inHistory && !alreadyLocked) {
+            // toggleGuildLock é async. não aguardamos para não bloquear a criação
+            // da timeline, apenas tentamos aplicar o lock (erros são silenciosos).
+            void guildStore.toggleGuildLock(guildId).catch(() => {});
+          }
+        } catch {
+          // silencioso: se algo falhar, não impedimos a criação da timeline
+        }
+      })
+      .catch(() => {
+        // silencioso
+      });
+
     return timeline;
   }
 

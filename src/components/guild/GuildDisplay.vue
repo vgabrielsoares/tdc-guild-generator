@@ -608,7 +608,7 @@ const cancelEditingName = () => {
 };
 
 // Função de toggle do lock
-const toggleLock = () => {
+const toggleLock = async () => {
   if (!guild.value) return;
 
   // Verificar se a guilda está salva no histórico
@@ -630,7 +630,7 @@ const toggleLock = () => {
   }
 
   try {
-    const success = guildStore.toggleGuildLock(guild.value.id);
+    const success = await guildStore.toggleGuildLock(guild.value.id);
     if (success) {
       const isNowLocked = guild.value.locked;
       const message = isNowLocked

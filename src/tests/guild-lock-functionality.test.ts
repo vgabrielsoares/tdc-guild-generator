@@ -20,7 +20,7 @@ describe("Guild Lock Functionality", () => {
 
     // Adicionar ao histórico e bloquear
     store.addToHistory(guild);
-    store.toggleGuildLock(guild.id);
+    await store.toggleGuildLock(guild.id);
 
     // Verificar que a guilda está bloqueada
     expect(store.currentGuild?.locked).toBe(true);
@@ -38,7 +38,7 @@ describe("Guild Lock Functionality", () => {
 
     // Adicionar ao histórico e bloquear
     store.addToHistory(guild);
-    store.toggleGuildLock(guild.id);
+    await store.toggleGuildLock(guild.id);
 
     // Verificar que a guilda está bloqueada
     expect(store.currentGuild?.locked).toBe(true);
@@ -56,7 +56,7 @@ describe("Guild Lock Functionality", () => {
 
     // Adicionar ao histórico e bloquear
     store.addToHistory(guild);
-    store.toggleGuildLock(guild.id);
+    await store.toggleGuildLock(guild.id);
 
     // Verificar que a guilda está bloqueada
     expect(store.currentGuild?.locked).toBe(true);
@@ -74,7 +74,7 @@ describe("Guild Lock Functionality", () => {
 
     // Adicionar ao histórico e bloquear
     store.addToHistory(guild);
-    store.toggleGuildLock(guild.id);
+    await store.toggleGuildLock(guild.id);
 
     // Verificar que a guilda está bloqueada
     expect(store.currentGuild?.locked).toBe(true);
@@ -124,7 +124,7 @@ describe("Guild Lock Functionality", () => {
 
     // Adicionar ao histórico e bloquear
     store.addToHistory(guild);
-    store.toggleGuildLock(guild.id);
+    await store.toggleGuildLock(guild.id);
 
     // Verificar que a guilda está bloqueada
     expect(store.currentGuild?.locked).toBe(true);

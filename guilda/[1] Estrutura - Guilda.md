@@ -545,10 +545,10 @@ Sinta-se livre para ajustar a ordem ou adaptar para soar melhor!
 | 72   | do Rubi          |
 | 73   | do Vendaval      |
 | 74   | do Sol           |
-| 75   | do Chama         |
+| 75   | da Chama         |
 | 76   | do Granito       |
 | 77   | do Manto         |
-| 78   | do Alvorada      |
+| 78   | da Alvorada      |
 | 79   | do Ciclo         |
 | 80   | do Éden          |
 | 81   | do Relâmpago     |
