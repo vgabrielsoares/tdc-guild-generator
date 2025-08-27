@@ -249,7 +249,9 @@ export const useGuildStore = defineStore("guild", () => {
       (g) => g.id === originalId
     );
     if (historyIndex !== -1) {
-      guildStorage.data.value.guildHistory[historyIndex] = regeneratedGuild;
+      const newHistory = guildStorage.data.value.guildHistory.slice();
+      newHistory[historyIndex] = regeneratedGuild;
+      guildStorage.data.value.guildHistory = newHistory;
     }
 
     return regeneratedGuild;
@@ -304,7 +306,9 @@ export const useGuildStore = defineStore("guild", () => {
       (g) => g.id === originalId
     );
     if (historyIndex !== -1) {
-      guildStorage.data.value.guildHistory[historyIndex] = regeneratedGuild;
+      const newHistory = guildStorage.data.value.guildHistory.slice();
+      newHistory[historyIndex] = regeneratedGuild;
+      guildStorage.data.value.guildHistory = newHistory;
     }
   }
 
@@ -356,7 +360,9 @@ export const useGuildStore = defineStore("guild", () => {
       (g) => g.id === originalId
     );
     if (historyIndex !== -1) {
-      guildStorage.data.value.guildHistory[historyIndex] = regeneratedGuild;
+      const newHistory = guildStorage.data.value.guildHistory.slice();
+      newHistory[historyIndex] = regeneratedGuild;
+      guildStorage.data.value.guildHistory = newHistory;
     }
   }
 
@@ -471,13 +477,16 @@ export const useGuildStore = defineStore("guild", () => {
       (g) => g.id === guildToSave.id
     );
     if (existingIndex === -1) {
-      // Modificar o storage diretamente para garantir persistência
-      guildStorage.data.value.guildHistory.unshift(guildToSave);
+      // Prepend immutably so Vue detects the change
+      const newHistory = [guildToSave, ...guildStorage.data.value.guildHistory];
 
-      // Limitar histórico a 50 guildas
-      if (guildStorage.data.value.guildHistory.length > 50) {
-        guildStorage.data.value.guildHistory =
-          guildStorage.data.value.guildHistory.slice(0, 50);
+      // Limit history to 50 guilds
+      guildStorage.data.value.guildHistory =
+        newHistory.length > 50 ? newHistory.slice(0, 50) : newHistory;
+
+      // If there is no currentGuild, set this as current for immediate rendering
+      if (!currentGuild.value) {
+        currentGuild.value = guildToSave;
       }
     }
   }
@@ -603,10 +612,12 @@ export const useGuildStore = defineStore("guild", () => {
     }
 
     const newGuild = { ...guild, locked: !guild.locked };
-    // Modificar o storage diretamente
-    guildStorage.data.value.guildHistory[guildIndex] = newGuild;
+    // Replace the history array immutably to ensure Vue reactivity consumers update
+    const newHistory = guildStorage.data.value.guildHistory.slice();
+    newHistory[guildIndex] = newGuild;
+    guildStorage.data.value.guildHistory = newHistory;
 
-    // Se a guilda atual está sendo modificada, atualizar também
+    // If the current guild is being modified, update it as well
     if (currentGuild.value?.id === guildId) {
       currentGuild.value = newGuild;
     }
