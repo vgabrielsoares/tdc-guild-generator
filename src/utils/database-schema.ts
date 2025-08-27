@@ -47,7 +47,14 @@ export const DB_STORES = [
   {
     name: "contracts",
     keyPath: "id",
-    indices: ["guildId", "status", "deadline", "createdAt"],
+    // support composite index for guildId + status for optimized queries
+    indices: [
+      "guildId",
+      "status",
+      "deadline",
+      "createdAt",
+      { name: "guildId_status", keyPath: ["guildId", "status"] },
+    ],
   },
   {
     name: "services",

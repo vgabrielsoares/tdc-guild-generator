@@ -54,13 +54,31 @@ function openDBOnce(): Promise<IDBDatabase> {
             keyPath: s.keyPath || "id",
           });
           if (Array.isArray(s.indices)) {
-            s.indices.forEach((idx: string) => {
-              try {
-                store.createIndex(idx, idx, { unique: false });
-              } catch (e) {
-                // ignore
+            s.indices.forEach(
+              (
+                idx:
+                  | string
+                  | {
+                      name: string;
+                      keyPath: string | string[];
+                      options?: IDBIndexParameters;
+                    }
+              ) => {
+                try {
+                  if (typeof idx === "string") {
+                    store.createIndex(idx, idx, { unique: false });
+                  } else if (typeof idx === "object" && idx !== null) {
+                    store.createIndex(
+                      idx.name,
+                      idx.keyPath as string | string[],
+                      idx.options ?? { unique: false }
+                    );
+                  }
+                } catch (e) {
+                  // ignore
+                }
               }
-            });
+            );
           }
         }
       });
