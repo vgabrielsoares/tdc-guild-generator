@@ -241,6 +241,16 @@ export const useContractsStore = defineStore("contracts", () => {
     storage.data.value.globalLastUpdate = new Date();
   };
 
+  // persist current guild's contracts to adapter and wait for completion
+  const persistCurrentGuildToAdapter = async () => {
+    if (!currentGuildId.value) return;
+    try {
+      await storage.persistGuildContracts(currentGuildId.value);
+    } catch (e) {
+      // silent
+    }
+  };
+
   /**
    * Carrega os contratos de uma guilda específica
    */
@@ -635,6 +645,8 @@ export const useContractsStore = defineStore("contracts", () => {
       lifecycleManager.markNewContractsGenerated();
       lastUpdate.value = new Date();
       saveToStorage();
+      // Ensure persistence completed before continuing (avoids UI showing counts without saved rows)
+      await persistCurrentGuildToAdapter();
 
       // Agendar próximos eventos de timeline
       scheduleContractEvents();
@@ -722,6 +734,8 @@ export const useContractsStore = defineStore("contracts", () => {
       lifecycleManager.markNewContractsGenerated();
       lastUpdate.value = new Date();
       saveToStorage();
+      // Ensure persistence completed before continuing (avoids UI showing counts without saved rows)
+      await persistCurrentGuildToAdapter();
 
       // Agendar eventos de timeline após gerar contratos
       scheduleContractEvents();
