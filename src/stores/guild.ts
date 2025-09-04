@@ -11,6 +11,7 @@ import { createGuild, isGuild } from "@/types/guild";
 import { generateRandomGuildName } from "@/data/guild-names";
 import { useGuildStorage } from "@/composables/useGuildStorage";
 import { useStorageAdapter } from "@/composables/useStorageAdapter";
+import { useCurrentGuildPersistence } from "@/composables/useCurrentGuildPersistence";
 
 // Interface para opções de geração
 export interface GenerateGuildOptions {
@@ -41,12 +42,22 @@ export const useGuildStore = defineStore("guild", () => {
   // Storage resiliente
   const guildStorage = useGuildStorage();
   const storageAdapter = useStorageAdapter();
+  const currentGuildPersistence = useCurrentGuildPersistence();
 
   // Refs computados a partir do storage com validação
   const currentGuild = computed({
     get: () => {
       const guild = guildStorage.data.value.currentGuild;
-      if (!guild) return null;
+      if (!guild) {
+        // Tentar recuperar do localStorage (para guildas não salvas no histórico)
+        const persistedGuild = currentGuildPersistence.currentGuild.value;
+        if (persistedGuild) {
+          // Restaurar a guilda do localStorage e sincronizar com IndexedDB
+          guildStorage.data.value.currentGuild = persistedGuild;
+          return persistedGuild;
+        }
+        return null;
+      }
 
       // Validate the stored guild using Zod helper. If invalid, remove it.
       try {
@@ -55,17 +66,27 @@ export const useGuildStore = defineStore("guild", () => {
         if (valid !== guild) {
           guildStorage.data.value.currentGuild = valid;
         }
+        // Sincronizar com localStorage sempre que houver uma guilda válida
+        if (
+          JSON.stringify(valid) !==
+          JSON.stringify(currentGuildPersistence.currentGuild.value)
+        ) {
+          currentGuildPersistence.setCurrentGuild(valid);
+        }
         return valid;
       } catch (err) {
         // invalid data persisted. clear it to avoid runtime errors
         // eslint-disable-next-line no-console
         console.warn("Invalid stored currentGuild removed:", err);
         guildStorage.data.value.currentGuild = null;
+        currentGuildPersistence.clearCurrentGuild();
         return null;
       }
     },
     set: (value) => {
       guildStorage.data.value.currentGuild = value;
+      // Sincronizar com localStorage
+      currentGuildPersistence.setCurrentGuild(value);
     },
   });
 
@@ -719,6 +740,15 @@ export const useGuildStore = defineStore("guild", () => {
     lastGenerationResult.value = null;
     lastConfig.value = null;
     error.value = null;
+
+    // Limpar também do storage IndexedDB para garantir consistência
+    void (async () => {
+      try {
+        await storageAdapter.del("settings", "guild-current-id");
+      } catch (e) {
+        // ignorar erros
+      }
+    })();
   }
 
   // Exportar guilda atual como JSON
