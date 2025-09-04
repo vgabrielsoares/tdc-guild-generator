@@ -16,7 +16,7 @@ import {
   type ServiceLifecycleState,
 } from "@/utils/generators/serviceLifeCycle";
 import { ServiceGenerator } from "@/utils/generators/serviceGenerator";
-import { saveToStorage, loadFromStorage } from "@/utils/storage";
+import { useServicesStorage } from "@/composables/useServicesStorage";
 import { useTimelineStore } from "@/stores/timeline";
 import { useGuildStore } from "@/stores/guild";
 import { useToast } from "@/composables/useToast";
@@ -42,6 +42,7 @@ export const useServicesStore = defineStore("services", () => {
   const timelineStore = useTimelineStore();
   const guildStore = useGuildStore();
   const { success } = useToast();
+  const servicesStorage = useServicesStorage();
 
   // State
   const services = ref<ServiceWithGuild[]>([]);
@@ -324,42 +325,78 @@ export const useServicesStore = defineStore("services", () => {
   };
 
   // Storage methods
-  const saveServicesToStorage = () => {
-    saveToStorage("services-store", {
-      services: services.value,
-      lifecycleState: exportLifecycleState(),
-    });
+  const saveServicesToStorage = async () => {
+    const currentGuildId = guildStore.currentGuild?.id;
+    if (!currentGuildId) return;
+
+    // Converter services para formato sem guildId (Service[])
+    const servicesForGuild = services.value
+      .filter((s) => s.guildId === currentGuildId)
+      .map((s) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { guildId: _, ...service } = s;
+        return service as Service;
+      });
+
+    await servicesStorage.updateServicesForGuild(
+      currentGuildId,
+      servicesForGuild
+    );
   };
 
-  const loadServicesFromStorage = (currentDate?: GameDate) => {
-    const data = loadFromStorage<{
-      services: ServiceWithGuild[];
-      lifecycleState: ServiceLifecycleState | null;
-    }>("services-store");
+  const loadServicesFromStorage = async (currentDate?: GameDate) => {
+    const currentGuildId = guildStore.currentGuild?.id;
+    if (!currentGuildId) return;
 
-    if (data) {
-      services.value = data.services || [];
-      if (data.lifecycleState && currentDate) {
-        importLifecycleState(data.lifecycleState, currentDate);
-      }
+    const guildServices = servicesStorage.getServicesForGuild(currentGuildId);
+
+    // Converter para ServiceWithGuild
+    const servicesWithGuild: ServiceWithGuild[] = guildServices.map(
+      (service) => ({
+        ...service,
+        guildId: currentGuildId,
+      })
+    );
+
+    services.value = servicesWithGuild;
+
+    // Inicializar lifecycle manager se necessário
+    if (currentDate) {
+      initializeLifecycleManager(currentDate);
     }
   };
 
-  const clearAllServices = () => {
-    services.value = [];
+  const clearAllServices = async (testGuildId?: string) => {
+    const currentGuildId = testGuildId || guildStore.currentGuild?.id;
+    if (!currentGuildId) return;
+
+    services.value = services.value.filter((s) => s.guildId !== currentGuildId);
     lifecycleManager.value = null;
-    saveServicesToStorage();
+    await servicesStorage.removeServicesForGuild(currentGuildId);
   };
 
-  // Auto-load de serviços fo storage quando store é incializado
-  // Garante serviços persistidos disponíveis para outras view (timeline)
-  loadServicesFromStorage();
+  // Auto-load de serviços do storage quando store é inicializado
+  // Garante serviços persistidos disponíveis para outras views (timeline)
+  void loadServicesFromStorage();
+
+  // Auto-save quando services mudam
+  watch(
+    () => services.value,
+    () => {
+      void saveServicesToStorage();
+    },
+    { deep: true }
+  );
 
   // watch pra guilda atual pra inicializar o lifecycle manager com a timeline
   watch(
     () => guildStore.currentGuild?.id,
     (newGuildId) => {
       if (!newGuildId) return;
+
+      // Carregar serviços da nova guilda
+      void loadServicesFromStorage(timelineStore.currentGameDate || undefined);
+
       const currentDate = timelineStore.currentGameDate;
       if (currentDate) {
         // Initialize lifecycle manager with the current timeline date
