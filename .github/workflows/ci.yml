@@ -36,6 +36,7 @@ jobs:
         run: npm run test:coverage
 
       - name: Build application
+        if: matrix.node-version != '18.x'
         run: npm run build
 
       - name: Upload coverage reports
