@@ -166,7 +166,16 @@ export function getTriggeredEvents(
   events: ScheduledEvent[],
   targetDate: GameDate
 ): ScheduledEvent[] {
-  return events.filter((event) => isDateBeforeOrEqual(event.date, targetDate));
+  return events.filter((event) => {
+    if (!event || !event.date) return false;
+    try {
+      // proteger contra datas inválidas
+      if (!isValidGameDate(event.date)) return false;
+      return isDateBeforeOrEqual(event.date, targetDate);
+    } catch {
+      return false;
+    }
+  });
 }
 
 /**
@@ -176,7 +185,15 @@ export function getRemainingEvents(
   events: ScheduledEvent[],
   targetDate: GameDate
 ): ScheduledEvent[] {
-  return events.filter((event) => !isDateBeforeOrEqual(event.date, targetDate));
+  return events.filter((event) => {
+    if (!event || !event.date) return false;
+    try {
+      if (!isValidGameDate(event.date)) return false;
+      return !isDateBeforeOrEqual(event.date, targetDate);
+    } catch {
+      return false;
+    }
+  });
 }
 
 /**
@@ -184,6 +201,13 @@ export function getRemainingEvents(
  */
 export function sortEventsByDate(events: ScheduledEvent[]): ScheduledEvent[] {
   return [...events].sort((a, b) => {
+    const aValid = a && a.date && isValidGameDate(a.date);
+    const bValid = b && b.date && isValidGameDate(b.date);
+
+    if (!aValid && !bValid) return 0;
+    if (!aValid) return 1;
+    if (!bValid) return -1;
+
     if (isSameDate(a.date, b.date)) return 0;
     return isDateBeforeOrEqual(a.date, b.date) ? -1 : 1;
   });
