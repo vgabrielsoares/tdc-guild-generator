@@ -117,7 +117,7 @@ export function rollOnTable<T>(
 
   // Clamp the roll result to the table range to prevent out-of-bounds issues
   const clampedRoll = Math.max(minValue, Math.min(maxValue, diceRoll.result));
-  
+
   if (clampedRoll !== diceRoll.result) {
     logTable.warn(
       `Roll ${diceRoll.result} clamped to ${clampedRoll} to fit table range ${minValue}-${maxValue}`

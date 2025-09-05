@@ -2,7 +2,7 @@
 // Will be implemented in Phase 7
 
 export interface Notice {
-  id: string
+  id: string;
   // To be implemented in Issue 7.1
 }
 
@@ -11,4 +11,4 @@ export interface NoticeType {
 }
 
 // Placeholder - to be expanded in Issue 7.1
-export type NoticeData = any
+export type NoticeData = any;

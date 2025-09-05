@@ -3,8 +3,8 @@
  * Define interfaces e padrões comuns para geração procedural
  */
 
-import type { SettlementType } from '@/types/guild';
-import { rollDice } from '@/utils/dice';
+import type { SettlementType } from "@/types/guild";
+import { rollDice } from "@/utils/dice";
 
 // Interface base para configuração de geração
 export interface BaseGenerationConfig {
@@ -23,7 +23,10 @@ export interface BaseGenerationResult<TData, TRolls = Record<string, number>> {
 }
 
 // Classe abstrata base para geradores
-export abstract class BaseGenerator<TConfig extends BaseGenerationConfig, TResult> {
+export abstract class BaseGenerator<
+  TConfig extends BaseGenerationConfig,
+  TResult,
+> {
   protected logs: string[] = [];
   protected debug: boolean = false;
 
@@ -35,13 +38,15 @@ export abstract class BaseGenerator<TConfig extends BaseGenerationConfig, TResul
   public generate(): TResult {
     this.logs = [];
     this.log(`Starting generation for ${this.config.settlementType}`);
-    
+
     try {
       const result = this.doGenerate();
       this.log(`Generation completed successfully`);
       return result;
     } catch (error) {
-      this.log(`Generation failed: ${error instanceof Error ? error.message : String(error)}`);
+      this.log(
+        `Generation failed: ${error instanceof Error ? error.message : String(error)}`
+      );
       throw error;
     }
   }
@@ -50,12 +55,16 @@ export abstract class BaseGenerator<TConfig extends BaseGenerationConfig, TResul
   protected abstract doGenerate(): TResult;
 
   // Utilitários para logging
-  protected log(message: string, category: string = 'GENERATOR'): void {
+  protected log(message: string, category: string = "GENERATOR"): void {
     const logMessage = `[${category}] ${message}`;
     this.logs.push(logMessage);
-    
+
     // Usar console apenas em modo debug e em desenvolvimento
-    if (this.debug && typeof window !== 'undefined' && window?.location?.hostname === 'localhost') {
+    if (
+      this.debug &&
+      typeof window !== "undefined" &&
+      window?.location?.hostname === "localhost"
+    ) {
       // eslint-disable-next-line no-console
       console.log(logMessage);
     }
@@ -65,19 +74,19 @@ export abstract class BaseGenerator<TConfig extends BaseGenerationConfig, TResul
   protected rollWithLog(
     notation: string,
     description: string,
-    category: string = 'ROLL'
+    category: string = "ROLL"
   ): { result: number; details: string } {
-    const roll = rollDice({ 
-      notation, 
+    const roll = rollDice({
+      notation,
       context: description,
-      logRoll: true 
+      logRoll: true,
     });
     const details = `${description}: ${notation} = ${roll.result}`;
     this.log(details, category);
-    
+
     return {
       result: roll.result,
-      details
+      details,
     };
   }
 
@@ -90,8 +99,8 @@ export abstract class BaseGenerator<TConfig extends BaseGenerationConfig, TResul
     const finalValue = baseValue + modifier;
     if (modifier !== 0) {
       this.log(
-        `${description}: ${baseValue} ${modifier >= 0 ? '+' : ''}${modifier} = ${finalValue}`,
-        'MODIFIER'
+        `${description}: ${baseValue} ${modifier >= 0 ? "+" : ""}${modifier} = ${finalValue}`,
+        "MODIFIER"
       );
     }
     return finalValue;
@@ -105,7 +114,7 @@ export abstract class BaseGenerator<TConfig extends BaseGenerationConfig, TResul
   // Método para validar configuração
   protected validateConfig(): void {
     if (!this.config.settlementType) {
-      throw new Error('Settlement type is required');
+      throw new Error("Settlement type is required");
     }
   }
 }

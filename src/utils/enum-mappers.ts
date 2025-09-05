@@ -3,17 +3,24 @@
  * Centraliza toda a lógica de conversão para evitar repetição
  */
 
-import { RelationLevel, ResourceLevel, VisitorLevel, SettlementType } from '@/types/guild';
+import {
+  RelationLevel,
+  ResourceLevel,
+  VisitorLevel,
+  SettlementType,
+} from "@/types/guild";
 
 // Mapeamento de relações governamentais
-export function mapGovernmentRelationToEnum(tableResult: string): RelationLevel {
+export function mapGovernmentRelationToEnum(
+  tableResult: string
+): RelationLevel {
   const mapping: Record<string, RelationLevel> = {
-    "Péssima": RelationLevel.PESSIMA,
-    "Ruim": RelationLevel.RUIM,
+    Péssima: RelationLevel.PESSIMA,
+    Ruim: RelationLevel.RUIM,
     "Ruim, mas tentam manter a cordialidade": RelationLevel.RUIM_CORDIAL,
-    "Diplomática": RelationLevel.DIPLOMATICA,
+    Diplomática: RelationLevel.DIPLOMATICA,
     "Boa, mas o governo tenta miná-los secretamente": RelationLevel.BOA_TENSAO,
-    "Boa": RelationLevel.BOA,
+    Boa: RelationLevel.BOA,
     "Muito boa, cooperam frequentemente": RelationLevel.MUITO_BOA,
     "Excelente, governo e guilda são quase como um": RelationLevel.EXCELENTE,
   };
@@ -22,7 +29,9 @@ export function mapGovernmentRelationToEnum(tableResult: string): RelationLevel 
 }
 
 // Mapeamento de relações populacionais
-export function mapPopulationRelationToEnum(tableResult: string): RelationLevel {
+export function mapPopulationRelationToEnum(
+  tableResult: string
+): RelationLevel {
   const mapping: Record<string, RelationLevel> = {
     "Péssima, puro ódio": RelationLevel.PESSIMA,
     "Ruim, vistos como mercenários": RelationLevel.RUIM,
@@ -31,7 +40,8 @@ export function mapPopulationRelationToEnum(tableResult: string): RelationLevel 
     "Boa, ajudam com problemas": RelationLevel.BOA_AJUDAM,
     "Boa, nos mantêm seguros": RelationLevel.BOA_SEGUROS,
     "Muito boa, sem eles estaríamos perdidos": RelationLevel.MUITO_BOA_PERDIDOS,
-    "Excelente, a guilda faz o assentamento funcionar": RelationLevel.EXCELENTE_FUNCIONAR,
+    "Excelente, a guilda faz o assentamento funcionar":
+      RelationLevel.EXCELENTE_FUNCIONAR,
   };
 
   return mapping[tableResult] || RelationLevel.OPINIAO_DIVIDIDA;
@@ -40,13 +50,13 @@ export function mapPopulationRelationToEnum(tableResult: string): RelationLevel 
 // Mapeamento de níveis de visitantes
 export function mapVisitorStringToEnum(visitorString: string): VisitorLevel {
   const mapping: Record<string, VisitorLevel> = {
-    "Vazia": VisitorLevel.VAZIA,
+    Vazia: VisitorLevel.VAZIA,
     "Quase deserta": VisitorLevel.QUASE_DESERTA,
     "Pouco movimentada": VisitorLevel.POUCO_MOVIMENTADA,
     "Nem muito nem pouco": VisitorLevel.NEM_MUITO_NEM_POUCO,
     "Muito frequentada": VisitorLevel.MUITO_FREQUENTADA,
-    "Abarrotada": VisitorLevel.ABARROTADA,
-    "Lotada": VisitorLevel.LOTADA,
+    Abarrotada: VisitorLevel.ABARROTADA,
+    Lotada: VisitorLevel.LOTADA,
   };
 
   return mapping[visitorString] || VisitorLevel.NEM_MUITO_NEM_POUCO;
@@ -56,16 +66,19 @@ export function mapVisitorStringToEnum(visitorString: string): VisitorLevel {
 export function mapResourceStringToEnum(resourceString: string): ResourceLevel {
   const mapping: Record<string, ResourceLevel> = {
     "Em débito": ResourceLevel.EM_DEBITO,
-    "Nenhum": ResourceLevel.NENHUM,
-    "Escassos": ResourceLevel.ESCASSOS,
-    "Escassos e obtidos com muito esforço e honestidade": ResourceLevel.ESCASSOS_HONESTOS,
-    "Limitados": ResourceLevel.LIMITADOS,
-    "Suficientes": ResourceLevel.SUFICIENTES,
-    "Excedentes": ResourceLevel.EXCEDENTES,
+    Nenhum: ResourceLevel.NENHUM,
+    Escassos: ResourceLevel.ESCASSOS,
+    "Escassos e obtidos com muito esforço e honestidade":
+      ResourceLevel.ESCASSOS_HONESTOS,
+    Limitados: ResourceLevel.LIMITADOS,
+    Suficientes: ResourceLevel.SUFICIENTES,
+    Excedentes: ResourceLevel.EXCEDENTES,
     "Excedentes mas alimenta fins malignos": ResourceLevel.EXCEDENTES_MALIGNOS,
-    "Abundantes porém quase todo vindo do governo de um assentamento próximo": ResourceLevel.ABUNDANTES_GOVERNO,
-    "Abundantes": ResourceLevel.ABUNDANTES,
-    "Abundantes vindos de muitos anos de serviço": ResourceLevel.ABUNDANTES_SERVICO,
+    "Abundantes porém quase todo vindo do governo de um assentamento próximo":
+      ResourceLevel.ABUNDANTES_GOVERNO,
+    Abundantes: ResourceLevel.ABUNDANTES,
+    "Abundantes vindos de muitos anos de serviço":
+      ResourceLevel.ABUNDANTES_SERVICO,
   };
 
   return mapping[resourceString] || ResourceLevel.LIMITADOS;
@@ -81,7 +94,9 @@ export function mapRelationLevelToString(relationLevel: RelationLevel): string {
 }
 
 // Mapeamento de tipos de assentamento para chaves das tabelas
-export function mapSettlementTypeToTableKey(settlementType: SettlementType): string {
+export function mapSettlementTypeToTableKey(
+  settlementType: SettlementType
+): string {
   const mapping: Record<SettlementType, string> = {
     [SettlementType.LUGAREJO]: "Lugarejo",
     [SettlementType.POVOADO]: "Povoado",

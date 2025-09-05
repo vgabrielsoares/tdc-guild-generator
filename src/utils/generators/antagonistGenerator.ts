@@ -1,4 +1,7 @@
-import { rollMultipleWithCombining, createTextBasedRollAgainChecker } from "@/utils/multiRollHandler";
+import {
+  rollMultipleWithCombining,
+  createTextBasedRollAgainChecker,
+} from "@/utils/multiRollHandler";
 import type { Antagonist } from "@/types/contract";
 import {
   ANTAGONIST_TYPES_TABLE,
@@ -19,13 +22,13 @@ export class AntagonistGenerator {
     // Usa sistema de múltiplas rolagens para tipos de antagonistas
     const typeResults = rollMultipleWithCombining(
       ANTAGONIST_TYPES_TABLE,
-      createTextBasedRollAgainChecker('Role duas vezes'),
-      'Tipos de Antagonistas',
-      2  // Limitar a 2 tipos máximo
+      createTextBasedRollAgainChecker("Role duas vezes"),
+      "Tipos de Antagonistas",
+      2 // Limitar a 2 tipos máximo
     );
 
     // Se houve múltiplos tipos, gera antagonistas combinados
-    if (typeResults.includes(' E ')) {
+    if (typeResults.includes(" E ")) {
       return this.generateCombinedAntagonists(typeResults);
     }
 
@@ -36,9 +39,13 @@ export class AntagonistGenerator {
   /**
    * Gera múltiplos antagonistas combinados baseado nos tipos coletados
    */
-  private static generateCombinedAntagonists(combinedTypes: string): Antagonist {
-    const types = combinedTypes.split(' E ').map(t => t.trim());
-    const antagonists = types.map(type => this.generateSingleAntagonist(type));
+  private static generateCombinedAntagonists(
+    combinedTypes: string
+  ): Antagonist {
+    const types = combinedTypes.split(" E ").map((t) => t.trim());
+    const antagonists = types.map((type) =>
+      this.generateSingleAntagonist(type)
+    );
 
     if (antagonists.length === 2) {
       const [first, second] = antagonists;
@@ -52,9 +59,11 @@ export class AntagonistGenerator {
 
     // Para mais de 2 antagonistas, combina tudo
     const combinedCategory = antagonists[0].category;
-    const combinedSpecificType = antagonists.map(a => a.specificType).join(', ');
-    const combinedName = antagonists.map(a => a.name).join(' & ');
-    const combinedDescription = `Múltiplas ameaças: ${antagonists.map(a => a.description).join(' Além disso, ')}`;
+    const combinedSpecificType = antagonists
+      .map((a) => a.specificType)
+      .join(", ");
+    const combinedName = antagonists.map((a) => a.name).join(" & ");
+    const combinedDescription = `Múltiplas ameaças: ${antagonists.map((a) => a.description).join(" Além disso, ")}`;
 
     return {
       category: combinedCategory,
@@ -79,7 +88,7 @@ export class AntagonistGenerator {
     // Usa novo sistema de múltiplas rolagens para detalhes específicos
     const specificType = rollMultipleWithCombining(
       detailTable,
-      createTextBasedRollAgainChecker('Role duas vezes'),
+      createTextBasedRollAgainChecker("Role duas vezes"),
       `Detalhes ${antagonistType}`
     );
 

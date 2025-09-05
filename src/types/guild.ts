@@ -28,7 +28,7 @@ export enum ResourceLevel {
 
 export enum VisitorLevel {
   VAZIA = "Vazia",
-  QUASE_DESERTA = "Quase deserta", 
+  QUASE_DESERTA = "Quase deserta",
   POUCO_MOVIMENTADA = "Pouco movimentada",
   NEM_MUITO_NEM_POUCO = "Nem muito nem pouco",
   MUITO_FREQUENTADA = "Muito frequentada",
@@ -43,7 +43,7 @@ export enum RelationLevel {
   RUIM_MERCENARIOS = "Ruim, vistos como mercenários",
   RUIM_CORDIAL = "Ruim, mas tentam manter a cordialidade",
   RUIM_PROBLEMAS = "Ruim, só causam problemas",
-  DIPLOMATICA = "Diplomática", 
+  DIPLOMATICA = "Diplomática",
   OPINIAO_DIVIDIDA = "Opinião dividida",
   BOA_TENSAO = "Boa, mas o governo tenta miná-los secretamente",
   BOA = "Boa",
@@ -187,20 +187,25 @@ export const GuildSchema = z.object({
   visitors: GuildVisitorsSchema,
   resources: GuildResourcesSchema,
   settlementType: SettlementTypeSchema,
-  createdAt: z.union([
-    z.date(),
-    z.string().transform((str) => new Date(str)),
-    z.number().transform((num) => new Date(num))
-  ]).refine((date) => !isNaN(date.getTime()), {
-    message: "Invalid date"
-  }),
-  updatedAt: z.union([
-    z.date(),
-    z.string().transform((str) => new Date(str)),
-    z.number().transform((num) => new Date(num))
-  ]).refine((date) => !isNaN(date.getTime()), {
-    message: "Invalid date"
-  }).optional(),
+  createdAt: z
+    .union([
+      z.date(),
+      z.string().transform((str) => new Date(str)),
+      z.number().transform((num) => new Date(num)),
+    ])
+    .refine((date) => !isNaN(date.getTime()), {
+      message: "Invalid date",
+    }),
+  updatedAt: z
+    .union([
+      z.date(),
+      z.string().transform((str) => new Date(str)),
+      z.number().transform((num) => new Date(num)),
+    ])
+    .refine((date) => !isNaN(date.getTime()), {
+      message: "Invalid date",
+    })
+    .optional(),
   locked: z.boolean().optional().default(false),
 });
 

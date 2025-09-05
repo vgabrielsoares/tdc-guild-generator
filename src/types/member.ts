@@ -2,7 +2,7 @@
 // Will be implemented in Phase 6
 
 export interface GuildMember {
-  id: string
+  id: string;
   // To be implemented in Issue 6.1
 }
 
@@ -11,4 +11,4 @@ export interface MemberRank {
 }
 
 // Placeholder - to be expanded in Issue 6.1
-export type MemberData = any
+export type MemberData = any;

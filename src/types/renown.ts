@@ -10,4 +10,4 @@ export interface RenownBenefits {
 }
 
 // Placeholder - to be expanded in Issue 8.1
-export type RenownData = any
+export type RenownData = any;

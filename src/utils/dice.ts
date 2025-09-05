@@ -453,7 +453,6 @@ export function rollAdvanced(
   return result;
 }
 
-
 /**
  * Export for testing and debugging
  */
