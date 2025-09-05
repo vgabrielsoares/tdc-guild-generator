@@ -191,8 +191,9 @@ const formatDate = (date: Date | string | null | undefined): string => {
 };
 
 const loadGuild = (guildId: string) => {
-  const success = guildStore.selectGuildFromHistory(guildId);
-  if (success) {
+  guildStore.selectGuildFromHistory(guildId);
+
+  if (guildStore.currentGuild?.id === guildId) {
     toast.success("Guilda carregada do histórico");
   } else {
     toast.error("Erro ao carregar guilda do histórico");
@@ -227,7 +228,7 @@ const toggleLock = async (guildId: string) => {
   }
 };
 
-const removeGuild = (guildId: string) => {
+const removeGuild = async (guildId: string) => {
   const guild = guildStore.guildHistory.find((g) => g.id === guildId);
 
   if (guild?.locked) {
@@ -235,7 +236,7 @@ const removeGuild = (guildId: string) => {
     return;
   }
 
-  const success = guildStore.removeFromHistory(guildId);
+  const success = await guildStore.removeFromHistory(guildId);
   if (success) {
     toast.success("Guilda removida do histórico");
   } else {
