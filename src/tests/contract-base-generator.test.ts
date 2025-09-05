@@ -429,7 +429,7 @@ describe("ContractGenerator - Issue 4.11 - Implementação Completa", () => {
 
       expect(contract.deadline.type).toBeDefined();
       expect(contract.deadline.value).toBeDefined();
-      
+
       // Verificar que o tipo é um dos valores válidos
       expect(Object.values(DeadlineType)).toContain(contract.deadline.type);
     });

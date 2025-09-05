@@ -19,12 +19,14 @@ describe("Settlement Dice Constraints - Bug Fix Validation", () => {
         // Lugarejo e Aldeia devem usar d8 (máximo 8)
         expect(result.lugarejo.roll).toBeLessThanOrEqual(8);
         expect(result.lugarejo.roll).toBeGreaterThanOrEqual(1);
-        
+
         expect(result.aldeia.roll).toBeLessThanOrEqual(8);
         expect(result.aldeia.roll).toBeGreaterThanOrEqual(1);
-        
+
         if (result.lugarejo.roll > 8 || result.aldeia.roll > 8) {
-          throw new Error(`Small settlement exceeded dice limits - Test ${index}: Lugarejo=${result.lugarejo.roll}, Aldeia=${result.aldeia.roll}`);
+          throw new Error(
+            `Small settlement exceeded dice limits - Test ${index}: Lugarejo=${result.lugarejo.roll}, Aldeia=${result.aldeia.roll}`
+          );
         }
       });
     });
@@ -61,43 +63,80 @@ describe("Settlement Dice Constraints - Bug Fix Validation", () => {
         // Pequenos assentamentos devem usar d8 para visitantes (máximo 8)
         expect(result.lugarejoVisitors.roll).toBeLessThanOrEqual(8);
         expect(result.lugarejoVisitors.roll).toBeGreaterThanOrEqual(1);
-        
+
         expect(result.aldeiaVisitors.roll).toBeLessThanOrEqual(8);
         expect(result.aldeiaVisitors.roll).toBeGreaterThanOrEqual(1);
-        
-        if (result.lugarejoVisitors.roll > 8 || result.aldeiaVisitors.roll > 8) {
-          throw new Error(`Small settlement visitors exceeded dice limits - Test ${index}: LugarejoV=${result.lugarejoVisitors.roll}, AldeiaV=${result.aldeiaVisitors.roll}`);
+
+        if (
+          result.lugarejoVisitors.roll > 8 ||
+          result.aldeiaVisitors.roll > 8
+        ) {
+          throw new Error(
+            `Small settlement visitors exceeded dice limits - Test ${index}: LugarejoV=${result.lugarejoVisitors.roll}, AldeiaV=${result.aldeiaVisitors.roll}`
+          );
         }
       });
     });
 
     it("should show clear differences between settlement types", () => {
-      const results: Record<string, ReturnType<typeof generateGuildStructure>[]> = {};
-      const settlementTypes = [ST.LUGAREJO, ST.POVOADO, ST.ALDEIA, ST.VILAREJO, ST.VILA_GRANDE, ST.CIDADELA, ST.CIDADE_GRANDE, ST.METROPOLE];
-      
+      const results: Record<
+        string,
+        ReturnType<typeof generateGuildStructure>[]
+      > = {};
+      const settlementTypes = [
+        ST.LUGAREJO,
+        ST.POVOADO,
+        ST.ALDEIA,
+        ST.VILAREJO,
+        ST.VILA_GRANDE,
+        ST.CIDADELA,
+        ST.CIDADE_GRANDE,
+        ST.METROPOLE,
+      ];
+
       // Gerar várias guildas para cada tipo de assentamento
       settlementTypes.forEach((settlementType) => {
         const guilds = [];
         for (let i = 0; i < 10; i++) {
-          const result = generateGuildStructure({ settlementType, useModifiers: false });
+          const result = generateGuildStructure({
+            settlementType,
+            useModifiers: false,
+          });
           guilds.push(result);
         }
         results[settlementType] = guilds;
       });
 
       // Verificar que diferentes tipos de assentamento produzem resultados distintos
-      const lugarejosRolls = results[ST.LUGAREJO].map((r) => r.rolls.structure.size);
-      const metropoleRolls = results[ST.METROPOLE].map((r) => r.rolls.structure.size);
-      
+      const lugarejosRolls = results[ST.LUGAREJO].map(
+        (r) => r.rolls.structure.size
+      );
+      const metropoleRolls = results[ST.METROPOLE].map(
+        (r) => r.rolls.structure.size
+      );
+
       // Lugarejo deve ter rolls menores que metrópole em média
-      const avgLugarejo = lugarejosRolls.reduce((a: number, b: number) => a + b, 0) / lugarejosRolls.length;
-      const avgMetropole = metropoleRolls.reduce((a: number, b: number) => a + b, 0) / metropoleRolls.length;
-      
+      const avgLugarejo =
+        lugarejosRolls.reduce((a: number, b: number) => a + b, 0) /
+        lugarejosRolls.length;
+      const avgMetropole =
+        metropoleRolls.reduce((a: number, b: number) => a + b, 0) /
+        metropoleRolls.length;
+
       expect(avgLugarejo).toBeLessThan(avgMetropole);
     });
 
     it("should handle all settlement types without errors", () => {
-      const settlementTypes = [ST.LUGAREJO, ST.POVOADO, ST.ALDEIA, ST.VILAREJO, ST.VILA_GRANDE, ST.CIDADELA, ST.CIDADE_GRANDE, ST.METROPOLE];
+      const settlementTypes = [
+        ST.LUGAREJO,
+        ST.POVOADO,
+        ST.ALDEIA,
+        ST.VILAREJO,
+        ST.VILA_GRANDE,
+        ST.CIDADELA,
+        ST.CIDADE_GRANDE,
+        ST.METROPOLE,
+      ];
 
       settlementTypes.forEach((settlementType) => {
         expect(() => {
@@ -105,7 +144,7 @@ describe("Settlement Dice Constraints - Bug Fix Validation", () => {
             settlementType,
             useModifiers: false,
           });
-          
+
           // Verifica que a estrutura básica está presente
           expect(result.guild).toBeDefined();
           expect(result.guild.settlementType).toBe(settlementType);
@@ -119,24 +158,26 @@ describe("Settlement Dice Constraints - Bug Fix Validation", () => {
     it("should maintain consistency in regeneration logic", () => {
       const settlementType = ST.POVOADO;
       const config = { settlementType, useModifiers: false };
-      
+
       // Gerar várias guildas com a mesma configuração
       const results = [];
       for (let i = 0; i < 20; i++) {
         results.push(generateGuildStructure(config));
       }
-      
+
       // Verificar que todas têm o mesmo tipo de assentamento
       results.forEach((result) => {
         expect(result.guild.settlementType).toBe(settlementType);
         expect(result.rolls.structure).toBeDefined();
         expect(result.rolls.structure.size).toBeGreaterThan(0);
         expect(result.rolls.structure.characteristics).toBeInstanceOf(Array);
-        expect(result.rolls.structure.characteristics.length).toBeGreaterThan(0);
+        expect(result.rolls.structure.characteristics.length).toBeGreaterThan(
+          0
+        );
       });
-      
+
       // Verificar que os rolls estão dentro dos limites esperados para cidade pequena
-      const sizeRolls = results.map(r => r.rolls.structure.size);
+      const sizeRolls = results.map((r) => r.rolls.structure.size);
       expect(Math.min(...sizeRolls)).toBeGreaterThanOrEqual(1);
       expect(Math.max(...sizeRolls)).toBeLessThanOrEqual(20); // d20 base
     });

@@ -1,28 +1,28 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { setActivePinia, createPinia } from 'pinia';
-import { useGuildStore } from '@/stores/guild';
-import { SettlementType } from '@/types/guild';
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { setActivePinia, createPinia } from "pinia";
+import { useGuildStore } from "@/stores/guild";
+import { SettlementType } from "@/types/guild";
 
 // Mock do gerador de nomes
-vi.mock('@/data/guild-names', () => ({
-  generateRandomGuildName: vi.fn().mockReturnValue('Nome Regenerado'),
+vi.mock("@/data/guild-names", () => ({
+  generateRandomGuildName: vi.fn().mockReturnValue("Nome Regenerado"),
 }));
 
-describe('Guild Name Regeneration', () => {
+describe("Guild Name Regeneration", () => {
   beforeEach(() => {
     // Limpar localStorage antes de cada teste para evitar interferência
     localStorage.clear();
     setActivePinia(createPinia());
   });
 
-  describe('regenerateGuildName', () => {
-    it('should regenerate guild name preserving all other data', async () => {
+  describe("regenerateGuildName", () => {
+    it("should regenerate guild name preserving all other data", async () => {
       const store = useGuildStore();
 
       // Gerar uma guilda inicial
       const originalGuild = await store.generateGuild({
         settlementType: SettlementType.ALDEIA,
-        name: 'Nome Original',
+        name: "Nome Original",
         saveToHistory: false,
       });
 
@@ -40,8 +40,8 @@ describe('Guild Name Regeneration', () => {
       const regeneratedGuild = store.currentGuild;
 
       expect(regeneratedGuild).toBeDefined();
-      expect(regeneratedGuild?.name).toBe('Nome Regenerado');
-      
+      expect(regeneratedGuild?.name).toBe("Nome Regenerado");
+
       // Verificar que todos os outros dados foram preservados
       expect(regeneratedGuild?.structure).toEqual(originalStructure);
       expect(regeneratedGuild?.relations).toEqual(originalRelations);
@@ -50,24 +50,24 @@ describe('Guild Name Regeneration', () => {
       expect(regeneratedGuild?.visitors).toEqual(originalVisitors);
       expect(regeneratedGuild?.settlementType).toBe(originalSettlementType);
       expect(regeneratedGuild?.createdAt).toEqual(originalCreatedAt);
-      
+
       // Verificar que updatedAt foi definido
       expect(regeneratedGuild?.updatedAt).toBeDefined();
       expect(regeneratedGuild?.updatedAt).toBeInstanceOf(Date);
     });
 
-    it('should throw error when no current guild exists', async () => {
+    it("should throw error when no current guild exists", async () => {
       const store = useGuildStore();
 
       // Verificar que não há guilda atual
       expect(store.currentGuild).toBeNull();
 
       await expect(store.regenerateGuildName()).rejects.toThrow(
-        'Cannot regenerate: no current guild'
+        "Cannot regenerate: no current guild"
       );
     });
 
-    it('should throw error when guild is locked', async () => {
+    it("should throw error when guild is locked", async () => {
       const store = useGuildStore();
 
       // Gerar uma guilda e bloqueá-la
@@ -81,17 +81,17 @@ describe('Guild Name Regeneration', () => {
       store.setCurrentGuild(lockedGuild);
 
       await expect(store.regenerateGuildName()).rejects.toThrow(
-        'Cannot regenerate guild name: guild is locked'
+        "Cannot regenerate guild name: guild is locked"
       );
     });
 
-    it('should update guild in history when regenerated', async () => {
+    it("should update guild in history when regenerated", async () => {
       const store = useGuildStore();
 
       // Gerar uma guilda e salvá-la no histórico
       await store.generateGuild({
         settlementType: SettlementType.ALDEIA,
-        name: 'Nome Original',
+        name: "Nome Original",
         saveToHistory: true,
       });
 
@@ -103,18 +103,20 @@ describe('Guild Name Regeneration', () => {
 
       // Verificar que o histórico foi atualizado
       expect(store.historyCount).toBe(1); // Mesmo número de guildas
-      
-      const guildInHistory = store.guildHistory.find(g => g.id === originalId);
+
+      const guildInHistory = store.guildHistory.find(
+        (g) => g.id === originalId
+      );
       expect(guildInHistory).toBeDefined();
-      expect(guildInHistory?.name).toBe('Nome Regenerado');
+      expect(guildInHistory?.name).toBe("Nome Regenerado");
     });
 
-    it('should preserve guild ID when regenerating name', async () => {
+    it("should preserve guild ID when regenerating name", async () => {
       const store = useGuildStore();
 
       const originalGuild = await store.generateGuild({
         settlementType: SettlementType.ALDEIA,
-        name: 'Nome Original',
+        name: "Nome Original",
         saveToHistory: false,
       });
 
@@ -125,13 +127,13 @@ describe('Guild Name Regeneration', () => {
       expect(store.currentGuild?.id).toBe(originalId);
     });
 
-    it('should work for guilds not in history', async () => {
+    it("should work for guilds not in history", async () => {
       const store = useGuildStore();
 
       // Gerar guilda sem salvar no histórico
       await store.generateGuild({
         settlementType: SettlementType.ALDEIA,
-        name: 'Nome Original',
+        name: "Nome Original",
         saveToHistory: false,
       });
 
@@ -140,17 +142,17 @@ describe('Guild Name Regeneration', () => {
       // Regenerar nome deve funcionar mesmo não estando no histórico
       await store.regenerateGuildName();
 
-      expect(store.currentGuild?.name).toBe('Nome Regenerado');
+      expect(store.currentGuild?.name).toBe("Nome Regenerado");
       expect(store.historyCount).toBe(0); // Ainda não no histórico
     });
 
-    it('should use random name generator', async () => {
+    it("should use random name generator", async () => {
       const store = useGuildStore();
-      const { generateRandomGuildName } = await import('@/data/guild-names');
+      const { generateRandomGuildName } = await import("@/data/guild-names");
 
       await store.generateGuild({
         settlementType: SettlementType.ALDEIA,
-        name: 'Nome Original',
+        name: "Nome Original",
         saveToHistory: false,
       });
 
@@ -161,8 +163,8 @@ describe('Guild Name Regeneration', () => {
     });
   });
 
-  describe('Integration with UI validations', () => {
-    it('should follow same lock validation pattern as other regeneration functions', async () => {
+  describe("Integration with UI validations", () => {
+    it("should follow same lock validation pattern as other regeneration functions", async () => {
       const store = useGuildStore();
 
       // Gerar guilda desbloqueada
@@ -180,7 +182,7 @@ describe('Guild Name Regeneration', () => {
 
       // Deve lançar erro para guilda bloqueada
       await expect(store.regenerateGuildName()).rejects.toThrow(
-        'Cannot regenerate guild name: guild is locked'
+        "Cannot regenerate guild name: guild is locked"
       );
     });
   });

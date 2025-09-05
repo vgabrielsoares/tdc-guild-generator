@@ -1,6 +1,6 @@
 /**
  * Testes para Elementos Narrativos de Serviços
- * 
+ *
  * Valida:
  * - Interfaces narrativas
  * - Enums seguindo tabelas específicas do markdown
@@ -36,7 +36,7 @@ describe("Service Narrative Elements - Issue 5.8 (Corrected)", () => {
     it("should have ServiceRivalMotivation with all 17 entries from md table", () => {
       const expectedMotivations = [
         "Faz isso por amor",
-        "Se atrapalha todo", 
+        "Se atrapalha todo",
         "Faz isso porque precisa",
         "Busca reconhecimento",
         "Busca uma recompensa pessoal",
@@ -57,7 +57,7 @@ describe("Service Narrative Elements - Issue 5.8 (Corrected)", () => {
       expectedMotivations.forEach((motivation) => {
         expect(Object.values(ServiceRivalMotivation)).toContain(motivation);
       });
-      
+
       // Verificar que tem exatamente 17 entradas (1-20 com alguns ranges)
       expect(Object.values(ServiceRivalMotivation)).toHaveLength(17);
     });
@@ -145,7 +145,7 @@ describe("Service Narrative Elements - Issue 5.8 (Corrected)", () => {
       type: ServiceObjectiveType.TREINAR_OU_ENSINAR,
       description: "Ensinar culinária básica para grupo de crianças",
       action: "Uma nova língua",
-      target: "Para crianças órfãs", 
+      target: "Para crianças órfãs",
       complication: "O conhecimento será usado contra você",
     };
 
@@ -166,7 +166,9 @@ describe("Service Narrative Elements - Issue 5.8 (Corrected)", () => {
         },
       };
 
-      expect(() => ServiceObjectiveSchema.parse(multipleObjective)).not.toThrow();
+      expect(() =>
+        ServiceObjectiveSchema.parse(multipleObjective)
+      ).not.toThrow();
     });
   });
 
@@ -174,11 +176,14 @@ describe("Service Narrative Elements - Issue 5.8 (Corrected)", () => {
     const validComplication: ServiceComplication = {
       type: ServiceComplicationType.GOVERNO_LOCAL_DESAPROVA,
       consequence: ServiceComplicationConsequence.MEDIDAS_LEGAIS,
-      description: "O governo local não aprova o serviço e tomará medidas legais",
+      description:
+        "O governo local não aprova o serviço e tomará medidas legais",
     };
 
     it("should validate complication structure", () => {
-      expect(() => ServiceComplicationSchema.parse(validComplication)).not.toThrow();
+      expect(() =>
+        ServiceComplicationSchema.parse(validComplication)
+      ).not.toThrow();
     });
 
     it("should have structure matching md tables", () => {
@@ -203,7 +208,7 @@ describe("Service Narrative Elements - Issue 5.8 (Corrected)", () => {
       expect(validRival).toHaveProperty("action");
       expect(validRival).toHaveProperty("motivation");
       expect(validRival).toHaveProperty("description");
-      
+
       // Verificar que não tem propriedades que não existem no .md
       expect(validRival).not.toHaveProperty("name");
       expect(validRival).not.toHaveProperty("advantage");
@@ -226,7 +231,7 @@ describe("Service Narrative Elements - Issue 5.8 (Corrected)", () => {
       expect(validOrigin).toHaveProperty("rootCause");
       expect(validOrigin).toHaveProperty("additionalComplicator");
       expect(validOrigin).toHaveProperty("description");
-      
+
       // Não deve ter propriedades que não existem no .md
       expect(validOrigin).not.toHaveProperty("timeline");
       expect(validOrigin).not.toHaveProperty("scope");
@@ -236,18 +241,21 @@ describe("Service Narrative Elements - Issue 5.8 (Corrected)", () => {
 
   describe("Interface ServiceAdditionalChallenge", () => {
     const validChallenge: ServiceAdditionalChallenge = {
-      description: "Pescadores precisam de criaturas fortes para puxar peixes muito pesados",
+      description:
+        "Pescadores precisam de criaturas fortes para puxar peixes muito pesados",
       hasChallenge: true,
     };
 
     it("should validate challenge structure", () => {
-      expect(() => ServiceAdditionalChallengeSchema.parse(validChallenge)).not.toThrow();
+      expect(() =>
+        ServiceAdditionalChallengeSchema.parse(validChallenge)
+      ).not.toThrow();
     });
 
     it("should have simple structure matching md section", () => {
       expect(validChallenge).toHaveProperty("description");
       expect(validChallenge).toHaveProperty("hasChallenge");
-      
+
       // Estrutura simples conforme .md
       expect(typeof validChallenge.hasChallenge).toBe("boolean");
       expect(typeof validChallenge.description).toBe("string");
@@ -258,9 +266,15 @@ describe("Service Narrative Elements - Issue 5.8 (Corrected)", () => {
     it("should use exact strings from markdown tables", () => {
       // Verificar que usamos strings exatas das tabelas
       expect(ServiceRivalMotivation.FAZ_POR_AMOR).toBe("Faz isso por amor");
-      expect(ServiceRivalMotivation.NA_VERDADE_E_CONTRATANTE).toBe("Na verdade é o contratante");
-      expect(ServiceComplicationType.GOVERNO_LOCAL_DESAPROVA).toBe("Governo local desaprova");
-      expect(ServiceOriginCause.TRADICAO_CONFLITO_FAMILIAR).toBe("Tradição/conflito familiar");
+      expect(ServiceRivalMotivation.NA_VERDADE_E_CONTRATANTE).toBe(
+        "Na verdade é o contratante"
+      );
+      expect(ServiceComplicationType.GOVERNO_LOCAL_DESAPROVA).toBe(
+        "Governo local desaprova"
+      );
+      expect(ServiceOriginCause.TRADICAO_CONFLITO_FAMILIAR).toBe(
+        "Tradição/conflito familiar"
+      );
     });
 
     it("should not have properties that don't exist in md", () => {
@@ -270,7 +284,7 @@ describe("Service Narrative Elements - Issue 5.8 (Corrected)", () => {
         consequence: ServiceComplicationConsequence.MEDIDAS_LEGAIS,
         description: "Governo desaprova e entrará com medidas legais",
       };
-      
+
       expect(complicationInterface).toHaveProperty("type");
       expect(complicationInterface).toHaveProperty("consequence");
       expect(complicationInterface).toHaveProperty("description");
@@ -280,7 +294,9 @@ describe("Service Narrative Elements - Issue 5.8 (Corrected)", () => {
       // Serviços têm foco diferente de contratos
       expect(Object.values(ServiceComplicationType)).not.toContain("Morte");
       expect(Object.values(ServiceComplicationType)).not.toContain("Violência");
-      expect(Object.values(ServiceComplicationType)).toContain("Animal ou mascote atrapalha");
+      expect(Object.values(ServiceComplicationType)).toContain(
+        "Animal ou mascote atrapalha"
+      );
     });
   });
 
@@ -296,7 +312,8 @@ describe("Service Narrative Elements - Issue 5.8 (Corrected)", () => {
         },
         complication: {
           type: ServiceComplicationType.ANIMAL_ATRAPALHA,
-          consequence: ServiceComplicationConsequence.NEGOCIAR_SOLUCAO_ALTERNATIVA,
+          consequence:
+            ServiceComplicationConsequence.NEGOCIAR_SOLUCAO_ALTERNATIVA,
           description: "Animal atrapalha e precisará negociar solução",
         },
         rival: {
@@ -316,10 +333,18 @@ describe("Service Narrative Elements - Issue 5.8 (Corrected)", () => {
       };
 
       // Todos os elementos seguem estrutura do .md
-      expect(completeService.objective.type).toBe(ServiceObjectiveType.TREINAR_OU_ENSINAR);
-      expect(completeService.complication.type).toBe(ServiceComplicationType.ANIMAL_ATRAPALHA);
-      expect(completeService.rival.action).toBe(ServiceRivalAction.FARA_MESMA_COISA);
-      expect(completeService.origin.rootCause).toBe(ServiceOriginCause.FALTA_COMUNICACAO);
+      expect(completeService.objective.type).toBe(
+        ServiceObjectiveType.TREINAR_OU_ENSINAR
+      );
+      expect(completeService.complication.type).toBe(
+        ServiceComplicationType.ANIMAL_ATRAPALHA
+      );
+      expect(completeService.rival.action).toBe(
+        ServiceRivalAction.FARA_MESMA_COISA
+      );
+      expect(completeService.origin.rootCause).toBe(
+        ServiceOriginCause.FALTA_COMUNICACAO
+      );
       expect(completeService.additionalChallenge.hasChallenge).toBe(true);
     });
   });
