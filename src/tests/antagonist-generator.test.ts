@@ -59,7 +59,7 @@ describe("AntagonistGenerator", () => {
 
       // Com múltiplos resultados, specificType pode conter apenas uma parte da descrição
       // Vamos verificar se alguma parte do specificType está na descrição
-      const specificTypes = antagonist.specificType.split(" E ");
+      const specificTypes = antagonist.specificType.split(" e ");
       const hasMatchingType = specificTypes.some((type) =>
         antagonist.description.toLowerCase().includes(type.toLowerCase().trim())
       );
