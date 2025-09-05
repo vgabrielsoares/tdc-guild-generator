@@ -21,25 +21,25 @@
               class="btn btn--primary"
               :disabled="isRegenerating"
             >
-              <icon name="refresh" :class="{ 'animate-spin': isRegenerating }" />
-              <span>{{ isRegenerating ? 'Regenerando...' : 'Regenerar' }}</span>
+              <icon
+                name="refresh"
+                :class="{ 'animate-spin': isRegenerating }"
+              />
+              <span>{{ isRegenerating ? "Regenerando..." : "Regenerar" }}</span>
             </button>
-            
-            <button
-              @click="$emit('guild:export')"
-              class="btn btn--secondary"
-            >
+
+            <button @click="$emit('guild:export')" class="btn btn--secondary">
               <icon name="download" />
               <span>Exportar</span>
             </button>
-            
+
             <button
               v-if="showAdvanced"
               @click="toggleAdvanced"
               class="btn btn--ghost"
             >
               <icon :name="showAdvancedInfo ? 'eye-slash' : 'eye'" />
-              <span>{{ showAdvancedInfo ? 'Ocultar' : 'Avançado' }}</span>
+              <span>{{ showAdvancedInfo ? "Ocultar" : "Avançado" }}</span>
             </button>
           </div>
         </template>
@@ -49,27 +49,27 @@
     <!-- Conteúdo principal em grid -->
     <div class="guild-details__content">
       <div class="guild-sections">
-        
         <!-- Estrutura Física -->
         <section class="guild-section">
           <h3 class="guild-section__title">
             <icon name="building" />
             Estrutura Física
           </h3>
-          
+
           <div class="guild-section__content">
             <div class="detail-grid">
               <div class="detail-item">
                 <dt>Tamanho da Sede</dt>
                 <dd>{{ guild.structure.size }}</dd>
               </div>
-              
+
               <div class="detail-item detail-item--full">
                 <dt>Características</dt>
                 <dd>
                   <ul class="characteristics-list">
                     <li
-                      v-for="(characteristic, index) in guild.structure.characteristics"
+                      v-for="(characteristic, index) in guild.structure
+                        .characteristics"
                       :key="index"
                       class="characteristic-item"
                     >
@@ -88,14 +88,14 @@
             <icon name="users" />
             Funcionários
           </h3>
-          
+
           <div class="guild-section__content">
             <div class="detail-grid">
               <div class="detail-item detail-item--full">
                 <dt>Descrição</dt>
                 <dd>{{ guild.staff.employees }}</dd>
               </div>
-              
+
               <div v-if="guild.staff.count" class="detail-item">
                 <dt>Quantidade</dt>
                 <dd>{{ guild.staff.count }}</dd>
@@ -110,13 +110,13 @@
             <icon name="handshake" />
             Relações
           </h3>
-          
+
           <div class="guild-section__content">
             <div class="detail-grid">
               <div class="detail-item">
                 <dt>Com o Governo</dt>
                 <dd>
-                  <span 
+                  <span
                     class="relation-status"
                     :class="getRelationClass(guild.relations.government)"
                   >
@@ -124,11 +124,11 @@
                   </span>
                 </dd>
               </div>
-              
+
               <div class="detail-item">
                 <dt>Com a População</dt>
                 <dd>
-                  <span 
+                  <span
                     class="relation-status"
                     :class="getRelationClass(guild.relations.population)"
                   >
@@ -136,8 +136,8 @@
                   </span>
                 </dd>
               </div>
-              
-              <div 
+
+              <div
                 v-if="guild.relations.notes"
                 class="detail-item detail-item--full"
               >
@@ -154,13 +154,13 @@
             <icon name="coins" />
             Recursos
           </h3>
-          
+
           <div class="guild-section__content">
             <div class="detail-grid">
               <div class="detail-item">
                 <dt>Nível</dt>
                 <dd>
-                  <span 
+                  <span
                     class="resource-status"
                     :class="getResourceClass(guild.resources.level)"
                   >
@@ -168,16 +168,16 @@
                   </span>
                 </dd>
               </div>
-              
-              <div 
+
+              <div
                 v-if="guild.resources.description"
                 class="detail-item detail-item--full"
               >
                 <dt>Descrição</dt>
                 <dd>{{ guild.resources.description }}</dd>
               </div>
-              
-              <div 
+
+              <div
                 v-if="guild.resources.details?.length"
                 class="detail-item detail-item--full"
               >
@@ -203,13 +203,13 @@
             <icon name="user-group" />
             Movimento de Visitantes
           </h3>
-          
+
           <div class="guild-section__content">
             <div class="detail-grid">
               <div class="detail-item">
                 <dt>Frequência</dt>
                 <dd>
-                  <span 
+                  <span
                     class="visitor-status"
                     :class="getVisitorClass(guild.visitors.frequency)"
                   >
@@ -217,16 +217,16 @@
                   </span>
                 </dd>
               </div>
-              
-              <div 
+
+              <div
                 v-if="guild.visitors.description"
                 class="detail-item detail-item--full"
               >
                 <dt>Descrição</dt>
                 <dd>{{ guild.visitors.description }}</dd>
               </div>
-              
-              <div 
+
+              <div
                 v-if="guild.visitors.types?.length"
                 class="detail-item detail-item--full"
               >
@@ -248,7 +248,7 @@
         </section>
 
         <!-- Informações Avançadas (Logs de Geração) -->
-        <section 
+        <section
           v-if="showAdvancedInfo && generationLogs.length"
           class="guild-section guild-section--advanced"
         >
@@ -256,7 +256,7 @@
             <icon name="document-text" />
             Logs de Geração
           </h3>
-          
+
           <div class="guild-section__content">
             <div class="logs-container">
               <div
@@ -276,10 +276,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import type { Guild } from '@/types/guild';
-import { RelationLevel, ResourceLevel, VisitorLevel } from '@/types/guild';
-import GuildInfoCard from './GuildInfoCard.vue';
+import { ref } from "vue";
+import type { Guild } from "@/types/guild";
+import { RelationLevel, ResourceLevel, VisitorLevel } from "@/types/guild";
+import GuildInfoCard from "./GuildInfoCard.vue";
 
 interface Props {
   readonly guild: Guild;
@@ -297,9 +297,9 @@ withDefaults(defineProps<Props>(), {
 });
 
 defineEmits<{
-  'guild:edit': [];
-  'guild:regenerate': [];
-  'guild:export': [];
+  "guild:edit": [];
+  "guild:regenerate": [];
+  "guild:export": [];
 }>();
 
 // Estado local
@@ -312,76 +312,76 @@ function toggleAdvanced(): void {
 
 // Classes de estilo baseadas nos valores
 function getRelationClass(relation: RelationLevel): string {
-  if (relation.includes('Péssima') || relation.includes('puro ódio')) {
-    return 'relation-status--terrible';
+  if (relation.includes("Péssima") || relation.includes("puro ódio")) {
+    return "relation-status--terrible";
   }
-  if (relation.includes('Ruim')) {
-    return 'relation-status--bad';
+  if (relation.includes("Ruim")) {
+    return "relation-status--bad";
   }
-  if (relation.includes('Diplomática') || relation.includes('dividida')) {
-    return 'relation-status--neutral';
+  if (relation.includes("Diplomática") || relation.includes("dividida")) {
+    return "relation-status--neutral";
   }
-  if (relation.includes('Boa')) {
-    return 'relation-status--good';
+  if (relation.includes("Boa")) {
+    return "relation-status--good";
   }
-  if (relation.includes('Muito boa') || relation.includes('Excelente')) {
-    return 'relation-status--excellent';
+  if (relation.includes("Muito boa") || relation.includes("Excelente")) {
+    return "relation-status--excellent";
   }
-  return 'relation-status--neutral';
+  return "relation-status--neutral";
 }
 
 function getResourceClass(level: ResourceLevel): string {
-  if (level.includes('débito') || level === ResourceLevel.NENHUM) {
-    return 'resource-status--critical';
+  if (level.includes("débito") || level === ResourceLevel.NENHUM) {
+    return "resource-status--critical";
   }
-  if (level.includes('Escassos')) {
-    return 'resource-status--poor';
+  if (level.includes("Escassos")) {
+    return "resource-status--poor";
   }
   if (level === ResourceLevel.LIMITADOS) {
-    return 'resource-status--limited';
+    return "resource-status--limited";
   }
   if (level === ResourceLevel.SUFICIENTES) {
-    return 'resource-status--good';
+    return "resource-status--good";
   }
-  if (level.includes('Abundantes') || level.includes('Excedentes')) {
-    return 'resource-status--excellent';
+  if (level.includes("Abundantes") || level.includes("Excedentes")) {
+    return "resource-status--excellent";
   }
-  return 'resource-status--neutral';
+  return "resource-status--neutral";
 }
 
 function getVisitorClass(level: VisitorLevel): string {
   if (level === VisitorLevel.VAZIA || level === VisitorLevel.QUASE_DESERTA) {
-    return 'visitor-status--empty';
+    return "visitor-status--empty";
   }
   if (level === VisitorLevel.POUCO_MOVIMENTADA) {
-    return 'visitor-status--low';
+    return "visitor-status--low";
   }
   if (level === VisitorLevel.NEM_MUITO_NEM_POUCO) {
-    return 'visitor-status--normal';
+    return "visitor-status--normal";
   }
   if (level === VisitorLevel.MUITO_FREQUENTADA) {
-    return 'visitor-status--high';
+    return "visitor-status--high";
   }
   if (level === VisitorLevel.ABARROTADA || level === VisitorLevel.LOTADA) {
-    return 'visitor-status--crowded';
+    return "visitor-status--crowded";
   }
-  return 'visitor-status--neutral';
+  return "visitor-status--neutral";
 }
 
 function getLogClass(log: string): string {
-  if (log.includes('[ERROR]') || log.includes('failed')) {
-    return 'log-entry--error';
+  if (log.includes("[ERROR]") || log.includes("failed")) {
+    return "log-entry--error";
   }
-  if (log.includes('[WARNING]')) {
-    return 'log-entry--warning';
+  if (log.includes("[WARNING]")) {
+    return "log-entry--warning";
   }
-  if (log.includes('[PHASE]')) {
-    return 'log-entry--phase';
+  if (log.includes("[PHASE]")) {
+    return "log-entry--phase";
   }
-  if (log.includes('[ROLL]')) {
-    return 'log-entry--roll';
+  if (log.includes("[ROLL]")) {
+    return "log-entry--roll";
   }
-  return 'log-entry--info';
+  return "log-entry--info";
 }
 </script>
 
@@ -592,7 +592,11 @@ function getLogClass(log: string): string {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

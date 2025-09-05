@@ -1,185 +1,302 @@
 <template>
   <Teleport to="body">
-    <Transition enter-active-class="transition-opacity duration-300"
-      leave-active-class="transition-opacity duration-300" enter-from-class="opacity-0" leave-to-class="opacity-0">
-      <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75"
-        @click="closeModal">
-        <div v-if="isOpen && contract" @click.stop
-          class="contract-details bg-gray-900 text-white rounded-xl p-6 shadow-2xl border border-amber-700/30 max-w-4xl w-full max-h-[90vh] overflow-auto relative">
+    <Transition
+      enter-active-class="transition-opacity duration-300"
+      leave-active-class="transition-opacity duration-300"
+      enter-from-class="opacity-0"
+      leave-to-class="opacity-0"
+    >
+      <div
+        v-if="isOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75"
+        @click="closeModal"
+      >
+        <div
+          v-if="isOpen && contract"
+          @click.stop
+          class="contract-details bg-gray-900 text-white rounded-xl p-6 shadow-2xl border border-amber-700/30 max-w-4xl w-full max-h-[90vh] overflow-auto relative"
+        >
           <!-- Header -->
           <div class="flex items-start justify-between mb-6">
             <div class="flex-1">
               <div class="flex items-center gap-3 mb-2">
                 <ContractStatus :status="contract.status" size="lg" />
-                <component :is="contractorIcon" class="w-6 h-6 text-amber-400" />
+                <component
+                  :is="contractorIcon"
+                  class="w-6 h-6 text-amber-400"
+                />
               </div>
               <h2 class="text-2xl font-bold text-white mb-2">
-                {{ contract.title || `Contrato #${contract.id.slice(-8).toUpperCase()}` }}
+                {{
+                  contract.title ||
+                  `Contrato #${contract.id.slice(-8).toUpperCase()}`
+                }}
               </h2>
               <p class="text-gray-300 mb-2">
-                {{ contractorTypeLabel }} - {{ contract.contractorName || 'Nome não especificado' }}
+                {{ contractorTypeLabel }} -
+                {{ contract.contractorName || "Nome não especificado" }}
               </p>
-              <p v-if="resolutionText" class="text-sm text-gray-400 italic mt-1">
+              <p
+                v-if="resolutionText"
+                class="text-sm text-gray-400 italic mt-1"
+              >
                 {{ resolutionText }}
               </p>
             </div>
-            <button @click="closeModal"
-              class="text-gray-400 hover:text-white transition-colors duration-200 p-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button
+              @click="closeModal"
+              class="text-gray-400 hover:text-white transition-colors duration-200 p-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
               <XMarkIcon class="w-5 h-5" />
             </button>
           </div>
 
           <!-- Content -->
           <div class="relative space-y-6">
-
             <!-- Painel de Ajuda -->
-            <div v-if="showHelpPanel" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/90">
+            <div
+              v-if="showHelpPanel"
+              class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/90"
+            >
               <div
-                class="bg-gray-800 border border-amber-400 p-6 rounded-lg max-w-2xl w-full max-h-[80vh] overflow-auto">
-                <ContractHelpPanel :is-open="showHelpPanel" :help-key="currentHelpKey" @close="handleCloseHelp" />
+                class="bg-gray-800 border border-amber-400 p-6 rounded-lg max-w-2xl w-full max-h-[80vh] overflow-auto"
+              >
+                <ContractHelpPanel
+                  :is-open="showHelpPanel"
+                  :help-key="currentHelpKey"
+                  @close="handleCloseHelp"
+                />
               </div>
             </div>
 
             <!-- Descrição -->
-            <section v-if="contract.description"
-              class="mb-6 p-4 bg-amber-900/20 rounded-lg border-l-4 border-amber-400">
+            <section
+              v-if="contract.description"
+              class="mb-6 p-4 bg-amber-900/20 rounded-lg border-l-4 border-amber-400"
+            >
               <h3 class="text-lg font-semibold text-amber-300 mb-2">
                 Descrição do Contrato
               </h3>
-              <p class="text-amber-100 leading-relaxed" v-html="formatMarkdown(contract.description)"></p>
+              <p
+                class="text-amber-100 leading-relaxed"
+                v-html="formatMarkdown(contract.description)"
+              ></p>
             </section>
 
             <!-- 1. Objetivo -->
-            <section v-if="contract.objective" class="bg-gray-800/50 rounded-lg p-6 mb-6">
-              <h3 class="text-lg font-semibold text-amber-300 mb-4 flex items-center gap-2">
+            <section
+              v-if="contract.objective"
+              class="bg-gray-800/50 rounded-lg p-6 mb-6"
+            >
+              <h3
+                class="text-lg font-semibold text-amber-300 mb-4 flex items-center gap-2"
+              >
                 <XCircleIcon class="w-5 h-5" />
                 Objetivo
-                <InfoButton help-key="contract-objectives" @open-help="handleOpenHelp('contract-objectives')"
-                  button-class="text-xs" />
+                <InfoButton
+                  help-key="contract-objectives"
+                  @open-help="handleOpenHelp('contract-objectives')"
+                  button-class="text-xs"
+                />
               </h3>
               <div>
                 <div class="flex items-center gap-2 mb-3">
-                  <ContractTooltip :content="getObjectiveTooltip(contract.objective.category)"
-                    :title="'Categoria do Objetivo'">
+                  <ContractTooltip
+                    :content="getObjectiveTooltip(contract.objective.category)"
+                    :title="'Categoria do Objetivo'"
+                  >
                     <span
-                      class="inline-block bg-amber-700/30 text-amber-200 px-3 py-1 rounded-full text-sm border border-amber-500/20">
+                      class="inline-block bg-amber-700/30 text-amber-200 px-3 py-1 rounded-full text-sm border border-amber-500/20"
+                    >
                       {{ getCategoryDisplayName(contract.objective.category) }}
                     </span>
                   </ContractTooltip>
                 </div>
-                <p class="text-white mb-4">{{ contract.objective.description }}</p>
+                <p class="text-white mb-4">
+                  {{ contract.objective.description }}
+                </p>
 
                 <!-- Especificação do objetivo -->
-                <div v-if="contract.objective.specificObjective"
-                  class="mt-3 p-4 bg-amber-900/20 rounded-lg border-l-4 border-amber-500/40">
+                <div
+                  v-if="contract.objective.specificObjective"
+                  class="mt-3 p-4 bg-amber-900/20 rounded-lg border-l-4 border-amber-500/40"
+                >
                   <div class="text-amber-300 font-medium mb-1">
                     Especificação
                   </div>
-                  <p class="text-white text-sm">{{ contract.objective.specificObjective }}</p>
+                  <p class="text-white text-sm">
+                    {{ contract.objective.specificObjective }}
+                  </p>
                 </div>
               </div>
             </section>
 
             <!-- 1.5. Contratante Inusitado -->
-            <section v-if="contract.unusualContractor?.isUnusual" class="bg-gray-800/50 rounded-lg p-6 mb-6">
-              <h3 class="text-lg font-semibold text-purple-300 mb-3 flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <section
+              v-if="contract.unusualContractor?.isUnusual"
+              class="bg-gray-800/50 rounded-lg p-6 mb-6"
+            >
+              <h3
+                class="text-lg font-semibold text-purple-300 mb-3 flex items-center gap-2"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 Contratante Inusitado
               </h3>
-              <p class="text-white mb-4">{{ contract.unusualContractor.description }}</p>
+              <p class="text-white mb-4">
+                {{ contract.unusualContractor.description }}
+              </p>
 
               <!-- Palavras-chave temáticas -->
               <div
-                v-if="contract.unusualContractor.themeKeywords && contract.unusualContractor.themeKeywords.length > 0"
-                class="mt-3 p-4 bg-purple-900/20 rounded-lg border-l-4 border-purple-500/40">
+                v-if="
+                  contract.unusualContractor.themeKeywords &&
+                  contract.unusualContractor.themeKeywords.length > 0
+                "
+                class="mt-3 p-4 bg-purple-900/20 rounded-lg border-l-4 border-purple-500/40"
+              >
                 <div class="text-purple-300 font-medium mb-2">
                   Palavras-chave para criatividade
                 </div>
                 <div class="flex flex-wrap gap-2">
-                  <span v-for="keyword in contract.unusualContractor.themeKeywords"
+                  <span
+                    v-for="keyword in contract.unusualContractor.themeKeywords"
                     :key="`${keyword.set}-${keyword.keyword}`"
-                    class="inline-block bg-purple-700/30 text-purple-200 px-3 py-1 rounded-full text-sm">
+                    class="inline-block bg-purple-700/30 text-purple-200 px-3 py-1 rounded-full text-sm"
+                  >
                     {{ keyword.keyword }}
                   </span>
                 </div>
                 <div class="text-xs text-purple-400 mt-3">
                   <InformationCircleIcon class="w-3 h-3 inline mr-1" />
-                  Use essas palavras-chave para inspirar características únicas, motivações, aparência ou
-                  maneirismos do contratante.
+                  Use essas palavras-chave para inspirar características únicas,
+                  motivações, aparência ou maneirismos do contratante.
                 </div>
               </div>
             </section>
 
             <!-- 2. Localidade -->
-            <section v-if="contract.location" class="bg-gray-800/50 rounded-lg p-6 mb-6">
-              <h3 class="text-lg font-semibold text-green-300 mb-3 flex items-center gap-2">
+            <section
+              v-if="contract.location"
+              class="bg-gray-800/50 rounded-lg p-6 mb-6"
+            >
+              <h3
+                class="text-lg font-semibold text-green-300 mb-3 flex items-center gap-2"
+              >
                 <MapPinIcon class="w-5 h-5" />
                 Localidade
-                <InfoButton help-key="contract-locations" @open-help="handleOpenHelp('contract-locations')"
-                  button-class="text-xs" />
+                <InfoButton
+                  help-key="contract-locations"
+                  @open-help="handleOpenHelp('contract-locations')"
+                  button-class="text-xs"
+                />
               </h3>
 
               <div class="space-y-4">
                 <div class="flex items-center">
-                  <ContractTooltip :content="getLocationTooltip()" :title="'Local da Missão'">
+                  <ContractTooltip
+                    :content="getLocationTooltip()"
+                    :title="'Local da Missão'"
+                  >
                     <span
-                      class="inline-block bg-green-700/30 text-green-200 px-3 py-1 rounded-full text-sm border border-green-500/20">
+                      class="inline-block bg-green-700/30 text-green-200 px-3 py-1 rounded-full text-sm border border-green-500/20"
+                    >
                       {{ contract.location.name }}
                     </span>
                   </ContractTooltip>
                 </div>
 
                 <!-- Especificação da localidade -->
-                <div v-if="contract.location.specification"
-                  class="p-4 bg-green-900/20 rounded-lg border-l-4 border-green-500/40">
+                <div
+                  v-if="contract.location.specification"
+                  class="p-4 bg-green-900/20 rounded-lg border-l-4 border-green-500/40"
+                >
                   <div class="text-green-300 font-medium mb-1">
                     Localização específica
                   </div>
-                  <p class="text-white mb-1">{{ contract.location.specification.location }}</p>
-                  <div v-if="contract.location.specification.description !== contract.location.specification.location"
-                    class="text-sm text-gray-300 mt-1">
+                  <p class="text-white mb-1">
+                    {{ contract.location.specification.location }}
+                  </p>
+                  <div
+                    v-if="
+                      contract.location.specification.description !==
+                      contract.location.specification.location
+                    "
+                    class="text-sm text-gray-300 mt-1"
+                  >
                     → {{ contract.location.specification.description }}
                   </div>
                 </div>
 
                 <!-- Distrito específico -->
-                <div v-if="contract.location.district"
-                  class="p-4 bg-green-900/20 rounded-lg border-l-4 border-green-500/40">
-                  <div class="text-green-300 font-medium mb-1">
-                    Distrito
-                  </div>
+                <div
+                  v-if="contract.location.district"
+                  class="p-4 bg-green-900/20 rounded-lg border-l-4 border-green-500/40"
+                >
+                  <div class="text-green-300 font-medium mb-1">Distrito</div>
                   <p class="text-white">
                     {{ contract.location.district.primary.name }}
-                    <span v-if="contract.location.district.secondary"> e {{
-                      contract.location.district.secondary.name }}</span>
+                    <span v-if="contract.location.district.secondary">
+                      e {{ contract.location.district.secondary.name }}</span
+                    >
                   </p>
                 </div>
 
                 <!-- Importância do local -->
-                <div v-if="contract.location.importance && contract.location.importance.type !== 'nenhuma'"
-                  class="p-4 bg-green-900/20 rounded-lg border-l-4 border-green-500/40">
-                  <div class="text-green-300 font-medium mb-1">
-                    Importância
-                  </div>
-                  <p class="text-white mb-1">{{ contract.location.importance.name }}</p>
-                  <div v-if="contract.location.importance.description !== contract.location.importance.name"
-                    class="text-sm text-gray-300 mt-1">
+                <div
+                  v-if="
+                    contract.location.importance &&
+                    contract.location.importance.type !== 'nenhuma'
+                  "
+                  class="p-4 bg-green-900/20 rounded-lg border-l-4 border-green-500/40"
+                >
+                  <div class="text-green-300 font-medium mb-1">Importância</div>
+                  <p class="text-white mb-1">
+                    {{ contract.location.importance.name }}
+                  </p>
+                  <div
+                    v-if="
+                      contract.location.importance.description !==
+                      contract.location.importance.name
+                    "
+                    class="text-sm text-gray-300 mt-1"
+                  >
                     → {{ contract.location.importance.description }}
                   </div>
                 </div>
 
                 <!-- Peculiaridade do local -->
-                <div v-if="contract.location.peculiarity && contract.location.peculiarity.type !== 'nenhuma'"
-                  class="p-4 bg-green-900/20 rounded-lg border-l-4 border-green-500/40">
+                <div
+                  v-if="
+                    contract.location.peculiarity &&
+                    contract.location.peculiarity.type !== 'nenhuma'
+                  "
+                  class="p-4 bg-green-900/20 rounded-lg border-l-4 border-green-500/40"
+                >
                   <div class="text-green-300 font-medium mb-1">
                     Peculiaridade
                   </div>
-                  <p class="text-white mb-1">{{ contract.location.peculiarity.name }}</p>
-                  <div v-if="contract.location.peculiarity.description !== contract.location.peculiarity.name"
-                    class="text-sm text-gray-300 mt-1">
+                  <p class="text-white mb-1">
+                    {{ contract.location.peculiarity.name }}
+                  </p>
+                  <div
+                    v-if="
+                      contract.location.peculiarity.description !==
+                      contract.location.peculiarity.name
+                    "
+                    class="text-sm text-gray-300 mt-1"
+                  >
                     → {{ contract.location.peculiarity.description }}
                   </div>
                 </div>
@@ -187,31 +304,54 @@
             </section>
 
             <!-- 3. Distância -->
-            <section v-if="contract.generationData.distanceRoll" class="bg-gray-800/50 rounded-lg p-6 mb-6">
-              <h3 class="text-lg font-semibold text-blue-300 mb-3 flex items-center gap-2">
+            <section
+              v-if="contract.generationData.distanceRoll"
+              class="bg-gray-800/50 rounded-lg p-6 mb-6"
+            >
+              <h3
+                class="text-lg font-semibold text-blue-300 mb-3 flex items-center gap-2"
+              >
                 <MapPinIcon class="w-5 h-5" />
                 Distância
               </h3>
               <div class="space-y-4">
                 <div class="flex items-center">
                   <span
-                    class="inline-block bg-blue-700/30 text-blue-200 px-3 py-1 rounded-full text-sm border border-blue-500/20">
-                    {{ distanceDetails?.description || 'Distância não especificada' }}
+                    class="inline-block bg-blue-700/30 text-blue-200 px-3 py-1 rounded-full text-sm border border-blue-500/20"
+                  >
+                    {{
+                      distanceDetails?.description ||
+                      "Distância não especificada"
+                    }}
                   </span>
                 </div>
 
-                <div v-if="distanceDetails?.hexagons || distanceDetails?.kilometers"
-                  class="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-blue-900/20 rounded-lg border-l-4 border-blue-500/40">
+                <div
+                  v-if="
+                    distanceDetails?.hexagons || distanceDetails?.kilometers
+                  "
+                  class="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-blue-900/20 rounded-lg border-l-4 border-blue-500/40"
+                >
                   <!-- Hexágonos -->
                   <div>
                     <div class="text-blue-300 font-medium mb-2">Hexágonos</div>
                     <div class="text-white text-xl font-bold">
                       <template v-if="distanceDetails?.hexagons">
-                        <template v-if="distanceDetails.hexagons.min === distanceDetails.hexagons.max">
-                          {{ distanceDetails.hexagons.min }} hexágono{{ distanceDetails.hexagons.min > 1 ? 's' : '' }}
+                        <template
+                          v-if="
+                            distanceDetails.hexagons.min ===
+                            distanceDetails.hexagons.max
+                          "
+                        >
+                          {{ distanceDetails.hexagons.min }} hexágono{{
+                            distanceDetails.hexagons.min > 1 ? "s" : ""
+                          }}
                         </template>
                         <template v-else>
-                          {{ distanceDetails.hexagons.min }}-{{ distanceDetails.hexagons.max }} hexágonos
+                          {{ distanceDetails.hexagons.min }}-{{
+                            distanceDetails.hexagons.max
+                          }}
+                          hexágonos
                         </template>
                       </template>
                       <template v-else>—</template>
@@ -220,14 +360,24 @@
 
                   <!-- Distância aproximada -->
                   <div>
-                    <div class="text-blue-300 font-medium mb-2">Distância aproximada</div>
+                    <div class="text-blue-300 font-medium mb-2">
+                      Distância aproximada
+                    </div>
                     <div class="text-white text-xl font-bold">
                       <template v-if="distanceDetails?.kilometers">
-                        <template v-if="distanceDetails.kilometers.min === distanceDetails.kilometers.max">
+                        <template
+                          v-if="
+                            distanceDetails.kilometers.min ===
+                            distanceDetails.kilometers.max
+                          "
+                        >
                           {{ distanceDetails.kilometers.min }} km
                         </template>
                         <template v-else>
-                          {{ distanceDetails.kilometers.min }}-{{ distanceDetails.kilometers.max }} km
+                          {{ distanceDetails.kilometers.min }}-{{
+                            distanceDetails.kilometers.max
+                          }}
+                          km
                         </template>
                       </template>
                       <template v-else>—</template>
@@ -244,18 +394,31 @@
 
             <!-- 4. Antagonista -->
             <section class="bg-gray-800/50 rounded-lg p-6 mb-6">
-              <h3 class="text-lg font-semibold text-red-300 mb-3 flex items-center gap-2">
+              <h3
+                class="text-lg font-semibold text-red-300 mb-3 flex items-center gap-2"
+              >
                 <UserMinusIcon class="w-5 h-5" />
                 Antagonista
-                <InfoButton help-key="contract-antagonists" @open-help="handleOpenHelp('contract-antagonists')"
-                  button-class="text-xs" />
+                <InfoButton
+                  help-key="contract-antagonists"
+                  @open-help="handleOpenHelp('contract-antagonists')"
+                  button-class="text-xs"
+                />
               </h3>
-              <div class="p-4 bg-red-900/20 rounded-lg border-l-4 border-red-500/40">
+              <div
+                class="p-4 bg-red-900/20 rounded-lg border-l-4 border-red-500/40"
+              >
                 <div class="flex items-center flex-wrap gap-2 mb-3">
-                  <span class="font-medium text-white">{{ contract.antagonist.specificType }}</span>
-                  <ContractTooltip :content="getAntagonistTooltip()" :title="'Oposição do Contrato'">
+                  <span class="font-medium text-white">{{
+                    contract.antagonist.specificType
+                  }}</span>
+                  <ContractTooltip
+                    :content="getAntagonistTooltip()"
+                    :title="'Oposição do Contrato'"
+                  >
                     <span
-                      class="inline-block bg-red-700/30 text-red-200 px-3 py-1 rounded-full text-sm border border-red-500/20">
+                      class="inline-block bg-red-700/30 text-red-200 px-3 py-1 rounded-full text-sm border border-red-500/20"
+                    >
                       {{ getCategoryDisplayName(contract.antagonist.category) }}
                     </span>
                   </ContractTooltip>
@@ -265,21 +428,38 @@
             </section>
 
             <!-- 5. Complicações -->
-            <section v-if="contract.complications?.length" class="bg-gray-800/50 rounded-lg p-6 mb-6">
-              <h3 class="text-lg font-semibold text-orange-300 mb-3 flex items-center gap-2">
+            <section
+              v-if="contract.complications?.length"
+              class="bg-gray-800/50 rounded-lg p-6 mb-6"
+            >
+              <h3
+                class="text-lg font-semibold text-orange-300 mb-3 flex items-center gap-2"
+              >
                 <ExclamationCircleIcon class="w-5 h-5" />
                 Complicações
-                <InfoButton help-key="contract-complications" @open-help="handleOpenHelp('contract-complications')"
-                  button-class="text-xs" />
+                <InfoButton
+                  help-key="contract-complications"
+                  @open-help="handleOpenHelp('contract-complications')"
+                  button-class="text-xs"
+                />
               </h3>
               <div class="space-y-4">
-                <div v-for="complication in contract.complications" :key="complication.category"
-                  class="p-4 bg-orange-900/20 rounded-lg border-l-4 border-orange-500/40">
+                <div
+                  v-for="complication in contract.complications"
+                  :key="complication.category"
+                  class="p-4 bg-orange-900/20 rounded-lg border-l-4 border-orange-500/40"
+                >
                   <div class="flex items-center flex-wrap gap-2 mb-3">
-                    <span class="font-medium text-white">{{ complication.specificDetail }}</span>
-                    <ContractTooltip :content="getComplicationTooltip()" :title="'Complicação da Missão'">
+                    <span class="font-medium text-white">{{
+                      complication.specificDetail
+                    }}</span>
+                    <ContractTooltip
+                      :content="getComplicationTooltip()"
+                      :title="'Complicação da Missão'"
+                    >
                       <span
-                        class="inline-block bg-orange-700/30 text-orange-200 px-3 py-1 rounded-full text-sm border border-orange-500/20">
+                        class="inline-block bg-orange-700/30 text-orange-200 px-3 py-1 rounded-full text-sm border border-orange-500/20"
+                      >
                         {{ getCategoryDisplayName(complication.category) }}
                       </span>
                     </ContractTooltip>
@@ -290,21 +470,36 @@
             </section>
 
             <!-- 6. Aliados -->
-            <section v-if="contract.allies?.length" class="bg-gray-800/50 rounded-lg p-6 mb-6">
-              <h3 class="text-lg font-semibold text-green-300 mb-3 flex items-center gap-2">
+            <section
+              v-if="contract.allies?.length"
+              class="bg-gray-800/50 rounded-lg p-6 mb-6"
+            >
+              <h3
+                class="text-lg font-semibold text-green-300 mb-3 flex items-center gap-2"
+              >
                 <UserPlusIcon class="w-5 h-5" />
                 Aliados Potenciais
-                <InfoButton help-key="contract-allies" @open-help="handleOpenHelp('contract-allies')"
-                  button-class="text-xs" />
+                <InfoButton
+                  help-key="contract-allies"
+                  @open-help="handleOpenHelp('contract-allies')"
+                  button-class="text-xs"
+                />
               </h3>
               <div class="space-y-4">
-                <div v-for="ally in contract.allies" :key="ally.name"
-                  class="p-4 bg-green-900/20 rounded-lg border-l-4 border-green-500/40">
+                <div
+                  v-for="ally in contract.allies"
+                  :key="ally.name"
+                  class="p-4 bg-green-900/20 rounded-lg border-l-4 border-green-500/40"
+                >
                   <div class="flex items-center flex-wrap gap-2 mb-3">
                     <span class="font-medium text-white">{{ ally.name }}</span>
-                    <ContractTooltip :content="getAllyTooltip()" :title="'Aliado Potencial'">
+                    <ContractTooltip
+                      :content="getAllyTooltip()"
+                      :title="'Aliado Potencial'"
+                    >
                       <span
-                        class="inline-block bg-green-700/30 text-green-200 px-3 py-1 rounded-full text-sm border border-green-500/20">
+                        class="inline-block bg-green-700/30 text-green-200 px-3 py-1 rounded-full text-sm border border-green-500/20"
+                      >
                         {{ getCategoryDisplayName(ally.category) }}
                       </span>
                     </ContractTooltip>
@@ -312,7 +507,9 @@
                   <p class="text-white mb-4">{{ ally.description }}</p>
 
                   <!-- Detalhes específicos do aliado -->
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3 text-sm">
+                  <div
+                    class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3 text-sm"
+                  >
                     <div>
                       <div class="text-green-300 font-medium mb-1">
                         Tipo específico
@@ -323,11 +520,16 @@
                       <div class="text-green-300 font-medium mb-1">
                         Quando aparece
                       </div>
-                      <p class="text-white">{{ getTimingDisplayName(ally.timing) }}</p>
+                      <p class="text-white">
+                        {{ getTimingDisplayName(ally.timing) }}
+                      </p>
                     </div>
 
                     <!-- Nível de poder para aventureiros -->
-                    <div v-if="ally.powerLevel !== undefined" class="md:col-span-2">
+                    <div
+                      v-if="ally.powerLevel !== undefined"
+                      class="md:col-span-2"
+                    >
                       <div class="text-green-300 font-medium mb-1">
                         Nível de Ameaça
                       </div>
@@ -335,13 +537,19 @@
                     </div>
 
                     <!-- Características para monstruosidades -->
-                    <div v-if="ally.characteristics?.length" class="md:col-span-2">
+                    <div
+                      v-if="ally.characteristics?.length"
+                      class="md:col-span-2"
+                    >
                       <div class="text-green-300 font-medium mb-2">
                         Características especiais
                       </div>
                       <ul class="text-white space-y-1">
-                        <li v-for="characteristic in ally.characteristics" :key="characteristic"
-                          class="flex items-start gap-2">
+                        <li
+                          v-for="characteristic in ally.characteristics"
+                          :key="characteristic"
+                          class="flex items-start gap-2"
+                        >
                           <span class="text-green-400 mt-0.5">•</span>
                           <span>{{ characteristic }}</span>
                         </li>
@@ -353,23 +561,36 @@
             </section>
 
             <!-- 7. Reviravoltas -->
-            <section v-if="contract.twists?.length" class="bg-gray-800/50 rounded-lg p-6 mb-6">
-              <h3 class="text-lg font-semibold text-purple-300 mb-3 flex items-center gap-2">
+            <section
+              v-if="contract.twists?.length"
+              class="bg-gray-800/50 rounded-lg p-6 mb-6"
+            >
+              <h3
+                class="text-lg font-semibold text-purple-300 mb-3 flex items-center gap-2"
+              >
                 <FaceSmileIcon class="w-5 h-5" />
                 Reviravoltas
               </h3>
               <div class="space-y-4">
-                <div v-for="twist in contract.twists" :key="twist.description"
-                  class="p-4 bg-purple-900/20 rounded-lg border-l-4 border-purple-500/40">
+                <div
+                  v-for="twist in contract.twists"
+                  :key="twist.description"
+                  class="p-4 bg-purple-900/20 rounded-lg border-l-4 border-purple-500/40"
+                >
                   <div class="flex items-center flex-wrap gap-2 mb-3">
                     <span class="font-medium text-white">Reviravolta</span>
-                    <span v-if="twist.who"
-                      class="inline-block bg-purple-700/30 text-purple-200 px-3 py-1 rounded-full text-sm border border-purple-500/20">
+                    <span
+                      v-if="twist.who"
+                      class="inline-block bg-purple-700/30 text-purple-200 px-3 py-1 rounded-full text-sm border border-purple-500/20"
+                    >
                       {{ twist.who }}
                     </span>
                   </div>
                   <p class="text-white mb-3">{{ twist.description }}</p>
-                  <div v-if="twist.what" class="p-2 bg-purple-800/30 rounded-lg text-purple-100 mt-2">
+                  <div
+                    v-if="twist.what"
+                    class="p-2 bg-purple-800/30 rounded-lg text-purple-100 mt-2"
+                  >
                     <strong>Revelação:</strong> {{ twist.what }}
                   </div>
                 </div>
@@ -377,18 +598,29 @@
             </section>
 
             <!-- 8. Consequências Severas -->
-            <section v-if="contract.severeConsequences?.length" class="bg-gray-800/50 rounded-lg p-6 mb-6">
-              <h3 class="text-lg font-semibold text-red-300 mb-3 flex items-center gap-2">
+            <section
+              v-if="contract.severeConsequences?.length"
+              class="bg-gray-800/50 rounded-lg p-6 mb-6"
+            >
+              <h3
+                class="text-lg font-semibold text-red-300 mb-3 flex items-center gap-2"
+              >
                 <ShieldExclamationIcon class="w-5 h-5" />
                 Consequências por Falha
               </h3>
               <div class="space-y-4">
-                <div v-for="consequence in contract.severeConsequences" :key="consequence.description"
-                  class="p-4 bg-red-900/20 rounded-lg border-l-4 border-red-500/40">
+                <div
+                  v-for="consequence in contract.severeConsequences"
+                  :key="consequence.description"
+                  class="p-4 bg-red-900/20 rounded-lg border-l-4 border-red-500/40"
+                >
                   <div class="flex items-center flex-wrap gap-2 mb-3">
-                    <span class="font-medium text-white">{{ consequence.category }}</span>
+                    <span class="font-medium text-white">{{
+                      consequence.category
+                    }}</span>
                     <span
-                      class="inline-block bg-red-700/30 text-red-200 px-3 py-1 rounded-full text-sm border border-red-500/20">
+                      class="inline-block bg-red-700/30 text-red-200 px-3 py-1 rounded-full text-sm border border-red-500/20"
+                    >
                       Consequência Severa
                     </span>
                   </div>
@@ -400,22 +632,31 @@
                       <div class="text-red-300 font-medium mb-1">
                         Consequência específica
                       </div>
-                      <p class="text-white">{{ consequence.specificConsequence }}</p>
+                      <p class="text-white">
+                        {{ consequence.specificConsequence }}
+                      </p>
                     </div>
 
                     <div class="md:col-span-2">
                       <div class="text-red-300 font-medium mb-1">
                         Impacto nos contratados
                       </div>
-                      <p class="text-white">{{ consequence.affectsContractors }}</p>
+                      <p class="text-white">
+                        {{ consequence.affectsContractors }}
+                      </p>
                     </div>
 
                     <!-- Efeito adicional se existir -->
-                    <div v-if="consequence.additionalEffect" class="md:col-span-2">
+                    <div
+                      v-if="consequence.additionalEffect"
+                      class="md:col-span-2"
+                    >
                       <div class="text-red-300 font-medium mb-1">
                         Efeito adicional
                       </div>
-                      <p class="text-white">{{ consequence.additionalEffect }}</p>
+                      <p class="text-white">
+                        {{ consequence.additionalEffect }}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -424,51 +665,87 @@
 
             <!-- 9. Pagamento -->
             <section class="bg-gray-800/50 rounded-lg p-6 mb-6">
-              <h3 class="text-lg font-semibold text-amber-300 mb-4 flex items-center gap-2">
+              <h3
+                class="text-lg font-semibold text-amber-300 mb-4 flex items-center gap-2"
+              >
                 <CurrencyDollarIcon class="w-5 h-5" />
                 Pagamento
-                <InfoButton help-key="contract-payment" @open-help="handleOpenHelp('contract-payment')"
-                  button-class="text-xs" />
+                <InfoButton
+                  help-key="contract-payment"
+                  @open-help="handleOpenHelp('contract-payment')"
+                  button-class="text-xs"
+                />
               </h3>
 
               <div class="mb-6">
-                <ContractValue :value="contract.value" :difficulty="contract.difficulty"
-                  :contractor-type="contract.contractorType" :payment-type="contract.paymentType" size="lg" />
+                <ContractValue
+                  :value="contract.value"
+                  :difficulty="contract.difficulty"
+                  :contractor-type="contract.contractorType"
+                  :payment-type="contract.paymentType"
+                  size="lg"
+                />
 
                 <!-- Mostrar valor original e valor com bônus quando o contrato foi reajustado -->
                 <div
-                  v-if="contract.generationData?.previousFinalGoldReward !== undefined && contract.generationData.previousFinalGoldReward !== contract.value.finalGoldReward"
-                  class="mt-4 p-3 bg-gray-800/40 rounded-lg border-l-4 border-amber-500/30 text-sm">
+                  v-if="
+                    contract.generationData?.previousFinalGoldReward !==
+                      undefined &&
+                    contract.generationData.previousFinalGoldReward !==
+                      contract.value.finalGoldReward
+                  "
+                  class="mt-4 p-3 bg-gray-800/40 rounded-lg border-l-4 border-amber-500/30 text-sm"
+                >
                   <div class="flex items-center justify-between text-gray-400">
                     <div>Valor original:</div>
-                    <div class="text-white font-medium">{{
-                      formatCurrency(contract.generationData.previousFinalGoldReward) }} PO$
+                    <div class="text-white font-medium">
+                      {{
+                        formatCurrency(
+                          contract.generationData.previousFinalGoldReward
+                        )
+                      }}
+                      PO$
                     </div>
                   </div>
                   <div class="flex items-center justify-between mt-2">
                     <div class="text-amber-300">Valor com bônus:</div>
-                    <div class="text-amber-100 font-bold">{{ formatCurrency(contract.value.finalGoldReward) }} PO$</div>
+                    <div class="text-amber-100 font-bold">
+                      {{ formatCurrency(contract.value.finalGoldReward) }} PO$
+                    </div>
                   </div>
                 </div>
               </div>
 
               <!-- Termos de Pagamento -->
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div class="p-4 bg-amber-900/20 rounded-lg border-l-4 border-amber-500/40">
-                  <h4 class="text-amber-300 font-medium mb-2 flex items-center gap-2">
+                <div
+                  class="p-4 bg-amber-900/20 rounded-lg border-l-4 border-amber-500/40"
+                >
+                  <h4
+                    class="text-amber-300 font-medium mb-2 flex items-center gap-2"
+                  >
                     <ClockIcon class="w-4 h-4" />
                     Prazo
                   </h4>
                   <div class="space-y-2">
-                    <div v-if="contract.deadline.value" class="flex justify-between">
+                    <div
+                      v-if="contract.deadline.value"
+                      class="flex justify-between"
+                    >
                       <span class="text-gray-400">Tempo:</span>
-                      <span class="text-white">{{ contract.deadline.value }}</span>
+                      <span class="text-white">{{
+                        contract.deadline.value
+                      }}</span>
                     </div>
                   </div>
                 </div>
 
-                <div class="p-4 bg-amber-900/20 rounded-lg border-l-4 border-amber-500/40">
-                  <h4 class="text-amber-300 font-medium mb-2 flex items-center gap-2">
+                <div
+                  class="p-4 bg-amber-900/20 rounded-lg border-l-4 border-amber-500/40"
+                >
+                  <h4
+                    class="text-amber-300 font-medium mb-2 flex items-center gap-2"
+                  >
                     <CurrencyDollarIcon class="w-4 h-4" />
                     Tipo de Pagamento
                   </h4>
@@ -480,25 +757,57 @@
 
               <!-- Recompensas e Incentivos -->
               <div v-if="contract.additionalRewards?.length" class="mb-6">
-                <h4 class="text-lg font-semibold text-green-300 mb-3 flex items-center gap-2">
+                <h4
+                  class="text-lg font-semibold text-green-300 mb-3 flex items-center gap-2"
+                >
                   <GiftIcon class="w-5 h-5" />
                   Recompensas e Incentivos
                 </h4>
                 <div class="space-y-3">
-                  <div v-for="reward in contract.additionalRewards" :key="reward.specificReward" class="p-4 rounded-lg"
-                    :class="reward.isPositive ? 'bg-green-900/20 border-l-4 border-green-500/40' : 'bg-red-900/20 border-l-4 border-red-500/40'">
+                  <div
+                    v-for="reward in contract.additionalRewards"
+                    :key="reward.specificReward"
+                    class="p-4 rounded-lg"
+                    :class="
+                      reward.isPositive
+                        ? 'bg-green-900/20 border-l-4 border-green-500/40'
+                        : 'bg-red-900/20 border-l-4 border-red-500/40'
+                    "
+                  >
                     <div class="flex items-start gap-3">
                       <div class="flex-shrink-0 mt-1">
-                        <CheckCircleIcon v-if="reward.isPositive" class="w-5 h-5 text-green-400" />
-                        <ExclamationTriangleIcon v-else class="w-5 h-5 text-red-400" />
+                        <CheckCircleIcon
+                          v-if="reward.isPositive"
+                          class="w-5 h-5 text-green-400"
+                        />
+                        <ExclamationTriangleIcon
+                          v-else
+                          class="w-5 h-5 text-red-400"
+                        />
                       </div>
                       <div class="flex-1">
-                        <div class="font-medium" :class="reward.isPositive ? 'text-green-300' : 'text-red-300'">
+                        <div
+                          class="font-medium"
+                          :class="
+                            reward.isPositive
+                              ? 'text-green-300'
+                              : 'text-red-300'
+                          "
+                        >
                           {{ getCategoryDisplayName(reward.category) }}
                         </div>
-                        <div class="text-white mt-1">{{ reward.specificReward }}</div>
-                        <div v-if="reward.description && reward.description !== reward.specificReward"
-                          class="text-gray-300 text-sm mt-1">{{ reward.description }}</div>
+                        <div class="text-white mt-1">
+                          {{ reward.specificReward }}
+                        </div>
+                        <div
+                          v-if="
+                            reward.description &&
+                            reward.description !== reward.specificReward
+                          "
+                          class="text-gray-300 text-sm mt-1"
+                        >
+                          {{ reward.description }}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -507,26 +816,36 @@
 
               <!-- Penalidades e Multas -->
               <div v-if="contract.penalty">
-                <h4 class="text-lg font-semibold text-red-300 mb-3 flex items-center gap-2">
+                <h4
+                  class="text-lg font-semibold text-red-300 mb-3 flex items-center gap-2"
+                >
                   <ExclamationTriangleIcon class="w-5 h-5" />
                   Penalidade Aplicada
                 </h4>
-                <div class="p-4 bg-red-900/20 rounded-lg border-l-4 border-red-500/40">
+                <div
+                  class="p-4 bg-red-900/20 rounded-lg border-l-4 border-red-500/40"
+                >
                   <div class="flex items-start gap-3">
                     <div class="flex-shrink-0 mt-0.5">
                       <XCircleIcon class="w-6 h-6 text-red-400" />
                     </div>
                     <div class="flex-1">
-                      <div class="text-red-300 font-medium mb-3">Multa por Quebra de Contrato</div>
+                      <div class="text-red-300 font-medium mb-3">
+                        Multa por Quebra de Contrato
+                      </div>
                       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <div class="text-sm text-gray-400 mb-1">Valor da Multa:</div>
+                          <div class="text-sm text-gray-400 mb-1">
+                            Valor da Multa:
+                          </div>
                           <div class="text-xl font-bold text-red-300">
                             {{ contract.penalty.amount }} PO$
                           </div>
                         </div>
                         <div>
-                          <div class="text-sm text-gray-400 mb-1">Data da Aplicação:</div>
+                          <div class="text-sm text-gray-400 mb-1">
+                            Data da Aplicação:
+                          </div>
                           <div class="text-lg text-white">
                             {{ formatGameDate(contract.penalty.appliedAt) }}
                           </div>
@@ -545,20 +864,32 @@
             </section>
 
             <!-- Pré-requisitos e Cláusulas -->
-            <section v-if="contract.prerequisites?.length || contract.clauses?.length"
-              class="bg-gray-800/50 rounded-lg p-6 mb-6">
-              <h3 class="text-lg font-semibold text-amber-300 mb-4 flex items-center gap-2">
+            <section
+              v-if="contract.prerequisites?.length || contract.clauses?.length"
+              class="bg-gray-800/50 rounded-lg p-6 mb-6"
+            >
+              <h3
+                class="text-lg font-semibold text-amber-300 mb-4 flex items-center gap-2"
+              >
                 <DocumentTextIcon class="w-5 h-5" />
                 Requisitos e Condições
-                <InfoButton help-key="contract-requirements" @open-help="handleOpenHelp('contract-requirements')"
-                  button-class="text-xs" />
+                <InfoButton
+                  help-key="contract-requirements"
+                  @open-help="handleOpenHelp('contract-requirements')"
+                  button-class="text-xs"
+                />
               </h3>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div v-if="contract.prerequisites?.length"
-                  class="p-4 bg-yellow-900/20 rounded-lg border-l-4 border-yellow-500/40">
+                <div
+                  v-if="contract.prerequisites?.length"
+                  class="p-4 bg-yellow-900/20 rounded-lg border-l-4 border-yellow-500/40"
+                >
                   <div class="flex items-center gap-2 mb-3">
                     <h4 class="text-yellow-300 font-medium">
-                      <ContractTooltip :content="getPrerequisiteTooltip()" :title="'Pré-requisitos do Contrato'">
+                      <ContractTooltip
+                        :content="getPrerequisiteTooltip()"
+                        :title="'Pré-requisitos do Contrato'"
+                      >
                         <div class="flex items-center gap-1">
                           <ExclamationTriangleIcon class="w-4 h-4" />
                           Pré-requisitos
@@ -567,19 +898,27 @@
                     </h4>
                   </div>
                   <ul class="text-white space-y-2">
-                    <li v-for="prerequisite in contract.prerequisites" :key="prerequisite"
-                      class="flex items-start gap-2">
+                    <li
+                      v-for="prerequisite in contract.prerequisites"
+                      :key="prerequisite"
+                      class="flex items-start gap-2"
+                    >
                       <span class="text-yellow-400 mt-0.5">•</span>
                       <span>{{ prerequisite }}</span>
                     </li>
                   </ul>
                 </div>
 
-                <div v-if="contract.clauses?.length"
-                  class="p-4 bg-blue-900/20 rounded-lg border-l-4 border-blue-500/40">
+                <div
+                  v-if="contract.clauses?.length"
+                  class="p-4 bg-blue-900/20 rounded-lg border-l-4 border-blue-500/40"
+                >
                   <div class="flex items-center gap-2 mb-3">
                     <h4 class="text-blue-300 font-medium">
-                      <ContractTooltip :content="getClauseTooltip()" :title="'Cláusulas Especiais'">
+                      <ContractTooltip
+                        :content="getClauseTooltip()"
+                        :title="'Cláusulas Especiais'"
+                      >
                         <div class="flex items-center gap-1">
                           <DocumentTextIcon class="w-4 h-4" />
                           Cláusulas Especiais
@@ -588,7 +927,11 @@
                     </h4>
                   </div>
                   <ul class="text-white space-y-2">
-                    <li v-for="clause in contract.clauses" :key="clause" class="flex items-start gap-2">
+                    <li
+                      v-for="clause in contract.clauses"
+                      :key="clause"
+                      class="flex items-start gap-2"
+                    >
                       <span class="text-blue-400 mt-0.5">•</span>
                       <span>{{ clause }}</span>
                     </li>
@@ -598,54 +941,87 @@
             </section>
 
             <!-- Palavras-chave temáticas do contrato -->
-            <section v-if="contract.themeKeywords && contract.themeKeywords.length > 0"
-              class="bg-gray-800/50 rounded-lg p-6 mb-6">
-              <h3 class="text-lg font-semibold text-indigo-300 mb-3 flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+            <section
+              v-if="contract.themeKeywords && contract.themeKeywords.length > 0"
+              class="bg-gray-800/50 rounded-lg p-6 mb-6"
+            >
+              <h3
+                class="text-lg font-semibold text-indigo-300 mb-3 flex items-center gap-2"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                  />
                 </svg>
                 Palavras-chave para criatividade
               </h3>
               <div class="space-y-4">
                 <div class="flex flex-wrap gap-2 mb-3">
-                  <span v-for="keyword in contract.themeKeywords" :key="`contract-${keyword.set}-${keyword.keyword}`"
-                    class="inline-block bg-indigo-700/30 text-indigo-200 px-3 py-1 rounded-full text-sm">
+                  <span
+                    v-for="keyword in contract.themeKeywords"
+                    :key="`contract-${keyword.set}-${keyword.keyword}`"
+                    class="inline-block bg-indigo-700/30 text-indigo-200 px-3 py-1 rounded-full text-sm"
+                  >
                     {{ keyword.keyword }}
                   </span>
                 </div>
 
                 <div class="text-indigo-400 flex items-center gap-1 text-sm">
                   <InformationCircleIcon class="w-4 h-4" />
-                  Use essas palavras-chave para inspirar elementos criativos, atmosfera, temas e desenvolvimento do
-                  contrato como um todo.
+                  Use essas palavras-chave para inspirar elementos criativos,
+                  atmosfera, temas e desenvolvimento do contrato como um todo.
                 </div>
               </div>
             </section>
 
             <!-- Informações de Debug (se habilitado) -->
-            <section v-if="showDebugInfo" class="bg-gray-800/50 rounded-lg p-6 mb-6 border-t border-amber-700/30 pt-4">
-              <h3 class="text-lg font-semibold text-amber-300 mb-3 flex items-center gap-2">
+            <section
+              v-if="showDebugInfo"
+              class="bg-gray-800/50 rounded-lg p-6 mb-6 border-t border-amber-700/30 pt-4"
+            >
+              <h3
+                class="text-lg font-semibold text-amber-300 mb-3 flex items-center gap-2"
+              >
                 <InformationCircleIcon class="w-5 h-5" />
                 Informações de Geração
               </h3>
               <div class="p-4 bg-gray-900/80 rounded-lg">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm font-mono">
+                <div
+                  class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm font-mono"
+                >
                   <div>
                     <div class="text-amber-300 mb-1">ID:</div>
                     <div class="text-gray-300">{{ contract.id }}</div>
                     <div class="text-amber-300 mt-3 mb-1">Criado:</div>
-                    <div class="text-gray-300">{{ formatDate(contract.createdAt) }}</div>
+                    <div class="text-gray-300">
+                      {{ formatDate(contract.createdAt) }}
+                    </div>
                     <div v-if="contract.completedAt">
                       <div class="text-amber-300 mt-3 mb-1">Concluído:</div>
-                      <div class="text-gray-300">{{ formatDate(contract.completedAt) }}</div>
+                      <div class="text-gray-300">
+                        {{ formatDate(contract.completedAt) }}
+                      </div>
                     </div>
                   </div>
                   <div v-if="contract.generationData">
                     <div class="text-amber-300 mb-1">Rolagem Base:</div>
-                    <div class="text-gray-300">{{ contract.generationData.baseRoll }}</div>
-                    <div class="text-amber-300 mt-3 mb-1">Tipo Assentamento:</div>
-                    <div class="text-gray-300">{{ contract.generationData.settlementType || 'N/A' }}</div>
+                    <div class="text-gray-300">
+                      {{ contract.generationData.baseRoll }}
+                    </div>
+                    <div class="text-amber-300 mt-3 mb-1">
+                      Tipo Assentamento:
+                    </div>
+                    <div class="text-gray-300">
+                      {{ contract.generationData.settlementType || "N/A" }}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -653,7 +1029,9 @@
 
             <!-- Histórico de Datas -->
             <section class="bg-gray-800/50 rounded-lg p-6 mb-6">
-              <h3 class="text-lg font-semibold text-amber-300 mb-3 flex items-center gap-2">
+              <h3
+                class="text-lg font-semibold text-amber-300 mb-3 flex items-center gap-2"
+              >
                 <ClockIcon class="w-5 h-5" />
                 Histórico
               </h3>
@@ -664,12 +1042,21 @@
                     <div class="text-white">{{ formatCreatedDisplay() }}</div>
                   </div>
 
-                  <div v-if="contract.acceptedAt || contract.takenByOthersInfo?.takenAt">
+                  <div
+                    v-if="
+                      contract.acceptedAt || contract.takenByOthersInfo?.takenAt
+                    "
+                  >
                     <div class="text-gray-400">Aceito em:</div>
                     <div class="text-white">{{ formatAcceptedDisplay() }}</div>
                   </div>
 
-                  <div v-if="contract.completedAt || contract.takenByOthersInfo?.estimatedResolutionDate">
+                  <div
+                    v-if="
+                      contract.completedAt ||
+                      contract.takenByOthersInfo?.estimatedResolutionDate
+                    "
+                  >
                     <div class="text-gray-400">Concluído em:</div>
                     <div class="text-white">{{ formatCompletedDisplay() }}</div>
                   </div>
@@ -679,28 +1066,41 @@
 
             <!-- Ações -->
             <div class="flex flex-wrap gap-3 pt-4 border-t border-amber-700/30">
-              <div class="flex items-center gap-2 text-sm text-amber-300 mr-auto">
+              <div
+                class="flex items-center gap-2 text-sm text-amber-300 mr-auto"
+              >
                 <InformationCircleIcon class="w-4 h-4" />
                 <span>{{ getDifficultyDescription(contract.difficulty) }}</span>
               </div>
 
-              <button v-if="canAccept" @click="handleAccept"
-                class="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors font-medium">
+              <button
+                v-if="canAccept"
+                @click="handleAccept"
+                class="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors font-medium"
+              >
                 Aceitar Contrato
               </button>
 
-              <button v-if="canComplete" @click="handleComplete"
-                class="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium">
+              <button
+                v-if="canComplete"
+                @click="handleComplete"
+                class="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
+              >
                 Marcar como Concluído
               </button>
 
-              <button v-if="canAbandon" @click="handleAbandon"
-                class="px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors font-medium">
+              <button
+                v-if="canAbandon"
+                @click="handleAbandon"
+                class="px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors font-medium"
+              >
                 Abandonar
               </button>
 
-              <button @click="closeModal"
-                class="px-6 py-3 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors font-medium">
+              <button
+                @click="closeModal"
+                class="px-6 py-3 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors font-medium"
+              >
                 Fechar
               </button>
             </div>
@@ -712,15 +1112,20 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import type { Contract } from '@/types/contract';
-import { ContractorType, ContractDifficulty, PaymentType, ContractStatus as ContractStatusEnum } from '@/types/contract';
-import { ContractGenerator } from '@/utils/generators/contractGenerator';
-import ContractStatus from './ContractStatus.vue';
-import ContractValue from './ContractValue.vue';
-import ContractTooltip from './ContractTooltip.vue';
-import ContractHelpPanel from './ContractHelpPanel.vue';
-import InfoButton from '@/components/common/InfoButton.vue';
+import { computed, ref } from "vue";
+import type { Contract } from "@/types/contract";
+import {
+  ContractorType,
+  ContractDifficulty,
+  PaymentType,
+  ContractStatus as ContractStatusEnum,
+} from "@/types/contract";
+import { ContractGenerator } from "@/utils/generators/contractGenerator";
+import ContractStatus from "./ContractStatus.vue";
+import ContractValue from "./ContractValue.vue";
+import ContractTooltip from "./ContractTooltip.vue";
+import ContractHelpPanel from "./ContractHelpPanel.vue";
+import InfoButton from "@/components/common/InfoButton.vue";
 import {
   UsersIcon,
   BuildingOfficeIcon,
@@ -738,11 +1143,9 @@ import {
   UserPlusIcon,
   ShieldExclamationIcon,
   GiftIcon,
-  CheckCircleIcon
-} from '@heroicons/vue/24/outline';
-import {
-  XCircleIcon
-} from '@heroicons/vue/24/solid';
+  CheckCircleIcon,
+} from "@heroicons/vue/24/outline";
+import { XCircleIcon } from "@heroicons/vue/24/solid";
 
 interface Props {
   isOpen: boolean;
@@ -758,14 +1161,14 @@ interface Emits {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  showDebugInfo: false
+  showDebugInfo: false,
 });
 
 const emit = defineEmits<Emits>();
 
 // ===== STATE =====
 const showHelpPanel = ref(false);
-const currentHelpKey = ref('');
+const currentHelpKey = ref("");
 
 // ===== COMPUTED =====
 
@@ -785,46 +1188,44 @@ const contractorIcon = computed(() => {
 });
 
 const contractorTypeLabel = computed(() => {
-  return props.contract?.contractorType || 'Desconhecido';
+  return props.contract?.contractorType || "Desconhecido";
 });
 
 // Texto explicando o tipo de resolução
 const resolutionText = computed(() => {
-  if (!props.contract) return '';
+  if (!props.contract) return "";
 
   const reason = props.contract.takenByOthersInfo?.resolutionReason;
   if (reason) return reason;
 
   switch (props.contract.status) {
     case ContractStatusEnum.RESOLVIDO_POR_OUTROS:
-      return 'O contrato foi resolvido por outros.';
+      return "O contrato foi resolvido por outros.";
     case ContractStatusEnum.ACEITO_POR_OUTROS:
-      return 'Assinado por outros aventureiros.';
+      return "Assinado por outros aventureiros.";
     case ContractStatusEnum.QUEBRADO:
-      return 'O contrato quebrou antes da conclusão.';
+      return "O contrato quebrou antes da conclusão.";
     case ContractStatusEnum.ANULADO:
-      return 'O contrato foi anulado.';
+      return "O contrato foi anulado.";
     default:
-      return '';
+      return "";
   }
 });
 
 const canAccept = computed(() => {
-  return props.contract?.status === 'Disponível';
+  return props.contract?.status === "Disponível";
 });
 
 const canComplete = computed(() => {
-  return props.contract && [
-    'Aceito',
-    'Em andamento'
-  ].includes(props.contract.status);
+  return (
+    props.contract && ["Aceito", "Em andamento"].includes(props.contract.status)
+  );
 });
 
 const canAbandon = computed(() => {
-  return props.contract && [
-    'Aceito',
-    'Em andamento'
-  ].includes(props.contract.status);
+  return (
+    props.contract && ["Aceito", "Em andamento"].includes(props.contract.status)
+  );
 });
 
 const distanceDetails = computed(() => {
@@ -835,30 +1236,30 @@ const distanceDetails = computed(() => {
 // ===== METHODS =====
 
 function closeModal() {
-  emit('close');
+  emit("close");
 }
 
 // Helper local para formatar valores monetários no componente
 function formatCurrency(value: number | undefined | null): string {
-  if (value === undefined || value === null || Number.isNaN(value)) return '—';
+  if (value === undefined || value === null || Number.isNaN(value)) return "—";
   return Number(value).toFixed(1).toString();
 }
 
 function handleAccept() {
   if (props.contract) {
-    emit('accept', props.contract);
+    emit("accept", props.contract);
   }
 }
 
 function handleComplete() {
   if (props.contract) {
-    emit('complete', props.contract);
+    emit("complete", props.contract);
   }
 }
 
 function handleAbandon() {
   if (props.contract) {
-    emit('abandon', props.contract);
+    emit("abandon", props.contract);
   }
 }
 
@@ -873,82 +1274,82 @@ function getDistanceDetails(contract: Contract): {
 function getPaymentTypeDescription(paymentType: PaymentType): string {
   switch (paymentType) {
     case PaymentType.DIRETO_CONTRATANTE:
-      return 'Pagamento direto com o contratante';
+      return "Pagamento direto com o contratante";
     case PaymentType.METADE_GUILDA_METADE_CONTRATANTE:
-      return 'Metade com a guilda, metade com o contratante';
+      return "Metade com a guilda, metade com o contratante";
     case PaymentType.METADE_GUILDA_METADE_BENS:
-      return 'Metade com a guilda, metade em bens com o contratante';
+      return "Metade com a guilda, metade em bens com o contratante";
     case PaymentType.BENS_SERVICOS:
-      return 'Em materiais, joias, bens ou serviços do contratante';
+      return "Em materiais, joias, bens ou serviços do contratante";
     case PaymentType.TOTAL_GUILDA:
-      return 'Pagamento total na guilda em PO$';
+      return "Pagamento total na guilda em PO$";
     case PaymentType.TOTAL_GUILDA_MAIS_SERVICOS:
-      return 'Pagamento total na guilda em PO$ e serviços do contratante';
+      return "Pagamento total na guilda em PO$ e serviços do contratante";
     default:
-      return 'Tipo de pagamento não especificado';
+      return "Tipo de pagamento não especificado";
   }
 }
 
 function getCategoryDisplayName(category: string): string {
   const categoryMap: Record<string, string> = {
-    'ATACAR_DESTRUIR': 'Atacar/Destruir',
-    'ENCONTRAR_RECUPERAR': 'Encontrar/Recuperar',
-    'CAPTURAR': 'Capturar',
-    'PROTEGER_SALVAR': 'Proteger/Salvar',
-    'EXPLORAR_DESCOBRIR': 'Explorar/Descobrir',
-    'ENTREGAR_RECEBER': 'Entregar/Receber',
-    'INVESTIGAR_SABOTAR': 'Investigar/Sabotar',
-    'SERVICOS_PERIGOSOS': 'Serviços Perigosos',
-    'RELIGIOSO': 'Religioso',
-    'HUMANOIDE_PODEROSO': 'Humanoide Poderoso',
-    'ARTEFATO_MAGICO': 'Artefato Mágico',
-    'ORGANIZACAO': 'Organização',
-    'PERIGO_IMINENTE': 'Perigo Iminente',
-    'ENTIDADE_SOBRENATURAL': 'Entidade Sobrenatural',
-    'ANOMALIA': 'Anomalia',
-    'DESASTRE_ACIDENTE': 'Desastre/Acidente',
-    'CRISE': 'Crise',
-    'MISTERIO': 'Mistério',
-    'RECURSOS': 'Recursos',
-    'VITIMAS': 'Vítimas',
-    'MIRACULOSO': 'Miraculoso',
-    'AMBIENTE_HOSTIL': 'Ambiente Hostil',
-    'INUSITADO': 'Inusitado',
-    'PROBLEMAS_DIPLOMATICOS': 'Problemas Diplomáticos',
-    'PROTECAO': 'Proteção',
-    'CONTRA_TEMPO_AMISTOSO': 'Contra-tempo Amistoso',
-    'ENCONTRO_HOSTIL': 'Encontro Hostil',
+    ATACAR_DESTRUIR: "Atacar/Destruir",
+    ENCONTRAR_RECUPERAR: "Encontrar/Recuperar",
+    CAPTURAR: "Capturar",
+    PROTEGER_SALVAR: "Proteger/Salvar",
+    EXPLORAR_DESCOBRIR: "Explorar/Descobrir",
+    ENTREGAR_RECEBER: "Entregar/Receber",
+    INVESTIGAR_SABOTAR: "Investigar/Sabotar",
+    SERVICOS_PERIGOSOS: "Serviços Perigosos",
+    RELIGIOSO: "Religioso",
+    HUMANOIDE_PODEROSO: "Humanoide Poderoso",
+    ARTEFATO_MAGICO: "Artefato Mágico",
+    ORGANIZACAO: "Organização",
+    PERIGO_IMINENTE: "Perigo Iminente",
+    ENTIDADE_SOBRENATURAL: "Entidade Sobrenatural",
+    ANOMALIA: "Anomalia",
+    DESASTRE_ACIDENTE: "Desastre/Acidente",
+    CRISE: "Crise",
+    MISTERIO: "Mistério",
+    RECURSOS: "Recursos",
+    VITIMAS: "Vítimas",
+    MIRACULOSO: "Miraculoso",
+    AMBIENTE_HOSTIL: "Ambiente Hostil",
+    INUSITADO: "Inusitado",
+    PROBLEMAS_DIPLOMATICOS: "Problemas Diplomáticos",
+    PROTECAO: "Proteção",
+    CONTRA_TEMPO_AMISTOSO: "Contra-tempo Amistoso",
+    ENCONTRO_HOSTIL: "Encontro Hostil",
     // Categorias de Aliados
-    'ARTEFATO': 'Artefato',
-    'CRIATURA_PODEROSA': 'Criatura Poderosa',
-    'INESPERADO': 'Inesperado',
-    'AJUDA_SOBRENATURAL': 'Ajuda Sobrenatural',
-    'CIVIS_ORDINARIOS': 'Civis Ordinários',
-    'NATUREZA': 'Natureza',
-    'REFUGIO': 'Refúgio',
-    'AVENTUREIROS': 'Aventureiros',
-    'MONSTRUOSIDADE_AMIGAVEL': 'Monstruosidade Amigável',
+    ARTEFATO: "Artefato",
+    CRIATURA_PODEROSA: "Criatura Poderosa",
+    INESPERADO: "Inesperado",
+    AJUDA_SOBRENATURAL: "Ajuda Sobrenatural",
+    CIVIS_ORDINARIOS: "Civis Ordinários",
+    NATUREZA: "Natureza",
+    REFUGIO: "Refúgio",
+    AVENTUREIROS: "Aventureiros",
+    MONSTRUOSIDADE_AMIGAVEL: "Monstruosidade Amigável",
     // Categorias de Consequências
-    'MALDICAO': 'Maldição',
-    'GUERRA': 'Guerra',
-    'CALAMIDADE_NATURAL': 'Calamidade Natural',
-    'PRAGA': 'Praga',
-    'EVENTOS_SOBRENATURAIS': 'Eventos Sobrenaturais',
-    'FOME_SECA': 'Fome/Seca',
-    'CRISE_ECONOMICA': 'Crise Econômica',
-    'PERSEGUICAO': 'Perseguição',
-    'MORTE_IMPORTANTES': 'Morte de Importantes',
+    MALDICAO: "Maldição",
+    GUERRA: "Guerra",
+    CALAMIDADE_NATURAL: "Calamidade Natural",
+    PRAGA: "Praga",
+    EVENTOS_SOBRENATURAIS: "Eventos Sobrenaturais",
+    FOME_SECA: "Fome/Seca",
+    CRISE_ECONOMICA: "Crise Econômica",
+    PERSEGUICAO: "Perseguição",
+    MORTE_IMPORTANTES: "Morte de Importantes",
     // Categorias de Recompensas Adicionais
-    'RIQUEZAS': 'Riquezas',
-    'ARTEFATOS_MAGICOS': 'Artefatos Mágicos',
-    'PODER': 'Poder',
-    'CONHECIMENTO': 'Conhecimento',
-    'INFLUENCIA_RENOME': 'Influência e Renome',
-    'GLORIA': 'Glória',
-    'MORAL': 'Moral',
-    'PAGAMENTO_DIFERENCIADO': 'Pagamento Diferenciado',
-    'RECOMPENSA_BIZARRA': 'Recompensa Bizarra',
-    'APARENCIAS_ENGANAM': 'Aparências Enganam'
+    RIQUEZAS: "Riquezas",
+    ARTEFATOS_MAGICOS: "Artefatos Mágicos",
+    PODER: "Poder",
+    CONHECIMENTO: "Conhecimento",
+    INFLUENCIA_RENOME: "Influência e Renome",
+    GLORIA: "Glória",
+    MORAL: "Moral",
+    PAGAMENTO_DIFERENCIADO: "Pagamento Diferenciado",
+    RECOMPENSA_BIZARRA: "Recompensa Bizarra",
+    APARENCIAS_ENGANAM: "Aparências Enganam",
   };
 
   return categoryMap[category] || category;
@@ -956,16 +1357,16 @@ function getCategoryDisplayName(category: string): string {
 
 function getTimingDisplayName(timing: string): string {
   const timingMap: Record<string, string> = {
-    'CORRENDO_PERIGO': 'Correndo perigo',
-    'JEITO_CONSTRANGEDOR': 'De um jeito constrangedor',
-    'MANEIRA_COMUM': 'De maneira comum e pacata',
-    'PEDINDO_AJUDA_DESCANSO': 'Pedindo ajuda durante um descanso',
-    'AINDA_ASSENTAMENTO': 'Ainda no assentamento',
-    'LIDANDO_COMPLICACAO': 'Já estará lidando com a complicação',
-    'UM_D4_DIAS_APOS': '1d4 dias após o começo do contrato',
-    'DOIS_D4_DIAS_APOS': '2d4 dias após o começo do contrato',
-    'MAGICAMENTE_INVOCADO': 'Magicamente invocado',
-    'PARA_SALVAR_DIA': 'Para salvar o dia'
+    CORRENDO_PERIGO: "Correndo perigo",
+    JEITO_CONSTRANGEDOR: "De um jeito constrangedor",
+    MANEIRA_COMUM: "De maneira comum e pacata",
+    PEDINDO_AJUDA_DESCANSO: "Pedindo ajuda durante um descanso",
+    AINDA_ASSENTAMENTO: "Ainda no assentamento",
+    LIDANDO_COMPLICACAO: "Já estará lidando com a complicação",
+    UM_D4_DIAS_APOS: "1d4 dias após o começo do contrato",
+    DOIS_D4_DIAS_APOS: "2d4 dias após o começo do contrato",
+    MAGICAMENTE_INVOCADO: "Magicamente invocado",
+    PARA_SALVAR_DIA: "Para salvar o dia",
   };
 
   return timingMap[timing] || timing;
@@ -974,61 +1375,76 @@ function getTimingDisplayName(timing: string): string {
 function getDifficultyDescription(difficulty: ContractDifficulty): string {
   switch (difficulty) {
     case ContractDifficulty.FACIL:
-      return 'Contrato de dificuldade fácil - Dificuldade e recompensa equilibradas';
+      return "Contrato de dificuldade fácil - Dificuldade e recompensa equilibradas";
     case ContractDifficulty.MEDIO:
-      return 'Contrato de dificuldade média - Dificuldade e recompensa levemente elevadas';
+      return "Contrato de dificuldade média - Dificuldade e recompensa levemente elevadas";
     case ContractDifficulty.DIFICIL:
-      return 'Contrato de dificuldade difícil - Dificuldade elevada e recompensa compensada';
+      return "Contrato de dificuldade difícil - Dificuldade elevada e recompensa compensada";
     case ContractDifficulty.MORTAL:
-      return 'Contrato de dificuldade mortal - Dificuldade mortal e recompensa triplicada';
+      return "Contrato de dificuldade mortal - Dificuldade mortal e recompensa triplicada";
     default:
-      return 'Dificuldade não especificada';
+      return "Dificuldade não especificada";
   }
 }
 
 function formatDate(date: Date | string | number): string {
   // Aceita Date, string ou number. Retorna '—' para valores inválidos.
-  if (!date) return '—';
+  if (!date) return "—";
   let d: Date;
   if (date instanceof Date) d = date;
-  else if (typeof date === 'string' || typeof date === 'number') d = new Date(date);
-  else return '—';
+  else if (typeof date === "string" || typeof date === "number")
+    d = new Date(date);
+  else return "—";
 
-  if (Number.isNaN(d.getTime())) return '—';
+  if (Number.isNaN(d.getTime())) return "—";
 
-  return new Intl.DateTimeFormat('pt-BR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
+  return new Intl.DateTimeFormat("pt-BR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
   }).format(d);
 }
 
-function formatGameDate(gameDate: { day: number; month: number; year: number }): string {
-  return `${gameDate.day.toString().padStart(2, '0')}/${gameDate.month.toString().padStart(2, '0')}/${gameDate.year}`;
+function formatGameDate(gameDate: {
+  day: number;
+  month: number;
+  year: number;
+}): string {
+  return `${gameDate.day.toString().padStart(2, "0")}/${gameDate.month.toString().padStart(2, "0")}/${gameDate.year}`;
 }
 
 function formatMarkdown(text: string): string {
-  if (!text) return '';
+  if (!text) return "";
 
-  return text
-    // Converter **texto** para <strong>texto</strong>
-    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-amber-300">$1</strong>')
-    // Preservar quebras de linha
-    .replace(/\n/g, '<br>');
+  return (
+    text
+      // Converter **texto** para <strong>texto</strong>
+      .replace(/\*\*(.*?)\*\*/g, '<strong class="text-amber-300">$1</strong>')
+      // Preservar quebras de linha
+      .replace(/\n/g, "<br>")
+  );
 }
 
 function getObjectiveTooltip(category: string): string {
   const tooltips: Record<string, string> = {
-    "Eliminação": "Derrotar criaturas, bandidos ou ameaças específicas. Use o valor XP para balancear encontros.",
-    "Escolta": "Proteger pessoas ou caravanas durante viagens. Considere perigos da jornada e valor da carga.",
-    "Investigação": "Descobrir informações e resolver mistérios. Desafios sociais e de conhecimento.",
-    "Recuperação": "Encontrar objetos, pessoas ou locais perdidos. Pode envolver exploração e busca.",
-    "Diplomacia": "Negociar acordos e resolver conflitos pacificamente. Foco em interpretação e persuasão."
+    Eliminação:
+      "Derrotar criaturas, bandidos ou ameaças específicas. Use o valor XP para balancear encontros.",
+    Escolta:
+      "Proteger pessoas ou caravanas durante viagens. Considere perigos da jornada e valor da carga.",
+    Investigação:
+      "Descobrir informações e resolver mistérios. Desafios sociais e de conhecimento.",
+    Recuperação:
+      "Encontrar objetos, pessoas ou locais perdidos. Pode envolver exploração e busca.",
+    Diplomacia:
+      "Negociar acordos e resolver conflitos pacificamente. Foco em interpretação e persuasão.",
   };
 
-  return tooltips[category] || `Categoria: ${category}. Use criatividade para desenvolver os desafios.`;
+  return (
+    tooltips[category] ||
+    `Categoria: ${category}. Use criatividade para desenvolver os desafios.`
+  );
 }
 
 function getLocationTooltip(): string {
@@ -1040,7 +1456,8 @@ function getLocationTooltip(): string {
     tooltip += ` Distância: ${props.contract.distance.result}.`;
   }
 
-  tooltip += " A distância afeta o valor do contrato e pode requerer preparação especial para viagem.";
+  tooltip +=
+    " A distância afeta o valor do contrato e pode requerer preparação especial para viagem.";
 
   return tooltip;
 }
@@ -1050,14 +1467,22 @@ function getAntagonistTooltip(): string {
 
   const category = props.contract.antagonist.category;
   const tooltips: Record<string, string> = {
-    "Humanoides": "Bandidos, cultistas, mercenários ou espiões. Use o valor XP para balancear encontros e motivações.",
-    "Monstros": "Bestas selvagens, aberrações ou mortos-vivos. Considere habitat natural e comportamento.",
-    "Naturais": "Desastres, pragas ou fenômenos climáticos. Desafios ambientais e de sobrevivência.",
-    "Políticos": "Corrupção, burocracia ou conflitos de interesse. Foco em interpretação e investigação.",
-    "Arcanos": "Magia descontrolada, entidades planares ou maldições. Mistério e elementos sobrenaturais."
+    Humanoides:
+      "Bandidos, cultistas, mercenários ou espiões. Use o valor XP para balancear encontros e motivações.",
+    Monstros:
+      "Bestas selvagens, aberrações ou mortos-vivos. Considere habitat natural e comportamento.",
+    Naturais:
+      "Desastres, pragas ou fenômenos climáticos. Desafios ambientais e de sobrevivência.",
+    Políticos:
+      "Corrupção, burocracia ou conflitos de interesse. Foco em interpretação e investigação.",
+    Arcanos:
+      "Magia descontrolada, entidades planares ou maldições. Mistério e elementos sobrenaturais.",
   };
 
-  return tooltips[category] || `Categoria: ${category}. Adapte o antagonista ao valor XP e atmosfera do contrato.`;
+  return (
+    tooltips[category] ||
+    `Categoria: ${category}. Adapte o antagonista ao valor XP e atmosfera do contrato.`
+  );
 }
 
 function getComplicationTooltip(): string {
@@ -1084,42 +1509,60 @@ function handleOpenHelp(helpKey: string) {
 
 function handleCloseHelp() {
   showHelpPanel.value = false;
-  currentHelpKey.value = '';
+  currentHelpKey.value = "";
 }
 
 // Helpers para exibir as datas reais no histórico (usa GameDate quando disponível)
 function formatCreatedDisplay(): string {
-  if (!props.contract) return '—';
+  if (!props.contract) return "—";
   try {
     return formatDate(props.contract.createdAt as Date | string | number);
   } catch (e) {
-    return '—';
+    return "—";
   }
 }
 
 function formatAcceptedDisplay(): string {
-  if (!props.contract) return '—';
+  if (!props.contract) return "—";
   const c = props.contract as Contract;
-  if (c.acceptedAt && typeof c.acceptedAt === 'object' && 'day' in c.acceptedAt) {
-    return formatGameDate(c.acceptedAt as { day: number; month: number; year: number });
+  if (
+    c.acceptedAt &&
+    typeof c.acceptedAt === "object" &&
+    "day" in c.acceptedAt
+  ) {
+    return formatGameDate(
+      c.acceptedAt as { day: number; month: number; year: number }
+    );
   }
   if (c.takenByOthersInfo?.takenAt) {
-    return formatGameDate(c.takenByOthersInfo.takenAt as { day: number; month: number; year: number });
+    return formatGameDate(
+      c.takenByOthersInfo.takenAt as {
+        day: number;
+        month: number;
+        year: number;
+      }
+    );
   }
   // Se houver acceptedAt como Date/string
   const raw = (c as unknown as { acceptedAt?: unknown }).acceptedAt;
   if (raw) return formatDate(raw as Date | string | number);
-  return '—';
+  return "—";
 }
 
 function formatCompletedDisplay(): string {
-  if (!props.contract) return '—';
+  if (!props.contract) return "—";
   const c = props.contract as Contract;
   if (c.takenByOthersInfo?.estimatedResolutionDate) {
-    return formatGameDate(c.takenByOthersInfo.estimatedResolutionDate as { day: number; month: number; year: number });
+    return formatGameDate(
+      c.takenByOthersInfo.estimatedResolutionDate as {
+        day: number;
+        month: number;
+        year: number;
+      }
+    );
   }
   if (c.completedAt) return formatDate(c.completedAt as Date | string | number);
-  return '—';
+  return "—";
 }
 </script>
 

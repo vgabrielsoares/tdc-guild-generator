@@ -1,8 +1,10 @@
 <template>
   <div>
     <!-- Install Prompt -->
-    <div v-if="showInstallPrompt"
-      class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-guild-800 border border-guild-600 rounded-lg p-4 shadow-lg z-50">
+    <div
+      v-if="showInstallPrompt"
+      class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-guild-800 border border-guild-600 rounded-lg p-4 shadow-lg z-50"
+    >
       <div class="flex items-start space-x-3">
         <div class="text-2xl">
           <GlobeAltIcon class="w-6 h-6 text-blue-400" />
@@ -16,7 +18,10 @@
             <button @click="installApp" class="btn-primary text-sm px-3 py-1">
               Instalar
             </button>
-            <button @click="dismissInstall" class="btn-secondary text-sm px-3 py-1">
+            <button
+              @click="dismissInstall"
+              class="btn-secondary text-sm px-3 py-1"
+            >
               Agora Não
             </button>
           </div>
@@ -28,8 +33,10 @@
     </div>
 
     <!-- Update Available -->
-    <div v-if="showUpdatePrompt"
-      class="fixed top-4 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-green-800 border border-green-600 rounded-lg p-4 shadow-lg z-50">
+    <div
+      v-if="showUpdatePrompt"
+      class="fixed top-4 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-green-800 border border-green-600 rounded-lg p-4 shadow-lg z-50"
+    >
       <div class="flex items-start space-x-3">
         <div class="text-2xl">
           <ArrowPathIcon class="w-6 h-6" />
@@ -40,10 +47,16 @@
             Uma nova versão está disponível. Recarregue para atualizar.
           </p>
           <div class="flex space-x-2">
-            <button @click="updateApp" class="bg-green-600 hover:bg-green-700 text-white text-sm px-3 py-1 rounded">
+            <button
+              @click="updateApp"
+              class="bg-green-600 hover:bg-green-700 text-white text-sm px-3 py-1 rounded"
+            >
               Atualizar
             </button>
-            <button @click="dismissUpdate" class="bg-gray-600 hover:bg-gray-700 text-white text-sm px-3 py-1 rounded">
+            <button
+              @click="dismissUpdate"
+              class="bg-gray-600 hover:bg-gray-700 text-white text-sm px-3 py-1 rounded"
+            >
               Depois
             </button>
           </div>
@@ -55,8 +68,10 @@
     </div>
 
     <!-- Offline Indicator -->
-    <div v-if="!isOnline"
-      class="fixed top-4 right-4 bg-yellow-800 border border-yellow-600 rounded-lg px-4 py-2 shadow-lg z-50">
+    <div
+      v-if="!isOnline"
+      class="fixed top-4 right-4 bg-yellow-800 border border-yellow-600 rounded-lg px-4 py-2 shadow-lg z-50"
+    >
       <div class="flex items-center space-x-2 text-yellow-200">
         <span>
           <SignalIcon class="w-4 h-4" />
@@ -68,125 +83,127 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { 
-  GlobeAltIcon, 
-  ArrowPathIcon, 
-  XMarkIcon, 
-  SignalIcon 
-} from '@heroicons/vue/24/outline'
+import { ref, onMounted, onUnmounted } from "vue";
+import {
+  GlobeAltIcon,
+  ArrowPathIcon,
+  XMarkIcon,
+  SignalIcon,
+} from "@heroicons/vue/24/outline";
 
 // Estado dos prompts
-const showInstallPrompt = ref(false)
-const showUpdatePrompt = ref(false)
-const isOnline = ref(navigator.onLine)
+const showInstallPrompt = ref(false);
+const showUpdatePrompt = ref(false);
+const isOnline = ref(navigator.onLine);
 
 // Event listeners
-let deferredPrompt: any = null
-let registration: ServiceWorkerRegistration | null = null
+let deferredPrompt: any = null;
+let registration: ServiceWorkerRegistration | null = null;
 
 // Install App
 const installApp = async () => {
   if (deferredPrompt) {
-    deferredPrompt.prompt()
-    const { outcome } = await deferredPrompt.userChoice
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
 
-    if (outcome === 'accepted') {
-      console.log('[PWA MANAGER] PWA installed successfully')
+    if (outcome === "accepted") {
+      console.log("[PWA MANAGER] PWA installed successfully");
     } else {
-      console.log('[PWA MANAGER] PWA installation declined')
+      console.log("[PWA MANAGER] PWA installation declined");
     }
 
-    deferredPrompt = null
-    showInstallPrompt.value = false
+    deferredPrompt = null;
+    showInstallPrompt.value = false;
   }
-}
+};
 
 const dismissInstall = () => {
-  showInstallPrompt.value = false
-  localStorage.setItem('pwa-install-dismissed', Date.now().toString())
-}
+  showInstallPrompt.value = false;
+  localStorage.setItem("pwa-install-dismissed", Date.now().toString());
+};
 
 // Update App
 const updateApp = () => {
   if (registration && registration.waiting) {
-    registration.waiting.postMessage({ type: 'SKIP_WAITING' })
-    window.location.reload()
+    registration.waiting.postMessage({ type: "SKIP_WAITING" });
+    window.location.reload();
   }
-}
+};
 
 const dismissUpdate = () => {
-  showUpdatePrompt.value = false
-}
+  showUpdatePrompt.value = false;
+};
 
 // Event Handlers
 const handleBeforeInstallPrompt = (e: Event) => {
-  e.preventDefault()
-  deferredPrompt = e
+  e.preventDefault();
+  deferredPrompt = e;
 
   // Só mostra se não foi dismissado recentemente (24h)
-  const dismissed = localStorage.getItem('pwa-install-dismissed')
+  const dismissed = localStorage.getItem("pwa-install-dismissed");
   if (!dismissed || Date.now() - parseInt(dismissed) > 24 * 60 * 60 * 1000) {
-    showInstallPrompt.value = true
+    showInstallPrompt.value = true;
   }
-}
+};
 
 const handleOnline = () => {
-  isOnline.value = true
-  console.log('[PWA MANAGER] Connection restored')
-}
+  isOnline.value = true;
+  console.log("[PWA MANAGER] Connection restored");
+};
 
 const handleOffline = () => {
-  isOnline.value = false
-  console.log('[PWA MANAGER] Connection lost - entering offline mode')
-}
+  isOnline.value = false;
+  console.log("[PWA MANAGER] Connection lost - entering offline mode");
+};
 
 const handleServiceWorkerUpdate = () => {
-  showUpdatePrompt.value = true
-}
+  showUpdatePrompt.value = true;
+};
 
 // Lifecycle
 onMounted(async () => {
   // Install prompt
-  window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+  window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
   // Online/Offline
-  window.addEventListener('online', handleOnline)
-  window.addEventListener('offline', handleOffline)
+  window.addEventListener("online", handleOnline);
+  window.addEventListener("offline", handleOffline);
 
   // Service Worker updates
-  if ('serviceWorker' in navigator) {
+  if ("serviceWorker" in navigator) {
     try {
-      registration = await navigator.serviceWorker.getRegistration() || null
+      registration = (await navigator.serviceWorker.getRegistration()) || null;
 
       if (registration) {
-        registration.addEventListener('updatefound', () => {
-          const newWorker = registration!.installing
+        registration.addEventListener("updatefound", () => {
+          const newWorker = registration!.installing;
 
           if (newWorker) {
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                handleServiceWorkerUpdate()
+            newWorker.addEventListener("statechange", () => {
+              if (
+                newWorker.state === "installed" &&
+                navigator.serviceWorker.controller
+              ) {
+                handleServiceWorkerUpdate();
               }
-            })
+            });
           }
-        })
+        });
       }
 
       // Listen for controllerchange (when SW takes control)
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        window.location.reload()
-      })
-
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+        window.location.reload();
+      });
     } catch (error) {
-      console.error('[PWA MANAGER] Service Worker registration failed:', error)
+      console.error("[PWA MANAGER] Service Worker registration failed:", error);
     }
   }
-})
+});
 
 onUnmounted(() => {
-  window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-  window.removeEventListener('online', handleOnline)
-  window.removeEventListener('offline', handleOffline)
-})
+  window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+  window.removeEventListener("online", handleOnline);
+  window.removeEventListener("offline", handleOffline);
+});
 </script>
