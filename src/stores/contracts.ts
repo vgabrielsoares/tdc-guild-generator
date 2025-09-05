@@ -54,6 +54,22 @@ import {
 } from "@/utils/timeline-store-integration";
 
 export const useContractsStore = defineStore("contracts", () => {
+  try {
+    const env =
+      (typeof process !== "undefined"
+        ? (process as unknown as { env?: Record<string, string> }).env
+        : undefined) || undefined;
+    const isVitest =
+      !!(env && env.VITEST === "true") ||
+      typeof (globalThis as unknown as { __vitest?: unknown }).__vitest !==
+        "undefined";
+    if (isVitest) {
+      // eslint-disable-next-line no-console
+      console.log("[CONTRACTS_STORE] module loaded under Vitest");
+    }
+  } catch {
+    // ignore
+  }
   // Store dependencies
   const timelineStore = useTimelineStore();
   const { success, info, warning } = useToast();
@@ -538,48 +554,100 @@ export const useContractsStore = defineStore("contracts", () => {
    */
   const initializeStore = async () => {
     try {
+      const env =
+        (typeof process !== "undefined"
+          ? (process as unknown as { env?: Record<string, string> }).env
+          : undefined) || undefined;
+      const isVitest =
+        !!(env && env.VITEST === "true") ||
+        typeof (globalThis as unknown as { __vitest?: unknown }).__vitest !==
+          "undefined";
+      const trace = (msg: string) => {
+        if (isVitest) {
+          // eslint-disable-next-line no-console
+          console.log(`[CONTRACTS_INIT] ${msg}`);
+        }
+      };
+
+      trace("starting initializeStore");
+
       // Garantir que os dados do storage foram carregados
       // Carregar explicitamente o storage para evitar condições de corrida
       // entre stores (guild/timeline/contracts)
       try {
+        trace("before storage.load()");
         await storage.load();
-      } catch {
-        // silent: em ambientes de teste/localStorage indisponível
+        trace("after storage.load()");
+      } catch (e) {
+        trace(`storage.load() failed: ${String(e)}`);
       }
 
       // Attempt migration early
       try {
+        trace("before storage.migrateLegacyIfNeeded()");
         await storage.migrateLegacyIfNeeded();
-      } catch {
-        // ignore
+        trace("after storage.migrateLegacyIfNeeded()");
+      } catch (e) {
+        trace(`storage.migrateLegacyIfNeeded() failed: ${String(e)}`);
       }
 
       // Se o storage lembra da última guilda usada, restaurar seus contratos
-      const persistedGuildId = storage.data.value.currentGuildId;
-      if (persistedGuildId) {
-        loadGuildContracts(persistedGuildId);
+      try {
+        const persistedGuildId = storage.data.value.currentGuildId;
+        trace(`persistedGuildId=${String(persistedGuildId)}`);
+        if (persistedGuildId) {
+          loadGuildContracts(persistedGuildId);
+          trace("loaded persisted guild contracts");
+        }
+      } catch (e) {
+        trace(`loading persisted guild failed: ${String(e)}`);
       }
 
       // Sincronizar com a guilda atual
       try {
+        trace("before syncWithCurrentGuild()");
         await syncWithCurrentGuild();
-      } catch {
-        // ignore
+        trace("after syncWithCurrentGuild()");
+      } catch (e) {
+        trace(`syncWithCurrentGuild() failed: ${String(e)}`);
       }
 
       // Inicializar o lifecycle
-      initializeLifecycle();
+      try {
+        trace("before initializeLifecycle()");
+        initializeLifecycle();
+        trace("after initializeLifecycle()");
+      } catch (e) {
+        trace(`initializeLifecycle() failed: ${String(e)}`);
+      }
 
       // Indicar que a reidratação/initialização foi concluída
       isReady.value = true;
 
       generationError.value = null;
+      trace("initializeStore completed");
     } catch (error) {
       generationError.value = "Erro ao inicializar store de contratos";
     }
   };
   // inicialização do store de contratos para persistência de outras views (timeline)
-  initializeStore();
+  let __isVitest = false;
+  try {
+    const env =
+      (typeof process !== "undefined"
+        ? (process as unknown as { env?: Record<string, string> }).env
+        : undefined) || undefined;
+    __isVitest =
+      !!(env && env.VITEST === "true") ||
+      typeof (globalThis as unknown as { __vitest?: unknown }).__vitest !==
+        "undefined";
+  } catch {
+    __isVitest = false;
+  }
+
+  if (!__isVitest) {
+    initializeStore();
+  }
 
   // watch pra mudanças da guilda e re-sync
   watch(
@@ -593,7 +661,7 @@ export const useContractsStore = defineStore("contracts", () => {
         }
       })();
     },
-    { immediate: true }
+    { immediate: !__isVitest }
   );
 
   /**

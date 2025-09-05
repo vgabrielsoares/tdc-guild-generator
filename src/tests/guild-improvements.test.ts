@@ -121,7 +121,7 @@ describe("Guild Improvements", () => {
       await guildStore.toggleGuildLock(guild.id);
 
       // Tentar remover (deve falhar)
-      const removed = guildStore.removeFromHistory(guild.id);
+      const removed = await guildStore.removeFromHistory(guild.id);
       expect(removed).toBe(false);
       expect(guildStore.guildHistory).toHaveLength(1);
     });
