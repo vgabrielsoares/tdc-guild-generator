@@ -1,0 +1,117 @@
+name: Feature Request
+description: Sugerir uma nova funcionalidade ou melhoria
+title: "[FEATURE] "
+labels: ["enhancement", "needs-triage"]
+assignees:
+  - vgabrielsoares
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por sugerir uma nova funcionalidade! Por favor, forneça detalhes sobre sua proposta.
+
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Descrição da Funcionalidade
+      description: Descreva claramente a funcionalidade que você gostaria de ver implementada
+      placeholder: Gostaria que o sistema tivesse a capacidade de...
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem-solution
+    attributes:
+      label: Problema que Resolve
+      description: Que problema esta funcionalidade resolveria?
+      placeholder: Atualmente é difícil/impossível fazer X porque...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Solução Proposta
+      description: Como você imagina que esta funcionalidade deveria funcionar?
+      placeholder: |
+        A funcionalidade poderia:
+        1. Permitir que o usuário...
+        2. Exibir informações sobre...
+        3. Facilitar o processo de...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Área do Sistema
+      description: Qual área do sistema seria afetada?
+      options:
+        - Geração de Guildas
+        - Sistema de Contratos
+        - Sistema de Serviços
+        - Mural de Avisos
+        - Membros da Guilda
+        - Sistema de Renome
+        - Interface/UI/UX
+        - Performance
+        - API/Integração
+        - Outro
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Prioridade
+      description: Qual a importância desta funcionalidade?
+      options:
+        - Baixa - Nice to have
+        - Média - Melhoria significativa
+        - Alta - Funcionalidade importante
+        - Crítica - Essencial para o sistema
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas Consideradas
+      description: Você pensou em outras formas de resolver este problema?
+      placeholder: Considerei também...
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Contexto Adicional
+      description: Qualquer informação extra que possa ser útil
+      placeholder: |
+        - Links para referências
+        - Exemplos de outros sistemas
+        - Mockups ou wireframes
+        - Regras de RPG relacionadas
+
+  - type: checkboxes
+    id: implementation
+    attributes:
+      label: Implementação
+      description: Informações sobre a implementação
+      options:
+        - label: Estou disposto(a) a ajudar na implementação
+          required: false
+        - label: Esta funcionalidade está relacionada às regras base do sistema
+          required: false
+        - label: Esta funcionalidade pode afetar outras partes do sistema
+          required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      description: Confirme que você verificou os seguintes itens
+      options:
+        - label: Verifiquei se já existe uma feature request similar
+          required: true
+        - label: Esta funcionalidade está alinhada com os objetivos do projeto
+          required: true
