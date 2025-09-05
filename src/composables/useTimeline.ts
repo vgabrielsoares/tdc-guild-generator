@@ -1,15 +1,15 @@
-import { computed } from 'vue';
-import { useTimelineStore } from '@/stores/timeline';
-import type { GameDate, ScheduledEventType } from '@/types/timeline';
-import { 
-  addDays, 
-  addWeeks, 
+import { computed } from "vue";
+import { useTimelineStore } from "@/stores/timeline";
+import type { GameDate, ScheduledEventType } from "@/types/timeline";
+import {
+  addDays,
+  addWeeks,
   addMonths,
   formatGameDate,
   formatShortGameDate,
   getDaysDifference,
-  createGameDate
-} from '@/utils/date-utils';
+  createGameDate,
+} from "@/utils/date-utils";
 
 /**
  * Composable para facilitar o uso do sistema de timeline
@@ -38,7 +38,7 @@ export function useTimeline() {
   };
 
   // Ações simplificadas
-  
+
   /**
    * Avança um dia na timeline
    */
@@ -162,7 +162,7 @@ export function useTimeline() {
    */
   function getNextEventDescription() {
     if (!nextEvent.value || !daysUntilNext.value) return null;
-    
+
     if (daysUntilNext.value === 0) {
       return `Hoje: ${nextEvent.value.description}`;
     } else if (daysUntilNext.value === 1) {
@@ -178,28 +178,28 @@ export function useTimeline() {
   function getTimelineStatus() {
     if (!currentDate.value) {
       return {
-        status: 'inactive',
-        message: 'Timeline não ativa',
+        status: "inactive",
+        message: "Timeline não ativa",
       };
     }
 
     if (hasEventsToday()) {
       return {
-        status: 'events-today',
+        status: "events-today",
         message: `${timelineStats.value.todayEvents} evento(s) hoje`,
       };
     }
 
     if (hasFutureEvents()) {
       return {
-        status: 'events-scheduled',
-        message: getNextEventDescription() || 'Eventos agendados',
+        status: "events-scheduled",
+        message: getNextEventDescription() || "Eventos agendados",
       };
     }
 
     return {
-      status: 'no-events',
-      message: 'Nenhum evento agendado',
+      status: "no-events",
+      message: "Nenhum evento agendado",
     };
   }
 
@@ -212,10 +212,10 @@ export function useTimeline() {
      */
     scheduleNewContracts(daysFromNow: number) {
       return scheduleEvent(
-        'new_contracts' as ScheduledEventType,
+        "new_contracts" as ScheduledEventType,
         daysFromNow,
-        'Novos contratos disponíveis',
-        { source: 'contract_generation' }
+        "Novos contratos disponíveis",
+        { source: "contract_generation" }
       );
     },
 
@@ -224,10 +224,10 @@ export function useTimeline() {
      */
     scheduleContractExpiration(contractId: string, daysFromNow: number) {
       return scheduleEvent(
-        'contract_expiration' as ScheduledEventType,
+        "contract_expiration" as ScheduledEventType,
         daysFromNow,
         `Contrato ${contractId} expira`,
-        { contractId, source: 'contract_deadline' }
+        { contractId, source: "contract_deadline" }
       );
     },
 
@@ -236,10 +236,10 @@ export function useTimeline() {
      */
     scheduleContractResolution(contractId: string, daysFromNow: number) {
       return scheduleEvent(
-        'contract_resolution' as ScheduledEventType,
+        "contract_resolution" as ScheduledEventType,
         daysFromNow,
         `Contrato ${contractId} será resolvido automaticamente`,
-        { contractId, source: 'automatic_resolution' }
+        { contractId, source: "automatic_resolution" }
       );
     },
   };

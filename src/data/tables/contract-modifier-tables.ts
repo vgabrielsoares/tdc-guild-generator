@@ -96,80 +96,79 @@ export const UNSIGNED_CONTRACT_RESOLUTION_TABLE: TableEntry<{
   description: string;
   action: string;
 }>[] = [
-    {
-      min: 1,
-      max: 2,
-      result: {
-        description: "Nenhum foi assinado, todos continuam disponíveis",
-        action: "keep_all",
-      },
+  {
+    min: 1,
+    max: 2,
+    result: {
+      description: "Nenhum foi assinado, todos continuam disponíveis",
+      action: "keep_all",
     },
-    {
-      min: 3,
-      max: 5,
-      result: {
-        description: "Todos foram devidamente resolvidos",
-        action: "resolve_all",
-      },
+  },
+  {
+    min: 3,
+    max: 5,
+    result: {
+      description: "Todos foram devidamente resolvidos",
+      action: "resolve_all",
     },
-    {
-      min: 6,
-      max: 10,
-      result: {
-        description: "Os de menor XP foram resolvidos",
-        action: "resolve_lowest_xp",
-      },
+  },
+  {
+    min: 6,
+    max: 10,
+    result: {
+      description: "Os de menor XP foram resolvidos",
+      action: "resolve_lowest_xp",
     },
-    {
-      min: 11,
-      max: 12,
-      result: {
-        description: "Contratos com as melhores Recompensas foram resolvidos",
-        action: "resolve_highest_reward",
-      },
+  },
+  {
+    min: 11,
+    max: 12,
+    result: {
+      description: "Contratos com as melhores Recompensas foram resolvidos",
+      action: "resolve_highest_reward",
     },
-    {
-      min: 13,
-      max: 15,
-      result: {
-        description: "1d6 contratos aleatórios são resolvidos",
-        action: "resolve_random_1d6",
-      },
+  },
+  {
+    min: 13,
+    max: 15,
+    result: {
+      description: "1d6 contratos aleatórios são resolvidos",
+      action: "resolve_random_1d6",
     },
-    {
-      min: 16,
-      max: 16,
-      result: {
-        description: "1d4+2 contratos são assinados, porém não são resolvidos",
-        action: "sign_but_not_resolve_1d4plus2",
-      },
+  },
+  {
+    min: 16,
+    max: 16,
+    result: {
+      description: "1d4+2 contratos são assinados, porém não são resolvidos",
+      action: "sign_but_not_resolve_1d4plus2",
     },
-    {
-      min: 17,
-      max: 18,
-      result: {
-        description: "1d6+2 contratos são resolvidos",
-        action: "resolve_1d6plus2",
-      },
+  },
+  {
+    min: 17,
+    max: 18,
+    result: {
+      description: "1d6+2 contratos são resolvidos",
+      action: "resolve_1d6plus2",
     },
-    {
-      min: 19,
-      max: 19,
-      result: {
-        description: "2d6+2 contratos são resolvidos",
-        action: "resolve_2d6plus2",
-      },
+  },
+  {
+    min: 19,
+    max: 19,
+    result: {
+      description: "2d6+2 contratos são resolvidos",
+      action: "resolve_2d6plus2",
     },
-    {
-      min: 20,
-      max: 20,
-      result: {
-        description:
-          "Nenhum foi assinado, e há algum motivo estranho para isso",
-        action: "strange_reason",
-      },
+  },
+  {
+    min: 20,
+    max: 20,
+    result: {
+      description: "Nenhum foi assinado, e há algum motivo estranho para isso",
+      action: "strange_reason",
     },
-  ];
+  },
+];
 
 // ===== MOTIVOS PARA NÃO RESOLUÇÃO =====
 

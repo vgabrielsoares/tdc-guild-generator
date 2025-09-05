@@ -1,13 +1,12 @@
-import { defineStore } from 'pinia';
-import { ref } from 'vue';
-import { nanoid } from 'nanoid';
-
+import { defineStore } from "pinia";
+import { ref } from "vue";
+import { nanoid } from "nanoid";
 
 export enum ToastType {
-  SUCCESS = 'success',
-  ERROR = 'error',
-  INFO = 'info',
-  WARNING = 'warning',
+  SUCCESS = "success",
+  ERROR = "error",
+  INFO = "info",
+  WARNING = "warning",
 }
 
 export interface Toast {
@@ -18,10 +17,10 @@ export interface Toast {
   duration?: number; // ms
 }
 
-export const useToastStore = defineStore('toast', () => {
+export const useToastStore = defineStore("toast", () => {
   const toasts = ref<Toast[]>([]);
 
-  function showToast(toast: Omit<Toast, 'id'>) {
+  function showToast(toast: Omit<Toast, "id">) {
     const id = nanoid();
     const toastObj: Toast = { id, ...toast };
     toasts.value.push(toastObj);
@@ -30,7 +29,7 @@ export const useToastStore = defineStore('toast', () => {
   }
 
   function removeToast(id: string) {
-    toasts.value = toasts.value.filter(t => t.id !== id);
+    toasts.value = toasts.value.filter((t) => t.id !== id);
   }
 
   return { toasts, showToast, removeToast };
