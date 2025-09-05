@@ -11,9 +11,8 @@ describe("Contracts persistence integration", () => {
   beforeEach(() => {
     setActivePinia(createPinia());
     // Mock dice/table utilities to make generation deterministic for the integration test
-    const mockRollDice = vi
-      .spyOn(dice, "rollDice")
-      .mockImplementation(({ notation }: { notation: string }) => {
+    vi.spyOn(dice, "rollDice").mockImplementation(
+      ({ notation }: { notation: string }) => {
         if (notation === "1d20") {
           return {
             result: 10,
@@ -66,21 +65,20 @@ describe("Contracts persistence integration", () => {
           modifier: 0,
           timestamp: new Date(),
         };
-      });
+      }
+    );
 
-    const mockRollOnTable = vi
-      .spyOn(dice, "rollOnTable")
-      .mockImplementation(() => ({
-        roll: {
-          result: 7,
-          notation: "1d20",
-          individual: [7],
-          modifier: 0,
-          timestamp: new Date(),
-        },
-        result: "1 semana",
-        tableEntry: { min: 7, max: 8, result: "1 semana" },
-      }));
+    vi.spyOn(dice, "rollOnTable").mockImplementation(() => ({
+      roll: {
+        result: 7,
+        notation: "1d20",
+        individual: [7],
+        modifier: 0,
+        timestamp: new Date(),
+      },
+      result: "1 semana",
+      tableEntry: { min: 7, max: 8, result: "1 semana" },
+    }));
   });
 
   it("should persist generated contracts and restore after load", async () => {
