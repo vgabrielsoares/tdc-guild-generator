@@ -153,7 +153,14 @@ export function useGuildStorage(): {
         "settings",
         CURRENT_GUILD_KEY
       );
-      if (currentId) {
+      let localBackupExists = false;
+      try {
+        localBackupExists = localStorage.getItem("current-guild") !== null;
+      } catch (e) {
+        localBackupExists = false;
+      }
+
+      if (currentId && localBackupExists) {
         // First, try to restore from the in-memory/merged guildHistory
         try {
           const found = (data.value.guildHistory || []).find(
