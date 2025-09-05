@@ -2383,22 +2383,29 @@ export function generateSpecificServiceDescription(
   let connector = "para";
   const actionLower = action.toLowerCase();
 
-  if (actionLower.includes("limpar") || actionLower.includes("pintar")) {
-    connector = "em";
-  } else if (
-    actionLower.includes("cobrar") ||
-    actionLower.includes("criar") ||
-    actionLower.includes("ajudar")
-  ) {
-    connector = "para";
-  } else if (
-    actionLower.includes("traduzir") ||
-    actionLower.includes("consertar") ||
-    actionLower.includes("preparar")
-  ) {
-    connector = "para";
-  } else if (actionLower.includes("trabalho")) {
-    connector = "para";
+  // Se a ação está definida na tabela de Serviços Específicos, force o conector para "para"
+  const isFromSpecificTable = SERVICOS_ESPECIFICOS_TABLE.some(
+    (entry) => entry.result.action.toLowerCase() === actionLower
+  );
+
+  if (!isFromSpecificTable) {
+    // Apenas aplicar os conectores alternativos quando NÃO vier da tabela específica
+    if (actionLower.includes("limpar") || actionLower.includes("pintar")) {
+      connector = "em";
+    } else if (
+      actionLower.includes("cobrar") ||
+      actionLower.includes("criar") ||
+      actionLower.includes("ajudar")
+    ) {
+      connector = "para";
+    } else if (
+      actionLower.includes("traduzir") ||
+      actionLower.includes("consertar") ||
+      actionLower.includes("preparar") ||
+      actionLower.includes("trabalho")
+    ) {
+      connector = "para";
+    }
   }
 
   return generateServiceDescription(action, target, complication, connector);
