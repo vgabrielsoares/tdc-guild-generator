@@ -1,5 +1,5 @@
-import { computed } from "vue";
 import { useTimelineStore } from "@/stores/timeline";
+import { storeToRefs } from "pinia";
 import type { GameDate, ScheduledEventType } from "@/types/timeline";
 import {
   addDays,
@@ -19,12 +19,16 @@ export function useTimeline() {
   const timelineStore = useTimelineStore();
 
   // Estado reativo
-  const currentDate = computed(() => timelineStore.currentGameDate);
-  const formattedDate = computed(() => timelineStore.formattedCurrentDate);
-  const nextEvent = computed(() => timelineStore.nextEvent);
-  const daysUntilNext = computed(() => timelineStore.daysUntilNextEvent);
-  const timelineStats = computed(() => timelineStore.timelineStats);
-  const events = computed(() => timelineStore.currentEvents);
+
+  // Obtém refs declarados no store (mantém .value para os consumidores)
+  const {
+    currentGameDate,
+    formattedCurrentDate,
+    nextEvent: nextEventRef,
+    daysUntilNextEvent,
+    timelineStats,
+    currentEvents,
+  } = storeToRefs(timelineStore);
 
   // Utilidades de data
   const dateUtils = {
@@ -65,8 +69,8 @@ export function useTimeline() {
    * Avança vários dias de uma vez
    */
   function passDays(days: number) {
-    if (!currentDate.value) return null;
-    const newDate = addDays(currentDate.value, days);
+    if (!currentGameDate.value) return null;
+    const newDate = addDays(currentGameDate.value, days);
     return timelineStore.setCustomDate(newDate);
   }
 
@@ -74,8 +78,8 @@ export function useTimeline() {
    * Avança semanas
    */
   function passWeeks(weeks: number) {
-    if (!currentDate.value) return null;
-    const newDate = addWeeks(currentDate.value, weeks);
+    if (!currentGameDate.value) return null;
+    const newDate = addWeeks(currentGameDate.value, weeks);
     return timelineStore.setCustomDate(newDate);
   }
 
@@ -83,8 +87,8 @@ export function useTimeline() {
    * Avança meses
    */
   function passMonths(months: number) {
-    if (!currentDate.value) return null;
-    const newDate = addMonths(currentDate.value, months);
+    if (!currentGameDate.value) return null;
+    const newDate = addMonths(currentGameDate.value, months);
     return timelineStore.setCustomDate(newDate);
   }
 
@@ -97,8 +101,8 @@ export function useTimeline() {
     description: string,
     data?: Record<string, unknown>
   ) {
-    if (!currentDate.value) return null;
-    const eventDate = addDays(currentDate.value, daysFromNow);
+    if (!currentGameDate.value) return null;
+    const eventDate = addDays(currentGameDate.value, daysFromNow);
     return timelineStore.scheduleEvent(type, eventDate, description, data);
   }
 
@@ -147,28 +151,30 @@ export function useTimeline() {
    * Verifica se há eventos hoje
    */
   function hasEventsToday() {
-    return timelineStats.value.todayEvents > 0;
+    return timelineStats.value?.todayEvents > 0;
   }
 
   /**
    * Verifica se há eventos futuros
    */
   function hasFutureEvents() {
-    return timelineStats.value.futureEvents > 0;
+    return timelineStats.value?.futureEvents > 0;
   }
 
   /**
    * Obtém uma descrição textual do próximo evento
    */
   function getNextEventDescription() {
-    if (!nextEvent.value || !daysUntilNext.value) return null;
+    const ne = nextEventRef.value;
+    const dn = daysUntilNextEvent.value;
+    if (!ne || dn == null) return null;
 
-    if (daysUntilNext.value === 0) {
-      return `Hoje: ${nextEvent.value.description}`;
-    } else if (daysUntilNext.value === 1) {
-      return `Amanhã: ${nextEvent.value.description}`;
+    if (dn === 0) {
+      return `Hoje: ${ne.description}`;
+    } else if (dn === 1) {
+      return `Amanhã: ${ne.description}`;
     } else {
-      return `Em ${daysUntilNext.value} dias: ${nextEvent.value.description}`;
+      return `Em ${dn} dias: ${ne.description}`;
     }
   }
 
@@ -176,17 +182,16 @@ export function useTimeline() {
    * Obtém status da timeline
    */
   function getTimelineStatus() {
-    if (!currentDate.value) {
+    if (!currentGameDate.value) {
       return {
         status: "inactive",
         message: "Timeline não ativa",
       };
     }
-
     if (hasEventsToday()) {
       return {
         status: "events-today",
-        message: `${timelineStats.value.todayEvents} evento(s) hoje`,
+        message: `${timelineStats.value?.todayEvents ?? 0} evento(s) hoje`,
       };
     }
 
@@ -244,18 +249,50 @@ export function useTimeline() {
     },
   };
 
+  // Utilidades avançadas para IndexedDB
+  const advancedQueries = {
+    /**
+     * Busca eventos por data específica
+     */
+    async getEventsByDate(guildId: string, date: GameDate) {
+      return timelineStore.getEventsByDate(guildId, date);
+    },
+
+    /**
+     * Busca eventos por tipo em uma guilda específica
+     */
+    async getEventsByTypeAndGuild(guildId: string, type: ScheduledEventType) {
+      return timelineStore.getEventsByTypeAndGuild(guildId, type);
+    },
+
+    /**
+     * Busca eventos pendentes para uma guilda
+     */
+    async getPendingEvents(guildId: string) {
+      return timelineStore.getPendingEvents(guildId);
+    },
+
+    /**
+     * Limpa histórico antigo
+     */
+    async cleanupOldHistory(guildId: string, daysToKeep = 90) {
+      return timelineStore.cleanupOldHistory(guildId, daysToKeep);
+    },
+  };
+
   return {
     // Estado
-    currentDate,
-    formattedDate,
-    nextEvent,
-    daysUntilNext,
-    timelineStats,
-    events,
+    currentDate: currentGameDate,
+    formattedDate: formattedCurrentDate,
+    nextEvent: nextEventRef,
+    daysUntilNext: daysUntilNextEvent,
+    timelineStats: timelineStats,
+    events: currentEvents,
 
     // Utilidades
     dateUtils,
     contractUtils,
+    advancedQueries,
 
     // Ações principais
     passDay,
