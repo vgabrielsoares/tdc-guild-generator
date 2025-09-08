@@ -15,8 +15,10 @@ export const DBContractSchema = z.object({
   guildId: z.string().min(1),
   value: z.record(z.unknown()),
   status: z.string(),
-  deadline: z.date().optional(),
-  createdAt: z.date(),
+  deadline: z.union([z.date(), z.string()]).optional(),
+  createdAt: z
+    .union([z.date(), z.string()])
+    .transform((val) => (typeof val === "string" ? new Date(val) : val)),
 });
 
 export const DBServiceSchema = z.object({
@@ -24,8 +26,10 @@ export const DBServiceSchema = z.object({
   guildId: z.string().min(1),
   value: z.record(z.unknown()),
   status: z.string(),
-  deadline: z.date().optional(),
-  createdAt: z.date(),
+  deadline: z.union([z.date(), z.string()]).optional(),
+  createdAt: z
+    .union([z.date(), z.string()])
+    .transform((val) => (typeof val === "string" ? new Date(val) : val)),
 });
 
 export const DBTimelineSchema = z.object({
