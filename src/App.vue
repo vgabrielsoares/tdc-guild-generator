@@ -58,15 +58,41 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from "vue";
 import { useRoute } from "vue-router";
 import PWAManager from "@/components/common/PWAManager.vue";
 import Toast from "@/components/common/Toast.vue";
 import { useTimelineIntegration } from "@/composables/useTimelineIntegration";
+import { useContractsStore } from "@/stores/contracts";
+import { useServicesStore } from "@/stores/services";
 
 const route = useRoute();
 
-// Inicializar integração automática entre timeline e contratos
-useTimelineIntegration();
+// Aguardar inicialização dos stores antes de ativar integração com timeline
+onMounted(async () => {
+  try {
+    // Inicializar stores críticos primeiro
+    const contractsStore = useContractsStore();
+    const servicesStore = useServicesStore();
+
+    // Aguardar que ambos os stores estejam prontos
+    if (contractsStore.initializeStore) {
+      await contractsStore.initializeStore();
+    }
+
+    if (servicesStore.initializeStore) {
+      await servicesStore.initializeStore();
+    }
+
+    // Só então inicializar integração com timeline
+    useTimelineIntegration();
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.warn("Erro na inicialização dos stores:", error);
+    // Fallback: inicializar integração mesmo com erro
+    useTimelineIntegration();
+  }
+});
 
 const navigation = [
   { name: "Início", href: "/" },
