@@ -47,6 +47,7 @@ export const useServicesStore = defineStore("services", () => {
   // State
   const services = ref<ServiceWithGuild[]>([]);
   const isLoading = ref(false);
+  const isReady = ref(false);
   const lifecycleManager = ref<ServiceLifecycleManager | null>(null);
   const lastUpdate = ref<GameDate>(createGameDate(1, 1, 2025));
 
@@ -342,6 +343,14 @@ export const useServicesStore = defineStore("services", () => {
       currentGuildId,
       servicesForGuild
     );
+
+    // Forçar persistência imediata para evitar perda de dados
+    try {
+      await servicesStorage.persistGuildServices(currentGuildId);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn("Failed to force persist services:", e);
+    }
   };
 
   const loadServicesFromStorage = async (currentDate?: GameDate) => {
@@ -375,9 +384,32 @@ export const useServicesStore = defineStore("services", () => {
     await servicesStorage.removeServicesForGuild(currentGuildId);
   };
 
+  /**
+   * Inicializa o store de serviços
+   */
+  const initializeStore = async () => {
+    try {
+      // Garantir que o storage foi carregado
+      await servicesStorage.load();
+
+      // Carregar serviços da guilda atual se existir
+      const currentGuildId = guildStore.currentGuild?.id;
+      if (currentGuildId) {
+        await loadServicesFromStorage(
+          timelineStore.currentGameDate || undefined
+        );
+      }
+
+      isReady.value = true;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.warn("Failed to initialize services store:", error);
+    }
+  };
+
   // Auto-load de serviços do storage quando store é inicializado
   // Garante serviços persistidos disponíveis para outras views (timeline)
-  void loadServicesFromStorage();
+  void initializeStore();
 
   // Auto-save quando services mudam
   watch(
@@ -737,6 +769,7 @@ export const useServicesStore = defineStore("services", () => {
     // State
     services,
     isLoading,
+    isReady,
     lifecycleManager,
 
     // Getters
@@ -771,6 +804,7 @@ export const useServicesStore = defineStore("services", () => {
     saveServicesToStorage,
     loadServicesFromStorage,
     clearAllServices,
+    initializeStore,
 
     // Skill test actions
     initializeServiceTests,
