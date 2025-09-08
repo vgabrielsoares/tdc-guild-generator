@@ -3,8 +3,19 @@ import type { Ref } from "vue";
 import { useStorageAdapter } from "@/composables/useStorageAdapter";
 import { serializeData, deserializeData } from "@/utils/storage";
 import type { Contract, GuildContracts } from "@/types/contract";
-import { ContractSchema } from "@/types/contract";
+import {
+  ContractSchema,
+  ContractStatus,
+  ContractDifficulty,
+  ContractorType,
+  PaymentType,
+} from "@/types/contract";
 import { DBContractSchema } from "@/utils/database-schema";
+
+// Helper para gerar IDs
+function generateId(): string {
+  return `contract_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+}
 
 export interface ContractsStorageState {
   guildContracts: Record<
@@ -36,7 +47,7 @@ export function useContractsStorage() {
     ...DEFAULT,
   });
 
-  // helper: safely extract guildId from a DB row or legacy wrapper
+  // helper: extrair com segurança guildId de uma linha do DB ou wrapper legado
   function getGuildIdFromRow(
     row: Record<string, unknown> | undefined | null
   ): string | null {
@@ -52,7 +63,7 @@ export function useContractsStorage() {
     return null;
   }
 
-  // helper: safely extract id from a DB row or legacy wrapper
+  // helper: extrair com segurança o id de uma linha do DB ou wrapper legado
   function getIdFromRow(
     row: Record<string, unknown> | undefined | null
   ): string | undefined {
@@ -68,11 +79,12 @@ export function useContractsStorage() {
     return undefined;
   }
 
-  // load all guild contract entries from 'contracts' store and assemble into the expected shape
+  // carregar todas as entradas de contratos da store 'contracts' e montar no formato esperado
   async function load() {
     try {
       const rows = await adapter.list<Record<string, unknown>>("contracts");
-      // rows are records saved with guildId field or generic contract entries
+
+      // as linhas são registros salvos com o campo guildId ou entradas genéricas de contrato
       const grouped: Record<
         string,
         {
@@ -85,66 +97,315 @@ export function useContractsStorage() {
 
       for (const r of rows) {
         if (!r) continue;
-        // Try to interpret as DBContractSchema first
+
+        // Converter para Record para facilitar o processamento
+        const rowData = r as Record<string, unknown>;
+        let processed = false;
+
+        // Tentar interpretar como DBContractSchema primeiro
         const dbParse = DBContractSchema.safeParse(r);
         if (dbParse.success) {
           const rec = dbParse.data;
           const gid = rec.guildId;
+
           grouped[gid] = grouped[gid] || {
             guildId: gid,
             contracts: [],
             lastUpdate: null,
             generationCount: 0,
           };
+
           const contractParse = ContractSchema.safeParse(rec.value);
-          if (contractParse.success)
+          if (contractParse.success) {
             grouped[gid].contracts.push(contractParse.data as Contract);
-          else grouped[gid].contracts.push(rec.value as unknown as Contract);
-          continue;
+          } else {
+            // Tentar recuperar contrato com dados mínimos
+            try {
+              const safeNewDate = (val: unknown): Date => {
+                if (!val) return new Date();
+                if (val instanceof Date) return val;
+                if (typeof val === "string" || typeof val === "number")
+                  return new Date(val);
+                return new Date();
+              };
+
+              // Primeiro, tentar converter apenas as datas problemáticas
+              const contractWithFixedDates = {
+                ...rec.value,
+                createdAt: safeNewDate(rec.value.createdAt),
+                expiresAt: rec.value.expiresAt
+                  ? safeNewDate(rec.value.expiresAt)
+                  : undefined,
+                completedAt: rec.value.completedAt
+                  ? safeNewDate(rec.value.completedAt)
+                  : undefined,
+              };
+
+              // Tentar validar novamente com datas corrigidas
+              const dateFixedParse = ContractSchema.safeParse(
+                contractWithFixedDates
+              );
+              if (dateFixedParse.success) {
+                grouped[gid].contracts.push(dateFixedParse.data as Contract);
+                continue; // Pular para o próximo contrato
+              }
+
+              // Se ainda falhar, usar fallback com dados mínimos
+              const minimalContract = {
+                id: rec.value.id || generateId(),
+                title: rec.value.title || "Contrato recuperado",
+                description: rec.value.description || "Descrição recuperada",
+                status: rec.value.status || ContractStatus.DISPONIVEL,
+                difficulty: rec.value.difficulty || ContractDifficulty.FACIL,
+                contractorType: rec.value.contractorType || ContractorType.POVO,
+                prerequisites: rec.value.prerequisites || [],
+                clauses: rec.value.clauses || [],
+                complications: rec.value.complications || [],
+                twists: rec.value.twists || [],
+                allies: rec.value.allies || [],
+                severeConsequences: rec.value.severeConsequences || [],
+                paymentType: rec.value.paymentType || PaymentType.TOTAL_GUILDA,
+                value: rec.value.value || {
+                  baseValue: 0,
+                  experienceValue: 0,
+                  rewardValue: 0,
+                  finalGoldReward: 0,
+                  modifiers: {},
+                },
+                deadline: rec.value.deadline || {
+                  type: "days",
+                  value: 30,
+                  description: "30 dias",
+                },
+                antagonist: rec.value.antagonist || {
+                  category: "ORGANIZACAO",
+                  type: "COMERCIANTE",
+                  name: "Antagonista desconhecido",
+                  description: "Descrição não disponível",
+                },
+                generationData: rec.value.generationData || {
+                  settlementType: "cidade",
+                  timestamp: new Date(),
+                  version: "1.0.0",
+                },
+                createdAt: safeNewDate(rec.value.createdAt),
+                expiresAt: rec.value.expiresAt
+                  ? safeNewDate(rec.value.expiresAt)
+                  : undefined,
+                completedAt: rec.value.completedAt
+                  ? safeNewDate(rec.value.completedAt)
+                  : undefined,
+                ...rec.value,
+              };
+
+              const recoveredParse = ContractSchema.safeParse(minimalContract);
+              if (recoveredParse.success) {
+                grouped[gid].contracts.push(recoveredParse.data as Contract);
+              } else {
+                // Como último recurso, adicionar sem validação
+                grouped[gid].contracts.push(rec.value as unknown as Contract);
+              }
+            } catch (recoveryError) {
+              // Como último recurso, tentar criar contrato básico apenas com campos essenciais
+              const contractId =
+                rec.value.id && typeof rec.value.id === "string"
+                  ? rec.value.id
+                  : generateId();
+
+              try {
+                const basicContract = {
+                  id: contractId,
+                  title: "Contrato recuperado (dados parciais)",
+                  description:
+                    "Contrato recuperado com dados mínimos devido a problemas de validação",
+                  status: ContractStatus.DISPONIVEL,
+                  difficulty: ContractDifficulty.FACIL,
+                  contractorType: ContractorType.POVO,
+                  prerequisites: [],
+                  clauses: [],
+                  complications: [],
+                  twists: [],
+                  allies: [],
+                  severeConsequences: [],
+                  paymentType: PaymentType.TOTAL_GUILDA,
+                  value: {
+                    baseValue: 0,
+                    experienceValue: 0,
+                    rewardValue: 0,
+                    finalGoldReward: 0,
+                    modifiers: {},
+                  },
+                  deadline: { type: "days", value: 30, description: "30 dias" },
+                  antagonist: {
+                    category: "ORGANIZACAO",
+                    type: "COMERCIANTE",
+                    name: "Antagonista desconhecido",
+                    description: "Descrição não disponível",
+                  },
+                  generationData: {
+                    settlementType: "cidade",
+                    timestamp: new Date(),
+                    version: "1.0.0",
+                  },
+                  createdAt: new Date(),
+                } as unknown as Contract;
+
+                grouped[gid].contracts.push(basicContract);
+                if (import.meta.env.DEV) {
+                  // eslint-disable-next-line no-console
+                  console.log(
+                    `[CONTRACTS_STORAGE] Created basic contract as fallback for ${contractId}`
+                  );
+                }
+              } catch (basicError) {
+                if (import.meta.env.DEV) {
+                  // eslint-disable-next-line no-console
+                  console.error(
+                    `[CONTRACTS_STORAGE] Even basic contract creation failed:`,
+                    basicError
+                  );
+                  // eslint-disable-next-line no-console
+                  console.log(
+                    `[CONTRACTS_STORAGE] Skipping contract ${contractId} entirely`
+                  );
+                }
+              }
+            }
+          }
+          processed = true;
+        } else {
+          if (import.meta.env.DEV) {
+            // eslint-disable-next-line no-console
+            console.warn(
+              `[CONTRACTS_STORAGE] DB schema validation failed for id=${getIdFromRow(rowData) ?? "unknown"} guild=${getGuildIdFromRow(rowData) ?? "unknown"}`,
+              dbParse.error
+            );
+          }
         }
 
-        // Fallback: legacy shape where an entry wraps a contract in `value` and value.guildId exists
-        const recAny = r as Record<string, unknown>;
-        if (
-          recAny &&
-          recAny.value &&
-          typeof recAny.value === "object" &&
-          (recAny.value as Record<string, unknown>).guildId
-        ) {
-          const g = String((recAny.value as Record<string, unknown>).guildId);
-          grouped[g] = grouped[g] || {
-            guildId: g,
-            contracts: [],
-            lastUpdate: null,
-            generationCount: 0,
-          };
-          const contractParse = ContractSchema.safeParse(
-            recAny.value as unknown
-          );
-          if (contractParse.success)
-            grouped[g].contracts.push(contractParse.data as Contract);
-          else grouped[g].contracts.push(recAny.value as unknown as Contract);
-          continue;
+        // Se ainda não processado, tentar interpretações de fallback
+        if (!processed) {
+          // Fallback: tentar interpretar como dados brutos de contrato
+          if (rowData && rowData.id && rowData.guildId) {
+            const gid = String(rowData.guildId);
+
+            grouped[gid] = grouped[gid] || {
+              guildId: gid,
+              contracts: [],
+              lastUpdate: null,
+              generationCount: 0,
+            };
+
+            // Tentar usar o campo 'value' ou o próprio registro como contrato
+            const contractData = rowData.value || rowData;
+            const contractParse = ContractSchema.safeParse(contractData);
+            if (contractParse.success) {
+              grouped[gid].contracts.push(contractParse.data as Contract);
+            } else {
+              // aviso conciso para que desenvolvedores saibam qual contrato falhou
+              if (import.meta.env.DEV) {
+                // eslint-disable-next-line no-console
+                console.warn(
+                  `[CONTRACTS_STORAGE] Fallback parsing failed for contract id=${String(rowData.id)} guild=${gid}`,
+                  contractParse.error
+                );
+              }
+              // Último recurso: adicionar como está
+              grouped[gid].contracts.push(contractData as unknown as Contract);
+            }
+            processed = true;
+          }
+
+          // Fallback: formato legado onde a entrada encapsula um contrato em `value` e value.guildId existe
+          if (
+            !processed &&
+            rowData &&
+            rowData.value &&
+            typeof rowData.value === "object" &&
+            (rowData.value as Record<string, unknown>).guildId
+          ) {
+            const g = String(
+              (rowData.value as Record<string, unknown>).guildId
+            );
+            grouped[g] = grouped[g] || {
+              guildId: g,
+              contracts: [],
+              lastUpdate: null,
+              generationCount: 0,
+            };
+            const contractParse = ContractSchema.safeParse(
+              rowData.value as unknown
+            );
+            if (contractParse.success) {
+              grouped[g].contracts.push(contractParse.data as Contract);
+            } else {
+              // aviso conciso de fallback
+              if (import.meta.env.DEV) {
+                // eslint-disable-next-line no-console
+                console.warn(
+                  `[CONTRACTS_STORAGE] Legacy wrapper parsing failed for guild=${g} id=${getIdFromRow(rowData) ?? "unknown"}`,
+                  contractParse.error
+                );
+              }
+              grouped[g].contracts.push(rowData.value as unknown as Contract);
+            }
+            processed = true;
+          }
         }
 
-        // Could not interpret this row, skip
-        continue;
+        // Não foi possível interpretar esta entrada, pular
+        if (!processed) {
+          if (import.meta.env.DEV) {
+            // eslint-disable-next-line no-console
+            console.warn(
+              `[CONTRACTS_STORAGE] Could not interpret row, skipping id=${getIdFromRow(rowData) ?? "unknown"} guild=${getGuildIdFromRow(rowData) ?? "unknown"}`
+            );
+          }
+        }
       }
 
-      // convert to guildContracts shape
+      // converter para o formato GuildContracts
       const guildContracts: Record<string, GuildContracts> = {};
+
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.log(
+          `[CONTRACTS_STORAGE] Converting grouped data: ${Object.keys(grouped).length} guilds`
+        );
+      }
+
       for (const k of Object.keys(grouped)) {
+        const contractCount = grouped[k].contracts.length;
+
         guildContracts[k] = {
           guildId: grouped[k].guildId,
           contracts: grouped[k].contracts,
           lastUpdate: grouped[k].lastUpdate ?? new Date(),
           generationCount:
-            grouped[k].generationCount ??
-            (grouped[k].contracts.length > 0 ? 1 : 0),
+            grouped[k].generationCount ?? (contractCount > 0 ? 1 : 0),
         };
+
+        if (import.meta.env.DEV) {
+          // eslint-disable-next-line no-console
+          console.log(
+            `[CONTRACTS_STORAGE] Converted guild ${k}: ${contractCount} contracts`
+          );
+        }
       }
 
       data.value.guildContracts = guildContracts;
+
+      if (import.meta.env.DEV) {
+        const totalGuilds = Object.keys(guildContracts).length;
+        const totalContracts = Object.values(guildContracts).reduce(
+          (sum, g) => sum + (g.contracts?.length || 0),
+          0
+        );
+        // eslint-disable-next-line no-console
+        console.log(
+          `[CONTRACTS_STORAGE] Loaded ${totalContracts} contracts for ${totalGuilds} guilds`
+        );
+      }
 
       // If no rows were found in the 'contracts' store, try to recover from a
       // persisted snapshot in settings (robustness for older clients / partial writes)
@@ -259,39 +520,78 @@ export function useContractsStorage() {
   }
 
   // Persist helpers: when a guildContracts entry is updated we save each contract individually
+  // Para evitar problemas de persistência assíncrona, usamos debounce e persistence forçada
+  let persistTimeout: ReturnType<typeof setTimeout> | null = null;
+
   watch(
     () => data.value.guildContracts,
     (newVal) => {
-      void (async () => {
-        for (const gid of Object.keys(newVal)) {
-          const entry = newVal[gid] as GuildContracts | undefined;
-          if (!entry) continue;
+      // Limpar timeout anterior se existir
+      if (persistTimeout) {
+        clearTimeout(persistTimeout);
+      }
+
+      // Criar novo timeout com delay menor para evitar perda de dados
+      persistTimeout = setTimeout(() => {
+        void (async () => {
           try {
-            // ensure each contract is stored in 'contracts' store
-            for (const c of entry.contracts) {
-              try {
-                // Clone contract into a plain object to avoid storing Vue proxies/reactive internals
-                const plain = deserializeData<Record<string, unknown>>(
-                  serializeData(c)
-                );
-                await adapter.put("contracts", c.id, {
-                  id: c.id,
-                  guildId: gid,
-                  value: plain,
-                  status: c.status,
-                  createdAt: (c as Contract).createdAt ?? new Date(),
-                });
-              } catch (e) {
+            for (const gid of Object.keys(newVal)) {
+              const entry = newVal[gid] as GuildContracts | undefined;
+              if (!entry) continue;
+
+              // Persistir contratos em batch para melhor performance
+              const batchPromises: Promise<void>[] = [];
+
+              for (const c of entry.contracts) {
+                const promise = (async () => {
+                  try {
+                    const plain = deserializeData<Record<string, unknown>>(
+                      serializeData(c)
+                    );
+
+                    const recordToSave = {
+                      id: c.id,
+                      guildId: gid,
+                      value: plain,
+                      status: c.status,
+                      createdAt: (c as Contract).createdAt ?? new Date(),
+                    };
+
+                    // Persistindo contrato (detalhes omitidos em logs para reduzir verbosidade)
+
+                    await adapter.put("contracts", c.id, recordToSave);
+                  } catch (e) {
+                    // eslint-disable-next-line no-console
+                    console.warn("failed to persist contract", c.id, e);
+                  }
+                })();
+
+                batchPromises.push(promise);
+              }
+
+              // Aguardar todas as persistências do guild atual
+              await Promise.all(batchPromises);
+              // Em DEV, reportar quantos contratos foram persistidos neste batch
+              if (import.meta.env.DEV) {
                 // eslint-disable-next-line no-console
-                console.warn("failed to persist contract", c.id, e);
+                console.log(
+                  `[CONTRACTS_STORAGE] Persisted ${entry.contracts.length} contracts for guild ${gid}`
+                );
               }
             }
+
+            // Persistir snapshot para recuperação rápida
+            await adapter.put("settings", "contracts-store-v2", {
+              guildContracts: data.value.guildContracts,
+              currentGuildId: data.value.currentGuildId,
+              globalLastUpdate: data.value.globalLastUpdate,
+            });
           } catch (e) {
             // eslint-disable-next-line no-console
             console.warn("useContractsStorage.persist failed", e);
           }
-        }
-      })();
+        })();
+      }, 100); // Timeout mais curto (100ms) para persistência mais rápida
     },
     { deep: true }
   );
