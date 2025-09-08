@@ -79,6 +79,7 @@ export function useServicesStorage() {
             }
           }
         } catch (parseError) {
+          // eslint-disable-next-line no-console
           console.warn("Failed to parse service row:", parseError);
           continue;
         }
@@ -91,6 +92,7 @@ export function useServicesStorage() {
       data.value.guildServices = guildServicesMap;
       data.value.globalLastUpdate = new Date();
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.warn("useServicesStorage.load failed", e);
     }
   }
@@ -170,6 +172,59 @@ export function useServicesStorage() {
     } catch (e) {
       // eslint-disable-next-line no-console
       console.warn("useServicesStorage.persist failed", e);
+    }
+  }
+
+  /**
+   * Persiste os serviços de uma guilda específica imediatamente
+   */
+  async function persistGuildServices(guildId: string): Promise<void> {
+    try {
+      const entry = data.value.guildServices[guildId];
+      if (!entry) return;
+
+      // Persistir serviços em batch
+      const batchPromises: Promise<void>[] = [];
+
+      for (const service of entry.services) {
+        const promise = (async () => {
+          try {
+            const plainService = JSON.parse(JSON.stringify(service));
+            await adapter.put("services", service.id, {
+              id: service.id,
+              guildId: guildId,
+              value: plainService,
+              status: service.status,
+              deadline: service.deadline,
+              createdAt:
+                (service as Service & { createdAt?: Date }).createdAt ??
+                new Date(),
+            });
+          } catch (e) {
+            // eslint-disable-next-line no-console
+            console.warn(
+              "failed to persist service (persistGuildServices)",
+              service.id,
+              e
+            );
+          }
+        })();
+
+        batchPromises.push(promise);
+      }
+
+      // Aguardar todas as persistências
+      await Promise.all(batchPromises);
+
+      // Persistir snapshot também
+      await adapter.put("settings", "services-store-v2", {
+        guildServices: data.value.guildServices,
+        currentGuildId: data.value.currentGuildId,
+        globalLastUpdate: data.value.globalLastUpdate,
+      });
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn("persistGuildServices failed", e);
     }
   }
 
@@ -260,40 +315,69 @@ export function useServicesStorage() {
   load();
 
   // Auto-persistir mudanças (similar ao padrão de contratos)
+  // Para evitar problemas de persistência assíncrona, usamos debounce e persistence forçada
+  let persistTimeout: ReturnType<typeof setTimeout> | null = null;
+
   watch(
     () => data.value.guildServices,
     (newVal) => {
-      void (async () => {
-        for (const gid of Object.keys(newVal)) {
-          const entry = newVal[gid] as GuildServices | undefined;
-          if (!entry) continue;
+      // Limpar timeout anterior se existir
+      if (persistTimeout) {
+        clearTimeout(persistTimeout);
+      }
+
+      // Criar novo timeout com delay menor para evitar perda de dados
+      persistTimeout = setTimeout(() => {
+        void (async () => {
           try {
-            // Garantir que cada serviço é armazenado no store 'services'
-            for (const service of entry.services) {
-              try {
-                // Clonagem para evitar problemas de reatividade
-                const plainService = JSON.parse(JSON.stringify(service));
-                await adapter.put("services", service.id, {
-                  id: service.id,
-                  guildId: gid,
-                  value: plainService,
-                  status: service.status,
-                  deadline: service.deadline,
-                  createdAt:
-                    (service as Service & { createdAt?: Date }).createdAt ??
-                    new Date(),
-                });
-              } catch (e) {
-                // eslint-disable-next-line no-console
-                console.warn("failed to persist service", service.id, e);
+            for (const gid of Object.keys(newVal)) {
+              const entry = newVal[gid] as GuildServices | undefined;
+              if (!entry) continue;
+
+              // Persistir serviços em batch para melhor performance
+              const batchPromises: Promise<void>[] = [];
+
+              // Garantir que cada serviço é armazenado no store 'services'
+              for (const service of entry.services) {
+                const promise = (async () => {
+                  try {
+                    // Clonagem para evitar problemas de reatividade
+                    const plainService = JSON.parse(JSON.stringify(service));
+                    await adapter.put("services", service.id, {
+                      id: service.id,
+                      guildId: gid,
+                      value: plainService,
+                      status: service.status,
+                      deadline: service.deadline,
+                      createdAt:
+                        (service as Service & { createdAt?: Date }).createdAt ??
+                        new Date(),
+                    });
+                  } catch (e) {
+                    // eslint-disable-next-line no-console
+                    console.warn("failed to persist service", service.id, e);
+                  }
+                })();
+
+                batchPromises.push(promise);
               }
+
+              // Aguardar todas as persistências do guild atual
+              await Promise.all(batchPromises);
             }
+
+            // Persistir snapshot para recuperação rápida
+            await adapter.put("settings", "services-store-v2", {
+              guildServices: data.value.guildServices,
+              currentGuildId: data.value.currentGuildId,
+              globalLastUpdate: data.value.globalLastUpdate,
+            });
           } catch (e) {
             // eslint-disable-next-line no-console
             console.warn("useServicesStorage.persist failed", e);
           }
-        }
-      })();
+        })();
+      }, 100); // Timeout mais curto (100ms) para persistência mais rápida
     },
     { deep: true }
   );
@@ -302,6 +386,7 @@ export function useServicesStorage() {
     data: readonly(data),
     load,
     persist,
+    persistGuildServices,
     getServicesForGuild,
     updateServicesForGuild,
     removeServicesForGuild,
