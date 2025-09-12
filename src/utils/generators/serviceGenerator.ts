@@ -1327,8 +1327,7 @@ export class ServiceGenerator {
    * Formato: número aleatório de 4 dígitos
    */
   private static generateServiceId(): string {
-    const fourDigitNumber = Math.floor(1000 + Math.random() * 9000);
-    return fourDigitNumber.toString();
+    return crypto.randomUUID();
   }
 
   // ===== MÉTODOS PARA SISTEMA DE TESTES E RECOMPENSAS =====
