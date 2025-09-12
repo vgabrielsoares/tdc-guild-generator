@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { setActivePinia, createPinia } from "pinia";
 import { useGuildStore } from "@/stores/guild";
 import { SettlementType } from "@/types/guild";
-import { GUILD_NAME_CONFIG } from "@/data/guild-names";
+import { GUILD_NAME_PREFIXES, GUILD_NAME_SUFFIXES } from "@/data/guild-names";
 import { type Guild } from "@/types/guild";
 
 // Mock localStorage
@@ -486,12 +486,12 @@ describe("Issue 3.4 - Guild Store Complete", () => {
       expect(guildName).toBeDefined();
 
       // Criar regex dinamicamente baseado na configuração atual
-      const prefixPattern = GUILD_NAME_CONFIG.prefixes
-        .map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
-        .join("|");
-      const suffixPattern = GUILD_NAME_CONFIG.suffixes
-        .map((s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
-        .join("|");
+      const prefixPattern = GUILD_NAME_PREFIXES.map((p: string) =>
+        p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+      ).join("|");
+      const suffixPattern = GUILD_NAME_SUFFIXES.map((s: string) =>
+        s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+      ).join("|");
       const traditionalPattern = new RegExp(
         `^(${prefixPattern}) (${suffixPattern})$`
       );
