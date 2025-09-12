@@ -42,40 +42,35 @@ export const useTimelineStore = defineStore("timeline", () => {
   // Normaliza diferentes representações de data para o formato GameDate
   function normalizeGameDate(input: unknown) {
     try {
-      if (!input || typeof input !== "object") {
-        return createDefaultGameDate();
-      }
+      if (input === null || input === undefined) return createDefaultGameDate();
 
-      // já é um GameDate com day/month/year
-      const maybe = input as Record<string, unknown>;
-      if (
-        typeof maybe.day === "number" &&
-        typeof maybe.month === "number" &&
-        typeof maybe.year === "number"
-      ) {
-        return createGameDate(
-          maybe.day as number,
-          maybe.month as number,
-          maybe.year as number
-        );
-      }
+      // Se já for um objeto do tipo GameDate
+      if (typeof input === "object") {
+        const obj = input as Record<string, unknown>;
+        if (
+          typeof obj.day === "number" &&
+          typeof obj.month === "number" &&
+          typeof obj.year === "number"
+        ) {
+          return createGameDate(
+            obj.day as number,
+            obj.month as number,
+            obj.year as number
+          );
+        }
 
-      // Date do JS
-      if (maybe instanceof Date) {
-        return createGameDate(
-          maybe.getDate(),
-          maybe.getMonth() + 1,
-          maybe.getFullYear()
-        );
-      }
+        // Se for uma instância Date (possivelmente revivida pela desserialização)
+        if (obj instanceof Date) {
+          return createGameDate(
+            obj.getDate(),
+            obj.getMonth() + 1,
+            obj.getFullYear()
+          );
+        }
 
-      // objeto que veio como serialização de Date ({"_seconds":..., ...}) ou string
-      if (input) {
-        const maybe = input as { toString?: unknown };
-        if (typeof maybe.toString === "function") {
-          const toStringFn = maybe.toString as unknown as () => string;
-          const str = String(toStringFn.call(maybe));
-          const parsed = new Date(str);
+        // Se for um objeto de data serializado produzido por serializeData (ex: { __type: 'Date', value: '...' })
+        if (obj.__type === "Date" && typeof obj.value === "string") {
+          const parsed = new Date(obj.value);
           if (!Number.isNaN(parsed.getTime())) {
             return createGameDate(
               parsed.getDate(),
@@ -83,6 +78,18 @@ export const useTimelineStore = defineStore("timeline", () => {
               parsed.getFullYear()
             );
           }
+        }
+      }
+
+      // Strings (ISO ou outros) ou timestamps numéricos
+      if (typeof input === "string" || typeof input === "number") {
+        const parsed = new Date(input as string | number);
+        if (!Number.isNaN(parsed.getTime())) {
+          return createGameDate(
+            parsed.getDate(),
+            parsed.getMonth() + 1,
+            parsed.getFullYear()
+          );
         }
       }
     } catch (e) {
@@ -112,35 +119,70 @@ export const useTimelineStore = defineStore("timeline", () => {
       const timelinesMap: Record<string, GuildTimeline> = {};
 
       for (const record of timelineRecords) {
-        const guildId = record.guildId;
+        const rec = record as unknown as Record<string, unknown>;
+        const guildId = rec.guildId as string;
 
+        // Garantir que exista um placeholder para esta guilda
         if (!timelinesMap[guildId]) {
           timelinesMap[guildId] = {
             guildId,
-            currentDate: normalizeGameDate(record.currentDate),
+            currentDate: createDefaultGameDate(),
             events: [],
-            createdAt: new Date(record.createdAt),
-            updatedAt: new Date(record.updatedAt),
+            createdAt: new Date(),
+            updatedAt: new Date(),
           };
         }
 
-        // Adicionar eventos se existirem
-        if (record.events && Array.isArray(record.events)) {
-          // Normalize cada evento recebido
-          for (const ev of record.events) {
-            try {
-              if (ev && typeof ev === "object") {
-                const eObj = {
-                  ...(ev as unknown as Record<string, unknown>),
-                } as Record<string, unknown>;
-                eObj.date = normalizeGameDate(eObj.date as unknown);
-                timelinesMap[guildId].events.push(
-                  eObj as unknown as ScheduledEvent
-                );
+        // Se este registro aparenta ser a timeline principal (possui currentDate ou array events), usá-lo para popular metadados
+        if (rec.currentDate || (rec.events && Array.isArray(rec.events))) {
+          // Sobrescrever currentDate se presente (esta é a linha autoritativa da timeline)
+          if (rec.currentDate) {
+            timelinesMap[guildId].currentDate = normalizeGameDate(
+              rec.currentDate
+            );
+          }
+
+          // createdAt/updatedAt podem estar armazenados como Date ou string
+          if (record.createdAt)
+            timelinesMap[guildId].createdAt = new Date(
+              record.createdAt as unknown as string | number | Date
+            );
+          if (record.updatedAt)
+            timelinesMap[guildId].updatedAt = new Date(
+              record.updatedAt as unknown as string | number | Date
+            );
+
+          // Mesclar array de eventos se presente
+          if (rec.events && Array.isArray(rec.events)) {
+            for (const ev of rec.events as unknown as unknown[]) {
+              try {
+                if (ev && typeof ev === "object") {
+                  const eObj = {
+                    ...(ev as unknown as Record<string, unknown>),
+                  } as Record<string, unknown>;
+                  eObj.date = normalizeGameDate(eObj.date as unknown);
+                  timelinesMap[guildId].events.push(
+                    eObj as unknown as ScheduledEvent
+                  );
+                }
+              } catch {
+                // ignore invalid event
               }
-            } catch {
-              // ignorar eventos inválidos
             }
+          }
+        }
+
+        // Se este registro aparenta ser uma linha de evento individual (possui propriedade event), adicioná-lo
+        if (rec.event && typeof rec.event === "object") {
+          try {
+            const ev = { ...(rec.event as Record<string, unknown>) } as Record<
+              string,
+              unknown
+            >;
+            ev.date = normalizeGameDate(ev.date as unknown);
+            timelinesMap[guildId].events.push(ev as unknown as ScheduledEvent);
+          } catch {
+            // ignore invalid
           }
         }
       }
@@ -151,7 +193,29 @@ export const useTimelineStore = defineStore("timeline", () => {
       });
 
       timelines.value = timelinesMap;
+      // marcar inicializado antes de tentar restaurar guilda atual
       isInitialized.value = true;
+
+      // Tentar restaurar a guilda atual persistida nas settings (compatibilidade com useGuildStorage)
+      try {
+        const persistedCurrentGuildId = await storageAdapter.get<string | null>(
+          "settings",
+          "guild-current-id"
+        );
+        if (
+          persistedCurrentGuildId &&
+          typeof persistedCurrentGuildId === "string"
+        ) {
+          // delegar para a função que já lida com sincronização com guild store
+          try {
+            setCurrentGuild(persistedCurrentGuildId);
+          } catch (e) {
+            // ignore errors restoring current guild to avoid breaking timeline load
+          }
+        }
+      } catch (e) {
+        // ignore errors reading settings
+      }
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("Erro ao carregar timelines:", error);

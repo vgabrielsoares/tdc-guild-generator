@@ -15,8 +15,10 @@ export const DBContractSchema = z.object({
   guildId: z.string().min(1),
   value: z.record(z.unknown()),
   status: z.string(),
-  deadline: z.date().optional(),
-  createdAt: z.date(),
+  deadline: z.union([z.date(), z.string()]).optional(),
+  createdAt: z
+    .union([z.date(), z.string()])
+    .transform((val) => (typeof val === "string" ? new Date(val) : val)),
 });
 
 export const DBServiceSchema = z.object({
@@ -24,8 +26,41 @@ export const DBServiceSchema = z.object({
   guildId: z.string().min(1),
   value: z.record(z.unknown()),
   status: z.string(),
-  deadline: z.date().optional(),
-  createdAt: z.date(),
+  deadline: z
+    .union([
+      z.date(),
+      z.string(),
+      z.object({
+        type: z.string(),
+        value: z.string().optional(),
+      }),
+    ])
+    .optional(),
+  createdAt: z
+    .union([
+      z.date(),
+      z.string(),
+      z.object({
+        day: z.number().int().min(1).max(31),
+        month: z.number().int().min(1).max(12),
+        year: z.number().int().min(1).max(9999),
+      }),
+    ])
+    .transform((val) => {
+      if (typeof val === "string") return new Date(val);
+      if (val instanceof Date) return val;
+      // Se for objeto com day/month/year, transformar em Date
+      if (
+        typeof val === "object" &&
+        val &&
+        "day" in val &&
+        "month" in val &&
+        "year" in val
+      ) {
+        return new Date(val.year, val.month - 1, val.day);
+      }
+      return new Date();
+    }),
 });
 
 export const DBTimelineSchema = z.object({
@@ -41,13 +76,13 @@ export const DBSettingSchema = z.object({
   value: z.unknown(),
 });
 
-// Store configuration to be consumed by the DB manager
+// Configuração de stores para ser consumida pelo gerenciador de DB
 export const DB_STORES = [
   { name: "guilds", keyPath: "id", indices: ["createdAt", "locked"] },
   {
     name: "contracts",
     keyPath: "id",
-    // support composite index for guildId + status for optimized queries
+    // suporte a índice composto para guildId + status para consultas otimizadas
     indices: [
       "guildId",
       "status",

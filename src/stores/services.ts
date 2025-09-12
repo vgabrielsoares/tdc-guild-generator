@@ -47,17 +47,21 @@ export const useServicesStore = defineStore("services", () => {
   // State
   const services = ref<ServiceWithGuild[]>([]);
   const isLoading = ref(false);
+  const isReady = ref(false);
+  const isInitializing = ref(false);
   const lifecycleManager = ref<ServiceLifecycleManager | null>(null);
   const lastUpdate = ref<GameDate>(createGameDate(1, 1, 2025));
 
-  // Computed for current guild ID
-  const currentGuildId = computed(() => guildStore.currentGuild?.id);
+  // Controle local do ID da guilda atual
+  const currentGuildId = ref<string | null>(null);
+
+  // Computed para guilda atual baseado no guild store
   const currentGuild = computed(() => guildStore.currentGuild);
 
   // Configuração do módulo para integração com timeline
   const moduleConfig: TimelineModuleConfig = {
     moduleType: "services",
-    guildIdGetter: () => currentGuildId.value,
+    guildIdGetter: () => currentGuildId.value || undefined,
     timelineStore,
   };
 
@@ -117,6 +121,12 @@ export const useServicesStore = defineStore("services", () => {
       // Inicializar lifecycle manager se necessário
       if (!lifecycleManager.value) {
         initializeLifecycleManager(currentDate);
+      }
+
+      // Atualizar currentGuildId local e persistir
+      if (currentGuildId.value !== guild.id) {
+        currentGuildId.value = guild.id;
+        await servicesStorage.setCurrentGuild(guild.id);
       }
 
       const config = {
@@ -234,7 +244,7 @@ export const useServicesStore = defineStore("services", () => {
       currentDate.day
     );
 
-    // Process events using the lifecycle manager
+    // Processar eventos usando o lifecycle manager
     const { updatedServices, processedEvents } =
       lifecycleManager.value!.processEvents(services.value, currentJSDate);
 
@@ -326,43 +336,100 @@ export const useServicesStore = defineStore("services", () => {
 
   // Storage methods
   const saveServicesToStorage = async () => {
-    const currentGuildId = guildStore.currentGuild?.id;
-    if (!currentGuildId) return;
+    const guildId = currentGuildId.value;
+    if (!guildId) return;
+
+    // Prevenir saves durante inicialização para evitar race conditions
+    if (isInitializing.value) {
+      // Evitar salvar enquanto o store estiver sendo inicializado
+      return;
+    }
 
     // Converter services para formato sem guildId (Service[])
     const servicesForGuild = services.value
-      .filter((s) => s.guildId === currentGuildId)
+      .filter((s) => s.guildId === guildId)
       .map((s) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { guildId: _, ...service } = s;
         return service as Service;
       });
 
-    await servicesStorage.updateServicesForGuild(
-      currentGuildId,
-      servicesForGuild
-    );
+    await servicesStorage.updateServicesForGuild(guildId, servicesForGuild);
+
+    // Garantir que o currentGuildId seja persistido sempre que salvamos
+    await servicesStorage.setCurrentGuild(guildId);
+
+    // Forçar persistência imediata para evitar perda de dados
+    try {
+      await servicesStorage.persistGuildServices(guildId);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn("Failed to force persist services:", e);
+    }
   };
 
   const loadServicesFromStorage = async (currentDate?: GameDate) => {
-    const currentGuildId = guildStore.currentGuild?.id;
-    if (!currentGuildId) return;
+    const guildId = currentGuildId.value;
+    if (!guildId) return;
 
-    const guildServices = servicesStorage.getServicesForGuild(currentGuildId);
+    const guildServices = servicesStorage.getServicesForGuild(guildId);
 
     // Converter para ServiceWithGuild
     const servicesWithGuild: ServiceWithGuild[] = guildServices.map(
       (service) => ({
         ...service,
-        guildId: currentGuildId,
+        guildId: guildId,
       })
     );
 
     services.value = servicesWithGuild;
 
+    // Garantir que o currentGuildId seja persistido ao carregar
+    await servicesStorage.setCurrentGuild(guildId);
+
     // Inicializar lifecycle manager se necessário
     if (currentDate) {
       initializeLifecycleManager(currentDate);
+    }
+  };
+
+  /**
+   * Sincroniza com a guilda atual do store de guild
+   */
+  const syncWithCurrentGuild = async () => {
+    const currentGuild = guildStore.currentGuild;
+
+    if (currentGuild && currentGuild.id !== currentGuildId.value) {
+      // Mudou para uma nova guilda, atualizar currentGuildId local primeiro
+      currentGuildId.value = currentGuild.id;
+
+      // Carregar seus serviços
+      await loadServicesFromStorage(timelineStore.currentGameDate || undefined);
+
+      // Tentar migrar dados antigos se necessário
+      await migrateLegacyIfNeeded();
+
+      // Atualizar o storage para lembrar da guilda atual
+      await servicesStorage.setCurrentGuild(currentGuild.id);
+    } else if (!currentGuild && currentGuildId.value) {
+      // Guilda foi desmarcada, limpar estado
+      currentGuildId.value = null;
+      services.value = [];
+      await servicesStorage.setCurrentGuild(null);
+    }
+  };
+
+  /**
+   * Migra dados legados se existirem
+   */
+  const migrateLegacyIfNeeded = async () => {
+    // A migração já é tratada pelo composable useServicesStorage
+    // Este método existe para compatibilidade com o padrão dos contratos
+    try {
+      // A migração acontece automaticamente durante o load() do storage
+      await servicesStorage.load();
+    } catch {
+      // silent
     }
   };
 
@@ -375,17 +442,95 @@ export const useServicesStore = defineStore("services", () => {
     await servicesStorage.removeServicesForGuild(currentGuildId);
   };
 
+  /**
+   * Inicializa o store de serviços
+   */
+  const initializeStore = async () => {
+    try {
+      // Definir flag de inicialização para prevenir saves prematuros
+      isInitializing.value = true;
+
+      // Garantir que o storage foi carregado
+      await servicesStorage.load();
+
+      // Se o storage lembra da última guilda usada, restaurar seus serviços
+      const persistedGuildId = servicesStorage.data.value.currentGuildId;
+      if (persistedGuildId) {
+        // Atualizar currentGuildId local
+        currentGuildId.value = persistedGuildId;
+
+        const guildServices =
+          servicesStorage.getServicesForGuild(persistedGuildId);
+        if (guildServices.length > 0) {
+          // Converter para ServiceWithGuild
+          const servicesWithGuild: ServiceWithGuild[] = guildServices.map(
+            (service) => ({
+              ...service,
+              guildId: persistedGuildId,
+            })
+          );
+          services.value = servicesWithGuild;
+        }
+      }
+
+      // Carregar serviços da guilda atual se existir
+      const currentGuildFromStore = guildStore.currentGuild?.id;
+      if (currentGuildFromStore) {
+        // Atualizar currentGuildId local
+        currentGuildId.value = currentGuildFromStore;
+
+        await loadServicesFromStorage(
+          timelineStore.currentGameDate || undefined
+        );
+      }
+
+      // Sincronizar com a guilda atual
+      await syncWithCurrentGuild();
+
+      isReady.value = true;
+
+      // Remover flag de inicialização para permitir saves normais
+      isInitializing.value = false;
+    } catch (error) {
+      // Garantir que a flag seja removida mesmo em caso de erro
+      isInitializing.value = false;
+      // eslint-disable-next-line no-console
+      console.warn("Failed to initialize services store:", error);
+    }
+  };
+
   // Auto-load de serviços do storage quando store é inicializado
   // Garante serviços persistidos disponíveis para outras views (timeline)
-  void loadServicesFromStorage();
+  void initializeStore();
 
   // Auto-save quando services mudam
   watch(
     () => services.value,
     () => {
-      void saveServicesToStorage();
+      // Não salvar durante inicialização para evitar race conditions
+      if (!isInitializing.value) {
+        void saveServicesToStorage();
+      }
     },
     { deep: true }
+  );
+
+  // Watch para mudanças da guilda e re-sincronização
+  watch(
+    () => guildStore.currentGuild?.id,
+    () => {
+      void (async () => {
+        try {
+          // Não sincronizar durante inicialização para evitar race conditions
+          if (!isInitializing.value) {
+            await syncWithCurrentGuild();
+          }
+        } catch {
+          // silent
+        }
+      })();
+    },
+    { immediate: false }
   );
 
   // watch pra guilda atual pra inicializar o lifecycle manager com a timeline
@@ -456,7 +601,7 @@ export const useServicesStore = defineStore("services", () => {
     applyAutomaticResolution(
       services.value,
       resolutionConfig,
-      () => currentGuildId.value,
+      () => currentGuildId.value || undefined,
       (updatedItems) => {
         services.value = updatedItems;
       },
@@ -511,7 +656,7 @@ export const useServicesStore = defineStore("services", () => {
     applyAutomaticResolution(
       services.value,
       resolutionConfig,
-      () => currentGuildId.value,
+      () => currentGuildId.value || undefined,
       (updatedItems) => {
         services.value = updatedItems;
       },
@@ -585,7 +730,7 @@ export const useServicesStore = defineStore("services", () => {
     // Configuração do módulo
     const moduleConfig: TimelineModuleConfig = {
       moduleType: "services",
-      guildIdGetter: () => currentGuildId.value,
+      guildIdGetter: () => currentGuildId.value || undefined,
       timelineStore,
     };
 
@@ -737,7 +882,9 @@ export const useServicesStore = defineStore("services", () => {
     // State
     services,
     isLoading,
+    isReady,
     lifecycleManager,
+    currentGuildId,
 
     // Getters
     activeServices,
@@ -770,7 +917,9 @@ export const useServicesStore = defineStore("services", () => {
     // Storage actions
     saveServicesToStorage,
     loadServicesFromStorage,
+    syncWithCurrentGuild,
     clearAllServices,
+    initializeStore,
 
     // Skill test actions
     initializeServiceTests,

@@ -61,25 +61,52 @@ export function createIndexedDBAdapter(): StorageAdapter {
         return new Promise<void>((resolve, reject) => {
           try {
             const objectStore = tx.objectStore(store);
-            const payload =
-              typeof value === "object" && value !== null
-                ? Object.assign({}, value as Record<string, unknown>, {
-                    id: key,
-                  })
-                : { id: key, value };
-            const req = objectStore.put(payload);
+            // respeitar o keyPath do object store (pode ser 'id' ou 'key', etc.)
+            const keyPath = (objectStore as IDBObjectStore).keyPath ?? "id";
+            const makePayload = () => {
+              if (typeof value === "object" && value !== null) {
+                const copy = Object.assign(
+                  {},
+                  value as Record<string, unknown>
+                );
+                // se keyPath for array (composto), não podemos preenchê-lo automaticamente, lançar para cair no fallback serializado
+                if (Array.isArray(keyPath)) {
+                  throw new Error(
+                    "composite keyPath not supported for automatic payload creation"
+                  );
+                }
+                (copy as Record<string, unknown>)[String(keyPath)] = key;
+                return copy;
+              }
+              // valor primitivo, encapsular em objeto usando o keyPath
+              return { [String(keyPath)]: key, value };
+            };
+            const payload = makePayload();
+            const req = objectStore.put(payload as unknown);
             req.onsuccess = () => resolve();
             req.onerror = () => reject(req.error);
           } catch (e) {
             // Fallback to serialized storage
             try {
               const objectStore = tx.objectStore(store);
-              const req2 = objectStore.put({
-                id: key,
-                __serialized: serializeData(value),
-              });
-              req2.onsuccess = () => resolve();
-              req2.onerror = () => reject(req2.error);
+              const keyPath = (objectStore as IDBObjectStore).keyPath ?? "id";
+              if (Array.isArray(keyPath)) {
+                // keyPaths compostos não podem ser preenchidos automaticamente, armazenar serializado com 'id'
+                const req2 = objectStore.put({
+                  id: key,
+                  __serialized: serializeData(value),
+                });
+                req2.onsuccess = () => resolve();
+                req2.onerror = () => reject(req2.error);
+              } else {
+                const payload2: Record<string, unknown> = {
+                  __serialized: serializeData(value),
+                };
+                payload2[String(keyPath)] = key;
+                const req2 = objectStore.put(payload2);
+                req2.onsuccess = () => resolve();
+                req2.onerror = () => reject(req2.error);
+              }
             } catch (err) {
               reject(err);
             }
