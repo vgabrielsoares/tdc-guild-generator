@@ -46,6 +46,19 @@
         </div>
       </div>
 
+      <!-- Filtro de Ordenação -->
+      <div class="sort-container">
+        <select
+          v-model="sortOrder"
+          class="sort-select"
+          title="Ordenar por data"
+        >
+          <option value="newest">Mais recente primeiro</option>
+          <option value="oldest">Mais antiga primeiro</option>
+        </select>
+      </div>
+    </div>
+
     <!-- Lista de Guildas -->
     <div v-if="guildStore.historyCount === 0" class="empty-history">
       <FolderOpenIcon class="empty-icon w-12 h-12 text-gray-500" />
@@ -191,11 +204,31 @@ const toast = useToast();
 
 const showConfirmClear = ref(false);
 const searchQuery = ref("");
+const sortOrder = ref<"newest" | "oldest">("newest");
+// Computed para filtrar e ordenar guildas
+const filteredGuilds = computed(() => {
+  let guilds = [...guildStore.guildHistory];
+
   // Aplicar filtro de pesquisa
   if (searchQuery.value.trim()) {
     const query = searchQuery.value.toLowerCase().trim();
     guilds = guilds.filter((guild) => guild.name.toLowerCase().includes(query));
   }
+
+  // Aplicar ordenação
+  guilds.sort((a, b) => {
+    const dateA = new Date(a.createdAt || 0).getTime();
+    const dateB = new Date(b.createdAt || 0).getTime();
+
+    if (sortOrder.value === "newest") {
+      return dateB - dateA; // Mais recente primeiro
+    } else {
+      return dateA - dateB; // Mais antiga primeiro
+    }
+  });
+
+  return guilds;
+});
 const lockedCount = computed(() => {
   return guildStore.guildHistory.filter((g) => g.locked).length;
 });
