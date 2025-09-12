@@ -101,11 +101,19 @@ export const useTimelineStore = defineStore("timeline", () => {
 
   // Flag para controlar se os dados foram carregados inicialmente
   const isInitialized = ref(false);
+  const isLoading = ref(false); // Proteção contra múltiplos carregamentos simultâneos
 
   /**
    * Carrega todas as timelines do IndexedDB
    */
   async function loadAllTimelinesFromDB(): Promise<void> {
+    // Proteção contra múltiplas execuções simultâneas
+    if (isLoading.value || isInitialized.value) {
+      return;
+    }
+
+    isLoading.value = true;
+
     try {
       const timelineRecords = await storageAdapter.list<{
         guildId: string;
@@ -117,6 +125,7 @@ export const useTimelineStore = defineStore("timeline", () => {
 
       // Agrupar eventos por guildId para reconstituir as timelines
       const timelinesMap: Record<string, GuildTimeline> = {};
+      const processedEventIds: Set<string> = new Set(); // Evitar duplicação de eventos
 
       for (const record of timelineRecords) {
         const rec = record as unknown as Record<string, unknown>;
@@ -160,10 +169,16 @@ export const useTimelineStore = defineStore("timeline", () => {
                   const eObj = {
                     ...(ev as unknown as Record<string, unknown>),
                   } as Record<string, unknown>;
-                  eObj.date = normalizeGameDate(eObj.date as unknown);
-                  timelinesMap[guildId].events.push(
-                    eObj as unknown as ScheduledEvent
-                  );
+
+                  // Verificar se o evento já foi processado para evitar duplicação
+                  const eventId = eObj.id as string;
+                  if (eventId && !processedEventIds.has(eventId)) {
+                    eObj.date = normalizeGameDate(eObj.date as unknown);
+                    timelinesMap[guildId].events.push(
+                      eObj as unknown as ScheduledEvent
+                    );
+                    processedEventIds.add(eventId);
+                  }
                 }
               } catch {
                 // ignore invalid event
@@ -172,15 +187,24 @@ export const useTimelineStore = defineStore("timeline", () => {
           }
         }
 
-        // Se este registro aparenta ser uma linha de evento individual (possui propriedade event), adicioná-lo
+        // Se este registro aparenta ser uma linha de evento individual (possui propriedade event),
+        // adicioná-lo APENAS se não foi processado no array principal
         if (rec.event && typeof rec.event === "object") {
           try {
             const ev = { ...(rec.event as Record<string, unknown>) } as Record<
               string,
               unknown
             >;
-            ev.date = normalizeGameDate(ev.date as unknown);
-            timelinesMap[guildId].events.push(ev as unknown as ScheduledEvent);
+
+            // Verificar se o evento já foi processado para evitar duplicação
+            const eventId = ev.id as string;
+            if (eventId && !processedEventIds.has(eventId)) {
+              ev.date = normalizeGameDate(ev.date as unknown);
+              timelinesMap[guildId].events.push(
+                ev as unknown as ScheduledEvent
+              );
+              processedEventIds.add(eventId);
+            }
           } catch {
             // ignore invalid
           }
@@ -221,6 +245,8 @@ export const useTimelineStore = defineStore("timeline", () => {
       console.error("Erro ao carregar timelines:", error);
       warning("Erro", "Falha ao carregar timelines do banco de dados");
       isInitialized.value = true; // Marca como inicializado mesmo com erro
+    } finally {
+      isLoading.value = false; // Limpar flag de carregamento
     }
   }
 
@@ -298,7 +324,9 @@ export const useTimelineStore = defineStore("timeline", () => {
   }
 
   // Inicialização automática
-  loadAllTimelinesFromDB();
+  if (!isInitialized.value && !isLoading.value) {
+    loadAllTimelinesFromDB();
+  }
 
   // Auto-save quando timelines mudam (com debounce para performance)
   let saveTimeout: NodeJS.Timeout | null = null;
@@ -339,7 +367,31 @@ export const useTimelineStore = defineStore("timeline", () => {
 
   // Computed: Eventos da timeline atual
   const currentEvents = computed((): ScheduledEvent[] => {
-    return currentTimeline.value?.events || [];
+    const events = currentTimeline.value?.events || [];
+
+    // Deduplicar eventos por ID para evitar duplicação visual
+    const uniqueEvents = new Map<string, ScheduledEvent>();
+
+    events.forEach((event) => {
+      if (event && event.id) {
+        // Manter o evento mais recente caso haja duplicatas
+        if (
+          !uniqueEvents.has(event.id) ||
+          (uniqueEvents.get(event.id)?.date &&
+            event.date &&
+            new Date(event.date.year, event.date.month - 1, event.date.day) >=
+              new Date(
+                uniqueEvents.get(event.id)!.date.year,
+                uniqueEvents.get(event.id)!.date.month - 1,
+                uniqueEvents.get(event.id)!.date.day
+              ))
+        ) {
+          uniqueEvents.set(event.id, event);
+        }
+      }
+    });
+
+    return Array.from(uniqueEvents.values());
   });
 
   // Computed: Próximo evento
