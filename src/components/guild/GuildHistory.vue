@@ -76,7 +76,7 @@
 
     <div v-else class="history-list">
       <div
-        v-for="guild in guildStore.guildHistory"
+        v-for="guild in paginatedGuilds"
         :key="guild.id"
         :class="[
           'history-item',
@@ -141,6 +141,59 @@
           </button>
         </div>
       </div>
+
+      <!-- Paginação -->
+      <div v-if="totalPages > 1" class="pagination">
+        <div class="pagination-info">
+          <span class="pagination-text">
+            Página {{ currentPage }} de {{ totalPages }} ({{
+              paginationStartIndex + 1
+            }}-{{ paginationEndIndex }} de {{ filteredGuilds.length }})
+          </span>
+        </div>
+
+        <div class="pagination-controls">
+          <button
+            @click="goToPage(1)"
+            :disabled="currentPage === 1"
+            class="btn btn-outline btn-sm pagination-btn"
+            title="Primeira página"
+          >
+            <ChevronDoubleLeftIcon class="w-4 h-4" />
+          </button>
+
+          <button
+            @click="goToPage(currentPage - 1)"
+            :disabled="currentPage === 1"
+            class="btn btn-outline btn-sm pagination-btn"
+            title="Página anterior"
+          >
+            <ChevronLeftIcon class="w-4 h-4" />
+          </button>
+
+          <span class="pagination-current">
+            {{ currentPage }}
+          </span>
+
+          <button
+            @click="goToPage(currentPage + 1)"
+            :disabled="currentPage === totalPages"
+            class="btn btn-outline btn-sm pagination-btn"
+            title="Próxima página"
+          >
+            <ChevronRightIcon class="w-4 h-4" />
+          </button>
+
+          <button
+            @click="goToPage(totalPages)"
+            :disabled="currentPage === totalPages"
+            class="btn btn-outline btn-sm pagination-btn"
+            title="Última página"
+          >
+            <ChevronDoubleRightIcon class="w-4 h-4" />
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Modal de Confirmação -->
@@ -185,7 +238,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import {
   ClockIcon,
   TrashIcon,
@@ -195,6 +248,11 @@ import {
   XMarkIcon,
   ExclamationTriangleIcon,
   StarIcon,
+  MagnifyingGlassIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronDoubleLeftIcon,
+  ChevronDoubleRightIcon,
 } from "@heroicons/vue/24/solid";
 import { useGuildStore } from "@/stores/guild";
 import { useToast } from "@/composables/useToast";
@@ -202,9 +260,15 @@ import { useToast } from "@/composables/useToast";
 const guildStore = useGuildStore();
 const toast = useToast();
 
+// Estados reativos
 const showConfirmClear = ref(false);
 const searchQuery = ref("");
 const sortOrder = ref<"newest" | "oldest">("newest");
+const currentPage = ref(1);
+
+// Configurações de paginação
+const ITEMS_PER_PAGE = 10;
+
 // Computed para filtrar e ordenar guildas
 const filteredGuilds = computed(() => {
   let guilds = [...guildStore.guildHistory];
@@ -229,9 +293,47 @@ const filteredGuilds = computed(() => {
 
   return guilds;
 });
+
+// Computed para paginação
+const totalPages = computed(() => {
+  return Math.ceil(filteredGuilds.value.length / ITEMS_PER_PAGE);
+});
+
+const paginationStartIndex = computed(() => {
+  return (currentPage.value - 1) * ITEMS_PER_PAGE;
+});
+
+const paginationEndIndex = computed(() => {
+  return Math.min(
+    paginationStartIndex.value + ITEMS_PER_PAGE,
+    filteredGuilds.value.length
+  );
+});
+
+const paginatedGuilds = computed(() => {
+  return filteredGuilds.value.slice(
+    paginationStartIndex.value,
+    paginationEndIndex.value
+  );
+});
+
+// Computed para contagem de guildas bloqueadas
 const lockedCount = computed(() => {
   return guildStore.guildHistory.filter((g) => g.locked).length;
 });
+
+// Watchers para reset de paginação
+watch([searchQuery, sortOrder], () => {
+  currentPage.value = 1;
+});
+
+// Métodos de paginação
+const goToPage = (page: number) => {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page;
+  }
+};
+
 // Método para limpar pesquisa
 const clearSearch = () => {
   searchQuery.value = "";
@@ -384,6 +486,10 @@ const confirmClearHistory = () => {
 .sort-select {
   @apply px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-colors;
 }
+
+/* Estados vazios */
+.empty-history,
+.empty-search {
   @apply text-center py-12 text-gray-400;
 }
 
@@ -440,6 +546,32 @@ const confirmClearHistory = () => {
   @apply flex gap-2 ml-4;
 }
 
+/* Paginação */
+.pagination {
+  @apply mt-6 pt-4 border-t border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-4;
+}
+
+.pagination-info {
+  @apply text-sm text-gray-400;
+}
+
+.pagination-text {
+  @apply block;
+}
+
+.pagination-controls {
+  @apply flex items-center gap-2;
+}
+
+.pagination-btn {
+  @apply flex items-center justify-center w-8 h-8 p-0;
+}
+
+.pagination-current {
+  @apply px-3 py-1 bg-blue-600 text-white rounded-lg text-sm font-medium min-w-[2rem] text-center;
+}
+
+/* Botões */
 .btn {
   @apply px-3 py-2 rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
 }
@@ -512,5 +644,28 @@ const confirmClearHistory = () => {
 
 .modal-actions {
   @apply flex gap-3 justify-end;
+}
+
+/* Responsividade */
+@media (max-width: 640px) {
+  .guild-info {
+    @apply grid-cols-1 gap-2;
+  }
+
+  .guild-details {
+    @apply text-left;
+  }
+
+  .history-item {
+    @apply flex-col items-start gap-3;
+  }
+
+  .guild-actions {
+    @apply ml-0 self-end;
+  }
+
+  .pagination-controls {
+    @apply flex-wrap justify-center;
+  }
 }
 </style>
