@@ -5,7 +5,9 @@
       <h3 class="history-title">
         <ClockIcon class="w-5 h-5" />
         Histórico de Guildas
-        <span class="history-count">({{ guildStore.historyCount }})</span>
+        <span class="history-count"
+          >({{ filteredGuilds.length }}/{{ guildStore.historyCount }})</span
+        >
       </h3>
 
       <div class="history-actions">
@@ -21,6 +23,29 @@
       </div>
     </div>
 
+    <!-- Filtros e Pesquisa -->
+    <div v-if="guildStore.historyCount > 0" class="history-filters">
+      <!-- Barra de Pesquisa -->
+      <div class="search-container">
+        <div class="search-input-wrapper">
+          <MagnifyingGlassIcon class="search-icon w-5 h-5" />
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Pesquisar por nome da guilda..."
+            class="search-input"
+          />
+          <button
+            v-if="searchQuery"
+            @click="clearSearch"
+            class="clear-search-button"
+            title="Limpar pesquisa"
+          >
+            <XMarkIcon class="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
     <!-- Lista de Guildas -->
     <div v-if="guildStore.historyCount === 0" class="empty-history">
       <FolderOpenIcon class="empty-icon w-12 h-12 text-gray-500" />
@@ -28,6 +53,12 @@
       <p class="empty-hint">
         Gere uma guilda e clique em "Salvar no Histórico" para começar
       </p>
+    </div>
+
+    <div v-else-if="filteredGuilds.length === 0" class="empty-search">
+      <MagnifyingGlassIcon class="empty-icon w-12 h-12 text-gray-500" />
+      <p>Nenhuma guilda encontrada</p>
+      <p class="empty-hint">Tente uma pesquisa diferente ou limpe o filtro</p>
     </div>
 
     <div v-else class="history-list">
@@ -159,10 +190,19 @@ const guildStore = useGuildStore();
 const toast = useToast();
 
 const showConfirmClear = ref(false);
-
+const searchQuery = ref("");
+  // Aplicar filtro de pesquisa
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase().trim();
+    guilds = guilds.filter((guild) => guild.name.toLowerCase().includes(query));
+  }
 const lockedCount = computed(() => {
   return guildStore.guildHistory.filter((g) => g.locked).length;
 });
+// Método para limpar pesquisa
+const clearSearch = () => {
+  searchQuery.value = "";
+};
 
 const formatDate = (date: Date | string | null | undefined): string => {
   try {
@@ -279,7 +319,38 @@ const confirmClearHistory = () => {
   @apply flex gap-2;
 }
 
-.empty-history {
+/* Filtros e Pesquisa */
+.history-filters {
+  @apply mb-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between;
+}
+
+.search-container {
+  @apply flex-1 max-w-md;
+}
+
+.search-input-wrapper {
+  @apply relative;
+}
+
+.search-icon {
+  @apply absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none;
+}
+
+.search-input {
+  @apply w-full pl-10 pr-10 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-colors;
+}
+
+.clear-search-button {
+  @apply absolute right-2 top-1/2 transform -translate-y-1/2 p-1 text-gray-400 hover:text-white hover:bg-gray-600 rounded transition-colors;
+}
+
+.sort-container {
+  @apply flex-shrink-0;
+}
+
+.sort-select {
+  @apply px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-colors;
+}
   @apply text-center py-12 text-gray-400;
 }
 
