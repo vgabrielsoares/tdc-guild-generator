@@ -27,12 +27,12 @@ export interface GuildStructureResult {
 
 // Tamanho da Sede (1d20)
 export const HEADQUARTERS_SIZE_TABLE: TableEntry<string>[] = [
-  { min: 1, max: 2, result: "Minúsculo (3m x 1,5m)" },
-  { min: 3, max: 5, result: "Muito pequeno (4,5m x 3m)" },
+  { min: 1, max: 2, result: "Minúsculo (3m x 2m)" },
+  { min: 3, max: 5, result: "Muito pequeno (5m x 3m)" },
   { min: 6, max: 6, result: "Pequeno e modesto (6m x 6m)" },
-  { min: 7, max: 8, result: "Pequeno e confortável (7,5m x 6m, +1 andar)" },
+  { min: 7, max: 8, result: "Pequeno e confortável (8m x 6m, +1 andar)" },
   { min: 9, max: 9, result: "Mediano e comum (9m x 9m)" },
-  { min: 10, max: 14, result: "Mediano em dobro (10,5m x 9m, +1 andar)" },
+  { min: 10, max: 14, result: "Mediano em dobro (10m x 9m, +1 andar)" },
   { min: 15, max: 16, result: "Grande (12m x 12m)" },
   { min: 17, max: 17, result: "Luxuosamente grande (12m x 12m, +2 andares)" },
   { min: 18, max: 18, result: "Enorme (15m x 15m, +1 andar)" },

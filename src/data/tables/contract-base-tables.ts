@@ -9,12 +9,12 @@ import { ContractDifficulty } from "@/types/contract";
 
 // Mapeia o tamanho da sede para o dado usado em quantidade e prazos
 export const CONTRACT_DICE_BY_SIZE: Record<string, string> = {
-  "Minúsculo (3m x 1,5m)": "1d4",
-  "Muito pequeno (4,5m x 3m)": "1d6",
+  "Minúsculo (3m x 2m)": "1d4",
+  "Muito pequeno (5m x 3m)": "1d6",
   "Pequeno e modesto (6m x 6m)": "1d6+1",
-  "Pequeno e confortável (7,5m x 6m, +1 andar)": "1d6+1",
+  "Pequeno e confortável (8m x 6m, +1 andar)": "1d6+1",
   "Mediano e comum (9m x 9m)": "1d8+2",
-  "Mediano em dobro (10,5m x 9m, +1 andar)": "1d8+2",
+  "Mediano em dobro (10m x 9m, +1 andar)": "1d8+2",
   "Grande (12m x 12m)": "1d10+2",
   "Luxuosamente grande (12m x 12m, +2 andares)": "1d12+4",
   "Enorme (15m x 15m, +1 andar)": "1d20+4",

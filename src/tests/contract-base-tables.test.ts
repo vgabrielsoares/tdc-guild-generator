@@ -24,17 +24,17 @@ import {
 describe("Contract Base Tables - Issue 4.3", () => {
   describe("CONTRACT_DICE_BY_SIZE", () => {
     it("should match exactly the headquarters size specifications from .md", () => {
-      expect(getContractDiceBySize("Minúsculo (3m x 1,5m)")).toBe("1d4");
-      expect(getContractDiceBySize("Muito pequeno (4,5m x 3m)")).toBe("1d6");
+      expect(getContractDiceBySize("Minúsculo (3m x 2m)")).toBe("1d4");
+      expect(getContractDiceBySize("Muito pequeno (5m x 3m)")).toBe("1d6");
       expect(getContractDiceBySize("Pequeno e modesto (6m x 6m)")).toBe(
         "1d6+1"
       );
       expect(
-        getContractDiceBySize("Pequeno e confortável (7,5m x 6m, +1 andar)")
+        getContractDiceBySize("Pequeno e confortável (8m x 6m, +1 andar)")
       ).toBe("1d6+1");
       expect(getContractDiceBySize("Mediano e comum (9m x 9m)")).toBe("1d8+2");
       expect(
-        getContractDiceBySize("Mediano em dobro (10,5m x 9m, +1 andar)")
+        getContractDiceBySize("Mediano em dobro (10m x 9m, +1 andar)")
       ).toBe("1d8+2");
       expect(getContractDiceBySize("Grande (12m x 12m)")).toBe("1d10+2");
       expect(

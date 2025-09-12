@@ -178,12 +178,12 @@ O tamanho da sede define a quantidade de recursos disponíveis e a capacidade de
 
 | 1d20  | Tamanho                                      |
 | ----- | -------------------------------------------- |
-| 1-2   | Minúsculo (3m x 1,5m)                        |
-| 3-5   | Muito pequeno (4,5m x 3m)                    |
+| 1-2   | Minúsculo (3m x 2m)                          |
+| 3-5   | Muito pequeno (5m x 3m)                      |
 | 6     | Pequeno e modesto (6m x 6m)                  |
-| 7-8   | Pequeno e confortável (7,5m x 6m, +1 andar)  |
+| 7-8   | Pequeno e confortável (8m x 6m, +1 andar)    |
 | 9     | Mediano e comum (9m x 9m)                    |
-| 10-14 | Mediano em dobro (10,5m x 9m, +1 andar)      |
+| 10-14 | Mediano em dobro (10m x 9m, +1 andar)        |
 | 15-16 | Grande (12m x 12m)                           |
 | 17    | Luxuosamente grande (12m x 12m, +2 andares)  |
 | 18    | Enorme (15m x 15m, +1 andar)                 |
@@ -309,6 +309,7 @@ A Guilda pode ser um ponto de encontro para aventureiros, mercadores e cidadãos
 Os frequentadores podem influenciar a quantidade de contratos disponíveis.
 
 <!-- markdownlint-disable-next-line MD024 -->
+
 #### Dados por Tipo de Assentamento
 
 Para essa seção, utilize os seguintes dados:
