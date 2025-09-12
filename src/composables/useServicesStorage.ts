@@ -26,11 +26,10 @@ const DEFAULT: ServicesStorageState = {
   globalLastUpdate: null,
 };
 
-/**
- * Composable responsável por persistir serviços no store `services` do adapter (IndexedDB quando disponível).
- * Também fornece uma migração do formato legacy salvo em `settings:services-store`.
- */
-export function useServicesStorage() {
+// Singleton instance
+let _instance: ReturnType<typeof createServicesStorage> | null = null;
+
+function createServicesStorage() {
   const adapter = useStorageAdapter();
   const data: Ref<ServicesStorageState> = ref<ServicesStorageState>({
     ...DEFAULT,
@@ -91,6 +90,19 @@ export function useServicesStorage() {
       // 3. Atualizar estado reativo
       data.value.guildServices = guildServicesMap;
       data.value.globalLastUpdate = new Date();
+
+      // 4. Carregar currentGuildId do storage
+      try {
+        const storedCurrentGuildId = await adapter.get<string | null>(
+          "settings",
+          "services-store-currentGuildId"
+        );
+        if (storedCurrentGuildId) {
+          data.value.currentGuildId = storedCurrentGuildId;
+        }
+      } catch (e) {
+        // ignore
+      }
     } catch (e) {
       // eslint-disable-next-line no-console
       console.warn("useServicesStorage.load failed", e);
@@ -232,7 +244,8 @@ export function useServicesStorage() {
    * Busca serviços por guildId
    */
   function getServicesForGuild(guildId: string): Service[] {
-    return data.value.guildServices[guildId]?.services || [];
+    const services = data.value.guildServices[guildId]?.services || [];
+    return services;
   }
 
   /**
@@ -280,8 +293,19 @@ export function useServicesStorage() {
   /**
    * Define a guilda atual
    */
-  function setCurrentGuild(guildId: string | null): void {
+  async function setCurrentGuild(guildId: string | null): Promise<void> {
     data.value.currentGuildId = guildId;
+
+    // Persistir o currentGuildId para que sobreviva a recarregamentos da página
+    try {
+      if (guildId) {
+        await adapter.put("settings", "services-store-currentGuildId", guildId);
+      } else {
+        await adapter.del("settings", "services-store-currentGuildId");
+      }
+    } catch (e) {
+      // ignore
+    }
   }
 
   /**
@@ -395,4 +419,20 @@ export function useServicesStorage() {
     reset,
     hasData,
   };
+}
+
+/**
+ * Composable responsável por persistir serviços no store `services` do adapter (IndexedDB quando disponível).
+ * Também fornece uma migração do formato legacy salvo em `settings:services-store`.
+ *
+ * Implementado como singleton para garantir que a mesma instância seja compartilhada
+ * entre diferentes stores e componentes.
+ */
+export function useServicesStorage() {
+  if (!_instance) {
+    _instance = createServicesStorage();
+  } else {
+    // ignore
+  }
+  return _instance;
 }
