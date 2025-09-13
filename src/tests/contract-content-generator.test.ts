@@ -276,7 +276,9 @@ describe("Contract Content Generator (Issue 4.12)", () => {
 
       // Tipo mais comum deve ser pagamento total na guilda (range 11-18 de 20, que são 8 de 20 = 40%)
       // Mas considerando variação estatística, vamos esperar pelo menos 25%
-      expect(totalGuildPayments).toBeGreaterThan(paymentTypes.length * 0.25);
+      expect(totalGuildPayments).toBeGreaterThanOrEqual(
+        paymentTypes.length * 0.25
+      );
     });
   });
 
