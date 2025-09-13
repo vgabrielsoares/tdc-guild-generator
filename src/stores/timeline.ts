@@ -940,7 +940,15 @@ export const useTimelineStore = defineStore("timeline", () => {
   function registerTimeAdvanceCallback(
     callback: (result: TimeAdvanceResult) => void
   ): void {
-    timeAdvanceCallbacks.value.push(callback);
+    // Evitar registros duplicados do mesmo callback
+    if (timeAdvanceCallbacks.value.indexOf(callback) === -1) {
+      timeAdvanceCallbacks.value.push(callback);
+    } else {
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.debug("[timeline] callback already registered");
+      }
+    }
   }
 
   /**
@@ -952,6 +960,11 @@ export const useTimelineStore = defineStore("timeline", () => {
     const index = timeAdvanceCallbacks.value.indexOf(callback);
     if (index > -1) {
       timeAdvanceCallbacks.value.splice(index, 1);
+    } else {
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.debug("[timeline] attempt to unregister unknown callback");
+      }
     }
   }
 

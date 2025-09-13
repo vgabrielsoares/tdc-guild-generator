@@ -3,7 +3,7 @@
  * Este composable gerencia a comunicação entre o sistema de timeline e todos os módulos
  */
 
-import { onMounted, onUnmounted } from "vue";
+import { onMounted, onUnmounted, getCurrentInstance } from "vue";
 import { useTimelineStore } from "@/stores/timeline";
 import { useContractsStore } from "@/stores/contracts";
 import { useServicesStore } from "@/stores/services";
@@ -58,15 +58,24 @@ export function useTimelineIntegration() {
     timelineStore.unregisterTimeAdvanceCallback(handleTimeAdvance);
   };
 
-  // Auto-inicializar quando o composable é usado
-  onMounted(() => {
-    initializeIntegration();
-  });
+  // Auto-inicializar quando o composable é usado dentro de um setup()
+  // Evitar registrar hooks caso o composable seja chamado fora de um
+  // contexto de componente (ex: em módulos globais durante inicialização).
+  const vm = getCurrentInstance();
+  if (vm) {
+    onMounted(() => {
+      initializeIntegration();
+    });
 
-  // Auto-limpeza quando o componente é desmontado
-  onUnmounted(() => {
-    cleanupIntegration();
-  });
+    // Auto-limpeza quando o componente é desmontado
+    onUnmounted(() => {
+      cleanupIntegration();
+    });
+  } else {
+    // Se não houver instância ativa, não registramos hooks automaticamente.
+    // Neste caso, recomendo que o chamador use `createTimelineIntegration()`
+    // e chame manualmente `register()` / `unregister()` quando apropriado.
+  }
 
   return {
     initializeIntegration,
