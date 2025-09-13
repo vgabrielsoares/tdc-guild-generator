@@ -87,6 +87,7 @@ import {
   shouldRollTwiceForLocation,
   requiresDistrictRoll,
   mapLocationToCategory,
+  DistrictType,
 } from "../../data/tables/contract-location-tables";
 
 import {
@@ -1548,57 +1549,72 @@ export class ContractGenerator {
     const specificationTable = getLocationSpecificationTable(
       mainLocationData.category
     );
-    const specificationResult = rollOnTable(specificationTable);
 
-    // Tratar casos de "role duas vezes"
-    const specifications: Array<{ location: string; description: string }> = [];
+    // Usar handleMultipleRolls para tratar corretamente o caso "Role duas vezes"
+    type LocSpec = {
+      location: string;
+      description: string;
+      rollTwice?: boolean;
+    };
 
-    if (shouldRollTwiceForLocation(specificationResult.result)) {
-      // Rolar duas vezes e usar ambos
-      const firstSpec = rollOnTable(specificationTable);
-      const secondSpec = rollOnTable(specificationTable);
-      specifications.push(
-        {
-          location: firstSpec.result.location,
-          description: firstSpec.result.description,
-        },
-        {
-          location: secondSpec.result.location,
-          description: secondSpec.result.description,
-        }
-      );
-    } else {
-      specifications.push({
-        location: specificationResult.result.location,
-        description: specificationResult.result.description,
-      });
-    }
+    // Isso garante que rolagens aninhadas também sejam tratadas (ex.: um "role duas vezes"
+    // que provoca mais dois resultados, que por sua vez podem provocar mais rolagens).
+    const specMulti = handleMultipleRolls<LocSpec>({
+      table: specificationTable,
+      shouldRollAgain: (r: LocSpec) => shouldRollTwiceForLocation(r),
+      context: `Especificação ${mainLocationData.name}`,
+    });
+
+    const specifications: Array<{ location: string; description: string }> =
+      specMulti.results.map((r: LocSpec) => ({
+        location: r.location,
+        description: r.description,
+      }));
 
     // 5. Verificar se precisa rolar distrito específico
     let districtInfo = null;
     if (specifications.some((spec) => requiresDistrictRoll(spec))) {
-      const districtResult = rollOnTable(DISTRITO_ESPECIFICO_TABLE);
-      if (shouldRollTwiceForLocation(districtResult.result)) {
-        const firstDistrict = rollOnTable(DISTRITO_ESPECIFICO_TABLE);
-        const secondDistrict = rollOnTable(DISTRITO_ESPECIFICO_TABLE);
+      // Uso de handleMultipleRolls para distrito específico também, garantindo
+      // tratamento correto de "role duas vezes" e deduplicação.
+      type DistrictSpec = {
+        type: DistrictType;
+        name: string;
+        description: string;
+        rollTwice?: boolean;
+      };
+
+      const districtMulti = handleMultipleRolls<DistrictSpec>({
+        table: DISTRITO_ESPECIFICO_TABLE,
+        shouldRollAgain: (r: DistrictSpec) => shouldRollTwiceForLocation(r),
+        context: `Distrito específico ${mainLocationData.name}`,
+        // Limitar a 2 resultados únicos para manter a estrutura primary/secondary
+        maxUniqueResults: 2,
+      });
+
+      if (districtMulti.results.length === 0) {
+        districtInfo = null;
+      } else if (districtMulti.results.length === 1) {
+        const d = districtMulti.results[0];
         districtInfo = {
           primary: {
-            type: firstDistrict.result.type,
-            name: firstDistrict.result.name,
-            description: firstDistrict.result.description,
-          },
-          secondary: {
-            type: secondDistrict.result.type,
-            name: secondDistrict.result.name,
-            description: secondDistrict.result.description,
+            type: d.type,
+            name: d.name,
+            description: d.description,
           },
         };
       } else {
+        const d1 = districtMulti.results[0];
+        const d2 = districtMulti.results[1];
         districtInfo = {
           primary: {
-            type: districtResult.result.type,
-            name: districtResult.result.name,
-            description: districtResult.result.description,
+            type: d1.type,
+            name: d1.name,
+            description: d1.description,
+          },
+          secondary: {
+            type: d2.type,
+            name: d2.name,
+            description: d2.description,
           },
         };
       }

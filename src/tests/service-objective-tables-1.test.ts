@@ -281,7 +281,9 @@ describe("Service Objective Tables - Part 1 (Issue 5.11)", () => {
       expect(
         getThreeColumnTable(ServiceObjectiveType.SERVICOS_ESPECIFICOS)
       ).not.toBeNull();
-      expect(getThreeColumnTable(ServiceObjectiveType.RELIGIOSO)).not.toBeNull();
+      expect(
+        getThreeColumnTable(ServiceObjectiveType.RELIGIOSO)
+      ).not.toBeNull();
       expect(getThreeColumnTable(ServiceObjectiveType.MULTIPLO)).toBeNull();
     });
   });
@@ -434,9 +436,7 @@ describe("Service Objective Tables - Part 1 (Issue 5.11)", () => {
       );
 
       expect(objective).not.toBeNull();
-      expect(objective!.description).toMatch(
-        /^.+ para .+, mas .+$/
-      );
+      expect(objective!.description).toMatch(/^.+ para .+, mas .+$/);
     });
   });
 });

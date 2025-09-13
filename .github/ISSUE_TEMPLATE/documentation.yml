@@ -1,0 +1,68 @@
+name: Documentation
+description: Melhorias ou correções na documentação
+title: "[DOCS] "
+labels: ["documentation", "needs-triage"]
+assignees:
+  - vgabrielsoares
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por contribuir com a documentação! Por favor, descreva o que precisa ser melhorado.
+
+  - type: dropdown
+    id: doc-type
+    attributes:
+      label: Tipo de Documentação
+      description: Que tipo de documentação precisa ser atualizada?
+      options:
+        - README.md
+        - Documentação de API
+        - Guias de uso
+        - Documentação de desenvolvimento
+        - Comentários no código
+        - Arquivos de regras (.md)
+        - Outro
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-issue
+    attributes:
+      label: Problema Atual
+      description: O que está errado ou faltando na documentação atual?
+      placeholder: A documentação atual não explica como...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-change
+    attributes:
+      label: Mudança Proposta
+      description: Como você gostaria que a documentação fosse melhorada?
+      placeholder: |
+        A documentação deveria:
+        - Incluir exemplos de...
+        - Explicar melhor como...
+        - Adicionar seção sobre...
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Contexto Adicional
+      description: Qualquer informação extra que possa ser útil
+      placeholder: |
+        - Links para recursos relacionados
+        - Exemplos de boa documentação
+        - Dificuldades específicas encontradas
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribuição
+      options:
+        - label: Estou disposto(a) a ajudar na escrita da documentação
+          required: false

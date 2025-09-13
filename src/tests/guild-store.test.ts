@@ -2,7 +2,10 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { setActivePinia, createPinia } from "pinia";
 import { useGuildStore } from "@/stores/guild";
 import { SettlementType } from "@/types/guild";
-import { GUILD_NAME_CONFIG } from "@/data/guild-names";
+import {
+  GUILD_NAME_PREFIXES_CLASSIFIED,
+  GUILD_NAME_SUFFIXES_CLASSIFIED,
+} from "@/data/guild-names";
 import { type Guild } from "@/types/guild";
 
 // Mock localStorage
@@ -411,10 +414,17 @@ describe("Issue 3.4 - Guild Store Complete", () => {
         settlementType: SettlementType.ALDEIA,
       });
 
-      expect(localStorageMock.setItem).toHaveBeenCalledWith(
-        "guild-store",
-        expect.any(String)
-      );
+      // useStorage saves with a debounce (200ms). Wait a bit before asserting.
+      await new Promise((resolve) => setTimeout(resolve, 250));
+
+      expect(localStorageMock.setItem).toHaveBeenCalled();
+      // adapter may prefix keys (e.g. "settings:guild-store"); assert a call used the guild-store suffix
+      const calls = (localStorageMock.setItem as any).mock.calls as any[];
+      expect(
+        calls.some(
+          (c: any[]) => typeof c[0] === "string" && c[0].endsWith("guild-store")
+        )
+      ).toBe(true);
     });
 
     it("should load state from localStorage", async () => {
@@ -425,11 +435,13 @@ describe("Issue 3.4 - Guild Store Complete", () => {
       });
 
       // Simular que os dados estão no localStorage
-      localStorageMock.getItem.mockReturnValue(JSON.stringify({
-        currentGuild: store1.currentGuild,
-        guildHistory: store1.guildHistory,
-        lastConfig: null
-      }));
+      localStorageMock.getItem.mockReturnValue(
+        JSON.stringify({
+          currentGuild: store1.currentGuild,
+          guildHistory: store1.guildHistory,
+          lastConfig: null,
+        })
+      );
 
       // Create new store instance to test loading (automaticamente carrega do storage)
       const store2 = useGuildStore();
@@ -476,14 +488,22 @@ describe("Issue 3.4 - Guild Store Complete", () => {
       const guildName = guild?.name;
       expect(guildName).toBeDefined();
 
-      // Criar regex dinamicamente baseado na configuração atual
-      const prefixPattern = GUILD_NAME_CONFIG.prefixes
-        .map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+      // Usar listas classificadas que são efetivamente utilizadas pela função
+      const classifiedPrefixes = GUILD_NAME_PREFIXES_CLASSIFIED.map(
+        (p) => p.name
+      );
+      const classifiedSuffixes = GUILD_NAME_SUFFIXES_CLASSIFIED.map(
+        (s) => s.name
+      );
+
+      // Criar regex dinamicamente baseado nas listas classificadas
+      const prefixPattern = classifiedPrefixes
+        .map((p: string) => p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
         .join("|");
-      const suffixPattern = GUILD_NAME_CONFIG.suffixes
-        .map((s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+      const suffixPattern = classifiedSuffixes
+        .map((s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
         .join("|");
-      const traditionalPattern = new RegExp(
+      const modernPattern = new RegExp(
         `^(${prefixPattern}) (${suffixPattern})$`
       );
 
@@ -493,7 +513,7 @@ describe("Issue 3.4 - Guild Store Complete", () => {
 
       // O nome deve corresponder a um dos padrões
       const isValidName =
-        traditionalPattern.test(guildName!) || specialPattern.test(guildName!);
+        modernPattern.test(guildName!) || specialPattern.test(guildName!);
       expect(isValidName).toBe(true);
     });
 

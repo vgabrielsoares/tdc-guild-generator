@@ -34,11 +34,11 @@ function rollOnTableWithSettlementDice<T>(
   context: string = ""
 ): { result: T; finalRoll: number; entry: TableEntry<T> } {
   const settlementKey = mapSettlementTypeToTableKey(settlementType);
-  const diceNotation = getDiceNotationString(settlementKey, 'structure');
-  
+  const diceNotation = getDiceNotationString(settlementKey, "structure");
+
   // Calculate total modifier value
   const totalModifier = modifiers.reduce((sum, mod) => sum + mod.value, 0);
-  
+
   // Usa utilitário para parsear a notação de dados
 
   const parsed = parseDiceNotation(diceNotation);
@@ -50,7 +50,7 @@ function rollOnTableWithSettlementDice<T>(
   // Soma todos os modificadores
   const finalModifier = existingModifier + totalModifier;
   // Monta a notação final
-  const finalDiceNotation = `${baseCount}d${baseSides}${finalModifier === 0 ? '' : (finalModifier > 0 ? `+${finalModifier}` : `${finalModifier}`)}`;
+  const finalDiceNotation = `${baseCount}d${baseSides}${finalModifier === 0 ? "" : finalModifier > 0 ? `+${finalModifier}` : `${finalModifier}`}`;
 
   // Roll the dice
   const diceRoll = rollDice({
@@ -60,8 +60,8 @@ function rollOnTableWithSettlementDice<T>(
   });
 
   // Find result in table
-  const entry = table.find(entry =>
-    diceRoll.result >= entry.min && diceRoll.result <= entry.max
+  const entry = table.find(
+    (entry) => diceRoll.result >= entry.min && diceRoll.result <= entry.max
   );
 
   const result = entry ? entry.result : table[table.length - 1].result;
@@ -69,7 +69,7 @@ function rollOnTableWithSettlementDice<T>(
   return {
     result,
     finalRoll: diceRoll.result,
-    entry: entry || table[table.length - 1]
+    entry: entry || table[table.length - 1],
   };
 }
 
@@ -97,20 +97,21 @@ function createCustomLog(category: string, message: string): void {
 function mapToRelationLevel(result: string): RelationLevel {
   // Mapeamento direto dos valores das tabelas para o enum
   const mappings: { [key: string]: RelationLevel } = {
-    "Péssima": RelationLevel.PESSIMA,
-    "Ruim": RelationLevel.RUIM,
+    Péssima: RelationLevel.PESSIMA,
+    Ruim: RelationLevel.RUIM,
     "Ruim, mas tentam manter a cordialidade": RelationLevel.RUIM_CORDIAL,
     "Ruim, só causam problemas": RelationLevel.RUIM_PROBLEMAS,
-    "Diplomática": RelationLevel.DIPLOMATICA,
+    Diplomática: RelationLevel.DIPLOMATICA,
     "Opinião dividida": RelationLevel.OPINIAO_DIVIDIDA,
     "Boa, mas o governo tenta miná-los secretamente": RelationLevel.BOA_TENSAO,
-    "Boa": RelationLevel.BOA,
+    Boa: RelationLevel.BOA,
     "Boa, ajudam com problemas": RelationLevel.BOA_AJUDAM,
     "Boa, nos mantêm seguros": RelationLevel.BOA_SEGUROS,
     "Muito boa, cooperam frequentemente": RelationLevel.MUITO_BOA,
     "Muito boa, sem eles estaríamos perdidos": RelationLevel.MUITO_BOA_PERDIDOS,
     "Excelente, governo e guilda são quase como um": RelationLevel.EXCELENTE,
-    "Excelente, a guilda faz o assentamento funcionar": RelationLevel.EXCELENTE_FUNCIONAR,
+    "Excelente, a guilda faz o assentamento funcionar":
+      RelationLevel.EXCELENTE_FUNCIONAR,
     "Péssima, puro ódio": RelationLevel.PESSIMA_ODIO,
     "Ruim, vistos como mercenários": RelationLevel.RUIM_MERCENARIOS,
   };
@@ -123,7 +124,7 @@ function mapToRelationLevel(result: string): RelationLevel {
     );
     return RelationLevel.DIPLOMATICA;
   }
-  
+
   return mapped;
 }
 
@@ -153,7 +154,7 @@ export function generateGovernmentRelations(
   // Handle 21+ case (Excelente result when roll > 20)
   let finalResult = result.result;
   let finalDescription = result.entry.description || "";
-  
+
   if (result.finalRoll > 20) {
     finalResult = "Excelente, governo e guilda são quase como um";
     finalDescription = "Relação excelente";
@@ -163,11 +164,11 @@ export function generateGovernmentRelations(
     "GUILD RELATIONS",
     `Government: ${finalResult} (rolled ${result.finalRoll})`
   );
-  
+
   return {
     level: stringToRelationLevel(finalResult),
     result: finalResult,
-    description: finalDescription
+    description: finalDescription,
   };
 }
 
@@ -197,7 +198,7 @@ export function generatePopulationRelations(
   // Handle 21+ case (Excelente result when roll > 20)
   let finalResult = result.result;
   let finalDescription = result.entry.description || "";
-  
+
   if (result.finalRoll > 20) {
     finalResult = "Excelente, a guilda faz o assentamento funcionar";
     finalDescription = "Reputação excelente";
@@ -207,11 +208,11 @@ export function generatePopulationRelations(
     "GUILD RELATIONS",
     `Population: ${finalResult} (rolled ${result.finalRoll})`
   );
-  
+
   return {
     level: stringToRelationLevel(finalResult),
     result: finalResult,
-    description: finalDescription
+    description: finalDescription,
   };
 }
 
@@ -237,7 +238,7 @@ export function generateResourceLevel(
 
   // Handle 21+ case (Abundantes vindos de muitos anos de serviço when roll > 20)
   let finalResult = result.result as string;
-  
+
   if (result.finalRoll > 20) {
     finalResult = "Abundantes vindos de muitos anos de serviço";
   }
@@ -289,24 +290,25 @@ export function generateResourceSpecialties(
  */
 function stringToRelationLevel(value: string): RelationLevel {
   const exactMapping: Record<string, RelationLevel> = {
-    'Péssima': RelationLevel.PESSIMA,
-    'Péssima, puro ódio': RelationLevel.PESSIMA_ODIO,
-    'Ruim': RelationLevel.RUIM,
-    'Ruim, vistos como mercenários': RelationLevel.RUIM_MERCENARIOS,
-    'Ruim, mas tentam manter a cordialidade': RelationLevel.RUIM_CORDIAL,
-    'Ruim, só causam problemas': RelationLevel.RUIM_PROBLEMAS,
-    'Diplomática': RelationLevel.DIPLOMATICA,
-    'Opinião dividida': RelationLevel.OPINIAO_DIVIDIDA,
-    'Boa, mas o governo tenta miná-los secretamente': RelationLevel.BOA_TENSAO,
-    'Boa': RelationLevel.BOA,
-    'Boa, ajudam com problemas': RelationLevel.BOA_AJUDAM,
-    'Boa, nos mantêm seguros': RelationLevel.BOA_SEGUROS,
-    'Muito boa, cooperam frequentemente': RelationLevel.MUITO_BOA,
-    'Muito boa, sem eles estaríamos perdidos': RelationLevel.MUITO_BOA_PERDIDOS,
-    'Excelente, governo e guilda são quase como um': RelationLevel.EXCELENTE,
-    'Excelente, a guilda faz o assentamento funcionar': RelationLevel.EXCELENTE_FUNCIONAR,
+    Péssima: RelationLevel.PESSIMA,
+    "Péssima, puro ódio": RelationLevel.PESSIMA_ODIO,
+    Ruim: RelationLevel.RUIM,
+    "Ruim, vistos como mercenários": RelationLevel.RUIM_MERCENARIOS,
+    "Ruim, mas tentam manter a cordialidade": RelationLevel.RUIM_CORDIAL,
+    "Ruim, só causam problemas": RelationLevel.RUIM_PROBLEMAS,
+    Diplomática: RelationLevel.DIPLOMATICA,
+    "Opinião dividida": RelationLevel.OPINIAO_DIVIDIDA,
+    "Boa, mas o governo tenta miná-los secretamente": RelationLevel.BOA_TENSAO,
+    Boa: RelationLevel.BOA,
+    "Boa, ajudam com problemas": RelationLevel.BOA_AJUDAM,
+    "Boa, nos mantêm seguros": RelationLevel.BOA_SEGUROS,
+    "Muito boa, cooperam frequentemente": RelationLevel.MUITO_BOA,
+    "Muito boa, sem eles estaríamos perdidos": RelationLevel.MUITO_BOA_PERDIDOS,
+    "Excelente, governo e guilda são quase como um": RelationLevel.EXCELENTE,
+    "Excelente, a guilda faz o assentamento funcionar":
+      RelationLevel.EXCELENTE_FUNCIONAR,
   };
-  
+
   const mapped = exactMapping[value];
   if (!mapped) {
     createCustomLog(
@@ -315,7 +317,7 @@ function stringToRelationLevel(value: string): RelationLevel {
     );
     return RelationLevel.DIPLOMATICA;
   }
-  
+
   return mapped;
 }
 
@@ -324,19 +326,22 @@ function stringToRelationLevel(value: string): RelationLevel {
  */
 function stringToResourceLevel(value: string): ResourceLevel {
   const mapping: Record<string, ResourceLevel> = {
-    'Em débito': ResourceLevel.EM_DEBITO,
-    'Nenhum': ResourceLevel.NENHUM,
-    'Escassos': ResourceLevel.ESCASSOS,
-    'Escassos e obtidos com muito esforço e honestidade': ResourceLevel.ESCASSOS_HONESTOS,
-    'Limitados': ResourceLevel.LIMITADOS,
-    'Suficientes': ResourceLevel.SUFICIENTES,
-    'Excedentes': ResourceLevel.EXCEDENTES,
-    'Excedentes mas alimenta fins malignos': ResourceLevel.EXCEDENTES_MALIGNOS,
-    'Abundantes porém quase todo vindo do governo de um assentamento próximo': ResourceLevel.ABUNDANTES_GOVERNO,
-    'Abundantes': ResourceLevel.ABUNDANTES,
-    'Abundantes vindos de muitos anos de serviço': ResourceLevel.ABUNDANTES_SERVICO,
+    "Em débito": ResourceLevel.EM_DEBITO,
+    Nenhum: ResourceLevel.NENHUM,
+    Escassos: ResourceLevel.ESCASSOS,
+    "Escassos e obtidos com muito esforço e honestidade":
+      ResourceLevel.ESCASSOS_HONESTOS,
+    Limitados: ResourceLevel.LIMITADOS,
+    Suficientes: ResourceLevel.SUFICIENTES,
+    Excedentes: ResourceLevel.EXCEDENTES,
+    "Excedentes mas alimenta fins malignos": ResourceLevel.EXCEDENTES_MALIGNOS,
+    "Abundantes porém quase todo vindo do governo de um assentamento próximo":
+      ResourceLevel.ABUNDANTES_GOVERNO,
+    Abundantes: ResourceLevel.ABUNDANTES,
+    "Abundantes vindos de muitos anos de serviço":
+      ResourceLevel.ABUNDANTES_SERVICO,
   };
-  
+
   return mapping[value] || ResourceLevel.LIMITADOS;
 }
 
@@ -346,15 +351,15 @@ function stringToResourceLevel(value: string): ResourceLevel {
 function stringToVisitorLevel(value: string): VisitorLevel {
   // Use exact match first, then fallback to contains
   const exactMapping: Record<string, VisitorLevel> = {
-    'Vazia': VisitorLevel.VAZIA,
-    'Quase deserta': VisitorLevel.QUASE_DESERTA,
-    'Pouco movimentada': VisitorLevel.POUCO_MOVIMENTADA,
-    'Nem muito nem pouco': VisitorLevel.NEM_MUITO_NEM_POUCO,
-    'Muito frequentada': VisitorLevel.MUITO_FREQUENTADA,
-    'Abarrotada': VisitorLevel.ABARROTADA,
-    'Lotada': VisitorLevel.LOTADA,
+    Vazia: VisitorLevel.VAZIA,
+    "Quase deserta": VisitorLevel.QUASE_DESERTA,
+    "Pouco movimentada": VisitorLevel.POUCO_MOVIMENTADA,
+    "Nem muito nem pouco": VisitorLevel.NEM_MUITO_NEM_POUCO,
+    "Muito frequentada": VisitorLevel.MUITO_FREQUENTADA,
+    Abarrotada: VisitorLevel.ABARROTADA,
+    Lotada: VisitorLevel.LOTADA,
   };
-  
+
   return exactMapping[value] || VisitorLevel.NEM_MUITO_NEM_POUCO;
 }
 
@@ -380,7 +385,7 @@ export function generateVisitorLevel(
 
   // Handle 20+ case (Lotada when roll > 20)
   let finalResult = result.result as string;
-  
+
   if (result.finalRoll > 20) {
     finalResult = "Lotada";
   }

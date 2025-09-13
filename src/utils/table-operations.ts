@@ -3,7 +3,7 @@
  * Funções reutilizáveis para lookup e validação de tabelas
  */
 
-import type { TableEntry } from '@/types/tables';
+import type { TableEntry } from "@/types/tables";
 
 /**
  * Busca um valor em uma tabela baseado no roll
@@ -11,8 +11,11 @@ import type { TableEntry } from '@/types/tables';
  * @param roll - Valor do dado rolado
  * @returns Resultado da tabela ou null se não encontrado
  */
-export function findTableEntry<T>(table: TableEntry<T>[], roll: number): T | null {
-  const entry = table.find(entry => roll >= entry.min && roll <= entry.max);
+export function findTableEntry<T>(
+  table: TableEntry<T>[],
+  roll: number
+): T | null {
+  const entry = table.find((entry) => roll >= entry.min && roll <= entry.max);
   return entry ? entry.result : null;
 }
 
@@ -53,25 +56,28 @@ export function lookupTableValue<T>(table: TableEntry<T>[], value: number): T {
  * @param expectedMax - Valor máximo esperado (ex: 20 para d20)
  * @returns true se a tabela tem cobertura completa
  */
-export function validateTableCoverage<T>(table: TableEntry<T>[], expectedMax: number): boolean {
+export function validateTableCoverage<T>(
+  table: TableEntry<T>[],
+  expectedMax: number
+): boolean {
   if (!table.length) return false;
 
   // Ordenar por min para verificação sequencial
   const sortedTable = [...table].sort((a, b) => a.min - b.min);
-  
+
   // Verificar se começa em 1
   if (sortedTable[0].min !== 1) return false;
-  
+
   // Verificar se termina no máximo esperado
   if (sortedTable[sortedTable.length - 1].max !== expectedMax) return false;
-  
+
   // Verificar se não há gaps
   for (let i = 0; i < sortedTable.length - 1; i++) {
     if (sortedTable[i].max + 1 !== sortedTable[i + 1].min) {
       return false;
     }
   }
-  
+
   return true;
 }
 
@@ -95,15 +101,15 @@ export function findTableOverlaps<T>(table: TableEntry<T>[]): Array<{
     for (let j = i + 1; j < table.length; j++) {
       const entry1 = table[i];
       const entry2 = table[j];
-      
+
       const overlapMin = Math.max(entry1.min, entry2.min);
       const overlapMax = Math.min(entry1.max, entry2.max);
-      
+
       if (overlapMin <= overlapMax) {
         overlaps.push({
           entry1,
           entry2,
-          overlap: { min: overlapMin, max: overlapMax }
+          overlap: { min: overlapMin, max: overlapMax },
         });
       }
     }
@@ -128,19 +134,19 @@ export function generateTableTestCases<T>(table: TableEntry<T>[]): Array<{
     entry: TableEntry<T>;
   }> = [];
 
-  table.forEach(entry => {
+  table.forEach((entry) => {
     // Testar valores de borda e meio
     const valuesToTest = [
       entry.min,
       entry.max,
-      Math.floor((entry.min + entry.max) / 2)
+      Math.floor((entry.min + entry.max) / 2),
     ].filter((value, index, array) => array.indexOf(value) === index); // Remove duplicatas
 
-    valuesToTest.forEach(roll => {
+    valuesToTest.forEach((roll) => {
       testCases.push({
         roll,
         result: entry.result,
-        entry
+        entry,
       });
     });
   });
@@ -165,12 +171,12 @@ export function calculateTableStatistics<T>(table: TableEntry<T>[]): {
   let maxValue = -Infinity;
   let totalRangeSize = 0;
 
-  table.forEach(entry => {
+  table.forEach((entry) => {
     // Calcular frequência de resultados
     const currentCount = resultFrequency.get(entry.result) || 0;
     const rangeSize = entry.max - entry.min + 1;
     resultFrequency.set(entry.result, currentCount + rangeSize);
-    
+
     // Calcular limites
     minValue = Math.min(minValue, entry.min);
     maxValue = Math.max(maxValue, entry.max);
@@ -182,6 +188,6 @@ export function calculateTableStatistics<T>(table: TableEntry<T>[]): {
     totalRange: maxValue - minValue + 1,
     averageRangeSize: totalRangeSize / table.length,
     resultFrequency,
-    coverage: { min: minValue, max: maxValue }
+    coverage: { min: minValue, max: maxValue },
   };
 }

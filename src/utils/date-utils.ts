@@ -1,23 +1,27 @@
-import type { GameDate, ScheduledEvent, CalendarConfig } from '@/types/timeline';
-import { 
-  DEFAULT_CALENDAR_CONFIG, 
-  createGameDate, 
+import type {
+  GameDate,
+  ScheduledEvent,
+  CalendarConfig,
+} from "@/types/timeline";
+import {
+  DEFAULT_CALENDAR_CONFIG,
+  createGameDate,
   getDaysInMonth,
   isDateBeforeOrEqual,
-  isSameDate
-} from '@/types/timeline';
+  isSameDate,
+} from "@/types/timeline";
 
 // Re-exportar funções importantes da timeline
-export { 
-  formatGameDate, 
-  isSameDate, 
+export {
+  formatGameDate,
+  isSameDate,
   isDateBeforeOrEqual,
   isDateAfter,
   isDateBefore,
   formatShortGameDate,
   createGameDate,
-  getDaysInMonth
-} from '@/types/timeline';
+  getDaysInMonth,
+} from "@/types/timeline";
 
 /**
  * Avança uma data do jogo por um número específico de dias
@@ -33,7 +37,7 @@ export function addDays(date: GameDate, days: number): GameDate {
   while (newDay > getDaysInMonth(newMonth, newYear)) {
     newDay -= getDaysInMonth(newMonth, newYear);
     newMonth++;
-    
+
     if (newMonth > 12) {
       newMonth = 1;
       newYear++;
@@ -56,16 +60,16 @@ export function subtractDays(date: GameDate, days: number): GameDate {
 
   while (newDay < 1) {
     newMonth--;
-    
+
     if (newMonth < 1) {
       newMonth = 12;
       newYear--;
-      
+
       if (newYear < 1) {
-        throw new Error('Data resultante seria inválida (ano menor que 1)');
+        throw new Error("Data resultante seria inválida (ano menor que 1)");
       }
     }
-    
+
     newDay += getDaysInMonth(newMonth, newYear);
   }
 
@@ -84,42 +88,45 @@ export function addWeeks(date: GameDate, weeks: number): GameDate {
  */
 export function addMonths(date: GameDate, months: number): GameDate {
   if (months === 0) return { ...date };
-  
+
   let newMonth = date.month + months;
   let newYear = date.year;
-  
+
   while (newMonth > 12) {
     newMonth -= 12;
     newYear++;
   }
-  
+
   while (newMonth < 1) {
     newMonth += 12;
     newYear--;
-    
+
     if (newYear < 1) {
-      throw new Error('Data resultante seria inválida (ano menor que 1)');
+      throw new Error("Data resultante seria inválida (ano menor que 1)");
     }
   }
-  
+
   // Ajustar o dia caso o mês de destino tenha menos dias
   const maxDaysInTargetMonth = getDaysInMonth(newMonth, newYear);
   const newDay = Math.min(date.day, maxDaysInTargetMonth);
-  
+
   return createGameDate(newDay, newMonth, newYear);
 }
 
 /**
  * Calcula a diferença em dias entre duas datas
  */
-export function getDaysDifference(startDate: GameDate, endDate: GameDate): number {
+export function getDaysDifference(
+  startDate: GameDate,
+  endDate: GameDate
+): number {
   if (isSameDate(startDate, endDate)) return 0;
-  
+
   // Implementação simplificada para cálculo rápido
   // Converte datas para número de dias desde o ano 1
   const startDays = dateToDays(startDate);
   const endDays = dateToDays(endDate);
-  
+
   return endDays - startDays;
 }
 
@@ -128,20 +135,20 @@ export function getDaysDifference(startDate: GameDate, endDate: GameDate): numbe
  */
 function dateToDays(date: GameDate): number {
   let totalDays = 0;
-  
+
   // Adicionar dias dos anos completos
   for (let year = 1; year < date.year; year++) {
     totalDays += isLeapYear(year) ? 366 : 365;
   }
-  
+
   // Adicionar dias dos meses completos do ano atual
   for (let month = 1; month < date.month; month++) {
     totalDays += getDaysInMonth(month, date.year);
   }
-  
+
   // Adicionar dias do mês atual
   totalDays += date.day;
-  
+
   return totalDays;
 }
 
@@ -149,21 +156,44 @@ function dateToDays(date: GameDate): number {
  * Verifica se um ano é bissexto
  */
 function isLeapYear(year: number): boolean {
-  return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+  return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
 }
 
 /**
  * Filtra eventos que devem ser acionados em ou antes de uma data específica
  */
-export function getTriggeredEvents(events: ScheduledEvent[], targetDate: GameDate): ScheduledEvent[] {
-  return events.filter(event => isDateBeforeOrEqual(event.date, targetDate));
+export function getTriggeredEvents(
+  events: ScheduledEvent[],
+  targetDate: GameDate
+): ScheduledEvent[] {
+  return events.filter((event) => {
+    if (!event || !event.date) return false;
+    try {
+      // proteger contra datas inválidas
+      if (!isValidGameDate(event.date)) return false;
+      return isDateBeforeOrEqual(event.date, targetDate);
+    } catch {
+      return false;
+    }
+  });
 }
 
 /**
  * Filtra eventos que ainda não foram acionados (futuro)
  */
-export function getRemainingEvents(events: ScheduledEvent[], targetDate: GameDate): ScheduledEvent[] {
-  return events.filter(event => !isDateBeforeOrEqual(event.date, targetDate));
+export function getRemainingEvents(
+  events: ScheduledEvent[],
+  targetDate: GameDate
+): ScheduledEvent[] {
+  return events.filter((event) => {
+    if (!event || !event.date) return false;
+    try {
+      if (!isValidGameDate(event.date)) return false;
+      return !isDateBeforeOrEqual(event.date, targetDate);
+    } catch {
+      return false;
+    }
+  });
 }
 
 /**
@@ -171,6 +201,13 @@ export function getRemainingEvents(events: ScheduledEvent[], targetDate: GameDat
  */
 export function sortEventsByDate(events: ScheduledEvent[]): ScheduledEvent[] {
   return [...events].sort((a, b) => {
+    const aValid = a && a.date && isValidGameDate(a.date);
+    const bValid = b && b.date && isValidGameDate(b.date);
+
+    if (!aValid && !bValid) return 0;
+    if (!aValid) return 1;
+    if (!bValid) return -1;
+
     if (isSameDate(a.date, b.date)) return 0;
     return isDateBeforeOrEqual(a.date, b.date) ? -1 : 1;
   });
@@ -179,10 +216,13 @@ export function sortEventsByDate(events: ScheduledEvent[]): ScheduledEvent[] {
 /**
  * Encontra o próximo evento a partir de uma data
  */
-export function getNextEvent(events: ScheduledEvent[], currentDate: GameDate): ScheduledEvent | null {
+export function getNextEvent(
+  events: ScheduledEvent[],
+  currentDate: GameDate
+): ScheduledEvent | null {
   const futureEvents = getRemainingEvents(events, currentDate);
   if (futureEvents.length === 0) return null;
-  
+
   const sortedEvents = sortEventsByDate(futureEvents);
   return sortedEvents[0];
 }
@@ -190,17 +230,22 @@ export function getNextEvent(events: ScheduledEvent[], currentDate: GameDate): S
 /**
  * Calcula dias até o próximo evento
  */
-export function getDaysUntilNextEvent(events: ScheduledEvent[], currentDate: GameDate): number | null {
+export function getDaysUntilNextEvent(
+  events: ScheduledEvent[],
+  currentDate: GameDate
+): number | null {
   const nextEvent = getNextEvent(events, currentDate);
   if (!nextEvent) return null;
-  
+
   return getDaysDifference(currentDate, nextEvent.date);
 }
 
 /**
  * Cria uma data padrão para inicializar timeline (1 de Janeiro do ano base)
  */
-export function createDefaultGameDate(config: CalendarConfig = DEFAULT_CALENDAR_CONFIG): GameDate {
+export function createDefaultGameDate(
+  config: CalendarConfig = DEFAULT_CALENDAR_CONFIG
+): GameDate {
   return createGameDate(1, 1, config.startYear);
 }
 
@@ -219,7 +264,10 @@ export function isValidGameDate(date: GameDate): boolean {
 /**
  * Obtém informações sobre um mês específico
  */
-export function getMonthInfo(month: number, year: number): {
+export function getMonthInfo(
+  month: number,
+  year: number
+): {
   name: string;
   days: number;
   isLeapYear: boolean;
@@ -227,7 +275,7 @@ export function getMonthInfo(month: number, year: number): {
   if (month < 1 || month > 12) {
     throw new Error(`Mês inválido: ${month}`);
   }
-  
+
   return {
     name: DEFAULT_CALENDAR_CONFIG.monthNames[month - 1],
     days: getDaysInMonth(month, year),
@@ -241,10 +289,10 @@ export function getMonthInfo(month: number, year: number): {
 export function generateMonthDays(month: number, year: number): GameDate[] {
   const monthInfo = getMonthInfo(month, year);
   const days: GameDate[] = [];
-  
+
   for (let day = 1; day <= monthInfo.days; day++) {
     days.push(createGameDate(day, month, year));
   }
-  
+
   return days;
 }

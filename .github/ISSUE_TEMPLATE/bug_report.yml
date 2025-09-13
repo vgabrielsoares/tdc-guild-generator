@@ -1,0 +1,114 @@
+name: Bug Report
+description: Reportar um bug ou problema no sistema
+title: "[BUG] "
+labels: ["bug", "needs-triage"]
+assignees:
+  - vgabrielsoares
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por reportar um bug! Por favor, preencha as informações abaixo para nos ajudar a resolver o problema.
+
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Descrição do Bug
+      description: Descreva claramente o que está acontecendo de errado
+      placeholder: O sistema deveria fazer X, mas está fazendo Y...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Passos para Reproduzir
+      description: Liste os passos específicos para reproduzir o bug
+      placeholder: |
+        1. Vá para a página...
+        2. Clique em...
+        3. Observe que...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Comportamento Esperado
+      description: Descreva o que deveria acontecer
+      placeholder: O sistema deveria...
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Comportamento Atual
+      description: Descreva o que realmente acontece
+      placeholder: Em vez disso, o sistema...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Componente Afetado
+      description: Qual área do sistema está afetada?
+      options:
+        - Geração de Guildas
+        - Sistema de Contratos
+        - Sistema de Serviços
+        - Mural de Avisos
+        - Membros da Guilda
+        - Sistema de Renome
+        - Interface/UI
+        - Performance
+        - Outro
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Prioridade
+      description: Qual a gravidade do problema?
+      options:
+        - Baixa - Funcionalidade secundária afetada
+        - Média - Funcionalidade principal com workaround
+        - Alta - Funcionalidade principal quebrada
+        - Crítica - Sistema inutilizável
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots ou Logs
+      description: Adicione screenshots, logs de erro ou outros dados relevantes
+      placeholder: Cole aqui screenshots, logs de console, etc.
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Ambiente
+      description: Informações sobre o ambiente onde o bug ocorreu
+      placeholder: |
+        - Browser: Chrome 118
+        - OS: Windows 11
+        - Versão do sistema: v0.1.0
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      description: Confirme que você verificou os seguintes itens
+      options:
+        - label: Verifiquei se já existe uma issue similar
+          required: true
+        - label: Testei em um browser diferente (se aplicável)
+          required: false
+        - label: Limpei o cache do browser
+          required: false

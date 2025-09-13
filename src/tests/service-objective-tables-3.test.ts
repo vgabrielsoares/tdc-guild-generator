@@ -160,20 +160,40 @@ describe("Service Objective Tables - Part 3 (Issue 5.13)", () => {
   describe("Specific Table Content Validation", () => {
     it("SERVICOS_ESPECIFICOS_TABLE should match .md content exactly", () => {
       // Test a few specific entries from the implemented table
-      expect(SERVICOS_ESPECIFICOS_TABLE[0].result.action).toBe("Limpar construção/local");
-      expect(SERVICOS_ESPECIFICOS_TABLE[0].result.target).toBe("Um nobre soberbo");
-      expect(SERVICOS_ESPECIFICOS_TABLE[0].result.complication).toBe("Alguém tenta constantemente dar ordens conflitantes");
+      expect(SERVICOS_ESPECIFICOS_TABLE[0].result.action).toBe(
+        "Limpar construção/local"
+      );
+      expect(SERVICOS_ESPECIFICOS_TABLE[0].result.target).toBe(
+        "Um nobre soberbo"
+      );
+      expect(SERVICOS_ESPECIFICOS_TABLE[0].result.complication).toBe(
+        "Alguém tenta constantemente dar ordens conflitantes"
+      );
 
-      expect(SERVICOS_ESPECIFICOS_TABLE[1].result.action).toBe("Cobrar impostos/dívidas");
-      expect(SERVICOS_ESPECIFICOS_TABLE[1].result.target).toBe("Um humanoide ranzinza");
-      expect(SERVICOS_ESPECIFICOS_TABLE[1].result.complication).toBe("Deve ser feito durante a madrugada");
+      expect(SERVICOS_ESPECIFICOS_TABLE[1].result.action).toBe(
+        "Cobrar impostos/dívidas"
+      );
+      expect(SERVICOS_ESPECIFICOS_TABLE[1].result.target).toBe(
+        "Um humanoide ranzinza"
+      );
+      expect(SERVICOS_ESPECIFICOS_TABLE[1].result.complication).toBe(
+        "Deve ser feito durante a madrugada"
+      );
 
       // Check that "Trabalho rural" is in position 6 (index 5)
-      expect(SERVICOS_ESPECIFICOS_TABLE[5].result.action).toBe("Trabalho rural");
-      expect(SERVICOS_ESPECIFICOS_TABLE[5].result.target).toBe("Um criminoso/mafioso");
-      expect(SERVICOS_ESPECIFICOS_TABLE[5].result.complication).toBe("Vai contra a moral e os bons costumes");
+      expect(SERVICOS_ESPECIFICOS_TABLE[5].result.action).toBe(
+        "Trabalho rural"
+      );
+      expect(SERVICOS_ESPECIFICOS_TABLE[5].result.target).toBe(
+        "Um criminoso/mafioso"
+      );
+      expect(SERVICOS_ESPECIFICOS_TABLE[5].result.complication).toBe(
+        "Vai contra a moral e os bons costumes"
+      );
 
-      expect(SERVICOS_ESPECIFICOS_TABLE[19].result.action).toBe("Cuidar de mascote");
+      expect(SERVICOS_ESPECIFICOS_TABLE[19].result.action).toBe(
+        "Cuidar de mascote"
+      );
     });
 
     it("TRABALHO_RURAL_TABLE should match .md content exactly", () => {
@@ -188,11 +208,15 @@ describe("Service Objective Tables - Part 3 (Issue 5.13)", () => {
       // Test a few specific entries from the implemented table
       expect(RELIGIOSO_TABLE[0].result.action).toBe("Pregar em praça pública");
       expect(RELIGIOSO_TABLE[0].result.target).toBe("Um herói ancestral");
-      expect(RELIGIOSO_TABLE[0].result.complication).toBe("Envolve um ritual macabro");
+      expect(RELIGIOSO_TABLE[0].result.complication).toBe(
+        "Envolve um ritual macabro"
+      );
 
       expect(RELIGIOSO_TABLE[1].result.action).toBe("Converter/purificar");
       expect(RELIGIOSO_TABLE[1].result.target).toBe("Toda uma vila/culto");
-      expect(RELIGIOSO_TABLE[1].result.complication).toBe("Rumores preveem uma tragédia");
+      expect(RELIGIOSO_TABLE[1].result.complication).toBe(
+        "Rumores preveem uma tragédia"
+      );
 
       expect(RELIGIOSO_TABLE[19].result.action).toBeDefined();
     });
@@ -225,7 +249,9 @@ describe("Service Objective Tables - Part 3 (Issue 5.13)", () => {
       );
       expect(result1.action).toBe("Limpar construção/local");
       expect(result1.target).toBe("Um nobre soberbo");
-      expect(result1.complication).toBe("Alguém tenta constantemente dar ordens conflitantes");
+      expect(result1.complication).toBe(
+        "Alguém tenta constantemente dar ordens conflitantes"
+      );
 
       const result20 = rollThreeColumnObjective(
         SERVICOS_ESPECIFICOS_TABLE,
@@ -241,9 +267,9 @@ describe("Service Objective Tables - Part 3 (Issue 5.13)", () => {
 
   describe("getThreeColumnTable", () => {
     it("should return correct tables for new implemented objective types", () => {
-      expect(getThreeColumnTable(ServiceObjectiveType.SERVICOS_ESPECIFICOS)).toBe(
-        SERVICOS_ESPECIFICOS_TABLE
-      );
+      expect(
+        getThreeColumnTable(ServiceObjectiveType.SERVICOS_ESPECIFICOS)
+      ).toBe(SERVICOS_ESPECIFICOS_TABLE);
       expect(getThreeColumnTable(ServiceObjectiveType.RELIGIOSO)).toBe(
         RELIGIOSO_TABLE
       );
@@ -258,7 +284,7 @@ describe("Service Objective Tables - Part 3 (Issue 5.13)", () => {
     describe("generateMultipleObjective", () => {
       it("should generate at least one objective", () => {
         const result = generateMultipleObjective();
-        
+
         expect(result.type).toBe(ServiceObjectiveType.MULTIPLO);
         expect(result.description).toBeDefined();
         expect(result.action).toBeDefined();
@@ -268,14 +294,15 @@ describe("Service Objective Tables - Part 3 (Issue 5.13)", () => {
 
       it("should combine multiple objectives when rolling multiple 20s", () => {
         const result = generateMultipleObjective();
-        
+
         expect(result.type).toBe(ServiceObjectiveType.MULTIPLO);
-        
+
         // Should contain connectors for multiple objectives
-        const hasMultipleConnector = result.description.includes("e também") || 
-                                    result.description.includes("+") ||
-                                    !result.description.includes("e também"); // Single objective is also valid
-        
+        const hasMultipleConnector =
+          result.description.includes("e também") ||
+          result.description.includes("+") ||
+          !result.description.includes("e também"); // Single objective is also valid
+
         expect(hasMultipleConnector).toBe(true);
       });
 
@@ -283,15 +310,15 @@ describe("Service Objective Tables - Part 3 (Issue 5.13)", () => {
         // Run multiple times to test the uniqueness logic
         for (let i = 0; i < 10; i++) {
           const result = generateMultipleObjective();
-          
+
           expect(result.type).toBe(ServiceObjectiveType.MULTIPLO);
           expect(result.description).toBeDefined();
-          
+
           // If it contains multiple objectives, they should be combined properly
           if (result.description.includes("e também")) {
             const parts = result.description.split("e também");
             expect(parts.length).toBeGreaterThanOrEqual(2);
-            parts.forEach(part => {
+            parts.forEach((part) => {
               expect(part.trim().length).toBeGreaterThan(0);
             });
           }
@@ -300,15 +327,15 @@ describe("Service Objective Tables - Part 3 (Issue 5.13)", () => {
 
       it("should handle proper grammar for multiple objectives", () => {
         const result = generateMultipleObjective();
-        
+
         expect(result.type).toBe(ServiceObjectiveType.MULTIPLO);
-        
+
         // Test different scenarios
         if (result.description.includes("e também")) {
           // Multiple objectives - should have proper connectors
           const parts = result.description.split("e também");
           expect(parts.length).toBeGreaterThanOrEqual(2);
-          
+
           // Last part should be connected with "e também"
           expect(parts[parts.length - 1].trim().length).toBeGreaterThan(0);
         } else {
@@ -319,21 +346,21 @@ describe("Service Objective Tables - Part 3 (Issue 5.13)", () => {
 
       it("should generate different combinations on multiple calls", () => {
         const results = [];
-        
+
         // Generate multiple results
         for (let i = 0; i < 5; i++) {
           results.push(generateMultipleObjective());
         }
-        
+
         // All should be valid
-        results.forEach(result => {
+        results.forEach((result) => {
           expect(result.type).toBe(ServiceObjectiveType.MULTIPLO);
           expect(result.description).toBeDefined();
           expect(result.description.length).toBeGreaterThan(0);
         });
-        
+
         // Due to randomization, at least some should be different
-        const uniqueDescriptions = new Set(results.map(r => r.description));
+        const uniqueDescriptions = new Set(results.map((r) => r.description));
         expect(uniqueDescriptions.size).toBeGreaterThan(0);
       });
     });
@@ -341,7 +368,7 @@ describe("Service Objective Tables - Part 3 (Issue 5.13)", () => {
     describe("generateServiceObjective with MULTIPLO", () => {
       it("should handle MULTIPLO type by generating combined objectives", () => {
         const result = generateServiceObjective(ServiceObjectiveType.MULTIPLO);
-        
+
         expect(result).not.toBeNull();
         expect(result!.type).toBe(ServiceObjectiveType.MULTIPLO);
         expect(result!.description).toContain("e também");
@@ -350,7 +377,7 @@ describe("Service Objective Tables - Part 3 (Issue 5.13)", () => {
       it("should generate different results on multiple calls", () => {
         const result1 = generateServiceObjective(ServiceObjectiveType.MULTIPLO);
         const result2 = generateServiceObjective(ServiceObjectiveType.MULTIPLO);
-        
+
         // With randomization, results should likely be different
         // (though there's a small chance they could be the same)
         expect(result1).not.toBeNull();
@@ -364,11 +391,11 @@ describe("Service Objective Tables - Part 3 (Issue 5.13)", () => {
       it("should work with all implemented objective types", () => {
         // Test that we can generate multiples using all implemented types
         const implementations = IMPLEMENTED_OBJECTIVE_TYPES.filter(
-          type => type !== ServiceObjectiveType.MULTIPLO
+          (type) => type !== ServiceObjectiveType.MULTIPLO
         );
-        
+
         expect(implementations.length).toBeGreaterThan(0);
-        
+
         // Generate multiple objectives multiple times to test variety
         for (let i = 0; i < 5; i++) {
           const result = generateMultipleObjective();
@@ -381,7 +408,9 @@ describe("Service Objective Tables - Part 3 (Issue 5.13)", () => {
 
   describe("generateServiceObjective", () => {
     it("should generate complete objectives for new implemented types", () => {
-      const specificService = generateServiceObjective(ServiceObjectiveType.SERVICOS_ESPECIFICOS);
+      const specificService = generateServiceObjective(
+        ServiceObjectiveType.SERVICOS_ESPECIFICOS
+      );
       expect(specificService).not.toBeNull();
       expect(specificService!.type).toBe("Serviços específicos");
       expect(specificService!.action).toBeTruthy();
@@ -389,7 +418,9 @@ describe("Service Objective Tables - Part 3 (Issue 5.13)", () => {
       expect(specificService!.complication).toBeTruthy();
       expect(specificService!.description).toBeTruthy();
 
-      const religious = generateServiceObjective(ServiceObjectiveType.RELIGIOSO);
+      const religious = generateServiceObjective(
+        ServiceObjectiveType.RELIGIOSO
+      );
       expect(religious).not.toBeNull();
       expect(religious!.type).toBe("Religioso");
       expect(religious!.action).toBeTruthy();
@@ -406,11 +437,15 @@ describe("Service Objective Tables - Part 3 (Issue 5.13)", () => {
     });
 
     it("should format description correctly for new types", () => {
-      const specificService = generateServiceObjective(ServiceObjectiveType.SERVICOS_ESPECIFICOS);
+      const specificService = generateServiceObjective(
+        ServiceObjectiveType.SERVICOS_ESPECIFICOS
+      );
       expect(specificService!.description).toContain("para");
       expect(specificService!.description).toContain("mas");
 
-      const religious = generateServiceObjective(ServiceObjectiveType.RELIGIOSO);
+      const religious = generateServiceObjective(
+        ServiceObjectiveType.RELIGIOSO
+      );
       expect(religious!.description).toContain("relacionado a");
       expect(religious!.description).toContain("mas");
     });
@@ -438,7 +473,9 @@ describe("Service Objective Tables - Part 3 (Issue 5.13)", () => {
         expect(description).toContain("para uma fazenda ou propriedade rural");
         expect(description).toContain("mas a terra está amaldiçoada");
         // Should contain a specific rural work type from the auxiliary table
-        expect(description).not.toBe("Trabalho rural para uma fazenda ou propriedade rural, mas a terra está amaldiçoada");
+        expect(description).not.toBe(
+          "Trabalho rural para uma fazenda ou propriedade rural, mas a terra está amaldiçoada"
+        );
       });
     });
 
@@ -446,7 +483,7 @@ describe("Service Objective Tables - Part 3 (Issue 5.13)", () => {
       it("should format descriptions with custom connectors", () => {
         const description1 = generateServiceDescription(
           "Realizar cerimônia",
-          "Um templo abandonado", 
+          "Um templo abandonado",
           "O local está profanado",
           "relacionado a"
         );
@@ -468,7 +505,9 @@ describe("Service Objective Tables - Part 3 (Issue 5.13)", () => {
 
   describe("Integration with ServiceObjective interface", () => {
     it("should generate objectives compatible with ServiceObjective interface", () => {
-      const specificService = generateServiceObjective(ServiceObjectiveType.SERVICOS_ESPECIFICOS);
+      const specificService = generateServiceObjective(
+        ServiceObjectiveType.SERVICOS_ESPECIFICOS
+      );
       expect(specificService).toMatchObject({
         type: expect.any(String),
         action: expect.any(String),
@@ -477,7 +516,9 @@ describe("Service Objective Tables - Part 3 (Issue 5.13)", () => {
         description: expect.any(String),
       });
 
-      const religious = generateServiceObjective(ServiceObjectiveType.RELIGIOSO);
+      const religious = generateServiceObjective(
+        ServiceObjectiveType.RELIGIOSO
+      );
       expect(religious).toMatchObject({
         type: expect.any(String),
         action: expect.any(String),
@@ -492,7 +533,7 @@ describe("Service Objective Tables - Part 3 (Issue 5.13)", () => {
     it("should follow three-column system as specified in .md", () => {
       // All new tables should follow the three-column pattern
       const tables = [SERVICOS_ESPECIFICOS_TABLE, RELIGIOSO_TABLE];
-      
+
       tables.forEach((table) => {
         table.forEach((entry) => {
           expect(entry.result).toHaveProperty("action");
@@ -503,8 +544,12 @@ describe("Service Objective Tables - Part 3 (Issue 5.13)", () => {
     });
 
     it("should generate descriptions following the format pattern", () => {
-      const specificService = generateServiceObjective(ServiceObjectiveType.SERVICOS_ESPECIFICOS);
-      const religious = generateServiceObjective(ServiceObjectiveType.RELIGIOSO);
+      const specificService = generateServiceObjective(
+        ServiceObjectiveType.SERVICOS_ESPECIFICOS
+      );
+      const religious = generateServiceObjective(
+        ServiceObjectiveType.RELIGIOSO
+      );
 
       // Both should include the required format elements
       expect(specificService!.description.toLowerCase()).toContain("para");

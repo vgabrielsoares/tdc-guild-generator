@@ -1,6 +1,6 @@
 /**
  * Testes para Validação das Tabelas Narrativas de Serviços
- * 
+ *
  * Valida:
  * - Cobertura completa dos ranges de dados
  * - Textos exatos conforme especificação
@@ -22,10 +22,10 @@ describe("Service Narrative Tables - Issue 5.14", () => {
   describe("Tabela de Origem do Problema (d20)", () => {
     it("should have exactly 20 entries covering 1-20", () => {
       expect(SERVICE_ORIGIN_TABLE).toHaveLength(20);
-      
+
       for (let i = 1; i <= 20; i++) {
         const hasEntry = SERVICE_ORIGIN_TABLE.some(
-          entry => i >= entry.min && i <= entry.max
+          (entry) => i >= entry.min && i <= entry.max
         );
         expect(hasEntry).toBe(true);
       }
@@ -34,7 +34,7 @@ describe("Service Narrative Tables - Issue 5.14", () => {
     it("should match exact markdown table entries", () => {
       const expectedOrigins = [
         "Tradição/conflito familiar",
-        "Corrupção no governo local", 
+        "Corrupção no governo local",
         "Aproveitador/charlatão",
         "Algo mundano, corriqueiro ou natural",
         "Antiga promessa não cumprida",
@@ -55,7 +55,9 @@ describe("Service Narrative Tables - Issue 5.14", () => {
         "A morte de um humanoide importante",
       ];
 
-      const tableEntries = SERVICE_ORIGIN_TABLE.map(entry => entry.result.description);
+      const tableEntries = SERVICE_ORIGIN_TABLE.map(
+        (entry) => entry.result.description
+      );
       expect(tableEntries).toEqual(expectedOrigins);
     });
   });
@@ -63,10 +65,10 @@ describe("Service Narrative Tables - Issue 5.14", () => {
   describe("Tabela de Complicador Adicional (d20)", () => {
     it("should have exactly 20 entries covering 1-20", () => {
       expect(SERVICE_ADDITIONAL_COMPLICATOR_TABLE).toHaveLength(20);
-      
+
       for (let i = 1; i <= 20; i++) {
         const hasEntry = SERVICE_ADDITIONAL_COMPLICATOR_TABLE.some(
-          entry => i >= entry.min && i <= entry.max
+          (entry) => i >= entry.min && i <= entry.max
         );
         expect(hasEntry).toBe(true);
       }
@@ -96,7 +98,9 @@ describe("Service Narrative Tables - Issue 5.14", () => {
         "Evento climático/desastre natural",
       ];
 
-      const tableEntries = SERVICE_ADDITIONAL_COMPLICATOR_TABLE.map(entry => entry.result.description);
+      const tableEntries = SERVICE_ADDITIONAL_COMPLICATOR_TABLE.map(
+        (entry) => entry.result.description
+      );
       expect(tableEntries).toEqual(expectedComplicators);
     });
   });
@@ -104,18 +108,18 @@ describe("Service Narrative Tables - Issue 5.14", () => {
   describe("Tabela de Chance de Complicações (d20)", () => {
     it("should have correct probability distribution", () => {
       expect(SERVICE_COMPLICATION_CHANCE_TABLE).toHaveLength(2);
-      
+
       // 1-14: Não (70% chance)
       const noComplicationEntry = SERVICE_COMPLICATION_CHANCE_TABLE.find(
-        entry => entry.result.hasComplication === false
+        (entry) => entry.result.hasComplication === false
       );
       expect(noComplicationEntry?.min).toBe(1);
       expect(noComplicationEntry?.max).toBe(14);
       expect(noComplicationEntry?.result.description).toBe("Não");
 
-      // 15-20: Sim (30% chance)  
+      // 15-20: Sim (30% chance)
       const hasComplicationEntry = SERVICE_COMPLICATION_CHANCE_TABLE.find(
-        entry => entry.result.hasComplication === true
+        (entry) => entry.result.hasComplication === true
       );
       expect(hasComplicationEntry?.min).toBe(15);
       expect(hasComplicationEntry?.max).toBe(20);
@@ -126,10 +130,10 @@ describe("Service Narrative Tables - Issue 5.14", () => {
   describe("Tabela de Tipos de Complicações (d20)", () => {
     it("should have exactly 20 entries covering 1-20", () => {
       expect(SERVICE_COMPLICATION_TYPE_TABLE).toHaveLength(20);
-      
+
       for (let i = 1; i <= 20; i++) {
         const hasEntry = SERVICE_COMPLICATION_TYPE_TABLE.some(
-          entry => i >= entry.min && i <= entry.max
+          (entry) => i >= entry.min && i <= entry.max
         );
         expect(hasEntry).toBe(true);
       }
@@ -159,7 +163,9 @@ describe("Service Narrative Tables - Issue 5.14", () => {
         "Role duas vezes e use ambos",
       ];
 
-      const tableEntries = SERVICE_COMPLICATION_TYPE_TABLE.map(entry => entry.result.description);
+      const tableEntries = SERVICE_COMPLICATION_TYPE_TABLE.map(
+        (entry) => entry.result.description
+      );
       expect(tableEntries).toEqual(expectedComplications);
     });
   });
@@ -167,10 +173,10 @@ describe("Service Narrative Tables - Issue 5.14", () => {
   describe("Tabela de Consequências das Complicações (d20)", () => {
     it("should have exactly 20 entries covering 1-20", () => {
       expect(SERVICE_COMPLICATION_CONSEQUENCE_TABLE).toHaveLength(20);
-      
+
       for (let i = 1; i <= 20; i++) {
         const hasEntry = SERVICE_COMPLICATION_CONSEQUENCE_TABLE.some(
-          entry => i >= entry.min && i <= entry.max
+          (entry) => i >= entry.min && i <= entry.max
         );
         expect(hasEntry).toBe(true);
       }
@@ -200,7 +206,9 @@ describe("Service Narrative Tables - Issue 5.14", () => {
         "Role duas vezes e use ambos",
       ];
 
-      const tableEntries = SERVICE_COMPLICATION_CONSEQUENCE_TABLE.map(entry => entry.result.description);
+      const tableEntries = SERVICE_COMPLICATION_CONSEQUENCE_TABLE.map(
+        (entry) => entry.result.description
+      );
       expect(tableEntries).toEqual(expectedConsequences);
     });
   });
@@ -208,18 +216,18 @@ describe("Service Narrative Tables - Issue 5.14", () => {
   describe("Tabela de Chance de Rivais (d20)", () => {
     it("should have correct probability distribution", () => {
       expect(SERVICE_RIVAL_CHANCE_TABLE).toHaveLength(2);
-      
+
       // 1-18: Não (90% chance)
       const noRivalEntry = SERVICE_RIVAL_CHANCE_TABLE.find(
-        entry => entry.result.hasRival === false
+        (entry) => entry.result.hasRival === false
       );
       expect(noRivalEntry?.min).toBe(1);
       expect(noRivalEntry?.max).toBe(18);
       expect(noRivalEntry?.result.description).toBe("Não");
 
-      // 19-20: Sim (10% chance)  
+      // 19-20: Sim (10% chance)
       const hasRivalEntry = SERVICE_RIVAL_CHANCE_TABLE.find(
-        entry => entry.result.hasRival === true
+        (entry) => entry.result.hasRival === true
       );
       expect(hasRivalEntry?.min).toBe(19);
       expect(hasRivalEntry?.max).toBe(20);
@@ -230,7 +238,7 @@ describe("Service Narrative Tables - Issue 5.14", () => {
   describe("Tabela de Ações do Rival (d20)", () => {
     it("should have correct range distribution", () => {
       expect(SERVICE_RIVAL_ACTION_TABLE).toHaveLength(10);
-      
+
       // Verificar ranges específicos conforme markdown
       const expectedRanges = [
         { min: 1, max: 5, description: "Irá contra seu objetivo" },
@@ -257,11 +265,11 @@ describe("Service Narrative Tables - Issue 5.14", () => {
   describe("Tabela de Motivação do Rival (d20)", () => {
     it("should have correct range distribution", () => {
       expect(SERVICE_RIVAL_MOTIVATION_TABLE).toHaveLength(17);
-      
+
       // Verificar que cobre 1-20
       for (let i = 1; i <= 20; i++) {
         const hasEntry = SERVICE_RIVAL_MOTIVATION_TABLE.some(
-          entry => i >= entry.min && i <= entry.max
+          (entry) => i >= entry.min && i <= entry.max
         );
         expect(hasEntry).toBe(true);
       }
@@ -277,12 +285,24 @@ describe("Service Narrative Tables - Issue 5.14", () => {
         { min: 9, max: 9, description: "Está seguindo ordens de terceiros" },
         { min: 10, max: 10, description: "Faz isso por pura diversão" },
         { min: 11, max: 11, description: "Faz isso por vingança" },
-        { min: 12, max: 12, description: "Está sob influência mágica ou mental" },
-        { min: 13, max: 13, description: "Está tentando evitar um desastre maior" },
+        {
+          min: 12,
+          max: 12,
+          description: "Está sob influência mágica ou mental",
+        },
+        {
+          min: 13,
+          max: 13,
+          description: "Está tentando evitar um desastre maior",
+        },
         { min: 14, max: 14, description: "Faz isso pelas crianças" },
         { min: 15, max: 15, description: "Se arrepende" },
         { min: 16, max: 16, description: "Desaparece depois disso" },
-        { min: 17, max: 17, description: "No fundo gosta, e faz isso por você" },
+        {
+          min: 17,
+          max: 17,
+          description: "No fundo gosta, e faz isso por você",
+        },
         { min: 18, max: 18, description: "Faz isso porque te odeia" },
         { min: 19, max: 19, description: "Faz isso contra a vontade dele" },
         { min: 20, max: 20, description: "Na verdade é o contratante" },
@@ -311,10 +331,10 @@ describe("Service Narrative Tables - Issue 5.14", () => {
         SERVICE_RIVAL_MOTIVATION_TABLE,
       ];
 
-      tables.forEach(table => {
-        const minValue = Math.min(...table.map(entry => entry.min));
-        const maxValue = Math.max(...table.map(entry => entry.max));
-        
+      tables.forEach((table) => {
+        const minValue = Math.min(...table.map((entry) => entry.min));
+        const maxValue = Math.max(...table.map((entry) => entry.max));
+
         expect(minValue).toBe(1);
         expect(maxValue).toBe(20);
       });

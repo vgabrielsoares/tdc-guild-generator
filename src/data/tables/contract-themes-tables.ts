@@ -1,6 +1,6 @@
 /**
  * Tabelas de Palavras-chave Temáticas e Contratantes Inusitados
- * 
+ *
  * Este arquivo implementa as tabelas para:
  * - Palavras-chave temáticas para criatividade nos contratos
  * - Teste de excentricidade para contratantes
@@ -184,31 +184,94 @@ export const UNUSUAL_CONTRACTOR_CHANCE_TABLE: TableEntry<boolean>[] = [
  * Tabela de contratantes inusitados (d100)
  */
 export const UNUSUAL_CONTRACTORS_TABLE: TableEntry<string>[] = [
-  { min: 1, max: 1, result: "Família nobre em desgraça por conta de conspiração política" },
-  { min: 2, max: 2, result: "Humanoide com uma doença contagiosa e debilitante" },
+  {
+    min: 1,
+    max: 1,
+    result: "Família nobre em desgraça por conta de conspiração política",
+  },
+  {
+    min: 2,
+    max: 2,
+    result: "Humanoide com uma doença contagiosa e debilitante",
+  },
   { min: 3, max: 3, result: "Lacaio de um lich em busca de mais poder" },
-  { min: 4, max: 4, result: "Sacerdote de uma religião que ainda não possui santuário no local" },
-  { min: 5, max: 5, result: "Cultistas canibais que fazem rituais com crianças" },
-  { min: 6, max: 6, result: "Feiticeiro em busca de algo que restaure seus poderes mágicos selados" },
-  { min: 7, max: 7, result: "Filho do líder local mas ele foi morto em combate numa emboscada" },
-  { min: 8, max: 8, result: "Comandante de tropas conquistadoras de outro reino" },
+  {
+    min: 4,
+    max: 4,
+    result: "Sacerdote de uma religião que ainda não possui santuário no local",
+  },
+  {
+    min: 5,
+    max: 5,
+    result: "Cultistas canibais que fazem rituais com crianças",
+  },
+  {
+    min: 6,
+    max: 6,
+    result:
+      "Feiticeiro em busca de algo que restaure seus poderes mágicos selados",
+  },
+  {
+    min: 7,
+    max: 7,
+    result: "Filho do líder local mas ele foi morto em combate numa emboscada",
+  },
+  {
+    min: 8,
+    max: 8,
+    result: "Comandante de tropas conquistadoras de outro reino",
+  },
   { min: 9, max: 9, result: "Trupe de músicos fugindo de alguma coisa" },
   { min: 10, max: 10, result: "Um deus tentando compreender os mortais" },
   { min: 11, max: 11, result: "Humanoide dado como morto anos atrás" },
-  { min: 12, max: 12, result: "Succubus/incubus apaixonado por um mortal procurando o seu amor" },
+  {
+    min: 12,
+    max: 12,
+    result: "Succubus/incubus apaixonado por um mortal procurando o seu amor",
+  },
   { min: 13, max: 13, result: "Vampiro vegetariano" },
-  { min: 14, max: 14, result: "Bruxo que busca vingança contra inquisidores que queimaram sua família" },
+  {
+    min: 14,
+    max: 14,
+    result:
+      "Bruxo que busca vingança contra inquisidores que queimaram sua família",
+  },
   { min: 15, max: 15, result: "Dragão metamorfoseado em ser humano" },
   { min: 16, max: 16, result: "Trupe circense que faz espetáculos hipnóticos" },
-  { min: 17, max: 17, result: "Criatura exótica capturada em terras distantes" },
-  { min: 18, max: 18, result: "Veterano de guerra mutilado, inválido ou aposentado" },
+  {
+    min: 17,
+    max: 17,
+    result: "Criatura exótica capturada em terras distantes",
+  },
+  {
+    min: 18,
+    max: 18,
+    result: "Veterano de guerra mutilado, inválido ou aposentado",
+  },
   { min: 19, max: 19, result: "Agente da lei atrás de um criminoso procurado" },
-  { min: 20, max: 20, result: "Uma antiga paixão do contratado tentando se re-aproximar" },
-  { min: 21, max: 21, result: "Seguidores de um antigo mal atrás de um artefato lendário capaz de libertá-lo" },
+  {
+    min: 20,
+    max: 20,
+    result: "Uma antiga paixão do contratado tentando se re-aproximar",
+  },
+  {
+    min: 21,
+    max: 21,
+    result:
+      "Seguidores de um antigo mal atrás de um artefato lendário capaz de libertá-lo",
+  },
   { min: 22, max: 22, result: "Sequestradores" },
   { min: 23, max: 23, result: "Pai/mãe tentando se aproximar do filho" },
-  { min: 24, max: 24, result: "Membros de uma sociedade secreta contra o governo" },
-  { min: 25, max: 25, result: "Um jovem humano que deseja capturar todos os monstros" },
+  {
+    min: 24,
+    max: 24,
+    result: "Membros de uma sociedade secreta contra o governo",
+  },
+  {
+    min: 25,
+    max: 25,
+    result: "Um jovem humano que deseja capturar todos os monstros",
+  },
   { min: 26, max: 26, result: "Sobreviventes de um ataque do Tarrasque" },
   { min: 27, max: 27, result: "Águia gigante" },
   { min: 28, max: 28, result: "Um arquiteto inovador" },
@@ -217,73 +280,234 @@ export const UNUSUAL_CONTRACTORS_TABLE: TableEntry<string>[] = [
   { min: 31, max: 31, result: "Nômades misteriosos" },
   { min: 32, max: 32, result: "Bugbear pescador" },
   { min: 33, max: 33, result: "Bando de homens ratos" },
-  { min: 34, max: 34, result: "Mestre insano em busca de seu discípulo que fugiu com o seu amor" },
+  {
+    min: 34,
+    max: 34,
+    result: "Mestre insano em busca de seu discípulo que fugiu com o seu amor",
+  },
   { min: 35, max: 35, result: "O último membro de um antigo e poderoso clã" },
-  { min: 36, max: 36, result: "Humanoide amaldiçoado, que se transforma em Falcão durante o dia" },
+  {
+    min: 36,
+    max: 36,
+    result: "Humanoide amaldiçoado, que se transforma em Falcão durante o dia",
+  },
   { min: 37, max: 37, result: "Monge com costumes diferentes" },
   { min: 38, max: 38, result: "Coletores de impostos a mando do governo" },
-  { min: 39, max: 39, result: "O contratante acredita ser o último de sua espécie" },
-  { min: 40, max: 40, result: "Humanoide que deve muito dinheiro para criaturas poderosas" },
+  {
+    min: 39,
+    max: 39,
+    result: "O contratante acredita ser o último de sua espécie",
+  },
+  {
+    min: 40,
+    max: 40,
+    result: "Humanoide que deve muito dinheiro para criaturas poderosas",
+  },
   { min: 41, max: 41, result: "Imigrantes refugiados" },
-  { min: 42, max: 42, result: "Orc fugindo de um mal maior que oprime suas terras" },
-  { min: 43, max: 43, result: "Um centauro exótico, civilizado e liderando cavaleiros" },
-  { min: 44, max: 44, result: "Humanoide amaldiçoado, que se transforma em lobo durante a noite" },
+  {
+    min: 42,
+    max: 42,
+    result: "Orc fugindo de um mal maior que oprime suas terras",
+  },
+  {
+    min: 43,
+    max: 43,
+    result: "Um centauro exótico, civilizado e liderando cavaleiros",
+  },
+  {
+    min: 44,
+    max: 44,
+    result: "Humanoide amaldiçoado, que se transforma em lobo durante a noite",
+  },
   { min: 45, max: 45, result: "Licantropo vegano e altruísta" },
-  { min: 46, max: 46, result: "Humanoide de aparência frágil, que diz ter vindo de uma época futura" },
-  { min: 47, max: 47, result: "Humanoide que recebeu a imortalidade dos deuses há 5 mil anos e que busca uma forma de morrer" },
-  { min: 48, max: 48, result: "Mago que se diz filho da própria morte e ameaça desintegrar pessoas quando se descontrola" },
-  { min: 49, max: 49, result: "Ancião (muito velho) bárbaro em busca de uma última aventura antes de se aposentar" },
-  { min: 50, max: 50, result: "Vampiro viajando pelo mundo buscando compreender sua própria existência" },
-  { min: 51, max: 51, result: "Humanoide de uma terra distante que não fala o idioma local" },
+  {
+    min: 46,
+    max: 46,
+    result:
+      "Humanoide de aparência frágil, que diz ter vindo de uma época futura",
+  },
+  {
+    min: 47,
+    max: 47,
+    result:
+      "Humanoide que recebeu a imortalidade dos deuses há 5 mil anos e que busca uma forma de morrer",
+  },
+  {
+    min: 48,
+    max: 48,
+    result:
+      "Mago que se diz filho da própria morte e ameaça desintegrar pessoas quando se descontrola",
+  },
+  {
+    min: 49,
+    max: 49,
+    result:
+      "Ancião (muito velho) bárbaro em busca de uma última aventura antes de se aposentar",
+  },
+  {
+    min: 50,
+    max: 50,
+    result:
+      "Vampiro viajando pelo mundo buscando compreender sua própria existência",
+  },
+  {
+    min: 51,
+    max: 51,
+    result: "Humanoide de uma terra distante que não fala o idioma local",
+  },
   { min: 52, max: 52, result: "Grupo de botânicos" },
-  { min: 53, max: 53, result: "Grupo de aventureiros quase idêntico ao dos jogadores mas com nomes e alinhamentos trocados" },
+  {
+    min: 53,
+    max: 53,
+    result:
+      "Grupo de aventureiros quase idêntico ao dos jogadores mas com nomes e alinhamentos trocados",
+  },
   { min: 54, max: 54, result: "Mago buscando imortalidade" },
-  { min: 55, max: 55, result: "Nobres de um reino aliado ou em processo de aliança" },
+  {
+    min: 55,
+    max: 55,
+    result: "Nobres de um reino aliado ou em processo de aliança",
+  },
   { min: 56, max: 56, result: "Grupo de aventureiros esquisito e chamativo" },
-  { min: 57, max: 57, result: "Mago de coração gentil que busca novos alunos para ensinar magia" },
-  { min: 58, max: 58, result: "Dragão majestoso e bondoso, cheio de conselhos e sabedoria" },
+  {
+    min: 57,
+    max: 57,
+    result: "Mago de coração gentil que busca novos alunos para ensinar magia",
+  },
+  {
+    min: 58,
+    max: 58,
+    result: "Dragão majestoso e bondoso, cheio de conselhos e sabedoria",
+  },
   { min: 59, max: 59, result: "Nobre paranoico preparado para tudo" },
   { min: 60, max: 60, result: "Ente" },
-  { min: 61, max: 61, result: "Investigador oficial do governo e seu assistente" },
-  { min: 62, max: 62, result: "Um escritor despreparado que quer ver tudo de perto" },
-  { min: 63, max: 63, result: "Um nobre poderoso, que de noite se disfarça para combater o crime" },
-  { min: 64, max: 64, result: "Humanoide que diz ser filho de um deus que busca matá-lo" },
+  {
+    min: 61,
+    max: 61,
+    result: "Investigador oficial do governo e seu assistente",
+  },
+  {
+    min: 62,
+    max: 62,
+    result: "Um escritor despreparado que quer ver tudo de perto",
+  },
+  {
+    min: 63,
+    max: 63,
+    result: "Um nobre poderoso, que de noite se disfarça para combater o crime",
+  },
+  {
+    min: 64,
+    max: 64,
+    result: "Humanoide que diz ser filho de um deus que busca matá-lo",
+  },
   { min: 65, max: 65, result: "Excêntrico alquimista e seu minizoológico" },
   { min: 66, max: 66, result: "Filósofos tentando levar iluminação ao mundo" },
   { min: 67, max: 67, result: "Mineradores atrás de boatos" },
   { min: 68, max: 68, result: "Orc erudito" },
   { min: 69, max: 69, result: "Casal de nobres condenado à morte" },
   { min: 70, max: 70, result: "Grupo de aventureiros famoso" },
-  { min: 71, max: 71, result: "Grupo de fugitivos políticos que participaram de uma intriga para matar o líder local" },
-  { min: 72, max: 72, result: "Xamã em busca de reclamar uma região que faz parte das lendas de sua tribo" },
+  {
+    min: 71,
+    max: 71,
+    result:
+      "Grupo de fugitivos políticos que participaram de uma intriga para matar o líder local",
+  },
+  {
+    min: 72,
+    max: 72,
+    result:
+      "Xamã em busca de reclamar uma região que faz parte das lendas de sua tribo",
+  },
   { min: 73, max: 73, result: "Um kenku" },
   { min: 74, max: 74, result: "Item mágico falante senciente" },
-  { min: 75, max: 75, result: "Caçador de recompensas interessado em fazer do novo mundo o seu campo de caça" },
-  { min: 76, max: 76, result: "Clérigo antigo pretendendo fazer ressurgir sua religião" },
-  { min: 77, max: 77, result: "Estudiosos em uma expedição para provar que a terra é plana" },
-  { min: 78, max: 78, result: "Um animal que foi amaldiçoado e transformado em humanoide" },
-  { min: 79, max: 79, result: "Eruditos com livros para montar uma biblioteca" },
-  { min: 80, max: 80, result: "Uma legião inteira de recrutas com ordens para expandir territórios" },
+  {
+    min: 75,
+    max: 75,
+    result:
+      "Caçador de recompensas interessado em fazer do novo mundo o seu campo de caça",
+  },
+  {
+    min: 76,
+    max: 76,
+    result: "Clérigo antigo pretendendo fazer ressurgir sua religião",
+  },
+  {
+    min: 77,
+    max: 77,
+    result: "Estudiosos em uma expedição para provar que a terra é plana",
+  },
+  {
+    min: 78,
+    max: 78,
+    result: "Um animal que foi amaldiçoado e transformado em humanoide",
+  },
+  {
+    min: 79,
+    max: 79,
+    result: "Eruditos com livros para montar uma biblioteca",
+  },
+  {
+    min: 80,
+    max: 80,
+    result:
+      "Uma legião inteira de recrutas com ordens para expandir territórios",
+  },
   { min: 81, max: 81, result: "Monges com intuito de abrir um monastério" },
   { min: 82, max: 82, result: "Animal falante revoltado com humanoides" },
-  { min: 83, max: 83, result: "Um humanoide que na verdade são três goblins em um sobretudo" },
+  {
+    min: 83,
+    max: 83,
+    result: "Um humanoide que na verdade são três goblins em um sobretudo",
+  },
   { min: 84, max: 84, result: "Cultista que busca invocar um deus antigo" },
   { min: 85, max: 85, result: "Pintor de muito talento" },
-  { min: 86, max: 86, result: "Humanoide que possui um artefato que faz ele virar seres de outros planos" },
-  { min: 87, max: 87, result: "O contratante não dorme há dias pois sempre tem um mesmo sonho de que sai em uma aventura" },
+  {
+    min: 86,
+    max: 86,
+    result:
+      "Humanoide que possui um artefato que faz ele virar seres de outros planos",
+  },
+  {
+    min: 87,
+    max: 87,
+    result:
+      "O contratante não dorme há dias pois sempre tem um mesmo sonho de que sai em uma aventura",
+  },
   { min: 88, max: 88, result: "Bandidos que fizeram um refúgio próximo" },
-  { min: 89, max: 89, result: "Humanoides infectados com um misterioso parasita dos mares" },
+  {
+    min: 89,
+    max: 89,
+    result: "Humanoides infectados com um misterioso parasita dos mares",
+  },
   { min: 90, max: 90, result: "Avatar de um deus, porém com amnésia" },
-  { min: 91, max: 91, result: "Humanoides de uma terra desconhecida que surgem quando desaparecimentos acontecem" },
+  {
+    min: 91,
+    max: 91,
+    result:
+      "Humanoides de uma terra desconhecida que surgem quando desaparecimentos acontecem",
+  },
   { min: 92, max: 92, result: "Lendário explorador" },
-  { min: 93, max: 93, result: "Crianças que alegam serem adultos amaldiçoados durante a viagem" },
-  { min: 94, max: 94, result: "O contratante é um famoso campeão de duelo de criaturas" },
+  {
+    min: 93,
+    max: 93,
+    result: "Crianças que alegam serem adultos amaldiçoados durante a viagem",
+  },
+  {
+    min: 94,
+    max: 94,
+    result: "O contratante é um famoso campeão de duelo de criaturas",
+  },
   { min: 95, max: 95, result: "Fanático religioso em busca de hereges" },
   { min: 96, max: 96, result: "Comitiva de anões para explorar montanhas" },
   { min: 97, max: 97, result: "Comitiva de elfos para explorar florestas" },
   { min: 98, max: 98, result: "Fantasma preso a um humanoide" },
   { min: 99, max: 99, result: "Duplo assassino em série" },
-  { min: 100, max: 100, result: "3 magos guiados por uma estrela, buscando uma criança profética" },
+  {
+    min: 100,
+    max: 100,
+    result: "3 magos guiados por uma estrela, buscando uma criança profética",
+  },
 ];
 
 // ===== CONJUNTOS DE PALAVRAS-CHAVE PARA CRIATIVIDADE =====
@@ -449,7 +673,10 @@ export const CREATIVITY_KEYWORDS_SET6_TABLE: TableEntry<string>[] = [
 /**
  * Mapeamento dos conjuntos temáticos para suas respectivas tabelas
  */
-export const THEME_KEYWORD_TABLES: Record<ThemeKeywordSet, TableEntry<string>[]> = {
+export const THEME_KEYWORD_TABLES: Record<
+  ThemeKeywordSet,
+  TableEntry<string>[]
+> = {
   [ThemeKeywordSet.MACABRO]: THEME_MACABRE_TABLE,
   [ThemeKeywordSet.GUERRA]: THEME_WAR_TABLE,
   [ThemeKeywordSet.FANTASIA]: THEME_FANTASY_TABLE,

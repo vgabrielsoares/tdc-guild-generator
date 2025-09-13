@@ -7,14 +7,11 @@
         :class="[
           'toast',
           `toast-${toast.type}`,
-          { 'toast-dismissible': toast.dismissible }
+          { 'toast-dismissible': toast.dismissible },
         ]"
       >
         <div class="toast-content">
-          <component 
-            :is="getToastIcon(toast.type)" 
-            class="toast-icon"
-          />
+          <component :is="getToastIcon(toast.type)" class="toast-icon" />
           <span class="toast-message">{{ toast.message }}</span>
         </div>
         <button
@@ -31,46 +28,46 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
-import { 
+import { ref, onMounted, onUnmounted } from "vue";
+import {
   CheckCircleIcon,
   ExclamationCircleIcon,
   ExclamationTriangleIcon,
   InformationCircleIcon,
-  XMarkIcon
-} from '@heroicons/vue/24/solid';
+  XMarkIcon,
+} from "@heroicons/vue/24/solid";
 
 export interface Toast {
   id: string;
   message: string;
-  type: 'success' | 'error' | 'warning' | 'info';
+  type: "success" | "error" | "warning" | "info";
   duration?: number;
   dismissible?: boolean;
 }
 
 const toasts = ref<Toast[]>([]);
 
-const getToastIcon = (type: Toast['type']) => {
+const getToastIcon = (type: Toast["type"]) => {
   const icons = {
     success: CheckCircleIcon,
     error: ExclamationCircleIcon,
     warning: ExclamationTriangleIcon,
-    info: InformationCircleIcon
+    info: InformationCircleIcon,
   };
   return icons[type];
 };
 
-const addToast = (toast: Omit<Toast, 'id'>) => {
+const addToast = (toast: Omit<Toast, "id">) => {
   const id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
   const newToast: Toast = {
     id,
     dismissible: true,
     duration: 4000,
-    ...toast
+    ...toast,
   };
-  
+
   toasts.value.push(newToast);
-  
+
   if (newToast.duration && newToast.duration > 0) {
     setTimeout(() => {
       removeToast(id);
@@ -79,7 +76,7 @@ const addToast = (toast: Omit<Toast, 'id'>) => {
 };
 
 const removeToast = (id: string) => {
-  const index = toasts.value.findIndex(toast => toast.id === id);
+  const index = toasts.value.findIndex((toast) => toast.id === id);
   if (index > -1) {
     toasts.value.splice(index, 1);
   }
@@ -90,22 +87,22 @@ const clearToasts = () => {
 };
 
 // Event listeners para toasts globais
-const handleToastEvent = (event: CustomEvent<Omit<Toast, 'id'>>) => {
+const handleToastEvent = (event: CustomEvent<Omit<Toast, "id">>) => {
   addToast(event.detail);
 };
 
 onMounted(() => {
-  window.addEventListener('show-toast', handleToastEvent as EventListener);
+  window.addEventListener("show-toast", handleToastEvent as EventListener);
 });
 
 onUnmounted(() => {
-  window.removeEventListener('show-toast', handleToastEvent as EventListener);
+  window.removeEventListener("show-toast", handleToastEvent as EventListener);
 });
 
 defineExpose({
   addToast,
   removeToast,
-  clearToasts
+  clearToasts,
 });
 </script>
 

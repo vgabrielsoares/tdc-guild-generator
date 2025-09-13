@@ -1,4 +1,3 @@
-// Contracts Store
 import { defineStore } from "pinia";
 import { ref, computed, readonly, watch } from "vue";
 import type { Contract } from "@/types/contract";
@@ -8,11 +7,9 @@ import {
   ContractorType,
   DeadlineType,
   calculateBreachPenalty,
-  type ContractsStorageState,
   type GuildContracts,
   createEmptyGuildContracts,
   canGuildGenerateContracts,
-  migrateContractsToGuildFormat,
 } from "@/types/contract";
 import {
   ContractLifecycleManager,
@@ -28,7 +25,7 @@ import {
 } from "@/utils/generators/contractGenerator";
 import { CONTRACT_DIFFICULTY_TABLE } from "@/data/tables/contract-base-tables";
 import { useGuildStore } from "./guild";
-import { useStorage } from "@/composables/useStorage";
+import { useContractsStorage } from "@/composables/useContractsStorage";
 import { useTimelineStore } from "./timeline";
 import { useToast } from "@/composables/useToast";
 import {
@@ -54,9 +51,10 @@ import {
   type ModuleEventConfig,
   type ModuleEventHandler,
 } from "@/utils/timeline-store-integration";
+import { shouldAutoInitialize } from "@/utils/environment-detection";
 
 export const useContractsStore = defineStore("contracts", () => {
-  // Store dependencies
+  // Dependências do store
   const timelineStore = useTimelineStore();
   const { success, info, warning } = useToast();
 
@@ -67,6 +65,9 @@ export const useContractsStore = defineStore("contracts", () => {
   const lastUpdate = ref<Date | null>(null);
   const generationError = ref<string | null>(null);
   const currentGuildId = ref<string | null>(null);
+
+  // Flag para prevenir saves durante inicialização
+  const isInitializing = ref(false);
 
   // Gerenciador de ciclo de vida
   const lifecycleManager = new ContractLifecycleManager();
@@ -83,11 +84,7 @@ export const useContractsStore = defineStore("contracts", () => {
   });
 
   // Persistência segregada por guilda
-  const storage = useStorage<ContractsStorageState>("contracts-store-v2", {
-    guildContracts: {},
-    currentGuildId: null,
-    globalLastUpdate: null,
-  });
+  const storage = useContractsStorage();
 
   // ===== COMPUTED =====
 
@@ -235,6 +232,14 @@ export const useContractsStore = defineStore("contracts", () => {
   const saveToStorage = () => {
     if (!currentGuildId.value) return;
 
+    // Prevenir saves durante inicialização para evitar race conditions
+    if (isInitializing.value) {
+      // Evitar salvar enquanto o store estiver sendo inicializado
+      return;
+    }
+
+    // chamada de saveToStorage (detalhes omitidos em logs)
+
     const guildData: GuildContracts =
       storage.data.value.guildContracts[currentGuildId.value] ||
       createEmptyGuildContracts(currentGuildId.value);
@@ -245,6 +250,35 @@ export const useContractsStore = defineStore("contracts", () => {
     storage.data.value.guildContracts[currentGuildId.value] = guildData;
     storage.data.value.currentGuildId = currentGuildId.value;
     storage.data.value.globalLastUpdate = new Date();
+
+    // Dados atualizados em memória. persistência assíncrona será tratada pelo composable
+  };
+
+  /**
+   * Salva os contratos da guilda atual no storage e força persistência imediata
+   */
+  const saveToStorageAndPersist = async () => {
+    saveToStorage();
+
+    // Forçar persistência imediata para evitar perda de dados
+    if (currentGuildId.value) {
+      try {
+        await storage.persistGuildContracts(currentGuildId.value);
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.warn("Failed to force persist contracts:", e);
+      }
+    }
+  };
+
+  // persistir contratos da guilda atual no adapter e aguardar conclusão
+  const persistCurrentGuildToAdapter = async () => {
+    if (!currentGuildId.value) return;
+    try {
+      await storage.persistGuildContracts(currentGuildId.value);
+    } catch (e) {
+      // silent
+    }
   };
 
   /**
@@ -267,8 +301,11 @@ export const useContractsStore = defineStore("contracts", () => {
     currentGuildId.value = guildId;
     storage.data.value.currentGuildId = guildId;
 
-    // Inicializar timeline para esta guilda
-    timelineStore.setCurrentGuild(guildId);
+    // Sincronizar com timeline SE ela já existir para esta guilda
+    // Não criar nova timeline automaticamente - isso deve ser feito explicitamente
+    if (timelineStore.timelines[guildId]) {
+      timelineStore.setCurrentGuild(guildId);
+    }
 
     // Marca que o store já tinha sido reidratado ao menos uma vez
     isReady.value = true;
@@ -277,8 +314,15 @@ export const useContractsStore = defineStore("contracts", () => {
   /**
    * Remove todos os contratos de uma guilda do storage
    */
-  const cleanupGuildContracts = (guildId: string) => {
+  const cleanupGuildContracts = async (guildId: string) => {
     delete storage.data.value.guildContracts[guildId];
+
+    // Remove persisted rows for this guild
+    try {
+      await storage.deleteGuildContracts(guildId);
+    } catch {
+      // ignore
+    }
 
     // Se era a guilda atual, limpar o estado
     if (currentGuildId.value === guildId) {
@@ -292,40 +336,36 @@ export const useContractsStore = defineStore("contracts", () => {
   /**
    * Migra contratos do formato antigo se existirem
    */
-  const migrateOldData = () => {
-    const oldStorage = useStorage("contracts-store", {
-      contracts: [] as Contract[],
-      lastUpdate: null as string | null,
-      lifecycle: {} as ContractLifecycleState,
-    });
-
-    if (oldStorage.data.value.contracts.length > 0 && currentGuildId.value) {
-      const migratedData = migrateContractsToGuildFormat(
-        oldStorage.data.value.contracts,
-        currentGuildId.value
-      );
-      storage.data.value.guildContracts[currentGuildId.value] = migratedData;
-      oldStorage.reset(); // Limpar dados antigos
-      saveToStorage();
+  const migrateOldData = async () => {
+    // Delegar migração legada para o composable que trata a chave legada baseada em settings
+    try {
+      await storage.migrateLegacyIfNeeded();
+    } catch {
+      // silent
     }
   };
 
   /**
    * Sincroniza com a guilda atual do store de guild
    */
-  const syncWithCurrentGuild = () => {
+  const syncWithCurrentGuild = async () => {
     const guildStore = useGuildStore();
     const currentGuild = guildStore.currentGuild;
 
     if (currentGuild && currentGuild.id !== currentGuildId.value) {
       loadGuildContracts(currentGuild.id);
-      migrateOldData(); // Tentar migrar dados antigos se necessário
+      await migrateOldData(); // Tentar migrar dados antigos se necessário
+
+      // Forçar persistência do novo currentGuildId
+      storage.data.value.currentGuildId = currentGuildId.value;
+      await saveToStorageAndPersist();
     } else if (!currentGuild && currentGuildId.value) {
       // Guilda foi desmarcada, limpar estado
       contracts.value = [];
       lastUpdate.value = null;
       currentGuildId.value = null;
       storage.data.value.currentGuildId = null;
+      await saveToStorageAndPersist();
     }
   };
 
@@ -382,10 +422,31 @@ export const useContractsStore = defineStore("contracts", () => {
   };
 
   /**
+   * Força recarregamento dos dados do storage (útil para debug e recuperação)
+   */
+  const forceReload = async () => {
+    try {
+      // Forçar recarregamento de dados do storage (sem logs verbosos)
+
+      await storage.load();
+
+      if (currentGuildId.value) {
+        loadGuildContracts(currentGuildId.value);
+      } else if (storage.data.value.currentGuildId) {
+        loadGuildContracts(storage.data.value.currentGuildId);
+      }
+
+      // Recarregamento concluído (detalhes omitidos)
+    } catch (e) {
+      // falha no forceReload
+    }
+  };
+
+  /**
    * Processa resolução automática específica para contratos assinados
    * Baseado na tabela "Resoluções para Contratos Firmados"
    */
-  const processSignedContractResolution = () => {
+  const processSignedContractResolution = async () => {
     const signedContracts = contracts.value.filter(
       (c) => c.status === ContractStatus.ACEITO_POR_OUTROS
     );
@@ -397,14 +458,14 @@ export const useContractsStore = defineStore("contracts", () => {
     // Aplicar resolução específica para contratos assinados por outros aventureiros
     contracts.value = applySignedContractResolution(contracts.value);
     lastUpdate.value = new Date();
-    saveToStorage();
+    await saveToStorageAndPersist();
   };
 
   /**
    * Processa resolução automática específica para contratos não assinados
    * Baseado na tabela "Resolução para Contratos que Não Foram Assinados"
    */
-  const processUnsignedContractResolution = () => {
+  const processUnsignedContractResolution = async () => {
     // Aplicar resolução apenas aos contratos DISPONIVEL (não assinados)
     const unsignedContracts = contracts.value.filter(
       (c) => c.status === ContractStatus.DISPONIVEL
@@ -417,7 +478,7 @@ export const useContractsStore = defineStore("contracts", () => {
     // Aplicar resolução específica para contratos não assinados
     contracts.value = applyUnsignedContractResolution(contracts.value);
     lastUpdate.value = new Date();
-    saveToStorage();
+    await saveToStorageAndPersist();
   };
 
   /**
@@ -536,49 +597,152 @@ export const useContractsStore = defineStore("contracts", () => {
    */
   const initializeStore = async () => {
     try {
+      // Definir flag de inicialização para prevenir saves prematuros
+      isInitializing.value = true;
+
+      const env =
+        (typeof process !== "undefined"
+          ? (process as unknown as { env?: Record<string, string> }).env
+          : undefined) || undefined;
+      const isVitest =
+        !!(env && env.VITEST === "true") ||
+        typeof (globalThis as unknown as { __vitest?: unknown }).__vitest !==
+          "undefined";
+      const isDev = import.meta.env.DEV;
+      const trace = (msg: string) => {
+        if (isVitest || isDev) {
+          // eslint-disable-next-line no-console
+          console.log(`[CONTRACTS_INIT] ${msg}`);
+        }
+      };
+
+      trace("starting initializeStore");
+
       // Garantir que os dados do storage foram carregados
       // Carregar explicitamente o storage para evitar condições de corrida
       // entre stores (guild/timeline/contracts)
       try {
-        storage.load();
-      } catch {
-        // silent: em ambientes de teste/localStorage indisponível
+        trace("before storage.load()");
+        await storage.load();
+        trace(
+          `after storage.load() - guildContracts keys: ${Object.keys(storage.data.value.guildContracts)}`
+        );
+      } catch (e) {
+        trace(`storage.load() failed: ${String(e)}`);
+      }
+
+      // Tentar migrar dados legados precocemente
+      try {
+        trace("before storage.migrateLegacyIfNeeded()");
+        await storage.migrateLegacyIfNeeded();
+        trace("after storage.migrateLegacyIfNeeded()");
+      } catch (e) {
+        trace(`storage.migrateLegacyIfNeeded() failed: ${String(e)}`);
       }
 
       // Se o storage lembra da última guilda usada, restaurar seus contratos
-      const persistedGuildId = storage.data.value.currentGuildId;
-      if (persistedGuildId) {
-        loadGuildContracts(persistedGuildId);
+      try {
+        const persistedGuildId = storage.data.value.currentGuildId;
+        trace(`persistedGuildId=${String(persistedGuildId)}`);
+        if (persistedGuildId) {
+          const guildData = storage.data.value.guildContracts[persistedGuildId];
+          trace(
+            `found guild data for ${persistedGuildId}: ${guildData?.contracts?.length || 0} contracts`
+          );
+          loadGuildContracts(persistedGuildId);
+          trace("loaded persisted guild contracts");
+        }
+      } catch (e) {
+        trace(`loading persisted guild failed: ${String(e)}`);
       }
 
       // Sincronizar com a guilda atual
-      syncWithCurrentGuild();
-
-      // Inicializar o lifecycle
-      initializeLifecycle();
+      try {
+        trace("before syncWithCurrentGuild()");
+        await syncWithCurrentGuild();
+        trace("after syncWithCurrentGuild()");
+      } catch (e) {
+        trace(`syncWithCurrentGuild() failed: ${String(e)}`);
+      }
 
       // Indicar que a reidratação/initialização foi concluída
       isReady.value = true;
 
       generationError.value = null;
+
+      // Remover flag de inicialização para permitir saves normais
+      isInitializing.value = false;
+
+      trace("initializeStore completed");
     } catch (error) {
+      // Garantir que a flag seja removida mesmo em caso de erro
+      isInitializing.value = false;
       generationError.value = "Erro ao inicializar store de contratos";
     }
   };
   // inicialização do store de contratos para persistência de outras views (timeline)
-  initializeStore();
+
+  // Inicializar store automaticamente, mas não em ambiente de testes
+  if (shouldAutoInitialize()) {
+    // Para garantir que a inicialização seja sempre chamada, mesmo em recarregamentos de página
+    initializeStore();
+
+    // Adicionar listener para visibilitychange para recarregar dados quando a página volta a ficar visível
+    if (typeof document !== "undefined") {
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden && isReady.value) {
+          // Página voltou a ficar visível, recarregar dados se necessário
+          void (async () => {
+            try {
+              await storage.load();
+              if (currentGuildId.value) {
+                const guildData =
+                  storage.data.value.guildContracts[currentGuildId.value];
+                if (
+                  guildData &&
+                  guildData.contracts.length !== contracts.value.length
+                ) {
+                  // Dados mudaram, recarregar
+                  loadGuildContracts(currentGuildId.value);
+                }
+              }
+            } catch (e) {
+              // ignore
+            }
+          })();
+        }
+      });
+    }
+
+    // Adicionar função global para debug (apenas em DEV)
+    if (import.meta.env.DEV && typeof window !== "undefined") {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).debugContracts = {
+        forceReload,
+        getStorage: () => storage.data.value,
+        getContracts: () => contracts.value,
+        getCurrentGuildId: () => currentGuildId.value,
+        isReady: () => isReady.value,
+      };
+    }
+  }
 
   // watch pra mudanças da guilda e re-sync
   watch(
     () => useGuildStore().currentGuild?.id,
     () => {
-      try {
-        syncWithCurrentGuild();
-      } catch {
-        // silent
-      }
+      void (async () => {
+        try {
+          // Não sincronizar durante inicialização para evitar race conditions
+          if (!isInitializing.value) {
+            await syncWithCurrentGuild();
+          }
+        } catch {
+          // silent
+        }
+      })();
     },
-    { immediate: true }
+    { immediate: shouldAutoInitialize() }
   );
 
   /**
@@ -630,6 +794,8 @@ export const useContractsStore = defineStore("contracts", () => {
       lifecycleManager.markNewContractsGenerated();
       lastUpdate.value = new Date();
       saveToStorage();
+      // Garantir que a persistência seja concluída antes de continuar (evita UI mostrando contagens sem linhas salvas)
+      await persistCurrentGuildToAdapter();
 
       // Agendar próximos eventos de timeline
       scheduleContractEvents();
@@ -711,12 +877,18 @@ export const useContractsStore = defineStore("contracts", () => {
       // Bloquear a guilda automaticamente após primeira geração de contratos
       // (impede regeneração de estrutura, mantendo consistência)
       if (!currentGuild.locked) {
-        guildStore.toggleGuildLock(currentGuild.id);
+        await guildStore.toggleGuildLock(currentGuild.id);
       }
 
       lifecycleManager.markNewContractsGenerated();
       lastUpdate.value = new Date();
+
+      // Atualizando armazenamento em memória para a guilda atual (persistência assíncrona)
+
       saveToStorage();
+      await persistCurrentGuildToAdapter();
+
+      // Persistência concluída (detalhes omitidos)
 
       // Agendar eventos de timeline após gerar contratos
       scheduleContractEvents();
@@ -1406,6 +1578,7 @@ export const useContractsStore = defineStore("contracts", () => {
     loadGuildContracts,
     cleanupGuildContracts,
     cleanupRemovedGuilds,
+    forceReload,
 
     // ===== ACTIONS - Geração e Ciclo de Vida =====
     generateContracts,

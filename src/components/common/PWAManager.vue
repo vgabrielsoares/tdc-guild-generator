@@ -68,125 +68,135 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { 
-  GlobeAltIcon, 
-  ArrowPathIcon, 
-  XMarkIcon, 
-  SignalIcon 
-} from '@heroicons/vue/24/outline'
+import { ref, onMounted, onUnmounted } from "vue";
+import {
+  GlobeAltIcon,
+  ArrowPathIcon,
+  XMarkIcon,
+  SignalIcon,
+} from "@heroicons/vue/24/outline";
 
 // Estado dos prompts
-const showInstallPrompt = ref(false)
-const showUpdatePrompt = ref(false)
-const isOnline = ref(navigator.onLine)
+const showInstallPrompt = ref(false);
+const showUpdatePrompt = ref(false);
+const isOnline = ref(navigator.onLine);
 
 // Event listeners
-let deferredPrompt: any = null
-let registration: ServiceWorkerRegistration | null = null
+let deferredPrompt: any = null;
+let registration: ServiceWorkerRegistration | null = null;
 
 // Install App
 const installApp = async () => {
   if (deferredPrompt) {
-    deferredPrompt.prompt()
-    const { outcome } = await deferredPrompt.userChoice
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
 
-    if (outcome === 'accepted') {
-      console.log('[PWA MANAGER] PWA installed successfully')
+    if (outcome === "accepted") {
+      console.log("[PWA MANAGER] PWA installed successfully");
     } else {
-      console.log('[PWA MANAGER] PWA installation declined')
+      console.log("[PWA MANAGER] PWA installation declined");
     }
 
-    deferredPrompt = null
-    showInstallPrompt.value = false
+    deferredPrompt = null;
+    showInstallPrompt.value = false;
   }
-}
+};
 
 const dismissInstall = () => {
-  showInstallPrompt.value = false
-  localStorage.setItem('pwa-install-dismissed', Date.now().toString())
-}
+  showInstallPrompt.value = false;
+  localStorage.setItem("pwa-install-dismissed", Date.now().toString());
+};
 
 // Update App
 const updateApp = () => {
   if (registration && registration.waiting) {
-    registration.waiting.postMessage({ type: 'SKIP_WAITING' })
-    window.location.reload()
+    try {
+      // postMessage pode falhar quando não há canal de comunicação ativo
+      registration.waiting.postMessage?.({ type: "SKIP_WAITING" });
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn('[PWA MANAGER] failed to postMessage to waiting worker', err);
+    }
+
+    // Reload independentemente de postMessage ter funcionado
+    window.location.reload();
   }
-}
+};
 
 const dismissUpdate = () => {
-  showUpdatePrompt.value = false
-}
+  showUpdatePrompt.value = false;
+};
 
 // Event Handlers
 const handleBeforeInstallPrompt = (e: Event) => {
-  e.preventDefault()
-  deferredPrompt = e
+  e.preventDefault();
+  deferredPrompt = e;
 
   // Só mostra se não foi dismissado recentemente (24h)
-  const dismissed = localStorage.getItem('pwa-install-dismissed')
+  const dismissed = localStorage.getItem("pwa-install-dismissed");
   if (!dismissed || Date.now() - parseInt(dismissed) > 24 * 60 * 60 * 1000) {
-    showInstallPrompt.value = true
+    showInstallPrompt.value = true;
   }
-}
+};
 
 const handleOnline = () => {
-  isOnline.value = true
-  console.log('[PWA MANAGER] Connection restored')
-}
+  isOnline.value = true;
+  console.log("[PWA MANAGER] Connection restored");
+};
 
 const handleOffline = () => {
-  isOnline.value = false
-  console.log('[PWA MANAGER] Connection lost - entering offline mode')
-}
+  isOnline.value = false;
+  console.log("[PWA MANAGER] Connection lost - entering offline mode");
+};
 
 const handleServiceWorkerUpdate = () => {
-  showUpdatePrompt.value = true
-}
+  showUpdatePrompt.value = true;
+};
 
 // Lifecycle
 onMounted(async () => {
   // Install prompt
-  window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+  window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
   // Online/Offline
-  window.addEventListener('online', handleOnline)
-  window.addEventListener('offline', handleOffline)
+  window.addEventListener("online", handleOnline);
+  window.addEventListener("offline", handleOffline);
 
   // Service Worker updates
-  if ('serviceWorker' in navigator) {
+  if ("serviceWorker" in navigator) {
     try {
-      registration = await navigator.serviceWorker.getRegistration() || null
+      registration = (await navigator.serviceWorker.getRegistration()) || null;
 
       if (registration) {
-        registration.addEventListener('updatefound', () => {
-          const newWorker = registration!.installing
+        registration.addEventListener("updatefound", () => {
+          const newWorker = registration!.installing;
 
           if (newWorker) {
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                handleServiceWorkerUpdate()
+            newWorker.addEventListener("statechange", () => {
+              if (
+                newWorker.state === "installed" &&
+                navigator.serviceWorker.controller
+              ) {
+                handleServiceWorkerUpdate();
               }
-            })
+            });
           }
-        })
+        });
       }
 
       // Listen for controllerchange (when SW takes control)
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        window.location.reload()
-      })
-
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+        window.location.reload();
+      });
     } catch (error) {
-      console.error('[PWA MANAGER] Service Worker registration failed:', error)
+      console.error("[PWA MANAGER] Service Worker registration failed:", error);
     }
   }
-})
+});
 
 onUnmounted(() => {
-  window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-  window.removeEventListener('online', handleOnline)
-  window.removeEventListener('offline', handleOffline)
-})
+  window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+  window.removeEventListener("online", handleOnline);
+  window.removeEventListener("offline", handleOffline);
+});
 </script>

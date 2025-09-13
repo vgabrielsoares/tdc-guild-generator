@@ -16,10 +16,10 @@
 </template>
 
 <script setup lang="ts">
-// Import renown components
-import RenownTracker from '@/components/renown/RenownTracker.vue'
-import { TrophyIcon } from '@heroicons/vue/24/outline'
+// Importar componentes de renome
+import RenownTracker from "@/components/renown/RenownTracker.vue";
+import { TrophyIcon } from "@heroicons/vue/24/outline";
 
-// Renown view implementation will be added in Phase 8
-console.log('[RENOWN] Renown View loaded')
+// Implementação da view de Renome será adicionada na Fase 8
+console.log("[RENOWN] Renown View carregada");
 </script>
