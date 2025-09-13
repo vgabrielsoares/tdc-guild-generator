@@ -1,5 +1,5 @@
 {
-  "name": "generator-guild",
+  "name": "tdc-guild-generator",
   "version": "0.1.0",
   "description": "Sistema completo para geração procedural de guildas de aventureiros para RPG de mesa",
   "type": "module",
