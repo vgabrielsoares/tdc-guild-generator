@@ -39,63 +39,102 @@ export const useTimelineStore = defineStore("timeline", () => {
   const storageAdapter = useStorageAdapter();
   const { success, info, warning } = useToast();
 
-  // Normaliza diferentes representações de data para o formato GameDate
-  function normalizeGameDate(input: unknown) {
-    try {
-      if (input === null || input === undefined) return createDefaultGameDate();
+  // ===== FUNÇÕES AUXILIARES PARA NORMALIZAÇÃO DE DATA =====
 
-      // Se já for um objeto do tipo GameDate
-      if (typeof input === "object") {
-        const obj = input as Record<string, unknown>;
-        if (
-          typeof obj.day === "number" &&
-          typeof obj.month === "number" &&
-          typeof obj.year === "number"
-        ) {
-          return createGameDate(
-            obj.day as number,
-            obj.month as number,
-            obj.year as number
-          );
-        }
+  /**
+   * Verifica se um objeto tem as propriedades de GameDate
+   */
+  function isGameDateObject(obj: Record<string, unknown>): boolean {
+    return (
+      typeof obj.day === "number" &&
+      typeof obj.month === "number" &&
+      typeof obj.year === "number"
+    );
+  }
 
-        // Se for uma instância Date (possivelmente revivida pela desserialização)
-        if (obj instanceof Date) {
-          return createGameDate(
-            obj.getDate(),
-            obj.getMonth() + 1,
-            obj.getFullYear()
-          );
-        }
+  /**
+   * Converte uma instância Date para GameDate
+   */
+  function dateToGameDate(date: Date): GameDate {
+    return createGameDate(
+      date.getDate(),
+      date.getMonth() + 1,
+      date.getFullYear()
+    );
+  }
 
-        // Se for um objeto de data serializado produzido por serializeData (ex: { __type: 'Date', value: '...' })
-        if (obj.__type === "Date" && typeof obj.value === "string") {
-          const parsed = new Date(obj.value);
-          if (!Number.isNaN(parsed.getTime())) {
-            return createGameDate(
-              parsed.getDate(),
-              parsed.getMonth() + 1,
-              parsed.getFullYear()
-            );
-          }
-        }
+  /**
+   * Processa objeto serializado de data (formato { __type: 'Date', value: '...' })
+   */
+  function processSerializedDate(
+    obj: Record<string, unknown>
+  ): GameDate | null {
+    if (obj.__type === "Date" && typeof obj.value === "string") {
+      const parsed = new Date(obj.value);
+      if (!Number.isNaN(parsed.getTime())) {
+        return dateToGameDate(parsed);
       }
+    }
+    return null;
+  }
 
-      // Strings (ISO ou outros) ou timestamps numéricos
-      if (typeof input === "string" || typeof input === "number") {
-        const parsed = new Date(input as string | number);
-        if (!Number.isNaN(parsed.getTime())) {
-          return createGameDate(
-            parsed.getDate(),
-            parsed.getMonth() + 1,
-            parsed.getFullYear()
-          );
-        }
-      }
-    } catch (e) {
-      // fallback
+  /**
+   * Processa dados de entrada do tipo object para normalização
+   */
+  function processObjectInput(input: Record<string, unknown>): GameDate | null {
+    // Se já for um objeto do tipo GameDate
+    if (isGameDateObject(input)) {
+      return createGameDate(
+        input.day as number,
+        input.month as number,
+        input.year as number
+      );
     }
 
+    // Se for uma instância Date
+    if (input instanceof Date) {
+      return dateToGameDate(input);
+    }
+
+    // Se for um objeto de data serializado
+    return processSerializedDate(input);
+  }
+
+  /**
+   * Processa dados de entrada do tipo string ou number para normalização
+   */
+  function processPrimitiveInput(input: string | number): GameDate | null {
+    const parsed = new Date(input);
+    if (!Number.isNaN(parsed.getTime())) {
+      return dateToGameDate(parsed);
+    }
+    return null;
+  }
+
+  // Normaliza diferentes representações de data para o formato GameDate
+  function normalizeGameDate(input: unknown): GameDate {
+    try {
+      // Verificação inicial de nulo/undefined
+      if (input === null || input === undefined) {
+        return createDefaultGameDate();
+      }
+
+      // Processamento de objetos
+      if (typeof input === "object") {
+        const result = processObjectInput(input as Record<string, unknown>);
+        if (result) return result;
+      }
+
+      // Processamento de strings e números (timestamps, ISO strings, etc.)
+      if (typeof input === "string" || typeof input === "number") {
+        const result = processPrimitiveInput(input);
+        if (result) return result;
+      }
+    } catch (e) {
+      // Fallback silencioso em caso de erro inesperado
+    }
+
+    // Fallback padrão
     return createDefaultGameDate();
   }
 
