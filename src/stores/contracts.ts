@@ -53,6 +53,15 @@ import {
 } from "@/utils/timeline-store-integration";
 import { shouldAutoInitialize } from "@/utils/environment-detection";
 
+// Estados da máquina de estado para inicialização
+enum InitializationState {
+  UNINITIALIZED = "uninitialized",
+  INITIALIZING = "initializing",
+  INITIALIZED = "initialized",
+  ERROR = "error",
+  RELOADING = "reloading",
+}
+
 export const useContractsStore = defineStore("contracts", () => {
   // Dependências do store
   const timelineStore = useTimelineStore();
@@ -66,8 +75,13 @@ export const useContractsStore = defineStore("contracts", () => {
   const generationError = ref<string | null>(null);
   const currentGuildId = ref<string | null>(null);
 
-  // Flag para prevenir saves durante inicialização
-  const isInitializing = ref(false);
+  // State machine para controle de inicialização
+  const initializationState = ref<InitializationState>(
+    InitializationState.UNINITIALIZED
+  );
+  const initializationError = ref<string | null>(null);
+  const initializationRetryCount = ref(0);
+  const maxRetries = 3;
 
   // Gerenciador de ciclo de vida
   const lifecycleManager = new ContractLifecycleManager();
@@ -85,6 +99,107 @@ export const useContractsStore = defineStore("contracts", () => {
 
   // Persistência segregada por guilda
   const storage = useContractsStorage();
+
+  // ===== COMPUTED PARA STATE MACHINE =====
+
+  // Estados computados para facilitar uso
+  const isInitializing = computed(
+    () =>
+      initializationState.value === InitializationState.INITIALIZING ||
+      initializationState.value === InitializationState.RELOADING
+  );
+
+  const isInitialized = computed(
+    () => initializationState.value === InitializationState.INITIALIZED
+  );
+
+  const hasInitializationError = computed(
+    () => initializationState.value === InitializationState.ERROR
+  );
+
+  const canRetryInitialization = computed(
+    () => initializationRetryCount.value < maxRetries
+  );
+
+  // ===== FUNÇÕES DO STATE MACHINE =====
+
+  /**
+   * Transiciona o estado de inicialização com validação
+   */
+  const transitionInitializationState = (
+    newState: InitializationState,
+    error?: string
+  ) => {
+    const currentState = initializationState.value;
+
+    // Validar transições válidas
+    const validTransitions: Record<InitializationState, InitializationState[]> =
+      {
+        [InitializationState.UNINITIALIZED]: [
+          InitializationState.INITIALIZING,
+          InitializationState.ERROR,
+        ],
+        [InitializationState.INITIALIZING]: [
+          InitializationState.INITIALIZED,
+          InitializationState.ERROR,
+        ],
+        [InitializationState.INITIALIZED]: [
+          InitializationState.RELOADING,
+          InitializationState.ERROR,
+        ],
+        [InitializationState.ERROR]: [
+          InitializationState.INITIALIZING,
+          InitializationState.RELOADING,
+        ],
+        [InitializationState.RELOADING]: [
+          InitializationState.INITIALIZED,
+          InitializationState.ERROR,
+        ],
+      };
+
+    if (!validTransitions[currentState]?.includes(newState)) {
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          `[contracts] Invalid state transition: ${currentState} -> ${newState}`
+        );
+      }
+      return false;
+    }
+
+    initializationState.value = newState;
+
+    if (error) {
+      initializationError.value = error;
+    } else if (newState === InitializationState.INITIALIZED) {
+      initializationError.value = null;
+      initializationRetryCount.value = 0;
+    }
+
+    return true;
+  };
+
+  /**
+   * Tenta reinitialization em caso de erro
+   */
+  const retryInitialization = async (): Promise<boolean> => {
+    if (!canRetryInitialization.value) {
+      return false;
+    }
+
+    initializationRetryCount.value++;
+
+    try {
+      transitionInitializationState(InitializationState.INITIALIZING);
+      await initializeStore();
+      return true;
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Erro desconhecido";
+      transitionInitializationState(InitializationState.ERROR, errorMessage);
+      return false;
+    }
+  };
 
   // ===== COMPUTED =====
 
@@ -597,8 +712,15 @@ export const useContractsStore = defineStore("contracts", () => {
    */
   const initializeStore = async () => {
     try {
-      // Definir flag de inicialização para prevenir saves prematuros
-      isInitializing.value = true;
+      // Transicionar para estado de inicialização
+      if (!transitionInitializationState(InitializationState.INITIALIZING)) {
+        // Se não conseguir transicionar (ex: já inicializando), aguardar
+        if (isInitializing.value) {
+          return; // Já está inicializando
+        }
+        // Forçar transição se estiver em estado inválido
+        initializationState.value = InitializationState.INITIALIZING;
+      }
 
       const env =
         (typeof process !== "undefined"
@@ -670,14 +792,18 @@ export const useContractsStore = defineStore("contracts", () => {
 
       generationError.value = null;
 
-      // Remover flag de inicialização para permitir saves normais
-      isInitializing.value = false;
+      // Transicionar para estado inicializado
+      transitionInitializationState(InitializationState.INITIALIZED);
 
       trace("initializeStore completed");
     } catch (error) {
-      // Garantir que a flag seja removida mesmo em caso de erro
-      isInitializing.value = false;
-      generationError.value = "Erro ao inicializar store de contratos";
+      // Transicionar para estado de erro
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Erro ao inicializar store de contratos";
+      transitionInitializationState(InitializationState.ERROR, errorMessage);
+      generationError.value = errorMessage;
     }
   };
   // inicialização do store de contratos para persistência de outras views (timeline)
@@ -1571,6 +1697,15 @@ export const useContractsStore = defineStore("contracts", () => {
     contractStats,
     canGenerateContracts,
     nextActions,
+
+    // ===== STATE MACHINE =====
+    initializationState: readonly(initializationState),
+    initializationError: readonly(initializationError),
+    isInitialized,
+    hasInitializationError,
+    canRetryInitialization,
+    transitionInitializationState,
+    retryInitialization,
 
     // ===== ACTIONS - Core =====
     initializeStore,
