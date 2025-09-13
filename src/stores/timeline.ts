@@ -33,7 +33,9 @@ export const useTimelineStore = defineStore("timeline", () => {
   const currentGuildId = ref<string | null>(null);
 
   // Callbacks para integração com outros stores
-  const timeAdvanceCallbacks = ref<((result: TimeAdvanceResult) => void)[]>([]);
+  const timeAdvanceCallbacks = ref<Set<(result: TimeAdvanceResult) => void>>(
+    new Set()
+  );
 
   // Storage adapter para IndexedDB
   const storageAdapter = useStorageAdapter();
@@ -976,9 +978,9 @@ export const useTimelineStore = defineStore("timeline", () => {
   function registerTimeAdvanceCallback(
     callback: (result: TimeAdvanceResult) => void
   ): void {
-    // Evitar registros duplicados do mesmo callback
-    if (timeAdvanceCallbacks.value.indexOf(callback) === -1) {
-      timeAdvanceCallbacks.value.push(callback);
+    // Evitar registros duplicados do mesmo callback (Set já garante unicidade)
+    if (!timeAdvanceCallbacks.value.has(callback)) {
+      timeAdvanceCallbacks.value.add(callback);
     } else {
       if (import.meta.env.DEV) {
         // eslint-disable-next-line no-console
@@ -993,9 +995,8 @@ export const useTimelineStore = defineStore("timeline", () => {
   function unregisterTimeAdvanceCallback(
     callback: (result: TimeAdvanceResult) => void
   ): void {
-    const index = timeAdvanceCallbacks.value.indexOf(callback);
-    if (index > -1) {
-      timeAdvanceCallbacks.value.splice(index, 1);
+    if (timeAdvanceCallbacks.value.has(callback)) {
+      timeAdvanceCallbacks.value.delete(callback);
     } else {
       if (import.meta.env.DEV) {
         // eslint-disable-next-line no-console
