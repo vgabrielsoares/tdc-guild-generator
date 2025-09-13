@@ -23,9 +23,10 @@ export function installFakeIndexedDB() {
         contains: (n: string) => !!stores[n],
       };
     }
-    createObjectStore(name: string, _opts?: unknown) {
+    createObjectStore(name: string, opts?: { keyPath?: string | string[] }) {
       if (!stores[name]) stores[name] = new Map();
       return {
+        keyPath: opts?.keyPath || "id", // padrão para "id"
         createIndex: () => undefined,
       };
     }
@@ -34,6 +35,7 @@ export function installFakeIndexedDB() {
         objectStore: (n: string) => {
           const map = stores[n] || new Map();
           return {
+            keyPath: "id", // padrão do schema
             get: (key: string) => {
               const req = new FakeRequest();
               setTimeout(() => {
@@ -42,14 +44,17 @@ export function installFakeIndexedDB() {
               }, 0);
               return req;
             },
-            put: (value: any) => {
+            put: (value: any, explicitKey?: string) => {
+              // Se uma chave explícita for fornecida, use-a
+              // Senão, extraia do keyPath do objeto
+              const keyPath = (this as any).keyPath || "id";
               const id =
-                (value && (value.id ?? value.key)) ||
-                value?.key ||
+                explicitKey ||
+                (value && typeof value === "object" && value[keyPath]) ||
                 String(Date.now());
               const req = new FakeRequest();
               setTimeout(() => {
-                map.set(id, value);
+                map.set(String(id), value);
                 req.onsuccess && req.onsuccess();
               }, 0);
               return req;
