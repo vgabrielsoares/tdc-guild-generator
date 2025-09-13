@@ -1418,4 +1418,14 @@ export class ServiceGenerator {
       return 5; // Fallback seguro
     }
   }
+
+  // ===== MÉTODOS PÚBLICOS PARA TESTES =====
+
+  /**
+   * Método público para testes que expõe a geração de descrição de serviços
+   * Permite testar a lógica de descrição sem quebrar o encapsulamento
+   */
+  static generateDescriptionForTesting(objective: ServiceObjective): string {
+    return this.generateServiceDescription(objective);
+  }
 }
