@@ -51,24 +51,9 @@ import {
   type ModuleEventConfig,
   type ModuleEventHandler,
 } from "@/utils/timeline-store-integration";
+import { shouldAutoInitialize } from "@/utils/environment-detection";
 
 export const useContractsStore = defineStore("contracts", () => {
-  try {
-    const env =
-      (typeof process !== "undefined"
-        ? (process as unknown as { env?: Record<string, string> }).env
-        : undefined) || undefined;
-    const isVitest =
-      !!(env && env.VITEST === "true") ||
-      typeof (globalThis as unknown as { __vitest?: unknown }).__vitest !==
-        "undefined";
-    if (isVitest) {
-      // eslint-disable-next-line no-console
-      console.log("[CONTRACTS_STORE] module loaded under Vitest");
-    }
-  } catch {
-    // ignore
-  }
   // Dependências do store
   const timelineStore = useTimelineStore();
   const { success, info, warning } = useToast();
@@ -696,22 +681,9 @@ export const useContractsStore = defineStore("contracts", () => {
     }
   };
   // inicialização do store de contratos para persistência de outras views (timeline)
-  let __isVitest = false;
-  try {
-    const env =
-      (typeof process !== "undefined"
-        ? (process as unknown as { env?: Record<string, string> }).env
-        : undefined) || undefined;
-    __isVitest =
-      !!(env && env.VITEST === "true") ||
-      typeof (globalThis as unknown as { __vitest?: unknown }).__vitest !==
-        "undefined";
-  } catch {
-    __isVitest = false;
-  }
 
   // Inicializar store automaticamente, mas não em ambiente de testes
-  if (!__isVitest) {
+  if (shouldAutoInitialize()) {
     // Para garantir que a inicialização seja sempre chamada, mesmo em recarregamentos de página
     initializeStore();
 
@@ -770,7 +742,7 @@ export const useContractsStore = defineStore("contracts", () => {
         }
       })();
     },
-    { immediate: !__isVitest }
+    { immediate: shouldAutoInitialize() }
   );
 
   /**
