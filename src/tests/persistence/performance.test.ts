@@ -451,15 +451,46 @@ describe("Storage Performance Benchmarks", () => {
   });
 
   describe("Memory Usage and Efficiency", () => {
+    // Helper para verificar se performance.memory está disponível
+    const isMemoryApiAvailable = (): boolean => {
+      try {
+        // Verificar se estamos em Chrome/Chromium baseado browsers
+        const hasMemoryApi =
+          typeof performance !== "undefined" &&
+          "memory" in performance &&
+          performance.memory !== null &&
+          typeof (
+            performance as unknown as { memory: { usedJSHeapSize: number } }
+          ).memory.usedJSHeapSize === "number";
+
+        return hasMemoryApi;
+      } catch {
+        return false;
+      }
+    };
+
+    const getMemoryUsage = (): number => {
+      if (!isMemoryApiAvailable()) {
+        return -1; // Indica que a API não está disponível
+      }
+
+      try {
+        return (
+          performance as unknown as { memory: { usedJSHeapSize: number } }
+        ).memory.usedJSHeapSize;
+      } catch {
+        return -1;
+      }
+    };
+
     it("should handle large datasets without memory issues", async () => {
       const largeDataset = 100;
       const store = "memory-test";
       const testData = generateTestData("large");
 
-      // Memory usage before operations
-      const memoryBefore =
-        (performance as unknown as { memory?: { usedJSHeapSize: number } })
-          .memory?.usedJSHeapSize || 0;
+      // Memory usage before operations (se disponível)
+      const memoryBefore = getMemoryUsage();
+      const hasMemoryApi = memoryBefore !== -1;
 
       // Store large dataset in IndexedDB
       const indexedDBStartTime = performance.now();
@@ -481,14 +512,21 @@ describe("Storage Performance Benchmarks", () => {
       const indexedDBRetrieveTime =
         performance.now() - indexedDBRetrieveStartTime;
 
-      // Memory usage after operations
-      const memoryAfter =
-        (performance as unknown as { memory?: { usedJSHeapSize: number } })
-          .memory?.usedJSHeapSize || 0;
+      // Memory usage after operations (se disponível)
+      const memoryAfter = getMemoryUsage();
 
-      // Verify memory usage is reasonable (if memory info is available)
-      if (memoryBefore > 0 && memoryAfter > 0) {
+      // Verify memory usage is reasonable (apenas se API estiver disponível)
+      if (hasMemoryApi && memoryBefore > 0 && memoryAfter > 0) {
         expect(memoryAfter).toBeGreaterThanOrEqual(memoryBefore);
+
+        // Adicional: verificar que o uso de memória não explodiu (crescimento razoável)
+        const memoryIncrease = memoryAfter - memoryBefore;
+        const reasonableMemoryIncrease = 50 * 1024 * 1024; // 50MB
+        expect(memoryIncrease).toBeLessThan(reasonableMemoryIncrease);
+      } else {
+        // Se API não disponível, apenas validar que não há crash
+        expect(memoryBefore).toBe(-1);
+        expect(memoryAfter).toBe(-1);
       }
 
       // Validations
