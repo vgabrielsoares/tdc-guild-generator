@@ -137,7 +137,8 @@ describe("Guild Names - Gender Agreement System", () => {
 
       GUILD_NAME_PREFIXES_CLASSIFIED.forEach((prefix) => {
         expect(prefix.name).toBeDefined();
-        expect(prefix.gender).toBeOneOf([Gender.MASCULINE, Gender.FEMININE]);
+        // Verifica se o gênero está entre os valores aceitos
+        expect([Gender.MASCULINE, Gender.FEMININE]).toContain(prefix.gender);
         expect(typeof prefix.name).toBe("string");
         expect(prefix.name.length).toBeGreaterThan(0);
       });
@@ -148,7 +149,8 @@ describe("Guild Names - Gender Agreement System", () => {
 
       GUILD_NAME_SUFFIXES_CLASSIFIED.forEach((suffix) => {
         expect(suffix.name).toBeDefined();
-        expect(suffix.type).toBeOneOf([SuffixType.ADJECTIVE, SuffixType.NOUN]);
+        // Verifica se o tipo do sufixo é ADJECTIVE ou NOUN
+        expect([SuffixType.ADJECTIVE, SuffixType.NOUN]).toContain(suffix.type);
         expect(typeof suffix.name).toBe("string");
         expect(suffix.name.length).toBeGreaterThan(0);
 
