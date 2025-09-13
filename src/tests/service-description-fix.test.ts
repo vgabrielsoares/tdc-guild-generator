@@ -13,12 +13,9 @@ describe("Service Description Fix - Extrair Recursos", () => {
       complication: "Exige ferramentas caras e específicas",
     };
 
-    // Acessar método privado para teste
-    const description = (
-      ServiceGenerator as unknown as {
-        generateServiceDescription: (obj: ServiceObjective) => string;
-      }
-    ).generateServiceDescription(objective);
+    // Usar método público para testes
+    const description =
+      ServiceGenerator.generateDescriptionForTesting(objective);
 
     // Deve incluir "de poço" corretamente (não "poço" sem preposição)
     expect(description).toContain("de material comum de poço");
@@ -36,11 +33,8 @@ describe("Service Description Fix - Extrair Recursos", () => {
       complication: "O local é instável",
     };
 
-    const description = (
-      ServiceGenerator as unknown as {
-        generateServiceDescription: (obj: ServiceObjective) => string;
-      }
-    ).generateServiceDescription(objective);
+    const description =
+      ServiceGenerator.generateDescriptionForTesting(objective);
 
     // Deve incluir "de caverna" corretamente (não "caverna" sem preposição)
     expect(description).toContain("de especiaria de caverna");
@@ -58,11 +52,8 @@ describe("Service Description Fix - Extrair Recursos", () => {
       complication: "O local está infestado/ocupado",
     };
 
-    const description = (
-      ServiceGenerator as unknown as {
-        generateServiceDescription: (obj: ServiceObjective) => string;
-      }
-    ).generateServiceDescription(objective);
+    const description =
+      ServiceGenerator.generateDescriptionForTesting(objective);
 
     // Deve incluir "de poço" corretamente
     expect(description).toContain("de mineral metálico de poço");
@@ -77,11 +68,8 @@ describe("Service Description Fix - Extrair Recursos", () => {
       complication: "Alguma complicação",
     };
 
-    const description = (
-      ServiceGenerator as unknown as {
-        generateServiceDescription: (obj: ServiceObjective) => string;
-      }
-    ).generateServiceDescription(objective);
+    const description =
+      ServiceGenerator.generateDescriptionForTesting(objective);
 
     // Deve manter o comportamento original para outros tipos
     expect(description).toContain("Auxiliar ou cuidar de pessoa doente");
