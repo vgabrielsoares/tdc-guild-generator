@@ -59,10 +59,10 @@ export const useGuildStore = defineStore("guild", () => {
         return null;
       }
 
-      // Validate the stored guild using Zod helper. If invalid, remove it.
+      // Validar a guild armazenada usando o helper Zod. Se inválida, removê-la.
       try {
         const valid = createGuild(guild);
-        // createGuild coerces/validates dates according to schema, so ensure storage has normalized value
+        // createGuild coerciona/valida datas conforme o schema, então garantir que o storage tenha valor normalizado
         if (valid !== guild) {
           guildStorage.data.value.currentGuild = valid;
         }
@@ -75,7 +75,7 @@ export const useGuildStore = defineStore("guild", () => {
         }
         return valid;
       } catch (err) {
-        // invalid data persisted. clear it to avoid runtime errors
+        // Dados inválidos persistidos. limpar para evitar erros em tempo de execução
         // eslint-disable-next-line no-console
         console.warn("Invalid stored currentGuild removed:", err);
         guildStorage.data.value.currentGuild = null;
@@ -505,7 +505,7 @@ export const useGuildStore = defineStore("guild", () => {
       guildStorage.data.value.guildHistory =
         newHistory.length > 50 ? newHistory.slice(0, 50) : newHistory;
 
-      // If there is no currentGuild, set this as current for immediate rendering
+      // Se não houver currentGuild, definir esta como current para renderização imediata
       if (!currentGuild.value) {
         currentGuild.value = guildToSave;
       }
@@ -528,7 +528,7 @@ export const useGuildStore = defineStore("guild", () => {
       const timelineStore = useTimelineStore();
       if (timelineStore.currentGuildId === guildId) return false;
     } catch {
-      // ignore if timeline store can't be resolved
+      // ignorar se o store de timeline não puder ser resolvido
     }
 
     const initialLength = guildStorage.data.value.guildHistory.length;
@@ -614,13 +614,20 @@ export const useGuildStore = defineStore("guild", () => {
     const guild = guildStorage.data.value.guildHistory[guildIndex];
 
     if (guild.locked) {
-      // If trying to unlock, ensure there isn't an active timeline for this guild
+      // Se tentando desbloquear, garantir que não exista uma timeline ativa para esta guilda
       try {
         const { useTimelineStore } = await import("./timeline");
         const timelineStore = useTimelineStore();
         const active = timelineStore.currentGuildId;
         if (active === guildId) {
           // do not allow unlocking while timeline is active
+          return false;
+        }
+
+        // Verificar se existe timeline criada para esta guilda
+        const hasTimeline = timelineStore.timelines[guildId];
+        if (hasTimeline) {
+          // Não permitir desbloqueio se existe timeline, mesmo que não seja a atual
           return false;
         }
       } catch {
@@ -654,12 +661,12 @@ export const useGuildStore = defineStore("guild", () => {
     }
 
     const newGuild = { ...guild, locked: !guild.locked };
-    // Replace the history array immutably to ensure Vue reactivity consumers update
+    // Substituir o array do histórico de forma imutável para garantir que os consumidores reativos do Vue sejam atualizados
     const newHistory = guildStorage.data.value.guildHistory.slice();
     newHistory[guildIndex] = newGuild;
     guildStorage.data.value.guildHistory = newHistory;
 
-    // If the current guild is being modified, update it as well
+    // Se a guild atual estiver sendo modificada, atualizá-la também
     if (currentGuild.value?.id === guildId) {
       currentGuild.value = newGuild;
     }

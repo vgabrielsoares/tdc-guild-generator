@@ -284,7 +284,7 @@ describe("ContractGenerator - Issue 4.11 - Implementação Completa", () => {
     it("deve usar 1d4 para 'Minúsculo'", () => {
       const minusculeGuild: Guild = {
         ...mockGuild,
-        structure: { ...mockGuild.structure, size: "Minúsculo (3m x 1,5m)" },
+        structure: { ...mockGuild.structure, size: "Minúsculo (3m x 2m)" },
       };
 
       const quantity = ContractGenerator.calculateContractQuantity({

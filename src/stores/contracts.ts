@@ -316,8 +316,11 @@ export const useContractsStore = defineStore("contracts", () => {
     currentGuildId.value = guildId;
     storage.data.value.currentGuildId = guildId;
 
-    // Inicializar timeline para esta guilda
-    timelineStore.setCurrentGuild(guildId);
+    // Sincronizar com timeline SE ela já existir para esta guilda
+    // Não criar nova timeline automaticamente - isso deve ser feito explicitamente
+    if (timelineStore.timelines[guildId]) {
+      timelineStore.setCurrentGuild(guildId);
+    }
 
     // Marca que o store já tinha sido reidratado ao menos uma vez
     isReady.value = true;
@@ -349,7 +352,7 @@ export const useContractsStore = defineStore("contracts", () => {
    * Migra contratos do formato antigo se existirem
    */
   const migrateOldData = async () => {
-    // Delegate legacy migration to composable which handles settings-based legacy key
+    // Delegar migração legada para o composable que trata a chave legada baseada em settings
     try {
       await storage.migrateLegacyIfNeeded();
     } catch {
@@ -819,7 +822,7 @@ export const useContractsStore = defineStore("contracts", () => {
       lifecycleManager.markNewContractsGenerated();
       lastUpdate.value = new Date();
       saveToStorage();
-      // Ensure persistence completed before continuing (avoids UI showing counts without saved rows)
+      // Garantir que a persistência seja concluída antes de continuar (evita UI mostrando contagens sem linhas salvas)
       await persistCurrentGuildToAdapter();
 
       // Agendar próximos eventos de timeline

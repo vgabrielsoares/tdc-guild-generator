@@ -27,7 +27,7 @@ import {
 import { ModifierCalculator } from "./resources-visitors-generator";
 
 /**
- * Helper function to find table entry by roll value
+ * Função auxiliar para encontrar entrada de tabela pelo valor da rolagem
  */
 function findTableEntry<T>(table: TableEntry<T>[], roll: number): T | null {
   const entry = table.find((entry) => roll >= entry.min && roll <= entry.max);
@@ -35,7 +35,7 @@ function findTableEntry<T>(table: TableEntry<T>[], roll: number): T | null {
 }
 
 /**
- * Helper to build dice notation string (e.g. 1d8+2, 1d20-1)
+ * Auxiliar para gerar string de notação de dados (ex.: 1d8+2, 1d20-1)
  */
 function buildDiceNotation(dice: string, modifier: number): string {
   if (!modifier) return `1${dice}`;
@@ -43,7 +43,7 @@ function buildDiceNotation(dice: string, modifier: number): string {
 }
 
 /**
- * Helper function to lookup a value in a table
+ * Função auxiliar para buscar um valor em uma tabela
  */
 function lookupTableValue<T>(table: TableEntry<T>[], value: number): T {
   const matchingEntry = table.find(
@@ -71,7 +71,7 @@ function lookupTableValue<T>(table: TableEntry<T>[], value: number): T {
 }
 
 /**
- * Maps SettlementType enum to SETTLEMENT_DICE keys
+ * Mapeia o enum SettlementType para as chaves em SETTLEMENT_DICE
  */
 function mapSettlementType(settlementType: SettlementType): string {
   const mapping: Record<SettlementType, string> = {
@@ -88,7 +88,7 @@ function mapSettlementType(settlementType: SettlementType): string {
 }
 
 /**
- * Generates the headquarters type (Normal or Sede Matriz) based on settlement type
+ * Gera o tipo de sede (Normal ou Sede Matriz) baseado no tipo de assentamento
  */
 export function generateHeadquartersType(settlementType: SettlementType): {
   isHeadquarters: boolean;
@@ -128,7 +128,7 @@ export function generateHeadquartersType(settlementType: SettlementType): {
 }
 
 /**
- * Generates the headquarters size based on settlement type and modifiers
+ * Gera o tamanho da sede com base no tipo de assentamento e modificadores
  */
 export function generateHeadquartersSize(
   settlementType: SettlementType,

@@ -1,10 +1,8 @@
 <template>
   <div>
     <!-- Install Prompt -->
-    <div
-      v-if="showInstallPrompt"
-      class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-guild-800 border border-guild-600 rounded-lg p-4 shadow-lg z-50"
-    >
+    <div v-if="showInstallPrompt"
+      class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-guild-800 border border-guild-600 rounded-lg p-4 shadow-lg z-50">
       <div class="flex items-start space-x-3">
         <div class="text-2xl">
           <GlobeAltIcon class="w-6 h-6 text-blue-400" />
@@ -18,10 +16,7 @@
             <button @click="installApp" class="btn-primary text-sm px-3 py-1">
               Instalar
             </button>
-            <button
-              @click="dismissInstall"
-              class="btn-secondary text-sm px-3 py-1"
-            >
+            <button @click="dismissInstall" class="btn-secondary text-sm px-3 py-1">
               Agora Não
             </button>
           </div>
@@ -33,10 +28,8 @@
     </div>
 
     <!-- Update Available -->
-    <div
-      v-if="showUpdatePrompt"
-      class="fixed top-4 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-green-800 border border-green-600 rounded-lg p-4 shadow-lg z-50"
-    >
+    <div v-if="showUpdatePrompt"
+      class="fixed top-4 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-green-800 border border-green-600 rounded-lg p-4 shadow-lg z-50">
       <div class="flex items-start space-x-3">
         <div class="text-2xl">
           <ArrowPathIcon class="w-6 h-6" />
@@ -47,16 +40,10 @@
             Uma nova versão está disponível. Recarregue para atualizar.
           </p>
           <div class="flex space-x-2">
-            <button
-              @click="updateApp"
-              class="bg-green-600 hover:bg-green-700 text-white text-sm px-3 py-1 rounded"
-            >
+            <button @click="updateApp" class="bg-green-600 hover:bg-green-700 text-white text-sm px-3 py-1 rounded">
               Atualizar
             </button>
-            <button
-              @click="dismissUpdate"
-              class="bg-gray-600 hover:bg-gray-700 text-white text-sm px-3 py-1 rounded"
-            >
+            <button @click="dismissUpdate" class="bg-gray-600 hover:bg-gray-700 text-white text-sm px-3 py-1 rounded">
               Depois
             </button>
           </div>
@@ -68,10 +55,8 @@
     </div>
 
     <!-- Offline Indicator -->
-    <div
-      v-if="!isOnline"
-      class="fixed top-4 right-4 bg-yellow-800 border border-yellow-600 rounded-lg px-4 py-2 shadow-lg z-50"
-    >
+    <div v-if="!isOnline"
+      class="fixed top-4 right-4 bg-yellow-800 border border-yellow-600 rounded-lg px-4 py-2 shadow-lg z-50">
       <div class="flex items-center space-x-2 text-yellow-200">
         <span>
           <SignalIcon class="w-4 h-4" />
@@ -125,7 +110,15 @@ const dismissInstall = () => {
 // Update App
 const updateApp = () => {
   if (registration && registration.waiting) {
-    registration.waiting.postMessage({ type: "SKIP_WAITING" });
+    try {
+      // postMessage pode falhar quando não há canal de comunicação ativo
+      registration.waiting.postMessage?.({ type: "SKIP_WAITING" });
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn('[PWA MANAGER] failed to postMessage to waiting worker', err);
+    }
+
+    // Reload independentemente de postMessage ter funcionado
     window.location.reload();
   }
 };

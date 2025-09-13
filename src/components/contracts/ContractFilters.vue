@@ -1,39 +1,24 @@
 <template>
-  <div
-    class="contract-filters bg-gray-800 rounded-lg border border-gray-700 p-4 space-y-4"
-  >
+  <div class="contract-filters bg-gray-800 rounded-lg border border-gray-700 p-4 space-y-4">
     <div class="flex items-center justify-between">
       <h3 class="text-lg font-semibold text-amber-400 flex items-center gap-2">
         <FunnelIcon class="w-5 h-5" />
         Filtros de Contratos
       </h3>
-      <button
-        @click="clearAllFilters"
-        class="text-sm text-gray-400 hover:text-white transition-colors underline"
-      >
+      <button @click="clearAllFilters" class="text-sm text-gray-400 hover:text-white transition-colors underline">
         Limpar Filtros
       </button>
     </div>
 
-    <div
-      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
-    >
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
       <!-- Filtro por Status -->
       <div class="filter-group">
         <label class="filter-label">Status</label>
-        <select
-          :value="filters.status"
-          @change="
-            updateStatusFilter(($event.target as HTMLSelectElement).value)
-          "
-          class="filter-select"
-        >
+        <select :value="filters.status" @change="
+          updateStatusFilter(($event.target as HTMLSelectElement).value)
+          " class="filter-select">
           <option value="">Todos os status</option>
-          <option
-            v-for="status in statusOptions"
-            :key="status.value"
-            :value="status.value"
-          >
+          <option v-for="status in statusOptions" :key="status.value" :value="status.value">
             {{ status.label }}
             {{ formatCount(status.totalCount, status.filteredCount) }}
           </option>
@@ -43,19 +28,11 @@
       <!-- Filtro por Dificuldade -->
       <div class="filter-group">
         <label class="filter-label">Dificuldade</label>
-        <select
-          :value="filters.difficulty"
-          @change="
-            updateDifficultyFilter(($event.target as HTMLSelectElement).value)
-          "
-          class="filter-select"
-        >
+        <select :value="filters.difficulty" @change="
+          updateDifficultyFilter(($event.target as HTMLSelectElement).value)
+          " class="filter-select">
           <option value="">Todas as dificuldades</option>
-          <option
-            v-for="difficulty in difficultyOptions"
-            :key="difficulty.value"
-            :value="difficulty.value"
-          >
+          <option v-for="difficulty in difficultyOptions" :key="difficulty.value" :value="difficulty.value">
             {{ difficulty.label }}
             {{ formatCount(difficulty.totalCount, difficulty.filteredCount) }}
           </option>
@@ -65,19 +42,11 @@
       <!-- Filtro por Contratante -->
       <div class="filter-group">
         <label class="filter-label">Contratante</label>
-        <select
-          :value="filters.contractor"
-          @change="
-            updateContractorFilter(($event.target as HTMLSelectElement).value)
-          "
-          class="filter-select"
-        >
+        <select :value="filters.contractor" @change="
+          updateContractorFilter(($event.target as HTMLSelectElement).value)
+          " class="filter-select">
           <option value="">Todos os contratantes</option>
-          <option
-            v-for="contractor in contractorOptions"
-            :key="contractor.value"
-            :value="contractor.value"
-          >
+          <option v-for="contractor in contractorOptions" :key="contractor.value" :value="contractor.value">
             {{ contractor.label }}
             {{ formatCount(contractor.totalCount, contractor.filteredCount) }}
           </option>
@@ -87,13 +56,9 @@
       <!-- Filtro por Prazo -->
       <div class="filter-group">
         <label class="filter-label">Prazo</label>
-        <select
-          :value="deadlineFilterValue"
-          @change="
-            updateDeadlineFilter(($event.target as HTMLSelectElement).value)
-          "
-          class="filter-select"
-        >
+        <select :value="deadlineFilterValue" @change="
+          updateDeadlineFilter(($event.target as HTMLSelectElement).value)
+          " class="filter-select">
           <option value="">Todos os prazos</option>
           <option value="with-deadline">
             Com prazo
@@ -123,20 +88,12 @@
       <div class="filter-group md:col-span-2">
         <label class="filter-label">Buscar</label>
         <div class="relative">
-          <input
-            :value="filters.searchText"
-            @input="
-              updateSearchFilter(($event.target as HTMLInputElement).value)
-            "
-            type="text"
-            placeholder="Buscar por título, descrição, objetivo ou contratante..."
-            class="filter-input pl-10"
-          />
-          <button
-            v-if="filters.searchText"
-            @click="clearSearchFilter"
-            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
-          >
+          <input :value="filters.searchText" @input="
+            updateSearchFilter(($event.target as HTMLInputElement).value)
+            " type="text" placeholder="Buscar por título, descrição, objetivo, contratante ou código..."
+            class="filter-input pl-10" />
+          <button v-if="filters.searchText" @click="clearSearchFilter"
+            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white">
             <XMarkIcon class="w-4 h-4" />
           </button>
         </div>
@@ -146,23 +103,11 @@
       <div class="filter-group">
         <label class="filter-label">Recompensa (PO$)</label>
         <div class="flex gap-2">
-          <input
-            :value="filters.minValue || ''"
-            @input="updateMinValue(($event.target as HTMLInputElement).value)"
-            type="number"
-            placeholder="Min"
-            class="filter-input text-sm"
-            min="0"
-          />
+          <input :value="filters.minValue || ''" @input="updateMinValue(($event.target as HTMLInputElement).value)"
+            type="number" placeholder="Min" class="filter-input text-sm" min="0" />
           <span class="text-gray-400 self-center">-</span>
-          <input
-            :value="filters.maxValue || ''"
-            @input="updateMaxValue(($event.target as HTMLInputElement).value)"
-            type="number"
-            placeholder="Max"
-            class="filter-input text-sm"
-            min="0"
-          />
+          <input :value="filters.maxValue || ''" @input="updateMaxValue(($event.target as HTMLInputElement).value)"
+            type="number" placeholder="Max" class="filter-input text-sm" min="0" />
         </div>
       </div>
     </div>
@@ -171,16 +116,10 @@
     <div v-if="hasActiveFilters" class="border-t border-gray-600 pt-4">
       <h4 class="text-sm font-medium text-gray-300 mb-2">Filtros Ativos</h4>
       <div class="flex flex-wrap gap-2">
-        <span
-          v-for="activeFilter in activeFilters"
-          :key="activeFilter.key"
-          class="inline-flex items-center gap-1 px-2 py-1 bg-amber-600/20 border border-amber-600/50 rounded text-sm text-amber-200"
-        >
+        <span v-for="activeFilter in activeFilters" :key="activeFilter.key"
+          class="inline-flex items-center gap-1 px-2 py-1 bg-amber-600/20 border border-amber-600/50 rounded text-sm text-amber-200">
           {{ activeFilter.label }}
-          <button
-            @click="removeFilter(activeFilter.key)"
-            class="text-amber-300 hover:text-white"
-          >
+          <button @click="removeFilter(activeFilter.key)" class="text-amber-300 hover:text-white">
             <XMarkIcon class="w-3 h-3" />
           </button>
         </span>
@@ -199,6 +138,7 @@ import {
   DeadlineType,
 } from "@/types/contract";
 import { getStatusLabel } from "@/utils/status-labels";
+import { matchesContractCode } from "@/utils/id-search";
 import { FunnelIcon, XMarkIcon } from "@heroicons/vue/24/outline";
 
 interface ContractFilters {
@@ -255,13 +195,15 @@ const getFilteredContractsExcluding = (
 
   if (excludeFilter !== "searchText" && props.filters.searchText.trim()) {
     const searchLower = props.filters.searchText.toLowerCase();
+    const searchText = props.filters.searchText.trim();
     result = result.filter(
       (c) =>
         c.description.toLowerCase().includes(searchLower) ||
         c.title.toLowerCase().includes(searchLower) ||
         c.objective?.description?.toLowerCase().includes(searchLower) ||
         c.contractorName?.toLowerCase().includes(searchLower) ||
-        c.location?.name?.toLowerCase().includes(searchLower)
+        c.location?.name?.toLowerCase().includes(searchLower) ||
+        matchesContractCode(searchText, c.id)
     );
   }
 

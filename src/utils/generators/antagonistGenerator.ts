@@ -121,6 +121,10 @@ export class AntagonistGenerator {
     antagonistType: string,
     specificType: string
   ): string {
-    return `Um ${specificType.toLowerCase()} que representa uma ameaça do tipo "${antagonistType}".`;
+    const capitalized =
+      specificType && specificType.length > 0
+        ? specificType.charAt(0).toUpperCase() + specificType.slice(1)
+        : specificType;
+    return `${capitalized} que representa uma ameaça do tipo "${antagonistType}".`;
   }
 }
