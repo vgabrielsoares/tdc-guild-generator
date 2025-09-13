@@ -439,10 +439,40 @@ Para limpar todos os dados armazenados:
 
 - **Sistema de dados robusto** com validação Zod
 - **Exportação** para CSV e PDF
-- **Armazenamento local** para persistência
+- **Persistência IndexedDB** com fallback LocalStorage
 - **Sistema de rolagens** simulando dados físicos
 
 ## Arquitetura e Performance
+
+### Sistema de Persistência
+
+O aplicativo utiliza uma **arquitetura híbrida de persistência** que garante confiabilidade e compatibilidade:
+
+#### IndexedDB (Primário)
+
+- **Banco de dados no navegador** com alta capacidade de armazenamento
+- **Performance otimizada** para grandes volumes de dados
+- **Consultas avançadas** e indexação eficiente
+- **Transações ACID** garantindo integridade dos dados
+
+#### LocalStorage (Fallback)
+
+- **Compatibilidade universal** com navegadores antigos
+- **Fallback automático** quando IndexedDB não está disponível
+- **Configurações PWA** (dismissal de prompts) mantidas no LocalStorage
+
+#### Adapters de Storage
+
+- **Abstração unificada** para diferentes tipos de armazenamento
+- **Detecção automática** da melhor opção disponível
+- **Interface consistente** independente da tecnologia de storage
+- **Testes automatizados** para garantir funcionamento em todos os ambientes
+
+#### Serialização de Dados
+
+- **Datas preservadas** com serialização/deserialização especializada
+- **Tipos TypeScript** mantidos através de validação Zod
+- **Backup automático** e recuperação de dados
 
 ### Considerações de Performance
 

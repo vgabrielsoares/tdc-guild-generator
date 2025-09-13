@@ -1,8 +1,9 @@
-// Funções utilitárias de storage
-// Implementação básica para persistência de dados
+// Utilitários de serialização para Storage Adapters
+// Funções reutilizadas pelos adapters IndexedDB e LocalStorage para garantir consistência
 
 /**
- * Serializa datas para localStorage
+ * Serializa datas para armazenamento persistente
+ * Usado pelos storage adapters para manter consistência na serialização
  */
 function dateReplacer(_key: string, value: unknown): unknown {
   if (value instanceof Date) {
@@ -12,7 +13,8 @@ function dateReplacer(_key: string, value: unknown): unknown {
 }
 
 /**
- * Deserializa datas do localStorage
+ * Deserializa datas do armazenamento persistente
+ * Usado pelos storage adapters para manter consistência na deserialização
  */
 function dateReviver(_key: string, value: unknown): unknown {
   if (
@@ -28,52 +30,13 @@ function dateReviver(_key: string, value: unknown): unknown {
   return value;
 }
 
-/**
- * Salva dados no localStorage
- */
-export function saveToStorage(key: string, data: unknown): void {
-  try {
-    localStorage.setItem(key, JSON.stringify(data, dateReplacer));
-    // eslint-disable-next-line no-console
-    console.log("[STORAGE] Saved to storage:", key);
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error("[STORAGE] Failed to save to storage:", error);
-  }
-}
+// ===== MIGRAÇÃO PARA STORAGE ADAPTERS =====
+// O sistema usa uma arquitetura de storage adapters:
+// - IndexedDB como storage principal (maior capacidade, melhor performance)
+// - LocalStorage como fallback automático (compatibilidade universal)
+// - Interface unificada através dos adapters para consistência
 
-/**
- * Carrega dados do localStorage
- */
-export function loadFromStorage<T>(key: string): T | null {
-  try {
-    const item = localStorage.getItem(key);
-    if (item) {
-      return JSON.parse(item, dateReviver) as T;
-    }
-    return null;
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error("[STORAGE] Failed to load from storage:", error);
-    return null;
-  }
-}
-
-/**
- * Remove dados do localStorage
- */
-export function removeFromStorage(key: string): void {
-  try {
-    localStorage.removeItem(key);
-    // eslint-disable-next-line no-console
-    console.log("[STORAGE] Removed from storage:", key);
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error("[STORAGE] Failed to remove from storage:", error);
-  }
-}
-
-// Helpers exportados para os adapters reutilizarem a mesma lógica de serialização
+// Funções de serialização exportadas para reutilização pelos adapters
 export function serializeData(value: unknown): string {
   return JSON.stringify(value, dateReplacer);
 }
