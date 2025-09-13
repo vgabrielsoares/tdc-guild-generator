@@ -18,7 +18,9 @@ describe("Recovery and Fault Tolerance Tests", () => {
     try {
       uninstallFakeIndexedDB();
     } catch (e) {
-      // ignore cleanup errors
+      // Ignorar erros de limpeza do FakeIndexedDB: em ambiente de teste,
+      // a biblioteca fake-indexeddb pode gerar erros harmless durante cleanup
+      // quando múltiplos testes executam em paralelo ou quando o DB já foi limpo
     }
   });
 
@@ -122,7 +124,7 @@ describe("Recovery and Fault Tolerance Tests", () => {
         }
       }
 
-      // Test list operation resilience  
+      // Test list operation resilience
       const allItems = await adapter.list(store);
       expect(allItems.length).toBeGreaterThanOrEqual(0); // Pode estar vazio no ambiente de teste
 
@@ -152,7 +154,9 @@ describe("Recovery and Fault Tolerance Tests", () => {
       try {
         await adapter.put(store, "corrupted", null as unknown as object);
       } catch (error) {
-        // Corruption attempt might fail, which is acceptable
+        // Tentativa de corrupção pode falhar com InvalidStateError ou DataError
+        // do IndexedDB ao tentar armazenar dados inválidos - isso é esperado
+        // e aceitável no ambiente de teste
       }
 
       // Verify other data remains accessible
@@ -191,7 +195,9 @@ describe("Recovery and Fault Tolerance Tests", () => {
         try {
           await operation();
         } catch (error) {
-          // Some operations might fail, which is acceptable
+          // Operações podem falhar com NotFoundError (para del/get de chaves inexistentes)
+          // ou com TransactionInactiveError em cenários de estado inconsistente
+          // Estas falhas são esperadas e aceitáveis neste teste de recuperação
         }
       }
 
