@@ -69,7 +69,7 @@ export function createIndexedDBAdapter(): StorageAdapter {
                   {},
                   value as Record<string, unknown>
                 );
-                // se keyPath for array (composto), não podemos preenchê-lo automaticamente, lançar para cair no fallback serializado
+                // Se keyPath for array (composto), não podemos preenchê-lo automaticamente; lançar para cair no fallback serializado
                 if (Array.isArray(keyPath)) {
                   throw new Error(
                     "composite keyPath not supported for automatic payload creation"
@@ -86,7 +86,7 @@ export function createIndexedDBAdapter(): StorageAdapter {
             req.onsuccess = () => resolve();
             req.onerror = () => reject(req.error);
           } catch (e) {
-            // Fallback to serialized storage
+            // Fallback para armazenamento serializado
             try {
               const objectStore = tx.objectStore(store);
               const keyPath = (objectStore as IDBObjectStore).keyPath ?? "id";

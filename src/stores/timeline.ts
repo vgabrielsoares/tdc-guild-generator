@@ -181,7 +181,7 @@ export const useTimelineStore = defineStore("timeline", () => {
                   }
                 }
               } catch {
-                // ignore invalid event
+                // ignorar evento inválido
               }
             }
           }
@@ -206,7 +206,7 @@ export const useTimelineStore = defineStore("timeline", () => {
               processedEventIds.add(eventId);
             }
           } catch {
-            // ignore invalid
+            // ignorar inválido
           }
         }
       }
@@ -234,11 +234,11 @@ export const useTimelineStore = defineStore("timeline", () => {
           try {
             setCurrentGuild(persistedCurrentGuildId);
           } catch (e) {
-            // ignore errors restoring current guild to avoid breaking timeline load
+            // ignorar erros ao restaurar guilda atual para evitar quebrar o carregamento da timeline
           }
         }
       } catch (e) {
-        // ignore errors reading settings
+        // ignorar erros ao ler settings
       }
     } catch (error) {
       // eslint-disable-next-line no-console
@@ -446,8 +446,9 @@ export const useTimelineStore = defineStore("timeline", () => {
   function setCurrentGuild(guildId: string): void {
     currentGuildId.value = guildId;
 
-    // Also attempt to notify the guild store so the 'currentGuild' is set and persisted.
-    // Use dynamic import to avoid circular dependency at module load time.
+    // Também tentar notificar o store de guild para que o 'currentGuild' seja
+    // definido e persistido.
+    // Usar import dinâmico para evitar dependência circular no momento de carregamento do módulo.
     void (async () => {
       try {
         const [{ useGuildStore }, { useStorageAdapter }] = await Promise.all([
@@ -456,14 +457,14 @@ export const useTimelineStore = defineStore("timeline", () => {
         ]);
 
         const guildStore = useGuildStore();
-        // If the guild is already present in history, load it into currentGuild
+        // Se a guilda já estiver presente no histórico, carregá-la em currentGuild
         const inHistory = guildStore.guildHistory.some((g) => g.id === guildId);
         if (inHistory) {
           guildStore.loadGuildFromHistory(guildId);
           return;
         }
 
-        // Fallback: try to fetch the guild directly from persistent storage and add to history
+        // Alternativa: tentar buscar a guilda diretamente do storage persistente e adicioná-la ao histórico
         const adapter = useStorageAdapter();
         try {
           const rec = await adapter.get<Record<string, unknown> | null>(
@@ -471,7 +472,7 @@ export const useTimelineStore = defineStore("timeline", () => {
             guildId
           );
           if (rec) {
-            // rec may be { value: Guild } or raw Guild
+            // rec pode ser { value: Guild } ou um Guild bruto
             let candidate: unknown = rec;
             if (
               rec &&
@@ -486,14 +487,14 @@ export const useTimelineStore = defineStore("timeline", () => {
               guildStore.addToHistory(guildObj);
               guildStore.setCurrentGuild(guildObj);
             } catch (e) {
-              // ignore parse errors
+              // ignorar erros de parse
             }
           }
         } catch (e) {
-          // ignore adapter errors
+          // ignorar erros do adaptador
         }
       } catch {
-        // ignore any errors to avoid breaking timeline creation
+        // ignorar quaisquer erros para evitar quebrar a criação da timeline
       }
     })();
   }

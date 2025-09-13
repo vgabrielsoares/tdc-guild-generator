@@ -8,17 +8,17 @@ import type {
   DiceResult,
 } from "@/types/dice";
 
-// Dice roll logs for debugging and history
+// Logs de rolagens de dados para depuração e histórico
 const rollLogs: RollLog[] = [];
 
 /**
- * Parse dice notation (e.g., "1d20", "2d6+3", "1d20+5", "3d8-2")
- * Supports: XdY, XdY+Z, XdY-Z
+ * Analisa a notação de dados (ex.: "1d20", "2d6+3", "1d20+5", "3d8-2")
+ * Suporta: XdY, XdY+Z, XdY-Z
  */
 export function parseDiceNotation(notation: string): DiceValidation {
   const cleanNotation = notation.trim().toLowerCase();
 
-  // Regex for dice notation: optional count, d, sides, optional modifier
+  // Regex para notação de dados: contagem opcional, d, faces, modificador opcional
   const diceRegex = /^(\d+)?d(\d+)([+-]\d+)?$/;
   const match = cleanNotation.match(diceRegex);
 
@@ -67,14 +67,14 @@ export function parseDiceNotation(notation: string): DiceValidation {
 }
 
 /**
- * Roll a single die with given number of sides
+ * Rola um único dado com o número de faces informado
  */
 export function rollSingleDie(sides: number): number {
   return Math.floor(Math.random() * sides) + 1;
 }
 
 /**
- * Roll dice with given notation
+ * Rola dados usando a notação informada
  */
 export function rollDice(config: RollConfig): DiceRoll {
   const validation = parseDiceNotation(config.notation);
@@ -86,7 +86,7 @@ export function rollDice(config: RollConfig): DiceRoll {
   const { count, sides, modifier } = validation.parsed;
   const individual: number[] = [];
 
-  // Handle advantage/disadvantage for single dice
+  // Tratar vantagem/desvantagem para rolagem de um único dado
   if ((config.advantage || config.disadvantage) && count === 1) {
     const roll1 = rollSingleDie(sides);
     const roll2 = rollSingleDie(sides);
@@ -103,7 +103,7 @@ export function rollDice(config: RollConfig): DiceRoll {
       );
     }
   } else {
-    // Normal rolls
+    // Rolagens normais
     for (let i = 0; i < count; i++) {
       individual.push(rollSingleDie(sides));
     }
@@ -120,7 +120,7 @@ export function rollDice(config: RollConfig): DiceRoll {
     timestamp: new Date(),
   };
 
-  // Log the roll
+  // Registrar a rolagem
   if (config.logRoll !== false) {
     logRoll(diceRoll, config.context);
   }
@@ -133,7 +133,7 @@ export function rollDice(config: RollConfig): DiceRoll {
 }
 
 /**
- * Simple dice roll function (backward compatibility)
+ * Função simples de rolagem (compatibilidade retroativa)
  */
 export function rollDiceSimple(notation: string, context?: string): DiceResult {
   const diceRoll = rollDice({ notation, logRoll: false, context });
@@ -154,8 +154,8 @@ interface TableEntry<T = unknown> {
 const tableLookupCache = new Map<string, Map<number, TableEntry>>();
 
 /**
- * Create an optimized lookup map for a table
- * Uses a Map for O(1) average case lookup instead of O(n) array find
+ * Cria um mapa de lookup otimizado para uma tabela
+ * Usa Map para lookup médio O(1) ao invés de buscar no array O(n)
  */
 function createTableLookupMap<T>(
   table: TableEntry<T>[]
@@ -193,7 +193,7 @@ function getTableLookupMap<T>(
 }
 
 /**
- * Binary search for table entry (for very large sparse tables)
+ * Busca binária por entrada de tabela (para tabelas muito grandes e esparsas)
  */
 function binarySearchTable<T>(
   table: TableEntry<T>[],
@@ -222,7 +222,7 @@ function binarySearchTable<T>(
 }
 
 /**
- * Roll on a table using dice - optimized for performance
+ * Rolar em uma tabela usando dados, otimizado para performance
  */
 export function rollOnTable<T>(config: TableRollConfig<T>): TableRoll<T> {
   const { table, modifier = 0, context, logRoll = true } = config;
@@ -237,7 +237,7 @@ export function rollOnTable<T>(config: TableRollConfig<T>): TableRoll<T> {
 
   let diceNotation: string;
 
-  // Auto-determine dice based on range
+  // Determinar automaticamente o dado baseado no intervalo
   if (maxValue <= 6) {
     diceNotation = "1d6";
   } else if (maxValue <= 8) {
@@ -251,7 +251,7 @@ export function rollOnTable<T>(config: TableRollConfig<T>): TableRoll<T> {
   } else if (maxValue <= 100) {
     diceNotation = "1d100";
   } else {
-    // For larger tables, use multiple dice
+    // Para tabelas maiores, usar múltiplos dados
     diceNotation = "2d20";
   }
 
@@ -265,7 +265,7 @@ export function rollOnTable<T>(config: TableRollConfig<T>): TableRoll<T> {
     logRoll,
   });
 
-  // Choose lookup strategy based on table characteristics
+  // Escolher estratégia de lookup baseada nas características da tabela
   let tableEntry: TableEntry<T> | null = null;
 
   const tableRange = maxValue - minValue + 1;
@@ -273,15 +273,15 @@ export function rollOnTable<T>(config: TableRollConfig<T>): TableRoll<T> {
   const density = tableSize / tableRange; // How dense is the table
 
   if (tableSize >= 50) {
-    // Use binary search for large tables regardless of density
+    // Usar busca binária para tabelas grandes independente da densidade
     tableEntry = binarySearchTable(table, roll.result);
   } else if (density >= 0.1 && tableSize >= 10 && tableRange <= 1000) {
-    // Use Map lookup for dense tables
+    // Usar lookup via Map para tabelas densas
     const cacheKey = context || `table-${tableSize}-${minValue}-${maxValue}`;
     const lookupMap = getTableLookupMap(table, cacheKey);
     tableEntry = lookupMap.get(roll.result) || null;
   } else {
-    // Use linear search for small or very sparse tables
+    // Usar busca linear para tabelas pequenas ou muito esparsas
     tableEntry =
       table.find(
         (entry) => roll.result >= entry.min && roll.result <= entry.max
@@ -292,7 +292,7 @@ export function rollOnTable<T>(config: TableRollConfig<T>): TableRoll<T> {
     console.warn(
       `[TABLE] No table entry found for roll ${roll.result} (range: ${minValue}-${maxValue})`
     );
-    // Return first entry as fallback
+    // Retornar a primeira entrada como fallback
     return {
       roll,
       result: table[0].result,
@@ -312,7 +312,7 @@ export function rollOnTable<T>(config: TableRollConfig<T>): TableRoll<T> {
 }
 
 /**
- * Log a roll for debugging and history
+ * Registrar a rolagem para depuração e histórico
  */
 export function logRoll(roll: DiceRoll, context?: string): void {
   const log: RollLog = {
@@ -334,14 +334,14 @@ export function logRoll(roll: DiceRoll, context?: string): void {
 }
 
 /**
- * Get roll history
+ * Obter histórico de rolagens
  */
 export function getRollHistory(limit = 20): RollLog[] {
   return rollLogs.slice(-limit).reverse();
 }
 
 /**
- * Clear roll history
+ * Limpar histórico de rolagens
  */
 export function clearRollHistory(): void {
   rollLogs.length = 0;
@@ -349,14 +349,14 @@ export function clearRollHistory(): void {
 }
 
 /**
- * Clear table lookup cache to free memory
+ * Limpar cache de lookup de tabelas para liberar memória
  */
 export function clearTableCache(): void {
   tableLookupCache.clear();
 }
 
 /**
- * Get cache statistics for debugging
+ * Obter estatísticas do cache para depuração
  */
 export function getCacheStats(): { cacheSize: number; totalEntries: number } {
   let totalEntries = 0;
@@ -371,7 +371,7 @@ export function getCacheStats(): { cacheSize: number; totalEntries: number } {
 }
 
 /**
- * Advanced dice rolling with multiple options
+ * Rolagem avançada de dados com múltiplas opções
  */
 export function rollAdvanced(
   notation: string,
@@ -454,7 +454,7 @@ export function rollAdvanced(
 }
 
 /**
- * Export for testing and debugging
+ * Exportar para testes e depuração
  */
 export function getRollLogs(): ReadonlyArray<RollLog> {
   return [...rollLogs];

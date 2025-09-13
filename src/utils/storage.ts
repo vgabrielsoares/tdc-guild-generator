@@ -1,5 +1,5 @@
-// Storage utility functions
-// Basic implementation for data persistence
+// Funções utilitárias de storage
+// Implementação básica para persistência de dados
 
 /**
  * Serializa datas para localStorage
@@ -29,7 +29,7 @@ function dateReviver(_key: string, value: unknown): unknown {
 }
 
 /**
- * Save data to localStorage
+ * Salva dados no localStorage
  */
 export function saveToStorage(key: string, data: unknown): void {
   try {
@@ -43,7 +43,7 @@ export function saveToStorage(key: string, data: unknown): void {
 }
 
 /**
- * Load data from localStorage
+ * Carrega dados do localStorage
  */
 export function loadFromStorage<T>(key: string): T | null {
   try {
@@ -60,7 +60,7 @@ export function loadFromStorage<T>(key: string): T | null {
 }
 
 /**
- * Remove data from localStorage
+ * Remove dados do localStorage
  */
 export function removeFromStorage(key: string): void {
   try {
@@ -73,7 +73,7 @@ export function removeFromStorage(key: string): void {
   }
 }
 
-// Export helpers for adapters to reuse the same serialization logic
+// Helpers exportados para os adapters reutilizarem a mesma lógica de serialização
 export function serializeData(value: unknown): string {
   return JSON.stringify(value, dateReplacer);
 }

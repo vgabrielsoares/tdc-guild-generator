@@ -1,9 +1,7 @@
 <template>
   <div class="space-y-8">
     <div class="text-center">
-      <h1
-        class="text-3xl font-medieval font-bold text-gold-400 mb-4 flex items-center justify-center gap-3"
-      >
+      <h1 class="text-3xl font-medieval font-bold text-gold-400 mb-4 flex items-center justify-center gap-3">
         <TrophyIcon class="w-8 h-8 text-gold-400" />
         Sistema de Renome
       </h1>
@@ -18,10 +16,10 @@
 </template>
 
 <script setup lang="ts">
-// Import renown components
+// Importar componentes de renome
 import RenownTracker from "@/components/renown/RenownTracker.vue";
 import { TrophyIcon } from "@heroicons/vue/24/outline";
 
-// Renown view implementation will be added in Phase 8
-console.log("[RENOWN] Renown View loaded");
+// Implementação da view de Renome será adicionada na Fase 8
+console.log("[RENOWN] Renown View carregada");
 </script>
