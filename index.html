@@ -1,12 +1,15 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/guild-logo.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Sistema completo para geração procedural de guildas de aventureiros para RPG de mesa" />
+    <meta
+      name="description"
+      content="Sistema para geração procedural de guildas de aventureiros para RPG de mesa"
+    />
     <meta name="theme-color" content="#2f8bb0" />
-    
+
     <!-- PWA Meta Tags -->
     <meta name="application-name" content="Gerador de Guildas" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -17,14 +20,38 @@
     <meta name="msapplication-config" content="/icons/browserconfig.xml" />
     <meta name="msapplication-TileColor" content="#2f8bb0" />
     <meta name="msapplication-tap-highlight" content="no" />
-    
+
     <!-- Favicon -->
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <link rel="manifest" href="/manifest.json" />
-    
+
     <title>Gerador de Guildas - Tabuleiro do Caos RPG</title>
   </head>
   <body>
+    <script>
+      // GitHub Pages SPA redirect handler
+      (function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectPath = urlParams.get("redirect");
+
+        if (redirectPath) {
+          // Remove o parâmetro redirect da URL
+          urlParams.delete("redirect");
+          const newSearch = urlParams.toString();
+          const newUrl =
+            window.location.pathname +
+            (newSearch ? "?" + newSearch : "") +
+            window.location.hash;
+
+          // Substitui a URL atual sem adicionar ao histórico
+          window.history.replaceState(null, null, newUrl);
+
+          // Define a rota para o Vue Router
+          sessionStorage.setItem("spa-redirect", redirectPath);
+        }
+      })();
+    </script>
+
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>
