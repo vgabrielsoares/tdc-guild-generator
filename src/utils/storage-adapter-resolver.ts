@@ -2,16 +2,19 @@ import { createIndexedDBAdapter } from "@/utils/storage-adapters/indexeddb-adapt
 import { createLocalStorageAdapter } from "@/utils/storage-adapters/localstorage-adapter";
 import type { StorageAdapter } from "@/utils/storage-adapter";
 import { createAdapterPlaceholder } from "@/utils/storage-adapter";
+import {
+  isVitestEnvironment,
+  isLocalStorageAvailable,
+} from "./environment-detection";
 
 let adapter: StorageAdapter | undefined = undefined;
 let persistentMemoryStores: Map<string, Map<string, unknown>> | null = null;
 
 export function getAdapter(): StorageAdapter {
-  if (typeof process !== "undefined" && process.env && process.env.VITEST) {
+  if (isVitestEnvironment()) {
     try {
       const INIT_KEY = "__vitest_inMemoryAdapter_init";
-      const lsPresent =
-        typeof localStorage !== "undefined" && localStorage !== null;
+      const lsPresent = isLocalStorageAvailable();
       const initFlag = lsPresent ? localStorage.getItem(INIT_KEY) : null;
 
       if (!adapter || !initFlag) {
