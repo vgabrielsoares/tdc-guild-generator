@@ -316,8 +316,11 @@ export const useContractsStore = defineStore("contracts", () => {
     currentGuildId.value = guildId;
     storage.data.value.currentGuildId = guildId;
 
-    // Inicializar timeline para esta guilda
-    timelineStore.setCurrentGuild(guildId);
+    // Sincronizar com timeline SE ela já existir para esta guilda
+    // Não criar nova timeline automaticamente - isso deve ser feito explicitamente
+    if (timelineStore.timelines[guildId]) {
+      timelineStore.setCurrentGuild(guildId);
+    }
 
     // Marca que o store já tinha sido reidratado ao menos uma vez
     isReady.value = true;

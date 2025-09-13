@@ -623,6 +623,13 @@ export const useGuildStore = defineStore("guild", () => {
           // do not allow unlocking while timeline is active
           return false;
         }
+
+        // Verificar se existe timeline criada para esta guilda
+        const hasTimeline = timelineStore.timelines[guildId];
+        if (hasTimeline) {
+          // Não permitir desbloqueio se existe timeline, mesmo que não seja a atual
+          return false;
+        }
       } catch {
         // ignore import errors and proceed with original checks
       }

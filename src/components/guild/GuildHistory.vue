@@ -392,10 +392,11 @@ const toggleLock = async (guildId: string) => {
     return;
   }
 
-  // Toggle failed — if we tried to unlock an in-use guild, show specific warning
+  // Toggle failed — if we tried to unlock, show specific warning based on the reason
   if (wasLocked) {
+    // Verificar se há timeline ou contratos ativos para mensagem mais específica
     toast.warning(
-      "Esta guilda já está em uso e não pode ser desbloqueada.",
+      "Esta guilda não pode ser desbloqueada porque possui timeline ou contratos iniciados.",
       "Desbloqueio não permitido"
     );
   } else {

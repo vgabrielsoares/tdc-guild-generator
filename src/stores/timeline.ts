@@ -460,8 +460,6 @@ export const useTimelineStore = defineStore("timeline", () => {
         const inHistory = guildStore.guildHistory.some((g) => g.id === guildId);
         if (inHistory) {
           guildStore.loadGuildFromHistory(guildId);
-          // Ensure it's locked when the timeline is active
-          void guildStore.toggleGuildLock(guildId);
           return;
         }
 
@@ -487,8 +485,6 @@ export const useTimelineStore = defineStore("timeline", () => {
               const guildObj = createGuild(candidate as unknown);
               guildStore.addToHistory(guildObj);
               guildStore.setCurrentGuild(guildObj);
-              // lock it
-              void guildStore.toggleGuildLock(guildId);
             } catch (e) {
               // ignore parse errors
             }
