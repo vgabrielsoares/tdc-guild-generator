@@ -47,4 +47,15 @@ const router = createRouter({
   ],
 });
 
+// Handle SPA redirects from GitHub Pages 404
+router.beforeEach((_to, _from, next) => {
+  const redirectPath = sessionStorage.getItem("spa-redirect");
+  if (redirectPath) {
+    sessionStorage.removeItem("spa-redirect");
+    next(redirectPath);
+  } else {
+    next();
+  }
+});
+
 export default router;
