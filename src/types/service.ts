@@ -648,7 +648,7 @@ export const ServiceTestStructureSchema = z.object({
  * Schema para desafios adicionais
  */
 export const ServiceAdditionalChallengeSchema = z.object({
-  description: z.string().min(1).max(500),
+  description: z.string().max(500),
   hasChallenge: z.boolean(),
 });
 

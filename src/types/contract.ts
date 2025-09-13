@@ -294,7 +294,7 @@ export const GenerationDataSchema = z.object({
 
 // Schema principal do contrato
 export const ContractSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().min(1), // Aceitar qualquer string válida, não apenas UUIDs
   title: z.string().min(1),
   description: z.string().min(1),
   status: z.nativeEnum(ContractStatus),
@@ -315,9 +315,30 @@ export const ContractSchema = z.object({
   severeConsequences: z.array(z.lazy(() => SevereConsequenceSchema)),
   additionalRewards: z.array(z.lazy(() => AdditionalRewardSchema)).optional(),
   themeKeywords: z.array(z.lazy(() => ThemeKeywordSchema)).optional(),
-  createdAt: z.date(),
-  expiresAt: z.date().optional(),
-  completedAt: z.date().optional(),
+  // Aceitar tanto Date quanto string para datas com conversão automática
+  createdAt: z.union([z.date(), z.string()]).transform((val) => {
+    if (val instanceof Date) return val;
+    if (typeof val === "string") return new Date(val);
+    return new Date();
+  }),
+  expiresAt: z
+    .union([z.date(), z.string(), z.null(), z.undefined()])
+    .optional()
+    .transform((val) => {
+      if (!val) return undefined;
+      if (val instanceof Date) return val;
+      if (typeof val === "string") return new Date(val);
+      return undefined;
+    }),
+  completedAt: z
+    .union([z.date(), z.string(), z.null(), z.undefined()])
+    .optional()
+    .transform((val) => {
+      if (!val) return undefined;
+      if (val instanceof Date) return val;
+      if (typeof val === "string") return new Date(val);
+      return undefined;
+    }),
   generationData: GenerationDataSchema,
 });
 
@@ -1001,21 +1022,47 @@ export const LocationCharacteristicsSchema = z.object({
 
 export const ContractLocationSchema = z.object({
   category: z.nativeEnum(LocationCategory),
-  specificLocation: z.string(),
-  name: z.string(),
-  description: z.string(),
-  characteristics: LocationCharacteristicsSchema,
-  modifiers: z.object({
-    experienceBonus: z.number(),
-    rewardModifier: z.number(),
-    difficultyIncrease: z.number(),
-  }),
-  travel: z.object({
-    distanceInHexes: z.number(),
-    estimatedTravelTime: z.string(),
-    transportRequired: z.boolean(),
-    specialRequirements: z.array(z.string()).optional(),
-  }),
+  specificLocation: z.string().min(1),
+  name: z.string().min(1),
+  description: z.string().min(1),
+  importance: z
+    .object({
+      type: z.string(),
+      name: z.string(),
+      description: z.string(),
+    })
+    .optional(),
+  peculiarity: z
+    .object({
+      type: z.string(),
+      name: z.string(),
+      description: z.string(),
+    })
+    .optional(),
+  specification: z
+    .object({
+      location: z.string(),
+      description: z.string(),
+    })
+    .optional()
+    .nullable(),
+  district: z
+    .object({
+      primary: z.object({
+        type: z.string(),
+        name: z.string(),
+        description: z.string(),
+      }),
+      secondary: z
+        .object({
+          type: z.string(),
+          name: z.string(),
+          description: z.string(),
+        })
+        .optional(),
+    })
+    .optional()
+    .nullable(),
 });
 
 export const AntagonistSchema = z.object({

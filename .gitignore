@@ -155,4 +155,4 @@ pids
 .env.production.local
 .env.local
 
-DEVELOPMENT_PLAN.md
+GUILD-GENERATOR-DEVELOPMENT_PLAN.md

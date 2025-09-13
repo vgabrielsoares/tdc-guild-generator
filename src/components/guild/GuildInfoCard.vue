@@ -10,34 +10,33 @@
           {{ guild.name }}
         </h3>
         <div class="guild-info-card__badges">
-          <div 
+          <div
             v-if="showBadge"
             class="guild-info-card__badge"
             :class="badgeClasses"
           >
             {{ guild.settlementType }}
           </div>
-          <div 
+          <div
             v-if="guild.structure.isHeadquarters"
             class="guild-info-card__badge guild-info-card__badge--headquarters"
           >
-            <svg 
-              class="inline-block w-3 h-3 mr-1" 
-              fill="currentColor" 
-              viewBox="0 0 20 20" 
+            <svg
+              class="inline-block w-3 h-3 mr-1"
+              fill="currentColor"
+              viewBox="0 0 20 20"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              <path
+                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+              />
             </svg>
             Sede Matriz
           </div>
         </div>
       </div>
-      
-      <div 
-        v-if="showActions" 
-        class="guild-info-card__actions"
-      >
+
+      <div v-if="showActions" class="guild-info-card__actions">
         <slot name="actions">
           <button
             @click="$emit('guild:edit')"
@@ -63,7 +62,7 @@
         <div class="guild-info-grid__item">
           <dt class="guild-info-grid__label">Recursos</dt>
           <dd class="guild-info-grid__value">
-            <span 
+            <span
               class="resource-level"
               :class="getResourceLevelClass(guild.resources.level)"
             >
@@ -76,7 +75,7 @@
         <div class="guild-info-grid__item">
           <dt class="guild-info-grid__label">Frequência</dt>
           <dd class="guild-info-grid__value">
-            <span 
+            <span
               class="visitor-level"
               :class="getVisitorLevelClass(guild.visitors.frequency)"
             >
@@ -86,7 +85,7 @@
         </div>
 
         <!-- Características (se houver espaço) -->
-        <div 
+        <div
           v-if="showCharacteristics && guild.structure.characteristics.length"
           class="guild-info-grid__item guild-info-grid__item--full"
         >
@@ -94,7 +93,8 @@
           <dd class="guild-info-grid__value">
             <div class="characteristics-list">
               <span
-                v-for="(characteristic, index) in guild.structure.characteristics"
+                v-for="(characteristic, index) in guild.structure
+                  .characteristics"
                 :key="index"
                 class="characteristic-tag"
               >
@@ -112,19 +112,13 @@
     </div>
 
     <!-- Footer com metadados -->
-    <div 
-      v-if="showMetadata" 
-      class="guild-info-card__footer"
-    >
+    <div v-if="showMetadata" class="guild-info-card__footer">
       <div class="guild-metadata">
         <span class="guild-metadata__item">
           <icon name="calendar" size="xs" />
           Criada: {{ formatDate(guild.createdAt) }}
         </span>
-        <span 
-          v-if="guild.updatedAt"
-          class="guild-metadata__item"
-        >
+        <span v-if="guild.updatedAt" class="guild-metadata__item">
           <icon name="clock" size="xs" />
           Atualizada: {{ formatDate(guild.updatedAt) }}
         </span>
@@ -134,9 +128,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import type { Guild } from '@/types/guild';
-import { ResourceLevel, VisitorLevel } from '@/types/guild';
+import { computed } from "vue";
+import type { Guild } from "@/types/guild";
+import { ResourceLevel, VisitorLevel } from "@/types/guild";
 
 // Interface para props
 interface Props {
@@ -161,65 +155,68 @@ const props = withDefaults(defineProps<Props>(), {
 
 // Emits tipados
 defineEmits<{
-  'guild:edit': [];
-  'guild:view': [];
-  'guild:delete': [];
+  "guild:edit": [];
+  "guild:view": [];
+  "guild:delete": [];
 }>();
 
 // Classes computadas para o badge
 const badgeClasses = computed(() => ({
-  'guild-info-card__badge--lugarejo': props.guild.settlementType === 'Lugarejo',
-  'guild-info-card__badge--povoado': props.guild.settlementType === 'Povoado',
-  'guild-info-card__badge--aldeia': props.guild.settlementType === 'Aldeia',
-  'guild-info-card__badge--vilarejo': props.guild.settlementType === 'Vilarejo',
-  'guild-info-card__badge--vila-grande': props.guild.settlementType === 'Vila Grande',
-  'guild-info-card__badge--cidadela': props.guild.settlementType === 'Cidadela',
-  'guild-info-card__badge--grande': props.guild.settlementType === 'Cidade Grande',
-  'guild-info-card__badge--metropole': props.guild.settlementType === 'Metrópole',
+  "guild-info-card__badge--lugarejo": props.guild.settlementType === "Lugarejo",
+  "guild-info-card__badge--povoado": props.guild.settlementType === "Povoado",
+  "guild-info-card__badge--aldeia": props.guild.settlementType === "Aldeia",
+  "guild-info-card__badge--vilarejo": props.guild.settlementType === "Vilarejo",
+  "guild-info-card__badge--vila-grande":
+    props.guild.settlementType === "Vila Grande",
+  "guild-info-card__badge--cidadela": props.guild.settlementType === "Cidadela",
+  "guild-info-card__badge--grande":
+    props.guild.settlementType === "Cidade Grande",
+  "guild-info-card__badge--metropole":
+    props.guild.settlementType === "Metrópole",
 }));
 
 // Classes para nível de recursos
 function getResourceLevelClass(level: ResourceLevel): string {
   const classes: Record<ResourceLevel, string> = {
-    [ResourceLevel.EM_DEBITO]: 'resource-level--critical',
-    [ResourceLevel.NENHUM]: 'resource-level--critical',
-    [ResourceLevel.ESCASSOS]: 'resource-level--poor',
-    [ResourceLevel.ESCASSOS_HONESTOS]: 'resource-level--poor',
-    [ResourceLevel.LIMITADOS]: 'resource-level--limited',
-    [ResourceLevel.SUFICIENTES]: 'resource-level--good',
-    [ResourceLevel.EXCEDENTES]: 'resource-level--excellent',
-    [ResourceLevel.EXCEDENTES_MALIGNOS]: 'resource-level--warning',
-    [ResourceLevel.ABUNDANTES_GOVERNO]: 'resource-level--government',
-    [ResourceLevel.ABUNDANTES]: 'resource-level--excellent',
-    [ResourceLevel.ABUNDANTES_SERVICO]: 'resource-level--excellent',
+    [ResourceLevel.EM_DEBITO]: "resource-level--critical",
+    [ResourceLevel.NENHUM]: "resource-level--critical",
+    [ResourceLevel.ESCASSOS]: "resource-level--poor",
+    [ResourceLevel.ESCASSOS_HONESTOS]: "resource-level--poor",
+    [ResourceLevel.LIMITADOS]: "resource-level--limited",
+    [ResourceLevel.SUFICIENTES]: "resource-level--good",
+    [ResourceLevel.EXCEDENTES]: "resource-level--excellent",
+    [ResourceLevel.EXCEDENTES_MALIGNOS]: "resource-level--warning",
+    [ResourceLevel.ABUNDANTES_GOVERNO]: "resource-level--government",
+    [ResourceLevel.ABUNDANTES]: "resource-level--excellent",
+    [ResourceLevel.ABUNDANTES_SERVICO]: "resource-level--excellent",
   };
-  
-  return classes[level] || 'resource-level--neutral';
+
+  return classes[level] || "resource-level--neutral";
 }
 
 // Classes para nível de visitantes
 function getVisitorLevelClass(level: VisitorLevel): string {
   const classes: Record<VisitorLevel, string> = {
-    [VisitorLevel.VAZIA]: 'visitor-level--empty',
-    [VisitorLevel.QUASE_DESERTA]: 'visitor-level--very-low',
-    [VisitorLevel.POUCO_MOVIMENTADA]: 'visitor-level--low',
-    [VisitorLevel.NEM_MUITO_NEM_POUCO]: 'visitor-level--normal',
-    [VisitorLevel.MUITO_FREQUENTADA]: 'visitor-level--high',
-    [VisitorLevel.ABARROTADA]: 'visitor-level--very-high',
-    [VisitorLevel.LOTADA]: 'visitor-level--crowded',
+    [VisitorLevel.VAZIA]: "visitor-level--empty",
+    [VisitorLevel.QUASE_DESERTA]: "visitor-level--very-low",
+    [VisitorLevel.POUCO_MOVIMENTADA]: "visitor-level--low",
+    [VisitorLevel.NEM_MUITO_NEM_POUCO]: "visitor-level--normal",
+    [VisitorLevel.MUITO_FREQUENTADA]: "visitor-level--high",
+    [VisitorLevel.ABARROTADA]: "visitor-level--very-high",
+    [VisitorLevel.LOTADA]: "visitor-level--crowded",
   };
-  
-  return classes[level] || 'visitor-level--neutral';
+
+  return classes[level] || "visitor-level--neutral";
 }
 
 // Formatação de data
 function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   }).format(date);
 }
 </script>

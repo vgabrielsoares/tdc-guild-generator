@@ -1139,22 +1139,28 @@ export class ServiceGenerator {
             const actionWordCount = action.split(/\s+/).filter(Boolean).length;
             const targetWordCount = target.split(/\s+/).filter(Boolean).length;
 
-            // Heurística: se action for uma única palavra (ex: 'especiaria') e target existir,
-            // inserir 'de' entre action e target: 'especiaria de pântano'.
-            // Se action tem múltiplas palavras e target é uma única palavra (ex: 'extrativismo animal' + 'submerso'),
-            // é provável que o target seja um adjetivo e não precise do 'de'.
-            if (!startsWithPrep(target) && !endsWithPrep(action)) {
-              if (actionWordCount === 1 && targetWordCount >= 1) {
-                description = `${verb} ${action} de ${target}`;
-              } else if (actionWordCount > 1 && targetWordCount === 1) {
-                description = `${verb} ${action} ${target}`;
-              } else {
-                description = `${verb} ${action} de ${target}`;
-              }
+            // Para EXTRAIR_RECURSOS, o verbo já é "Extrair recursos de", então:
+            // "Extrair recursos de" + "material comum" + "de" + "poço" deve ser "Extrair recursos de material comum de poço"
+            if (objective.type === ServiceObjectiveType.EXTRAIR_RECURSOS) {
+              description = `${verb} ${action} de ${target}`;
             } else {
-              description = `${verb} ${action} ${target}`
-                .replace(/\s+/g, " ")
-                .trim();
+              // Heurística para outros casos: se action for uma única palavra (ex: 'especiaria') e target existir,
+              // inserir 'de' entre action e target: 'especiaria de pântano'.
+              // Se action tem múltiplas palavras e target é uma única palavra (ex: 'extrativismo animal' + 'submerso'),
+              // é provável que o target seja um adjetivo e não precise do 'de'.
+              if (!startsWithPrep(target) && !endsWithPrep(action)) {
+                if (actionWordCount === 1 && targetWordCount >= 1) {
+                  description = `${verb} ${action} de ${target}`;
+                } else if (actionWordCount > 1 && targetWordCount === 1) {
+                  description = `${verb} ${action} ${target}`;
+                } else {
+                  description = `${verb} ${action} de ${target}`;
+                }
+              } else {
+                description = `${verb} ${action} ${target}`
+                  .replace(/\s+/g, " ")
+                  .trim();
+              }
             }
           } else {
             description = `${verb} ${action} ${target}`
@@ -1327,8 +1333,7 @@ export class ServiceGenerator {
    * Formato: número aleatório de 4 dígitos
    */
   private static generateServiceId(): string {
-    const fourDigitNumber = Math.floor(1000 + Math.random() * 9000);
-    return fourDigitNumber.toString();
+    return crypto.randomUUID();
   }
 
   // ===== MÉTODOS PARA SISTEMA DE TESTES E RECOMPENSAS =====
@@ -1412,5 +1417,15 @@ export class ServiceGenerator {
     } catch {
       return 5; // Fallback seguro
     }
+  }
+
+  // ===== MÉTODOS PÚBLICOS PARA TESTES =====
+
+  /**
+   * Método público para testes que expõe a geração de descrição de serviços
+   * Permite testar a lógica de descrição sem quebrar o encapsulamento
+   */
+  static generateDescriptionForTesting(objective: ServiceObjective): string {
+    return this.generateServiceDescription(objective);
   }
 }

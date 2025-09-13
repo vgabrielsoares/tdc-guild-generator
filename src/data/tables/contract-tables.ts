@@ -3,4 +3,4 @@ export {
   STAFF_CONDITION_MODIFIERS,
   CROWD_REDUCTION_TABLE,
   CONTRACT_QUANTITY_TABLE as CONTRACTS_AVAILABLE_TABLE,
-} from './contract-base-tables';
+} from "./contract-base-tables";

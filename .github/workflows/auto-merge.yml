@@ -1,0 +1,108 @@
+name: Auto-Merge Dependabot
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  auto-merge:
+    name: Auto-merge Dependabot PRs
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    
+    permissions:
+      contents: write
+      pull-requests: write
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit
+        
+      - name: Run type check
+        run: npm run type-check
+        
+      - name: Run tests
+        run: npm run test:coverage
+        
+      - name: Build application
+        run: npm run build
+        
+      - name: Check if PR is ready for auto-merge
+        id: check-pr
+        uses: actions/github-script@v7
+        with:
+          result-encoding: string
+          script: |
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+            
+            // Verificar se é um PR de patch ou minor
+            const title = pr.title.toLowerCase();
+            const isMinorOrPatch = title.includes('patch') || 
+                                  title.includes('minor') || 
+                                  (!title.includes('major') && !title.includes('breaking'));
+            
+            console.log(`PR title: ${pr.title}`);
+            console.log(`Is minor or patch: ${isMinorOrPatch}`);
+            console.log(`PR mergeable: ${pr.mergeable}`);
+            console.log(`PR draft: ${pr.draft}`);
+            
+            if (isMinorOrPatch && pr.mergeable && !pr.draft) {
+              return 'true';
+            }
+            return 'false';
+            
+      - name: Enable auto-merge for Dependabot PR
+        if: steps.check-pr.outputs.result == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.pulls.createReview({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              event: 'APPROVE',
+              body: '🤖 Auto-approved by CI workflow after successful tests'
+            });
+            
+            await github.rest.pulls.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              commit_title: 'chore: auto-merge dependabot PR',
+              merge_method: 'squash'
+            });
+            
+      - name: Comment on major version updates
+        if: steps.check-pr.outputs.result == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `
+                🔍 **Manual Review Required**
+                
+                This Dependabot PR requires manual review because:
+                - It contains major version updates
+                - It may include breaking changes
+                
+                Please review the changes carefully before merging.
+                
+                ✅ All automated tests have passed
+              `
+            });

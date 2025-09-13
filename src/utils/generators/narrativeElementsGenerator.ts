@@ -43,7 +43,7 @@ export function generateUnusualContractor(): UnusualContractor {
   if (!isUnusual) {
     // Mesmo contratantes comuns recebem palavras-chave para inspiração
     const themeKeywords = generateContractorThemeKeywords();
-    
+
     return {
       isUnusual: false,
       description: "Contratante comum - use as tabelas padrão de contratantes.",
@@ -96,12 +96,12 @@ export function generateThemeKeywords(): ThemeKeyword[] {
 
     // Mapear índice da tabela para enum correto
     const themeSetMap = [
-      ThemeKeywordSet.MACABRO,     // Tabela 1
-      ThemeKeywordSet.GUERRA,      // Tabela 2
-      ThemeKeywordSet.FANTASIA,    // Tabela 3
-      ThemeKeywordSet.STEAMPUNK,   // Tabela 4
-      ThemeKeywordSet.MASMORRAS,   // Tabela 5
-      ThemeKeywordSet.POLITICA,    // Tabela 6
+      ThemeKeywordSet.MACABRO, // Tabela 1
+      ThemeKeywordSet.GUERRA, // Tabela 2
+      ThemeKeywordSet.FANTASIA, // Tabela 3
+      ThemeKeywordSet.STEAMPUNK, // Tabela 4
+      ThemeKeywordSet.MASMORRAS, // Tabela 5
+      ThemeKeywordSet.POLITICA, // Tabela 6
     ];
 
     // Rolar na tabela selecionada
@@ -140,7 +140,9 @@ export function generateContractorThemeKeywords(): ThemeKeyword[] {
     let tableIndex: number;
     let attempts = 0;
     do {
-      tableIndex = Math.floor(Math.random() * ALL_CONTRACTOR_KEYWORD_TABLES.length);
+      tableIndex = Math.floor(
+        Math.random() * ALL_CONTRACTOR_KEYWORD_TABLES.length
+      );
       attempts++;
     } while (usedTables.has(tableIndex) && attempts < 10);
 
@@ -149,12 +151,12 @@ export function generateContractorThemeKeywords(): ThemeKeyword[] {
 
     // Mapear índice da tabela para enum (usando os mesmos para simplificar)
     const contractorSetMap = [
-      ThemeKeywordSet.MACABRO,     // Conjunto 1
-      ThemeKeywordSet.GUERRA,      // Conjunto 2
-      ThemeKeywordSet.FANTASIA,    // Conjunto 3
-      ThemeKeywordSet.STEAMPUNK,   // Conjunto 4
-      ThemeKeywordSet.MASMORRAS,   // Conjunto 5
-      ThemeKeywordSet.POLITICA,    // Conjunto 6
+      ThemeKeywordSet.MACABRO, // Conjunto 1
+      ThemeKeywordSet.GUERRA, // Conjunto 2
+      ThemeKeywordSet.FANTASIA, // Conjunto 3
+      ThemeKeywordSet.STEAMPUNK, // Conjunto 4
+      ThemeKeywordSet.MASMORRAS, // Conjunto 5
+      ThemeKeywordSet.POLITICA, // Conjunto 6
     ];
 
     // Rolar na tabela selecionada
@@ -209,9 +211,7 @@ export function generateAdvancedNarrativeElements() {
  * @param keywords - Palavras-chave para incorporar
  * @returns Sugestões de como integrar as palavras-chave
  */
-export function suggestKeywordIntegration(
-  keywords: ThemeKeyword[]
-): string[] {
+export function suggestKeywordIntegration(keywords: ThemeKeyword[]): string[] {
   if (keywords.length === 0) {
     return ["Nenhuma palavra-chave para integrar."];
   }

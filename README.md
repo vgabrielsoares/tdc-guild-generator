@@ -3,6 +3,8 @@
 [![Vue 3](https://img.shields.io/badge/Vue-3.x-green.svg)](https://vuejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.x-cyan.svg)](https://tailwindcss.com/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-brightgreen.svg)](https://vgabrielsoares.github.io/tdc-guild-generator/)
+[![Deploy Status](https://github.com/vgabrielsoares/tdc-guild-generator/actions/workflows/deploy.yml/badge.svg)](https://github.com/vgabrielsoares/tdc-guild-generator/actions/workflows/deploy.yml)
 
 Um sistema completo para geração procedural de guildas de aventureiros para RPG de mesa. Baseado em regras e tabelas utilizando rolagem de dados, este gerador permite criar guildas completas com estrutura, contratos, serviços, membros e sistema de renome.
 
@@ -133,10 +135,10 @@ git --version   # deve retornar versão do git
 
 ```bash
 # Clone o repositório
-git clone https://github.com/vgabrielsoares/generator-guild.git
+git clone https://github.com/vgabrielsoares/tdc-guild-generator.git
 
 # Entre no diretório do projeto
-cd generator-guild
+cd tdc-guild-generator
 
 # Mude para a branch de desenvolvimento
 git checkout dev
@@ -288,7 +290,7 @@ npx vue-tsc --noEmit --watch
 
 - **Documentação Vue 3**: [vuejs.org](https://vuejs.org/)
 - **Documentação Vite**: [vitejs.dev](https://vitejs.dev/)
-- **Issues**: [GitHub Issues](https://github.com/vgabrielsoares/generator-guild/issues)
+- **Issues**: [GitHub Issues](https://github.com/vgabrielsoares/tdc-guild-generator/issues)
 
 ### Funcionalidades PWA
 
@@ -439,10 +441,40 @@ Para limpar todos os dados armazenados:
 
 - **Sistema de dados robusto** com validação Zod
 - **Exportação** para CSV e PDF
-- **Armazenamento local** para persistência
+- **Persistência IndexedDB** com fallback LocalStorage
 - **Sistema de rolagens** simulando dados físicos
 
 ## Arquitetura e Performance
+
+### Sistema de Persistência
+
+O aplicativo utiliza uma **arquitetura híbrida de persistência** que garante confiabilidade e compatibilidade:
+
+#### IndexedDB (Primário)
+
+- **Banco de dados no navegador** com alta capacidade de armazenamento
+- **Performance otimizada** para grandes volumes de dados
+- **Consultas avançadas** e indexação eficiente
+- **Transações ACID** garantindo integridade dos dados
+
+#### LocalStorage (Fallback)
+
+- **Compatibilidade universal** com navegadores antigos
+- **Fallback automático** quando IndexedDB não está disponível
+- **Configurações PWA** (dismissal de prompts) mantidas no LocalStorage
+
+#### Adapters de Storage
+
+- **Abstração unificada** para diferentes tipos de armazenamento
+- **Detecção automática** da melhor opção disponível
+- **Interface consistente** independente da tecnologia de storage
+- **Testes automatizados** para garantir funcionamento em todos os ambientes
+
+#### Serialização de Dados
+
+- **Datas preservadas** com serialização/deserialização especializada
+- **Tipos TypeScript** mantidos através de validação Zod
+- **Backup automático** e recuperação de dados
 
 ### Considerações de Performance
 
@@ -487,7 +519,9 @@ O gerador utiliza um sistema complexo de tabelas probabilísticas que considera:
 
 ### Acesso Web
 
-Simplesmente acesse o aplicativo no seu navegador - funciona imediatamente em qualquer dispositivo!
+🌐 **Acesso Online**: [https://vgabrielsoares.github.io/tdc-guild-generator/](https://vgabrielsoares.github.io/tdc-guild-generator/)
+
+O aplicativo está hospedado no GitHub Pages e funciona imediatamente em qualquer dispositivo! Nenhuma instalação necessária.
 
 ### Instalação como App
 

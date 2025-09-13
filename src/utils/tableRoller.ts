@@ -24,7 +24,7 @@ const logTable = {
   },
 };
 
-// Dice notation selection thresholds
+// Limiares para seleção da notação de dados (dice notation)
 const DICE_THRESHOLDS = {
   D6_MAX: 6,
   D8_MAX: 8,
@@ -32,11 +32,11 @@ const DICE_THRESHOLDS = {
   D12_MAX: 12,
   D20_MAX: 20,
   D100_MAX: 100,
-  // For larger ranges using multiple dice
+  // Para intervalos maiores usar múltiplos dados
   MULTI_DICE_2D6_RANGE: 36,
 } as const;
 
-// Dice notation mappings
+// Mapeamentos de notações de dados
 const DICE_NOTATIONS = {
   D6: "1d6",
   D8: "1d8",
@@ -49,7 +49,7 @@ const DICE_NOTATIONS = {
 } as const;
 
 /**
- * Determine appropriate dice notation based on table range
+ * Determina a notação de dados apropriada com base no intervalo da tabela
  */
 function getDiceNotationForRange(maxValue: number, range: number): string {
   if (maxValue <= DICE_THRESHOLDS.D6_MAX) {
@@ -74,7 +74,7 @@ function getDiceNotationForRange(maxValue: number, range: number): string {
 }
 
 /**
- * Roll on a standard range table (e.g., 1-6, 1-20, etc.)
+ * Rolar em uma tabela com intervalo padrão (ex.: 1-6, 1-20, etc.)
  */
 export function rollOnTable<T>(
   table: TableEntry<T>[],
@@ -85,39 +85,39 @@ export function rollOnTable<T>(
     throw new Error("Table is empty or undefined");
   }
 
-  // Validate table first
+  // Validar a tabela primeiro
   const validation = validateTable(table);
   if (!validation.isValid) {
     throw new Error(`Invalid table: ${validation.errors.join(", ")}`);
   }
 
-  // Calculate total modifier value
+  // Calcular o valor total dos modificadores
   const totalModifier = modifiers.reduce((sum, mod) => sum + mod.value, 0);
 
-  // Determine the range and dice needed
+  // Determinar o intervalo e o dado necessário
   const minValue = Math.min(...table.map((entry) => entry.min));
   const maxValue = Math.max(...table.map((entry) => entry.max));
   const range = maxValue - minValue + 1;
 
-  // Determine appropriate dice notation
+  // Determinar notação de dados apropriada
   const diceNotation = getDiceNotationForRange(maxValue, range);
 
-  // Add modifier to dice notation if present
+  // Adicionar modificador à notação de dados se presente
   const finalDiceNotation =
     totalModifier !== 0
       ? `${diceNotation}${totalModifier > 0 ? `+${totalModifier}` : `${totalModifier}`}`
       : diceNotation;
 
-  // Roll the dice
+  // Rolar os dados
   const diceRoll = rollDice({
     notation: finalDiceNotation,
     context: context || "Table roll",
     logRoll: true,
   });
 
-  // Clamp the roll result to the table range to prevent out-of-bounds issues
+  // Limitar o resultado da rolagem ao intervalo da tabela para evitar out-of-bounds
   const clampedRoll = Math.max(minValue, Math.min(maxValue, diceRoll.result));
-  
+
   if (clampedRoll !== diceRoll.result) {
     logTable.warn(
       `Roll ${diceRoll.result} clamped to ${clampedRoll} to fit table range ${minValue}-${maxValue}`
@@ -126,7 +126,7 @@ export function rollOnTable<T>(
 
   const finalRoll = clampedRoll;
 
-  // Find the matching table entry
+  // Encontrar a entrada correspondente na tabela
   const matchingEntry = table.find(
     (entry) => finalRoll >= entry.min && finalRoll <= entry.max
   );
@@ -135,7 +135,7 @@ export function rollOnTable<T>(
     logTable.warn(
       `No table entry found for roll ${finalRoll} (range: ${minValue}-${maxValue})`
     );
-    // Use the closest entry as fallback
+    // Usar a entrada mais próxima como fallback
     const closest = table.reduce((prev, curr) => {
       const prevDistance = Math.min(
         Math.abs(prev.min - finalRoll),
@@ -198,12 +198,12 @@ export function rollOnWeightedTable<T>(entries: WeightedEntry<T>[]): T {
     }
   }
 
-  // Fallback (should never reach here with valid weights)
+  // Fallback (não deve ocorrer com pesos válidos)
   return entries[entries.length - 1].result;
 }
 
 /**
- * Validate table structure
+ * Validar a estrutura da tabela
  */
 export function validateTable<T>(table: TableEntry<T>[]): TableValidation {
   const errors: string[] = [];
@@ -214,13 +214,13 @@ export function validateTable<T>(table: TableEntry<T>[]): TableValidation {
     return { isValid: false, errors, warnings };
   }
 
-  // Create a map to track original indices for better error reporting
+  // Criar um mapa para rastrear índices originais para melhores mensagens de erro
   const entryIndices = new Map<TableEntry<T>, number>();
   table.forEach((entry, index) => {
     entryIndices.set(entry, index);
   });
 
-  // Check for valid min/max values
+  // Verificar valores min/max válidos
   for (let i = 0; i < table.length; i++) {
     const entry = table[i];
 
@@ -240,10 +240,10 @@ export function validateTable<T>(table: TableEntry<T>[]): TableValidation {
     }
   }
 
-  // Sort entries by min value for efficient overlap/gap detection
+  // Ordenar entradas por valor min para detectar sobreposições e gaps eficientemente
   const sortedEntries = [...table].sort((a, b) => a.min - b.min);
 
-  // Single pass to detect overlaps and gaps
+  // Passagem única para detectar sobreposições e lacunas
   for (let i = 0; i < sortedEntries.length - 1; i++) {
     const current = sortedEntries[i];
     const next = sortedEntries[i + 1];
@@ -289,7 +289,7 @@ export function createTable<T>(
 }
 
 /**
- * Parse dice notation to extract maximum range
+ * Analisar notação de dados para extrair o alcance máximo
  */
 function getDiceMaxRange(diceNotation: string): number {
   if (diceNotation.includes("d100")) {

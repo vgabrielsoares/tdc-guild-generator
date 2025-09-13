@@ -215,8 +215,8 @@ describe("Contract Narrative Elements (Issue 4.13)", () => {
         themeKeywords: [
           { set: ThemeKeywordSet.FANTASIA, keyword: "Natureza" },
           { set: ThemeKeywordSet.FANTASIA, keyword: "Sabedoria" },
-          { set: ThemeKeywordSet.FANTASIA, keyword: "Tempo" }
-        ]
+          { set: ThemeKeywordSet.FANTASIA, keyword: "Tempo" },
+        ],
       });
 
       // Verifica se todos os elementos foram validados corretamente

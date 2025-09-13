@@ -190,7 +190,6 @@
 import { ref, computed, onMounted } from "vue";
 import { useContractsStore } from "@/stores/contracts";
 import { useGuildStore } from "@/stores/guild";
-import { useTimelineIntegration } from "@/composables/useTimelineIntegration";
 import type {
   Contract,
   ContractStatus,
@@ -227,8 +226,7 @@ const contractsStore = useContractsStore();
 const guildStore = useGuildStore();
 
 // ===== INTEGRAÇÃO DE TIMELINE =====
-// Inicializa automaticamente a integração entre timeline e contratos
-useTimelineIntegration();
+// A integração global com a timeline é inicializada em `App.vue`.
 
 // ===== STATE =====
 const currentPage = ref(1);

@@ -354,7 +354,7 @@ async function initializeTimeline() {
     guildStore.addToHistory(currentGuild);
 
     // Bloquear a guilda
-    guildStore.toggleGuildLock(currentGuild.id);
+    await guildStore.toggleGuildLock(currentGuild.id);
   } catch (error) {
     // Erro tratado pelos stores individuais - adicionar log se necessário
   }

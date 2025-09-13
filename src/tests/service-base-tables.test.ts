@@ -217,8 +217,8 @@ describe("Service Base Tables - Issue 5.9", () => {
   describe("Utility Functions", () => {
     describe("getServiceDiceBySize", () => {
       it("should return correct dice for each size category", () => {
-        expect(getServiceDiceBySize("Minúsculo (3m x 1,5m)")).toBe("1d4");
-        expect(getServiceDiceBySize("Muito pequeno (4,5m x 3m)")).toBe("1d6");
+        expect(getServiceDiceBySize("Minúsculo (3m x 2m)")).toBe("1d4");
+        expect(getServiceDiceBySize("Muito pequeno (5m x 3m)")).toBe("1d6");
         expect(
           getServiceDiceBySize("Colossal e primorosa (20m x 20m, +2 andares)")
         ).toBe("1d20+10");

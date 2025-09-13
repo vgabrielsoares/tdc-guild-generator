@@ -3,23 +3,23 @@
  * Implementa o fluxo completo de geração
  */
 
-import type { Guild, SettlementType } from '@/types/guild';
-import { generateRandomGuildName } from '@/data/guild-names';
-import { 
-  StructureGenerator, 
+import type { Guild, SettlementType } from "@/types/guild";
+import { generateRandomGuildName } from "@/data/guild-names";
+import {
+  StructureGenerator,
   type StructureGenerationConfig,
-  type StructureGenerationResult
-} from './structure-generator';
-import { 
-  RelationsGenerator, 
+  type StructureGenerationResult,
+} from "./structure-generator";
+import {
+  RelationsGenerator,
   type RelationsGenerationConfig,
-  type RelationsGenerationResult
-} from './relations-generator';
-import { 
-  ResourcesVisitorsGenerator, 
+  type RelationsGenerationResult,
+} from "./relations-generator";
+import {
+  ResourcesVisitorsGenerator,
   type ResourcesVisitorsGenerationConfig,
-  type ResourcesVisitorsGenerationResult
-} from './resources-visitors-generator';
+  type ResourcesVisitorsGenerationResult,
+} from "./resources-visitors-generator";
 
 // Configuração principal para geração de guilda
 export interface GuildGenerationConfig {
@@ -94,17 +94,19 @@ export class GuildGenerator {
     this.logs = [];
     this.log(`=== Starting complete guild generation ===`);
     this.validateConfig();
-    
+
     try {
       // Fase 1: Gerar estrutura e funcionários
       const structureResult = this.generateStructure();
-      
+
       // Extrair informação de Sede Matriz
-      const headquartersModifier = structureResult.data.structure.isHeadquarters ? 5 : 0;
-      
+      const headquartersModifier = structureResult.data.structure.isHeadquarters
+        ? 5
+        : 0;
+
       // Fase 2: Gerar relações
       const relationsResult = this.generateRelations(headquartersModifier);
-      
+
       // Fase 3: Gerar recursos (aplicando modificadores de relações e Sede Matriz)
       const resourcesVisitorsResult = this.generateResourcesAndVisitors(
         structureResult.data.staff.employees,
@@ -112,16 +114,16 @@ export class GuildGenerator {
         relationsResult.data.relations.population,
         headquartersModifier
       );
-      
+
       // Fase 4: Montar a guilda final
       const guild = this.assembleGuild(
         structureResult,
         relationsResult,
         resourcesVisitorsResult
       );
-      
+
       this.log(`=== Guild generation completed ===`);
-      
+
       return {
         data: { guild },
         rolls: {
@@ -142,7 +144,9 @@ export class GuildGenerator {
         timestamp: new Date(),
       };
     } catch (error) {
-      this.log(`Generation failed: ${error instanceof Error ? error.message : String(error)}`);
+      this.log(
+        `Generation failed: ${error instanceof Error ? error.message : String(error)}`
+      );
       throw error;
     }
   }
@@ -151,20 +155,20 @@ export class GuildGenerator {
    * Gera a estrutura física e funcionários da guilda
    */
   private generateStructure() {
-    this.log(`--- Phase 1: Generating structure ---`, 'PHASE');
-    
+    this.log(`--- Phase 1: Generating structure ---`, "PHASE");
+
     const config: StructureGenerationConfig = {
       settlementType: this.config.settlementType,
       customModifiers: this.config.customModifiers?.structure,
       debug: this.debug,
     };
-    
+
     const generator = new StructureGenerator(config);
     const result = generator.generate();
-    
+
     // Incorporar logs do sub-gerador
-    result.logs.forEach(log => this.logs.push(log));
-    
+    result.logs.forEach((log) => this.logs.push(log));
+
     return result;
   }
 
@@ -172,23 +176,27 @@ export class GuildGenerator {
    * Gera as relações da guilda com governo e população
    */
   private generateRelations(headquartersModifier: number = 0) {
-    this.log(`--- Phase 2: Generating relations ---`, 'PHASE');
-    
+    this.log(`--- Phase 2: Generating relations ---`, "PHASE");
+
     const config: RelationsGenerationConfig = {
       settlementType: this.config.settlementType,
       customModifiers: {
-        government: (this.config.customModifiers?.relations?.government || 0) + headquartersModifier,
-        population: (this.config.customModifiers?.relations?.population || 0) + headquartersModifier,
+        government:
+          (this.config.customModifiers?.relations?.government || 0) +
+          headquartersModifier,
+        population:
+          (this.config.customModifiers?.relations?.population || 0) +
+          headquartersModifier,
       },
       debug: this.debug,
     };
-    
+
     const generator = new RelationsGenerator(config);
     const result = generator.generate();
-    
+
     // Incorporar logs do sub-gerador
-    result.logs.forEach(log => this.logs.push(log));
-    
+    result.logs.forEach((log) => this.logs.push(log));
+
     return result;
   }
 
@@ -197,17 +205,21 @@ export class GuildGenerator {
    */
   private generateResourcesAndVisitors(
     employees: string,
-    government: import('@/types/guild').RelationLevel,
-    population: import('@/types/guild').RelationLevel,
+    government: import("@/types/guild").RelationLevel,
+    population: import("@/types/guild").RelationLevel,
     headquartersModifier: number = 0
   ) {
-    this.log(`--- Phase 3: Generating resources and visitors ---`, 'PHASE');
-    
+    this.log(`--- Phase 3: Generating resources and visitors ---`, "PHASE");
+
     const config: ResourcesVisitorsGenerationConfig = {
       settlementType: this.config.settlementType,
       customModifiers: {
-        resources: (this.config.customModifiers?.resources?.level || 0) + headquartersModifier,
-        visitors: (this.config.customModifiers?.visitors?.frequency || 0) + headquartersModifier,
+        resources:
+          (this.config.customModifiers?.resources?.level || 0) +
+          headquartersModifier,
+        visitors:
+          (this.config.customModifiers?.visitors?.frequency || 0) +
+          headquartersModifier,
       },
       relationModifiers: {
         government,
@@ -216,13 +228,13 @@ export class GuildGenerator {
       },
       debug: this.debug,
     };
-    
+
     const generator = new ResourcesVisitorsGenerator(config);
     const result = generator.generate();
-    
+
     // Incorporar logs do sub-gerador
-    result.logs.forEach(log => this.logs.push(log));
-    
+    result.logs.forEach((log) => this.logs.push(log));
+
     return result;
   }
 
@@ -234,10 +246,10 @@ export class GuildGenerator {
     relationsResult: RelationsGenerationResult,
     resourcesVisitorsResult: ResourcesVisitorsGenerationResult
   ): Guild {
-    this.log(`--- Phase 4: Assembling final guild ---`, 'PHASE');
-    
+    this.log(`--- Phase 4: Assembling final guild ---`, "PHASE");
+
     const guildName = this.config.name || this.generateGuildName();
-    
+
     const guild: Guild = {
       id: this.generateGuildId(),
       name: guildName,
@@ -249,9 +261,9 @@ export class GuildGenerator {
       settlementType: this.config.settlementType,
       createdAt: new Date(),
     };
-    
-    this.log(`Guild "${guildName}" assembled successfully`, 'ASSEMBLY');
-    
+
+    this.log(`Guild "${guildName}" assembled successfully`, "ASSEMBLY");
+
     return guild;
   }
 
@@ -274,21 +286,21 @@ export class GuildGenerator {
    */
   private validateConfig(): void {
     if (!this.config.settlementType) {
-      throw new Error('Settlement type is required');
+      throw new Error("Settlement type is required");
     }
-    
+
     if (this.config.name && this.config.name.trim().length === 0) {
-      throw new Error('Guild name cannot be empty');
+      throw new Error("Guild name cannot be empty");
     }
   }
 
   /**
    * Utilitário para logging
    */
-  private log(message: string, category: string = 'GENERATOR'): void {
+  private log(message: string, category: string = "GENERATOR"): void {
     const logMessage = `[${category}] ${message}`;
     this.logs.push(logMessage);
-    
+
     if (this.debug) {
       // eslint-disable-next-line no-console
       console.log(logMessage);
@@ -297,18 +309,23 @@ export class GuildGenerator {
 }
 
 // Função de conveniência para geração rápida de guilda
-export function generateGuild(config: GuildGenerationConfig): GuildGenerationResult {
+export function generateGuild(
+  config: GuildGenerationConfig
+): GuildGenerationResult {
   const generator = new GuildGenerator(config);
   return generator.generate();
 }
 
 // Função simplificada para geração rápida apenas com tipo de assentamento
-export function generateQuickGuild(settlementType: SettlementType, name?: string): Guild {
+export function generateQuickGuild(
+  settlementType: SettlementType,
+  name?: string
+): Guild {
   const config: GuildGenerationConfig = {
     settlementType,
     name,
   };
-  
+
   const result = generateGuild(config);
   return result.data.guild;
 }

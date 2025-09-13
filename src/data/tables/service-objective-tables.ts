@@ -1975,6 +1975,34 @@ export function getThreeColumnTable(
   }
 }
 
+// ===== OTIMIZAÇÕES DE PERFORMANCE =====
+
+/**
+ * Set pre-computado das ações da tabela SERVICOS_ESPECIFICOS_TABLE
+ * para lookup O(1) ao invés de busca O(n)
+ */
+const SPECIFIC_SERVICE_ACTIONS_SET = new Set(
+  SERVICOS_ESPECIFICOS_TABLE.map((entry) => entry.result.action.toLowerCase())
+);
+
+/**
+ * Set pre-computado dos ambientes selvagens (lowercase)
+ * para lookup O(1) ao invés de busca O(n)
+ */
+const WILD_ENVIRONMENTS_SET = new Set(
+  WILD_ENVIRONMENTS.map((env) => env.toLowerCase())
+);
+
+/**
+ * Verifica se uma ação pertence à tabela de Serviços Específicos (O(1))
+ * @param actionLower - A ação já em lowercase para comparação
+ */
+function isActionFromSpecificTable(actionLower: string): boolean {
+  return SPECIFIC_SERVICE_ACTIONS_SET.has(actionLower);
+}
+
+// ===== FUNÇÕES DE GERAÇÃO E ROLAGEM =====
+
 /**
  * Gera um objetivo de serviço completo baseado no tipo
  * Combina tipo + rolagem de três colunas + formatação final
@@ -2326,11 +2354,22 @@ export function generateCareDescription(
  * Valida se um ambiente é considerado selvagem para extração
  */
 export function isWildEnvironment(environment: string): boolean {
-  return (
-    WILD_ENVIRONMENTS.some((wild) =>
-      environment.toLowerCase().includes(wild.toLowerCase())
-    ) || environment.toLowerCase().includes("selvagem")
-  );
+  const envLower = environment.toLowerCase();
+
+  // Verificação direta no set pré-computado
+  if (WILD_ENVIRONMENTS_SET.has(envLower)) {
+    return true;
+  }
+
+  // Verificar se contém algum ambiente selvagem como substring
+  for (const wildEnv of WILD_ENVIRONMENTS_SET) {
+    if (envLower.includes(wildEnv)) {
+      return true;
+    }
+  }
+
+  // Verificação adicional para palavra "selvagem"
+  return envLower.includes("selvagem");
 }
 
 /**
@@ -2383,22 +2422,27 @@ export function generateSpecificServiceDescription(
   let connector = "para";
   const actionLower = action.toLowerCase();
 
-  if (actionLower.includes("limpar") || actionLower.includes("pintar")) {
-    connector = "em";
-  } else if (
-    actionLower.includes("cobrar") ||
-    actionLower.includes("criar") ||
-    actionLower.includes("ajudar")
-  ) {
-    connector = "para";
-  } else if (
-    actionLower.includes("traduzir") ||
-    actionLower.includes("consertar") ||
-    actionLower.includes("preparar")
-  ) {
-    connector = "para";
-  } else if (actionLower.includes("trabalho")) {
-    connector = "para";
+  // Se a ação está definida na tabela de Serviços Específicos, force o conector para "para"
+  const isFromSpecificTable = isActionFromSpecificTable(actionLower);
+
+  if (!isFromSpecificTable) {
+    // Apenas aplicar os conectores alternativos quando NÃO vier da tabela específica
+    if (actionLower.includes("limpar") || actionLower.includes("pintar")) {
+      connector = "em";
+    } else if (
+      actionLower.includes("cobrar") ||
+      actionLower.includes("criar") ||
+      actionLower.includes("ajudar")
+    ) {
+      connector = "para";
+    } else if (
+      actionLower.includes("traduzir") ||
+      actionLower.includes("consertar") ||
+      actionLower.includes("preparar") ||
+      actionLower.includes("trabalho")
+    ) {
+      connector = "para";
+    }
   }
 
   return generateServiceDescription(action, target, complication, connector);

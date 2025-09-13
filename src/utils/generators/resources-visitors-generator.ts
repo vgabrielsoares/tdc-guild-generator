@@ -440,14 +440,21 @@ export function generateResourcesAndVisitors(
  * Usa os modificadores corretos baseados nos dados originais da guilda
  */
 export function regenerateVisitorsOnly(
-  settlementType: import('@/types/guild').SettlementType,
+  settlementType: import("@/types/guild").SettlementType,
   employees: string,
-  resources: import('@/types/guild').ResourceLevel,
+  resources: import("@/types/guild").ResourceLevel,
   customModifiers?: { visitors?: number },
   debug = false
-): { frequency: import('@/types/guild').VisitorLevel; roll: number; logs: readonly string[] } {
+): {
+  frequency: import("@/types/guild").VisitorLevel;
+  roll: number;
+  logs: readonly string[];
+} {
   // Calcular modificador de visitantes usando dados originais preservados
-  const relationModifier = ModifierCalculator.calculateVisitorModifiers(employees, resources);
+  const relationModifier = ModifierCalculator.calculateVisitorModifiers(
+    employees,
+    resources
+  );
   const customModifier = customModifiers?.visitors || 0;
   const totalVisitorsModifier = relationModifier + customModifier;
 

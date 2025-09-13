@@ -9,6 +9,7 @@ import type {
 } from "@/types/timeline";
 import {
   createDefaultGameDate,
+  createGameDate,
   addDays,
   getTriggeredEvents,
   getRemainingEvents,
@@ -18,7 +19,7 @@ import {
   formatGameDate,
   isSameDate,
 } from "@/utils/date-utils";
-import { useStorage } from "@/composables/useStorage";
+import { useStorageAdapter } from "@/composables/useStorageAdapter";
 import { useToast } from "@/composables/useToast";
 
 // Função simples para gerar IDs únicos
@@ -32,25 +33,364 @@ export const useTimelineStore = defineStore("timeline", () => {
   const currentGuildId = ref<string | null>(null);
 
   // Callbacks para integração com outros stores
-  const timeAdvanceCallbacks = ref<((result: TimeAdvanceResult) => void)[]>([]);
-
-  // Storage e utilitários
-  const { data: storedTimelines, reset: resetStorage } = useStorage(
-    "guild-timelines",
-    {} as Record<string, GuildTimeline>
+  const timeAdvanceCallbacks = ref<Set<(result: TimeAdvanceResult) => void>>(
+    new Set()
   );
+
+  // Storage adapter para IndexedDB
+  const storageAdapter = useStorageAdapter();
   const { success, info, warning } = useToast();
 
-  // Carregar dados do storage na inicialização
-  if (storedTimelines.value && typeof storedTimelines.value === "object") {
-    timelines.value = { ...storedTimelines.value };
+  // ===== FUNÇÕES AUXILIARES PARA NORMALIZAÇÃO DE DATA =====
+
+  /**
+   * Verifica se um objeto tem as propriedades de GameDate
+   */
+  function isGameDateObject(obj: Record<string, unknown>): boolean {
+    return (
+      typeof obj.day === "number" &&
+      typeof obj.month === "number" &&
+      typeof obj.year === "number"
+    );
   }
 
-  // Auto-save quando timelines mudam
+  /**
+   * Converte uma instância Date para GameDate
+   */
+  function dateToGameDate(date: Date): GameDate {
+    return createGameDate(
+      date.getDate(),
+      date.getMonth() + 1,
+      date.getFullYear()
+    );
+  }
+
+  /**
+   * Processa objeto serializado de data (formato { __type: 'Date', value: '...' })
+   */
+  function processSerializedDate(
+    obj: Record<string, unknown>
+  ): GameDate | null {
+    if (obj.__type === "Date" && typeof obj.value === "string") {
+      const parsed = new Date(obj.value);
+      if (!Number.isNaN(parsed.getTime())) {
+        return dateToGameDate(parsed);
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Processa dados de entrada do tipo object para normalização
+   */
+  function processObjectInput(input: Record<string, unknown>): GameDate | null {
+    // Se já for um objeto do tipo GameDate
+    if (isGameDateObject(input)) {
+      return createGameDate(
+        input.day as number,
+        input.month as number,
+        input.year as number
+      );
+    }
+
+    // Se for uma instância Date
+    if (input instanceof Date) {
+      return dateToGameDate(input);
+    }
+
+    // Se for um objeto de data serializado
+    return processSerializedDate(input);
+  }
+
+  /**
+   * Processa dados de entrada do tipo string ou number para normalização
+   */
+  function processPrimitiveInput(input: string | number): GameDate | null {
+    const parsed = new Date(input);
+    if (!Number.isNaN(parsed.getTime())) {
+      return dateToGameDate(parsed);
+    }
+    return null;
+  }
+
+  // Normaliza diferentes representações de data para o formato GameDate
+  function normalizeGameDate(input: unknown): GameDate {
+    try {
+      // Verificação inicial de nulo/undefined
+      if (input === null || input === undefined) {
+        return createDefaultGameDate();
+      }
+
+      // Processamento de objetos
+      if (typeof input === "object") {
+        const result = processObjectInput(input as Record<string, unknown>);
+        if (result) return result;
+      }
+
+      // Processamento de strings e números (timestamps, ISO strings, etc.)
+      if (typeof input === "string" || typeof input === "number") {
+        const result = processPrimitiveInput(input);
+        if (result) return result;
+      }
+    } catch (e) {
+      // Fallback silencioso em caso de erro inesperado
+    }
+
+    // Fallback padrão
+    return createDefaultGameDate();
+  }
+
+  // Flag para controlar se os dados foram carregados inicialmente
+  const isInitialized = ref(false);
+  const isLoading = ref(false); // Proteção contra múltiplos carregamentos simultâneos
+
+  /**
+   * Carrega todas as timelines do IndexedDB
+   */
+  async function loadAllTimelinesFromDB(): Promise<void> {
+    // Proteção contra múltiplas execuções simultâneas
+    if (isLoading.value || isInitialized.value) {
+      return;
+    }
+
+    isLoading.value = true;
+
+    try {
+      const timelineRecords = await storageAdapter.list<{
+        guildId: string;
+        currentDate: GameDate;
+        events: ScheduledEvent[];
+        createdAt: Date;
+        updatedAt: Date;
+      }>("timeline");
+
+      // Agrupar eventos por guildId para reconstituir as timelines
+      const timelinesMap: Record<string, GuildTimeline> = {};
+      const processedEventIds: Set<string> = new Set(); // Evitar duplicação de eventos
+
+      for (const record of timelineRecords) {
+        const rec = record as unknown as Record<string, unknown>;
+        const guildId = rec.guildId as string;
+
+        // Garantir que exista um placeholder para esta guilda
+        if (!timelinesMap[guildId]) {
+          timelinesMap[guildId] = {
+            guildId,
+            currentDate: createDefaultGameDate(),
+            events: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
+        }
+
+        // Se este registro aparenta ser a timeline principal (possui currentDate ou array events), usá-lo para popular metadados
+        if (rec.currentDate || (rec.events && Array.isArray(rec.events))) {
+          // Sobrescrever currentDate se presente (esta é a linha autoritativa da timeline)
+          if (rec.currentDate) {
+            timelinesMap[guildId].currentDate = normalizeGameDate(
+              rec.currentDate
+            );
+          }
+
+          // createdAt/updatedAt podem estar armazenados como Date ou string
+          if (record.createdAt)
+            timelinesMap[guildId].createdAt = new Date(
+              record.createdAt as unknown as string | number | Date
+            );
+          if (record.updatedAt)
+            timelinesMap[guildId].updatedAt = new Date(
+              record.updatedAt as unknown as string | number | Date
+            );
+
+          // Mesclar array de eventos se presente
+          if (rec.events && Array.isArray(rec.events)) {
+            for (const ev of rec.events as unknown as unknown[]) {
+              try {
+                if (ev && typeof ev === "object") {
+                  const eObj = {
+                    ...(ev as unknown as Record<string, unknown>),
+                  } as Record<string, unknown>;
+
+                  // Verificar se o evento já foi processado para evitar duplicação
+                  const eventId = eObj.id as string;
+                  if (eventId && !processedEventIds.has(eventId)) {
+                    eObj.date = normalizeGameDate(eObj.date as unknown);
+                    timelinesMap[guildId].events.push(
+                      eObj as unknown as ScheduledEvent
+                    );
+                    processedEventIds.add(eventId);
+                  }
+                }
+              } catch {
+                // ignorar evento inválido
+              }
+            }
+          }
+        }
+
+        // Se este registro aparenta ser uma linha de evento individual (possui propriedade event),
+        // adicioná-lo APENAS se não foi processado no array principal
+        if (rec.event && typeof rec.event === "object") {
+          try {
+            const ev = { ...(rec.event as Record<string, unknown>) } as Record<
+              string,
+              unknown
+            >;
+
+            // Verificar se o evento já foi processado para evitar duplicação
+            const eventId = ev.id as string;
+            if (eventId && !processedEventIds.has(eventId)) {
+              ev.date = normalizeGameDate(ev.date as unknown);
+              timelinesMap[guildId].events.push(
+                ev as unknown as ScheduledEvent
+              );
+              processedEventIds.add(eventId);
+            }
+          } catch {
+            // ignorar inválido
+          }
+        }
+      }
+
+      // Ordenar eventos por data em cada timeline
+      Object.values(timelinesMap).forEach((timeline) => {
+        timeline.events = sortEventsByDate(timeline.events);
+      });
+
+      timelines.value = timelinesMap;
+      // marcar inicializado antes de tentar restaurar guilda atual
+      isInitialized.value = true;
+
+      // Tentar restaurar a guilda atual persistida nas settings (compatibilidade com useGuildStorage)
+      try {
+        const persistedCurrentGuildId = await storageAdapter.get<string | null>(
+          "settings",
+          "guild-current-id"
+        );
+        if (
+          persistedCurrentGuildId &&
+          typeof persistedCurrentGuildId === "string"
+        ) {
+          // delegar para a função que já lida com sincronização com guild store
+          try {
+            setCurrentGuild(persistedCurrentGuildId);
+          } catch (e) {
+            // ignorar erros ao restaurar guilda atual para evitar quebrar o carregamento da timeline
+          }
+        }
+      } catch (e) {
+        // ignorar erros ao ler settings
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Erro ao carregar timelines:", error);
+      warning("Erro", "Falha ao carregar timelines do banco de dados");
+      isInitialized.value = true; // Marca como inicializado mesmo com erro
+    } finally {
+      isLoading.value = false; // Limpar flag de carregamento
+    }
+  }
+
+  /**
+   * Salva uma timeline específica no IndexedDB
+   */
+  async function saveTimelineToDatabase(
+    timeline: GuildTimeline
+  ): Promise<void> {
+    try {
+      // Salvar dados básicos da timeline
+      const timelineKey = `timeline_${timeline.guildId}`;
+      await storageAdapter.put("timeline", timelineKey, {
+        guildId: timeline.guildId,
+        currentDate: timeline.currentDate,
+        events: timeline.events,
+        createdAt: timeline.createdAt,
+        updatedAt: timeline.updatedAt,
+      });
+
+      // Salvar eventos individuais para otimização de consultas
+      for (const event of timeline.events) {
+        if (!event || !event.date) continue; // proteger eventos inválidos
+
+        const normalizedDate = normalizeGameDate(event.date);
+
+        const eventKey = `event_${event.id}`;
+        await storageAdapter.put("timeline", eventKey, {
+          guildId: timeline.guildId,
+          event: { ...event, date: normalizedDate },
+          eventDate: new Date(
+            normalizedDate.year,
+            normalizedDate.month - 1,
+            normalizedDate.day
+          ),
+          eventType: event.type,
+        });
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Erro ao salvar timeline:", error);
+      throw new Error("Falha ao salvar timeline no banco de dados");
+    }
+  }
+
+  /**
+   * Remove uma timeline do IndexedDB
+   */
+  async function removeTimelineFromDatabase(guildId: string): Promise<void> {
+    try {
+      // Remover timeline principal
+      const timelineKey = `timeline_${guildId}`;
+      await storageAdapter.del("timeline", timelineKey);
+
+      // Buscar e remover eventos associados
+      const allRecords = await storageAdapter.list<{
+        guildId: string;
+        event?: ScheduledEvent;
+      }>("timeline");
+
+      const eventsToDelete = allRecords.filter(
+        (record) => record.guildId === guildId && record.event
+      );
+
+      for (const eventRecord of eventsToDelete) {
+        if (eventRecord.event) {
+          await storageAdapter.del("timeline", `event_${eventRecord.event.id}`);
+        }
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Erro ao remover timeline:", error);
+      throw new Error("Falha ao remover timeline do banco de dados");
+    }
+  }
+
+  // Inicialização automática
+  if (!isInitialized.value && !isLoading.value) {
+    loadAllTimelinesFromDB();
+  }
+
+  // Auto-save quando timelines mudam (com debounce para performance)
+  let saveTimeout: NodeJS.Timeout | null = null;
   watch(
     timelines,
     (newTimelines) => {
-      storedTimelines.value = { ...newTimelines };
+      if (!isInitialized.value) return; // Não salvar durante carregamento inicial
+
+      // Debounce para evitar muitas operações de salvamento
+      if (saveTimeout) {
+        clearTimeout(saveTimeout);
+      }
+
+      saveTimeout = setTimeout(async () => {
+        for (const timeline of Object.values(newTimelines)) {
+          try {
+            await saveTimelineToDatabase(timeline);
+          } catch (error) {
+            // eslint-disable-next-line no-console
+            console.error("Erro no auto-save da timeline:", error);
+          }
+        }
+      }, 500); // Aguardar 500ms entre salvamentos
     },
     { deep: true }
   );
@@ -68,7 +408,31 @@ export const useTimelineStore = defineStore("timeline", () => {
 
   // Computed: Eventos da timeline atual
   const currentEvents = computed((): ScheduledEvent[] => {
-    return currentTimeline.value?.events || [];
+    const events = currentTimeline.value?.events || [];
+
+    // Deduplicar eventos por ID para evitar duplicação visual
+    const uniqueEvents = new Map<string, ScheduledEvent>();
+
+    events.forEach((event) => {
+      if (event && event.id) {
+        // Manter o evento mais recente caso haja duplicatas
+        if (
+          !uniqueEvents.has(event.id) ||
+          (uniqueEvents.get(event.id)?.date &&
+            event.date &&
+            new Date(event.date.year, event.date.month - 1, event.date.day) >=
+              new Date(
+                uniqueEvents.get(event.id)!.date.year,
+                uniqueEvents.get(event.id)!.date.month - 1,
+                uniqueEvents.get(event.id)!.date.day
+              ))
+        ) {
+          uniqueEvents.set(event.id, event);
+        }
+      }
+    });
+
+    return Array.from(uniqueEvents.values());
   });
 
   // Computed: Próximo evento
@@ -122,6 +486,58 @@ export const useTimelineStore = defineStore("timeline", () => {
    */
   function setCurrentGuild(guildId: string): void {
     currentGuildId.value = guildId;
+
+    // Também tentar notificar o store de guild para que o 'currentGuild' seja
+    // definido e persistido.
+    // Usar import dinâmico para evitar dependência circular no momento de carregamento do módulo.
+    void (async () => {
+      try {
+        const [{ useGuildStore }, { useStorageAdapter }] = await Promise.all([
+          import("./guild"),
+          import("@/composables/useStorageAdapter"),
+        ]);
+
+        const guildStore = useGuildStore();
+        // Se a guilda já estiver presente no histórico, carregá-la em currentGuild
+        const inHistory = guildStore.guildHistory.some((g) => g.id === guildId);
+        if (inHistory) {
+          guildStore.loadGuildFromHistory(guildId);
+          return;
+        }
+
+        // Alternativa: tentar buscar a guilda diretamente do storage persistente e adicioná-la ao histórico
+        const adapter = useStorageAdapter();
+        try {
+          const rec = await adapter.get<Record<string, unknown> | null>(
+            "guilds",
+            guildId
+          );
+          if (rec) {
+            // rec pode ser { value: Guild } ou um Guild bruto
+            let candidate: unknown = rec;
+            if (
+              rec &&
+              typeof rec === "object" &&
+              (rec as Record<string, unknown>).value
+            ) {
+              candidate = (rec as Record<string, unknown>).value;
+            }
+            const { createGuild } = await import("@/types/guild");
+            try {
+              const guildObj = createGuild(candidate as unknown);
+              guildStore.addToHistory(guildObj);
+              guildStore.setCurrentGuild(guildObj);
+            } catch (e) {
+              // ignorar erros de parse
+            }
+          }
+        } catch (e) {
+          // ignorar erros do adaptador
+        }
+      } catch {
+        // ignorar quaisquer erros para evitar quebrar a criação da timeline
+      }
+    })();
   }
 
   /**
@@ -166,14 +582,54 @@ export const useTimelineStore = defineStore("timeline", () => {
 
     timelines.value[guildId] = timeline;
 
+    // Set this guild as current timeline/guild so UI and other stores sync
+    currentGuildId.value = guildId;
+
+    // Ao criar a timeline pela primeira vez, marcar a guilda como bloqueada
+    // automaticamente para evitar que o usuário regenere partes que deveriam
+    // permanecer estáveis após a inicialização da timeline. Usamos import
+    // dinâmico para evitar import circulares entre stores.
+    import("./guild")
+      .then(({ useGuildStore }) => {
+        try {
+          const guildStore = useGuildStore();
+          // Se a guilda já estiver no histórico e desbloqueada, aplicar lock
+          const inHistory = guildStore.guildHistory.some(
+            (g) => g.id === guildId
+          );
+          const alreadyLocked = guildStore.guildHistory.some(
+            (g) => g.id === guildId && g.locked
+          );
+
+          if (inHistory && !alreadyLocked) {
+            // toggleGuildLock é async. não aguardamos para não bloquear a criação
+            // da timeline, apenas tentamos aplicar o lock (erros são silenciosos).
+            void guildStore.toggleGuildLock(guildId).catch(() => {});
+          }
+        } catch {
+          // silencioso: se algo falhar, não impedimos a criação da timeline
+        }
+      })
+      .catch(() => {
+        // silencioso
+      });
+
     return timeline;
   }
 
   /**
    * Remove a timeline de uma guilda (quando guilda é removida)
    */
-  function removeTimelineForGuild(guildId: string): void {
+  async function removeTimelineForGuild(guildId: string): Promise<void> {
     if (timelines.value[guildId]) {
+      // Remover do banco de dados
+      try {
+        await removeTimelineFromDatabase(guildId);
+      } catch (error) {
+        warning("Erro", "Falha ao remover timeline do banco de dados");
+      }
+
+      // Remover do estado local
       delete timelines.value[guildId];
 
       // Se era a timeline atual, limpar referência
@@ -330,6 +786,153 @@ export const useTimelineStore = defineStore("timeline", () => {
   }
 
   /**
+   * Busca eventos por data específica (otimizada para IndexedDB)
+   */
+  async function getEventsByDate(
+    guildId: string,
+    date: GameDate
+  ): Promise<ScheduledEvent[]> {
+    try {
+      const targetDate = new Date(date.year, date.month - 1, date.day);
+      const allRecords = await storageAdapter.list<{
+        guildId: string;
+        event?: ScheduledEvent;
+        eventDate?: Date;
+      }>("timeline");
+
+      return allRecords
+        .filter(
+          (record) =>
+            record.guildId === guildId &&
+            record.event &&
+            record.eventDate &&
+            record.eventDate.getTime() === targetDate.getTime()
+        )
+        .map((record) => record.event as ScheduledEvent);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Erro ao buscar eventos por data:", error);
+      return [];
+    }
+  }
+
+  /**
+   * Busca eventos por tipo em uma guilda específica (otimizada para IndexedDB)
+   */
+  async function getEventsByTypeAndGuild(
+    guildId: string,
+    type: ScheduledEventType
+  ): Promise<ScheduledEvent[]> {
+    try {
+      const allRecords = await storageAdapter.list<{
+        guildId: string;
+        event?: ScheduledEvent;
+        eventType?: string;
+      }>("timeline");
+
+      return allRecords
+        .filter(
+          (record) =>
+            record.guildId === guildId &&
+            record.event &&
+            record.eventType === type
+        )
+        .map((record) => record.event as ScheduledEvent);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Erro ao buscar eventos por tipo:", error);
+      return [];
+    }
+  }
+
+  /**
+   * Busca eventos pendentes (futuros) para uma guilda
+   */
+  async function getPendingEvents(guildId: string): Promise<ScheduledEvent[]> {
+    try {
+      const timeline = timelines.value[guildId];
+      if (!timeline) return [];
+
+      const currentDate = timeline.currentDate;
+      const currentDateJs = new Date(
+        currentDate.year,
+        currentDate.month - 1,
+        currentDate.day
+      );
+
+      const allRecords = await storageAdapter.list<{
+        guildId: string;
+        event?: ScheduledEvent;
+        eventDate?: Date;
+      }>("timeline");
+
+      return allRecords
+        .filter(
+          (record) =>
+            record.guildId === guildId &&
+            record.event &&
+            record.eventDate &&
+            record.eventDate.getTime() > currentDateJs.getTime()
+        )
+        .map((record) => record.event as ScheduledEvent)
+        .sort((a, b) => {
+          const dateA = new Date(a.date.year, a.date.month - 1, a.date.day);
+          const dateB = new Date(b.date.year, b.date.month - 1, b.date.day);
+          return dateA.getTime() - dateB.getTime();
+        });
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Erro ao buscar eventos pendentes:", error);
+      return [];
+    }
+  }
+
+  /**
+   * Limpeza de histórico temporal antigo (manter últimos N dias)
+   */
+  async function cleanupOldHistory(
+    guildId: string,
+    daysToKeep: number = 90
+  ): Promise<void> {
+    try {
+      const timeline = timelines.value[guildId];
+      if (!timeline) return;
+
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
+
+      const allRecords = await storageAdapter.list<{
+        guildId: string;
+        event?: ScheduledEvent;
+        eventDate?: Date;
+      }>("timeline");
+
+      const recordsToDelete = allRecords.filter(
+        (record) =>
+          record.guildId === guildId &&
+          record.event &&
+          record.eventDate &&
+          record.eventDate.getTime() < cutoffDate.getTime()
+      );
+
+      for (const record of recordsToDelete) {
+        if (record.event) {
+          await storageAdapter.del("timeline", `event_${record.event.id}`);
+        }
+      }
+
+      info(
+        "Limpeza concluída",
+        `${recordsToDelete.length} eventos antigos removidos`
+      );
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Erro na limpeza de histórico:", error);
+      warning("Erro", "Falha na limpeza de eventos antigos");
+    }
+  }
+
+  /**
    * Limpa todos os eventos de uma timeline
    */
   function clearEvents(): void {
@@ -349,10 +952,22 @@ export const useTimelineStore = defineStore("timeline", () => {
   /**
    * Reseta todas as timelines (usado para limpeza)
    */
-  function resetAllTimelines(): void {
+  async function resetAllTimelines(): Promise<void> {
+    // Remover todas as timelines do banco de dados
+    const guildIds = Object.keys(timelines.value);
+
+    for (const guildId of guildIds) {
+      try {
+        await removeTimelineFromDatabase(guildId);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(`Erro ao remover timeline ${guildId}:`, error);
+      }
+    }
+
+    // Limpar estado local
     timelines.value = {};
     currentGuildId.value = null;
-    resetStorage();
 
     info("Timelines resetadas", "Todas as timelines foram removidas");
   }
@@ -363,7 +978,15 @@ export const useTimelineStore = defineStore("timeline", () => {
   function registerTimeAdvanceCallback(
     callback: (result: TimeAdvanceResult) => void
   ): void {
-    timeAdvanceCallbacks.value.push(callback);
+    // Evitar registros duplicados do mesmo callback (Set já garante unicidade)
+    if (!timeAdvanceCallbacks.value.has(callback)) {
+      timeAdvanceCallbacks.value.add(callback);
+    } else {
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.debug("[timeline] callback already registered");
+      }
+    }
   }
 
   /**
@@ -372,9 +995,13 @@ export const useTimelineStore = defineStore("timeline", () => {
   function unregisterTimeAdvanceCallback(
     callback: (result: TimeAdvanceResult) => void
   ): void {
-    const index = timeAdvanceCallbacks.value.indexOf(callback);
-    if (index > -1) {
-      timeAdvanceCallbacks.value.splice(index, 1);
+    if (timeAdvanceCallbacks.value.has(callback)) {
+      timeAdvanceCallbacks.value.delete(callback);
+    } else {
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.debug("[timeline] attempt to unregister unknown callback");
+      }
     }
   }
 
@@ -416,8 +1043,19 @@ export const useTimelineStore = defineStore("timeline", () => {
     clearEvents,
     resetAllTimelines,
 
+    // Consultas IndexedDB
+    getEventsByDate,
+    getEventsByTypeAndGuild,
+    getPendingEvents,
+    cleanupOldHistory,
+
     // Callbacks de integração
     registerTimeAdvanceCallback,
     unregisterTimeAdvanceCallback,
+
+    // Utilitários de persistência
+    loadAllTimelinesFromDB,
+    saveTimelineToDatabase,
+    removeTimelineFromDatabase,
   };
 });
