@@ -39,7 +39,7 @@ body:
       description: Descreva o que deveria acontecer
       placeholder: O sistema deveria...
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: actual-behavior
@@ -48,7 +48,7 @@ body:
       description: Descreva o que realmente acontece
       placeholder: Em vez disso, o sistema...
     validations:
-      required: true
+      required: false
 
   - type: dropdown
     id: component
@@ -98,7 +98,7 @@ body:
         - OS: Windows 11
         - Versão do sistema: v0.1.0
     validations:
-      required: true
+      required: false
 
   - type: checkboxes
     id: terms
