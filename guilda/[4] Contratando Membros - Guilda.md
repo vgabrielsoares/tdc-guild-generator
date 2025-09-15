@@ -6,6 +6,8 @@ Há um livro de registros no qual os membros da guilda podem preencher para se d
 
 Cada sede da guilda tem o seu próprio livro de registros, que normalmente, é composto por membros da guilda que residem por perto, não mais que a 10 dias de viagem dali. Caso viaje para mais longe ou se mude, a guilda deve ser devidamente notificada para que tudo seja registrado, não fazer isso pode resultar, também, em multas e retaliações.
 
+<!-- TODO: utilizar as raças e subraças feitas na tabela de avisos -->
+
 ## Livro de Registro
 
 ### Quantidade de Registros
