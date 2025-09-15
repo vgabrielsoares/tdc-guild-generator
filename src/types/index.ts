@@ -16,4 +16,5 @@ export * from "./contract";
 export * from "./service";
 export * from "./member";
 export * from "./notice";
+export * from "./species";
 export * from "./renown";
