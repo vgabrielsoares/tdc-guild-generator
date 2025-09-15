@@ -5,6 +5,7 @@ import { SettlementType } from "@/types/guild";
 import {
   GUILD_NAME_PREFIXES_CLASSIFIED,
   GUILD_NAME_SUFFIXES_CLASSIFIED,
+  SuffixType,
 } from "@/data/guild-names";
 import { type Guild } from "@/types/guild";
 
@@ -492,9 +493,29 @@ describe("Issue 3.4 - Guild Store Complete", () => {
       const classifiedPrefixes = GUILD_NAME_PREFIXES_CLASSIFIED.map(
         (p) => p.name
       );
-      const classifiedSuffixes = GUILD_NAME_SUFFIXES_CLASSIFIED.map(
-        (s) => s.name
-      );
+
+      // Obter todos os sufixos incluindo formas flexionadas de adjetivos
+      const classifiedSuffixes = GUILD_NAME_SUFFIXES_CLASSIFIED.flatMap((s) => {
+        // Para adjetivos com formas específicas
+        if (s.type === SuffixType.ADJECTIVE) {
+          const forms = [];
+          // Adicionar forma neutra se existir
+          if (s.neutralForm) {
+            forms.push(s.neutralForm);
+          }
+          // Adicionar formas masculina e feminina se existirem
+          if (s.masculineForm) {
+            forms.push(s.masculineForm);
+          }
+          if (s.feminineForm) {
+            forms.push(s.feminineForm);
+          }
+          // Se nenhuma forma específica, usar o nome base
+          return forms.length > 0 ? forms : [s.name];
+        }
+        // Para substantivos, usar apenas o nome
+        return [s.name];
+      });
 
       // Criar regex dinamicamente baseado nas listas classificadas
       const prefixPattern = classifiedPrefixes
@@ -514,6 +535,7 @@ describe("Issue 3.4 - Guild Store Complete", () => {
       // O nome deve corresponder a um dos padrões
       const isValidName =
         modernPattern.test(guildName!) || specialPattern.test(guildName!);
+
       expect(isValidName).toBe(true);
     });
 
