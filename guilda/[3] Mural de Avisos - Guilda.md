@@ -557,9 +557,45 @@ Solicitações em busca de auxílio contra feras, monstros ou ameaças que assol
 
 ##### Recompensa da Caçada
 
-<!-- TODO: estruturar tabela de recompensas -->
+A tabela de recompensa para caçadas é rolada de acordo com o NA da criatura e quantas criaturas são.
 
-> **Nota**: Role o tesouro individual apropriado (Livro do Mestre, pag. 136) e quantas vezes for preciso de acordo com a quantidade conhecida de caças, o resultado será a recompensa pela caçada.
+<!-- No sistema, isso deve ser representado com um tooltip que fica disponível toda vez que um aviso for do tipo proposta de caçada, para que os próprios mestres rolem manualmente de acordo com a caçada que eles construíram (levar em consideração a quantidade e o NA) -->
+
+| NA da criatura | Dado   |
+| -------------- | ------ |
+| 0-4            | 1d4    |
+| 5-9            | 1d6    |
+| 10-14          | 1d8    |
+| 15-20          | 1d10   |
+| 25-30          | 1d12   |
+| 35-40          | 1d10+3 |
+| 45-50          | 1d10+5 |
+| 55-60          | 1d12+5 |
+| 65-70          | 1d20+2 |
+| 75-80          | 1d20+5 |
+
+| 1d100 | Recompensa por criatura |
+| ----- | ----------------------- |
+| 1     | 3d6\*5 C$               |
+| 2     | 3d6\*10 C$              |
+| 3     | 5d6\*10 C$              |
+| 4     | 1d6 PO$                 |
+| 5     | 1d10 PO$                |
+| 6     | 2d6 PO$                 |
+| 7     | 3d6 PO$                 |
+| 8     | 4d6 PO$                 |
+| 9     | 5d6 PO$                 |
+| 10    | 8d6 PO$                 |
+| 11    | 10d6 PO$                |
+| 12    | 10d10 PO$               |
+| 13    | 10d6\*2 PO$             |
+| 14    | 10d6\*3 PO$             |
+| 15    | 10d10\*3 PO$            |
+| 16    | 10d10\*5 PO$            |
+| 17    | 10d6\*10 PO$            |
+| 18    | 10d10\*12 PO$           |
+| 19    | 10d6\*20 PO$            |
+| 20    | 10d20\*10 PO$           |
 
 ##### Reviravoltas
 
