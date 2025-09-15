@@ -32,6 +32,7 @@ import {
   getObjectiveSpecificationTable,
   shouldRollTwiceForObjective,
   shouldRollTwiceForSpecification,
+  LOCATION_TYPE_TABLE,
 } from "../../data/tables/contract-content-tables";
 
 import { AntagonistGenerator } from "./antagonistGenerator";
@@ -1435,30 +1436,23 @@ export class ContractGenerator {
 
         // Se houver múltiplos resultados (re-rolagem produziu "role duas vezes"), combinar como antes
         if (filtered.length > 1) {
-          const combinedTarget = filtered
-            .map(
-              (
-                spec: {
-                  target: string;
-                  description: string;
-                  rollTwice?: boolean;
-                },
-                index: number
-              ) => (index === 0 ? spec.target : spec.target.toLowerCase())
+          // Aplicar tipo de local a cada especificação se necessário
+          const processedSpecs = filtered.map((spec) =>
+            this.applyLocationTypeIfNeeded({
+              target: spec.target,
+              description: spec.description,
+            })
+          );
+
+          const combinedTarget = processedSpecs
+            .map((spec, index) =>
+              index === 0 ? spec.target : spec.target.toLowerCase()
             )
             .join(", além disso ");
 
-          const combinedDescription = filtered
-            .map(
-              (
-                spec: {
-                  target: string;
-                  description: string;
-                  rollTwice?: boolean;
-                },
-                index: number
-              ) =>
-                index === 0 ? spec.description : spec.description.toLowerCase()
+          const combinedDescription = processedSpecs
+            .map((spec, index) =>
+              index === 0 ? spec.description : spec.description.toLowerCase()
             )
             .join(". Além disso, ");
 
@@ -1470,9 +1464,14 @@ export class ContractGenerator {
 
         // Resultado único resolvido
         const resolved = filtered[0];
+        const processedResolved = this.applyLocationTypeIfNeeded({
+          target: resolved.target,
+          description: resolved.description,
+        });
+
         return {
-          target: `${resolved.target} (Carga Secreta)`,
-          description: `${resolved.description} (Carga Secreta)`,
+          target: `${processedResolved.target} (Carga Secreta)`,
+          description: `${processedResolved.description} (Carga Secreta)`,
         };
       }
 
@@ -1485,12 +1484,16 @@ export class ContractGenerator {
 
     // Se temos múltiplas especificações (resultado de "role duas vezes")
     if (specResult.results.length > 1) {
-      // Processar todas as especificações retornadas, tratando gatilho secreto
+      // Processar todas as especificações retornadas, tratando gatilho secreto e tipo de local
       const specifications = specResult.results.map((spec) => {
         if (spec.target === SECRET_TRIGGER_TEXT) {
           return resolveSecretEntry();
         }
-        return { target: spec.target, description: spec.description };
+        // Aplicar tipo de local se necessário
+        return this.applyLocationTypeIfNeeded({
+          target: spec.target,
+          description: spec.description,
+        });
       });
 
       // Combinar targets e descrições
@@ -1518,7 +1521,40 @@ export class ContractGenerator {
       return resolveSecretEntry();
     }
 
-    return singleSpec;
+    // Aplicar tipo de local se necessário
+    return this.applyLocationTypeIfNeeded(singleSpec);
+  }
+
+  /**
+   * Aplica a especificação de tipo de local quando o objetivo é "Um local ou território"
+   * Segue a regra: "Role abaixo sempre que cair 'Um local' nas Especificações por Objetivo"
+   */
+  private static applyLocationTypeIfNeeded(specification: {
+    target: string;
+    description: string;
+  }): {
+    target: string;
+    description: string;
+  } {
+    // Verificar se o target contém "local ou território"
+    if (specification.target.toLowerCase().includes("local ou território")) {
+      // Rolar na tabela de tipo de local
+      const locationTypeResult = rollOnTable(LOCATION_TYPE_TABLE);
+      const locationType = locationTypeResult.result;
+
+      // Substituir "local ou território" pelo tipo específico
+      const specificTarget = specification.target.replace(
+        /local ou território/gi,
+        locationType.description.toLowerCase()
+      );
+
+      return {
+        target: specificTarget,
+        description: `${specification.description} (${locationType.description})`,
+      };
+    }
+
+    return specification;
   }
 
   /**
