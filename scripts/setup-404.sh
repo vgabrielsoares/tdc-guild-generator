@@ -1,0 +1,88 @@
+#!/bin/bash
+# Script para configurar o 404.html com base path correto para GitHub Pages
+
+# Cria o 404.html na pasta dist com configuração correta
+cat > dist/404.html << 'EOF'
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Redirecionando... - Gerador de Guildas</title>
+    <script>
+      // GitHub Pages SPA redirect hack
+      // Redireciona 404s para index.html com o path preservado
+      const basePath = "/tdc-guild-generator";
+      const currentPath = window.location.pathname;
+
+      // Se estamos em uma sub-rota, redireciona para index.html
+      if (
+        currentPath !== basePath + "/" &&
+        currentPath !== basePath + "/index.html"
+      ) {
+        const searchParams = window.location.search;
+        const hash = window.location.hash;
+
+        // Preserva a rota original como parâmetro
+        const redirectPath = currentPath.replace(basePath, "");
+        window.location.replace(
+          basePath +
+            "/index.html?redirect=" +
+            encodeURIComponent(redirectPath) +
+            searchParams +
+            hash
+        );
+      }
+    </script>
+  </head>
+  <body>
+    <div
+      style="
+        font-family: 'Crimson Text', Georgia, serif;
+        background: linear-gradient(135deg, #1f2937 0%, #4c1d95 100%);
+        color: white;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        margin: 0;
+        padding: 20px;
+      "
+    >
+      <div>
+        <h1 style="font-size: 2rem; margin-bottom: 1rem">
+          Redirecionando...
+        </h1>
+        <p style="font-size: 1.1rem; opacity: 0.8; margin-bottom: 2rem">
+          Você está sendo redirecionado para o Gerador de Guildas
+        </p>
+        <div
+          style="
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+          "
+        ></div>
+      </div>
+    </div>
+
+    <style>
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </body>
+</html>
+EOF
+
+echo "404.html configurado para produção com basePath: /tdc-guild-generator"

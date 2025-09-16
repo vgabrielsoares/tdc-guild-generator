@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build",
+    "build:github": "npm run build && ./scripts/setup-404.sh",
     "preview": "vite preview",
     "lint": "echo 'Linting será configurado nas próximas issues'",
     "format": "prettier --write src/",
@@ -16,7 +17,8 @@
     "test:coverage": "vitest --coverage",
     "type-check": "vue-tsc --noEmit",
     "audit:security": "audit-ci --moderate",
-    "ci:full": "npm run type-check && npm run test:coverage && npm run build"
+    "ci:full": "npm run type-check && npm run test:coverage && npm run build",
+    "deploy:prepare": "npm run ci:full && ./scripts/setup-404.sh"
   },
   "dependencies": {
     "@headlessui/vue": "^1.7.16",
