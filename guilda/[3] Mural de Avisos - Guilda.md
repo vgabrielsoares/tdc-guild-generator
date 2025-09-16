@@ -19,7 +19,7 @@ Todo jogo medieval tem o clássico mural de avisos. Aqui ele é administrado pel
 | 1d20   | Há algum aviso inicialmente? |
 | ------ | ---------------------------- |
 | 1-10   | Não, nenhum                  |
-| 11-12  | Talvez, -4d20                |
+| 11-13  | Talvez, -4d20                |
 | 14-16  | Mais ou menos, -2d20         |
 | 17-20+ | Sim                          |
 
@@ -119,8 +119,8 @@ Anúncios de compra, venda ou troca de mercadorias, muitas vezes acompanhados de
 
 | 1d20  | O que?            |
 | ----- | ----------------- |
-| 1-3   | Partes de animais |
-| 6-8   | Serviços          |
+| 1-4   | Partes de animais |
+| 5-8   | Serviços          |
 | 9-11  | Animais rurais    |
 | 12    | Poções mágicas    |
 | 13    | Objetos de arte   |
@@ -218,8 +218,10 @@ Notificações sombrias anunciando a data e o local da punição de condenados, 
 
 | 1d20  | Modo de execução                |
 | ----- | ------------------------------- |
-| 1-7   | Forca/guilhotina                |
-| 8-10  | Fogueira/apedrejamento          |
+| 1-4   | Forca                           |
+| 5-8   | Guilhotina                      |
+| 9     | Fogueira                        |
+| 10    | Apedrejamento                   |
 | 11-12 | Trancafiado em uma masmorra     |
 | 13    | Arena de combate                |
 | 14    | Envenenamento                   |
@@ -334,6 +336,8 @@ Retratos ou descrições de criminosos, foragidos, e inocentes geralmente com um
 
 ##### Condenado Fugitivo
 
+Todo condenado fugitivo tem um Motivo de Infâmia, uma Periculosidade, uma Peculiaridade e uma Característica. A recompensa é definida pela periculosidade.
+
 ###### Motivo da Infâmia
 
 | 1d20  | Motivo da infâmia                   |
@@ -411,6 +415,8 @@ Retratos ou descrições de criminosos, foragidos, e inocentes geralmente com um
 
 ###### Traços Notáveis
 
+Caso o resultado de Pecularidade tenha sido "Traços notáveis", role na tabela abaixo.
+
 | 1d20  | Traços notáveis       |
 | ----- | --------------------- |
 | 1-4   | Exímio espadachim     |
@@ -428,7 +434,7 @@ Retratos ou descrições de criminosos, foragidos, e inocentes geralmente com um
 >
 > - Criaturas com nível de periculosidade "Altíssima" ou maior, serão procuradas, pelo menos, em todos os assentamentos que tenham uma sede da guilda.
 > - Uma criatura com nível de periculosidade "Alta" ou maior, sempre será procurada "viva ou morta"
-> - Periculosidade não foi pensado para ser usado como mecânica (NA) para calcular um desafio, mas sim como os habitantes se sentem ou são de fato ameaçados por aquele criminoso, às vezes um plebeu com uma informação que pode destruir todo um reino teria periculosidade altíssima por exemplo.
+> - Periculosidade não foi pensado para ser usado como mecânica (NA) para calcular um desafio, mas sim como os habitantes se sentem ou são de fato ameaçados por aquele criminoso, às vezes um plebeu com uma informação que pode destruir todo um reino teria periculosidade altíssima, por exemplo.
 
 #### Proposta de Caçada
 
@@ -892,16 +898,16 @@ As espécies a seguir têm vários tipos e sub-raças. Role para decidir qual o 
 
 #### Dados por Tamanho do Assentamento
 
-| Tamanho       | Dado             |
-| ------------- | ---------------- |
-| Lugarejo      | 1d20-15          |
-| Povoado       | 2d20-15          |
-| Aldeia        | 1d20-10          |
-| Vilarejo      | 2d20-10          |
-| Vila grande   | 1d20-10 e 1d20-5 |
-| Cidadela      | 2d20-10 e 1d20-5 |
-| Cidade grande | 2d20-5           |
-| Metrópole     | 2d20-5 e 1d20    |
+| Tamanho       | Dado    |
+| ------------- | ------- |
+| Lugarejo      | 1d20-15 |
+| Povoado       | 2d20-15 |
+| Aldeia        | 1d20-10 |
+| Vilarejo      | 2d20-10 |
+| Vila grande   | 1d20-5  |
+| Cidadela      | 2d20-5  |
+| Cidade grande | 2d20    |
+| Metrópole     | 2d20+5  |
 
 > **Nota**: Role diretamente da tabela de mural de avisos. Quando achar necessário, retire o redutor.
 
