@@ -1,18 +1,80 @@
-// Notice Tables
-// Will be implemented in Issue 7.2
-import type { TableEntry } from "@/types/tables";
+export {
+  // Modificadores e dados por tamanho
+  SETTLEMENT_SIZE_MODIFIERS,
+  SETTLEMENT_SIZE_DICE,
+  GUILD_HQ_SIZE_MODIFIERS,
+  STAFF_CONDITION_MODIFIERS,
 
-// Placeholder tables - to be implemented in Issue 7.2
-export const NOTICE_TYPE_TABLE: TableEntry<string>[] = [
-  { min: 1, max: 3, result: "Procurado" },
-  { min: 4, max: 6, result: "Comercial" },
-  { min: 7, max: 10, result: "Aviso" },
-];
+  // Tabelas principais
+  INITIAL_AVAILABILITY_TABLE,
+  NOTICE_TYPE_TABLE,
+  ALTERNATIVE_PAYMENT_TABLE,
 
-export const NOTICE_URGENCY_TABLE: TableEntry<string>[] = [
-  { min: 1, max: 5, result: "Normal" },
-  { min: 6, max: 8, result: "Urgente" },
-  { min: 9, max: 10, result: "Crítico" },
-];
+  // Tabelas específicas por tipo de aviso
+  COMMERCIAL_PROPOSAL_TYPE_TABLE,
+  COMMERCIAL_PROPOSAL_WHAT_TABLE,
+  COMMERCIAL_PROPOSAL_WHO_TABLE,
+  DIVULGATION_TYPE_TABLE,
+  DIVULGATION_WHO_TABLE,
+  EXECUTION_WHO_TABLE,
+  EXECUTION_REASON_TABLE,
+  EXECUTION_METHOD_TABLE,
 
-// More tables will be added in Issue 7.2
+  // Proposta de Caçada
+  HUNT_PROPOSAL_TYPE_TABLE,
+  HUNT_CREATURE_SPECIFICATION_TABLE,
+  HUNT_LOCATION_TABLE,
+  HUNT_PECULIARITY_TABLE,
+  HUNT_CHARACTERISTIC_I_TABLE,
+  HUNT_CHARACTERISTIC_II_TABLE,
+  HUNT_TEST_ADVANTAGE_TABLE,
+  HUNT_REWARD_DICE_BY_CR,
+  HUNT_REWARD_TABLE,
+  HUNT_TWIST_CHECK_TABLE,
+  HUNT_TWIST_TYPE_TABLE,
+
+  // Cartaz de procurado
+  WANTED_POSTER_TYPE_TABLE,
+  MISSING_INNOCENT_WHO_TABLE,
+  MISSING_LAST_SEEN_TABLE,
+  MISSING_CHARACTERISTICS_I_TABLE,
+  MISSING_CHARACTERISTICS_II_TABLE,
+  MISSING_PECULIARITY_TABLE,
+  MISSING_REWARD_TABLE,
+  FUGITIVE_INFAMY_REASON_TABLE,
+  FUGITIVE_DANGEROUSNESS_TABLE,
+  FUGITIVE_PECULIARITIES_TABLE,
+  FUGITIVE_CHARACTERISTICS_TABLE,
+  FUGITIVE_NOTABLE_TRAITS_TABLE,
+  FUGITIVE_REWARD_BY_DANGER,
+
+  // Outros tipos
+  INHABITANTS_NOTICE_TABLE,
+  PRONOUNCEMENT_TYPE_TABLE,
+  PRONOUNCEMENT_PECULIARITY_TABLE,
+
+  // Espécies e sub-raças
+  SPECIES_TABLE,
+  CENTAUR_SUBRACE_TABLE,
+  ELF_SUBRACE_TABLE,
+  ANIMALESQUE_SUBRACE_TABLE,
+  HALFBLOOD_SUBRACE_TABLE,
+  DRACONIC_SUBRACE_TABLE,
+  CONSTRUCT_SUBRACE_TABLE,
+  URGANI_SUBRACE_TABLE,
+  MOOGANI_SUBRACE_TABLE,
+  GAZARAI_SUBRACE_TABLE,
+
+  // Renovação do mural
+  NEW_NOTICES_TIMING_TABLE,
+  RENEWAL_DICE_BY_SETTLEMENT,
+  NOTICE_REMOVAL_TIMING_TABLE,
+  NOTICE_REMOVAL_MODIFIERS,
+
+  // Funções utilitárias
+  getSettlementSizeModifier,
+  getSettlementSizeDice,
+  getGuildHQSizeModifier,
+  getStaffConditionModifier,
+  getFugitiveRewardByDanger,
+} from "./notice-base-tables";
