@@ -76,9 +76,7 @@ export default defineConfig({
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
         navigateFallback:
-          process.env.NODE_ENV === "production"
-            ? "/tdc-guild-generator/index.html"
-            : "/index.html",
+          process.env.NODE_ENV === "production" ? "/tdc-guild-generator/" : "/",
         navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
         runtimeCaching: [
           {
