@@ -12,9 +12,9 @@ export const SETTLEMENT_SIZE_MODIFIERS: Record<string, number> = {
   Povoado: 0,
   Aldeia: 0,
   Vilarejo: 2,
-  "Vila grande": 2,
+  "Vila Grande": 2,
   Cidadela: 4,
-  "Cidade grande": 8,
+  "Cidade Grande": 8,
   Metrópole: 12,
 };
 
@@ -74,9 +74,9 @@ export const SETTLEMENT_SIZE_DICE: Record<string, string> = {
   Povoado: "2d20",
   Aldeia: "2d20",
   Vilarejo: "3d20",
-  "Vila grande": "4d20",
+  "Vila Grande": "4d20",
   Cidadela: "5d20",
-  "Cidade grande": "6d20",
+  "Cidade Grande": "6d20",
   Metrópole: "8d20",
 };
 
