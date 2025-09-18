@@ -72,8 +72,9 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
         const mockDice = vi
           .fn()
           .mockReturnValueOnce(20) // Disponibilidade: Sim (17-999)
-          .mockReturnValueOnce(1) // Quantidade: 1d20 = 1
-          // Adicionar 13 rolagens para tipos de avisos (uma para cada aviso calculado)
+          .mockReturnValueOnce(20) // Quantidade: 1d20 = 20 (base alta)
+          .mockReturnValueOnce(1) // Modificador sede minúscula: -1d20 = -1 (resultado final: 20-1=19)
+          // Adicionar 19 rolagens para tipos de avisos
           .mockReturnValue(10); // Para todos os tipos subsequentes (animals payment)
 
         const generator = new NoticeGenerator(mockDice);
@@ -97,14 +98,18 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
 
         // Debug: Se falhar aqui, problema é na disponibilidade inicial
         expect(notices.length).toBeGreaterThan(0);
+        expect(notices.length).toBe(19); // 20 - 1 = 19 avisos esperados
       });
 
       it("deve aplicar modificadores por tamanho de assentamento corretamente", () => {
         const guild = createMockGuild();
 
         // Teste para Metrópole (+12 modificador)
-        mockDiceRoller.mockReturnValueOnce(5); // Base 5 + 12 = 17 -> "Sim"
-        mockDiceRoller.mockReturnValueOnce(10); // Quantidade de avisos
+        mockDiceRoller
+          .mockReturnValueOnce(5) // Base 5 + 12 = 17 -> "Sim"
+          .mockReturnValueOnce(10) // Quantidade de avisos
+          // Adicionar rolagens para os 10 avisos individuais (tipos)
+          .mockReturnValue(10); // Para todos os tipos subsequentes
 
         const notices = generator.generate({
           guild,
@@ -125,7 +130,9 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
           .mockReturnValueOnce(10) // -4d20: segunda rolagem
           .mockReturnValueOnce(18) // -4d20: terceira rolagem (17+ = "Sim")
           .mockReturnValueOnce(8) // -4d20: quarta rolagem
-          .mockReturnValueOnce(15); // Quantidade de avisos
+          .mockReturnValueOnce(15) // Quantidade de avisos
+          // Adicionar rolagens para os 15 avisos individuais
+          .mockReturnValue(10); // Para todos os tipos subsequentes
 
         const notices = generator.generate({
           guild,
@@ -134,7 +141,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
 
         // Deve ter avisos porque uma das 4 rolagens extras resultou em "Sim"
         expect(notices.length).toBeGreaterThan(0);
-        expect(mockDiceRoller).toHaveBeenCalledTimes(6); // 1 inicial + 4 extras + 1 quantidade
+        expect(mockDiceRoller).toHaveBeenCalledTimes(6 + 15); // 1 inicial + 4 extras + 1 quantidade + 15 tipos
       });
 
       it("deve processar caso 'Mais ou menos, -2d20' corretamente", () => {
@@ -145,7 +152,9 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
           .mockReturnValueOnce(15) // Primeira rolagem -> "Mais ou menos"
           .mockReturnValueOnce(8) // -2d20: primeira rolagem
           .mockReturnValueOnce(19) // -2d20: segunda rolagem (17+ = "Sim")
-          .mockReturnValueOnce(12); // Quantidade de avisos
+          .mockReturnValueOnce(12) // Quantidade de avisos
+          // Adicionar rolagens para os 12 avisos individuais
+          .mockReturnValue(10); // Para todos os tipos subsequentes
 
         const notices = generator.generate({
           guild,
@@ -154,7 +163,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
 
         // Deve ter avisos porque uma das 2 rolagens extras resultou em "Sim"
         expect(notices.length).toBeGreaterThan(0);
-        expect(mockDiceRoller).toHaveBeenCalledTimes(4); // 1 inicial + 2 extras + 1 quantidade
+        expect(mockDiceRoller).toHaveBeenCalledTimes(4 + 12); // 1 inicial + 2 extras + 1 quantidade + 12 tipos
       });
     });
   });
@@ -219,7 +228,9 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
         mockDiceRoller
           .mockReturnValueOnce(20) // Disponibilidade
           .mockReturnValueOnce(20) // Base (1d20 para lugarejo)
-          .mockReturnValueOnce(5); // Modificador -1d20
+          .mockReturnValueOnce(5) // Modificador -1d20
+          // Adicionar rolagens para os 15 avisos individuais esperados
+          .mockReturnValue(10); // Para todos os tipos subsequentes (animals payment)
 
         const notices = generator.generate({
           guild,
@@ -242,7 +253,9 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
         mockDiceRoller
           .mockReturnValueOnce(20) // Disponibilidade
           .mockReturnValueOnce(15) // Base
-          .mockReturnValueOnce(8); // Modificador 1d20 = 8, então +8-10 = -2
+          .mockReturnValueOnce(8) // Modificador 1d20 = 8, então +8-10 = -2
+          // Adicionar rolagens para os 13 avisos individuais esperados
+          .mockReturnValue(10); // Para todos os tipos subsequentes
 
         const notices = generator.generate({
           guild,
@@ -265,7 +278,9 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
         mockDiceRoller
           .mockReturnValueOnce(20) // Disponibilidade
           .mockReturnValueOnce(15) // Base
-          .mockReturnValueOnce(3); // Penalidade -1d20 = -3
+          .mockReturnValueOnce(3) // Penalidade -1d20 = -3
+          // Adicionar rolagens para os 12 avisos individuais esperados
+          .mockReturnValue(10); // Para todos os tipos subsequentes
 
         const notices = generator.generate({
           guild,
@@ -286,7 +301,9 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
         mockDiceRoller
           .mockReturnValueOnce(20) // Disponibilidade
           .mockReturnValueOnce(10) // Base
-          .mockReturnValueOnce(7); // Bônus +1d20 = +7
+          .mockReturnValueOnce(7) // Bônus +1d20 = +7
+          // Adicionar rolagens para os 17 avisos individuais esperados
+          .mockReturnValue(10); // Para todos os tipos subsequentes
 
         const notices = generator.generate({
           guild,
