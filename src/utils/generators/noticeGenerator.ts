@@ -69,7 +69,7 @@ export class NoticeGenerator {
    */
   private checkInitialAvailability(settlementType: SettlementType): boolean {
     const baseRoll = this.diceRoller("1d20");
-    const modifier = getSettlementSizeModifier(settlementType.toString());
+    const modifier = getSettlementSizeModifier(settlementType);
     const finalRoll = baseRoll + modifier;
 
     // Encontrar entrada na tabela baseada na rolagem final
@@ -90,13 +90,19 @@ export class NoticeGenerator {
         this.diceRoller("1d20"),
         this.diceRoller("1d20"),
       ];
-      return extraRolls.some((roll) => roll + modifier >= 17); // Pelo menos um "Sim"
+      return extraRolls.some((roll) => {
+        const extraFinalRoll = roll + modifier;
+        return extraFinalRoll >= 17; // Pelo menos um "Sim"
+      });
     }
 
     if (entryFound.result.modifier === "-2d20") {
       // "Mais ou menos, -2d20" - rolar 2d20 e verificar se pelo menos um resulta em disponibilidade
       const extraRolls = [this.diceRoller("1d20"), this.diceRoller("1d20")];
-      return extraRolls.some((roll) => roll + modifier >= 17); // Pelo menos um "Sim"
+      return extraRolls.some((roll) => {
+        const extraFinalRoll = roll + modifier;
+        return extraFinalRoll >= 17; // Pelo menos um "Sim"
+      });
     }
 
     return entryFound.result.available;
@@ -111,7 +117,7 @@ export class NoticeGenerator {
     settlementType: SettlementType
   ): number {
     // Base: dados por tamanho do assentamento
-    const settlementDice = getSettlementSizeDice(settlementType.toString());
+    const settlementDice = getSettlementSizeDice(settlementType);
     let totalCount = this.diceRoller(settlementDice);
 
     // Modificador por tamanho da sede da guilda
@@ -133,8 +139,9 @@ export class NoticeGenerator {
           ? "despreparados"
           : "normal";
     const staffModifier = getStaffConditionModifier(staffCondition);
-    if (staffModifier) {
-      const modifierValue = this.diceRoller(staffModifier.replace(/[+-]/, "")); // Remove sinal e rola
+    if (staffModifier && staffModifier !== "+0" && staffModifier !== "-0") {
+      const diceNotation = staffModifier.replace(/[+-]/, ""); // Remove sinal
+      const modifierValue = this.diceRoller(diceNotation);
       if (staffModifier.startsWith("-")) {
         totalCount -= modifierValue;
       } else {
@@ -183,6 +190,8 @@ export class NoticeGenerator {
 
     // Gerar pagamento alternativo para contratos e serviços
     let alternativePayment: AlternativePayment | undefined;
+    let reducedReward = false;
+
     if (
       noticeType === NoticeType.SERVICES ||
       noticeType === NoticeType.CONTRACTS
@@ -196,9 +205,16 @@ export class NoticeGenerator {
           paymentEntry.result
         );
       }
+      reducedReward = true; // Sempre marcar recompensa reduzida para contratos e serviços
     }
 
-    return this.createBaseNotice(noticeType, alternativePayment);
+    const notice = this.createBaseNotice(
+      noticeType,
+      alternativePayment,
+      reducedReward
+    );
+
+    return notice;
   }
 
   /**
@@ -246,7 +262,8 @@ export class NoticeGenerator {
    */
   private createBaseNotice(
     type: NoticeType,
-    alternativePayment?: AlternativePayment
+    alternativePayment?: AlternativePayment,
+    reducedReward?: boolean
   ): Notice {
     const now = new Date();
     const baseNotice: Notice = {
@@ -258,8 +275,7 @@ export class NoticeGenerator {
       // Será preenchido com conteúdo específico em Issues subsequentes
       content: null,
       alternativePayment,
-      reducedReward:
-        type === NoticeType.SERVICES || type === NoticeType.CONTRACTS,
+      reducedReward: reducedReward || false,
       mentionedSpecies: [], // Será preenchido automaticamente nas próximas Issues
       createdAt: now,
       updatedAt: now,
