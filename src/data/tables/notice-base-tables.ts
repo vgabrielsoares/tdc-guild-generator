@@ -2268,7 +2268,9 @@ export function getSettlementSizeDice(settlementType: string): string {
  * Obtém o modificador por tamanho da sede da guilda
  */
 export function getGuildHQSizeModifier(hqSize: string): string {
-  return GUILD_HQ_SIZE_MODIFIERS[hqSize] || "+0";
+  // Extrair apenas a parte do tamanho, removendo as dimensões entre parênteses
+  const sizeKey = hqSize.split("(")[0].trim();
+  return GUILD_HQ_SIZE_MODIFIERS[sizeKey] || "+0";
 }
 
 /**
