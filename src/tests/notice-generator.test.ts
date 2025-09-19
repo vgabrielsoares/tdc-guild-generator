@@ -1,4 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import {
+  describe,
+  it,
+  expect,
+  vi,
+  beforeEach,
+  type MockedFunction,
+} from "vitest";
 import { NoticeGenerator } from "@/utils/generators/noticeGenerator";
 import type { Guild } from "@/types/guild";
 import {
@@ -46,10 +53,10 @@ function createMockGuild(overrides: Partial<Guild> = {}): Guild {
 
 describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
   let generator: NoticeGenerator;
-  let mockDiceRoller: ReturnType<typeof vi.fn>;
+  let mockDiceRoller: MockedFunction<(notation: string) => number>;
 
   beforeEach(() => {
-    mockDiceRoller = vi.fn();
+    mockDiceRoller = vi.fn<[string], number>();
     generator = new NoticeGenerator(mockDiceRoller);
   });
 
