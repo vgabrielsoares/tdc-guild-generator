@@ -56,7 +56,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
   let mockDiceRoller: MockedFunction<(notation: string) => number>;
 
   beforeEach(() => {
-    mockDiceRoller = vi.fn<[string], number>();
+    mockDiceRoller = vi.fn();
     generator = new NoticeGenerator(mockDiceRoller);
   });
 
