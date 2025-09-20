@@ -51,7 +51,8 @@ export interface CrossModuleResult {
 export async function executeCrossModuleIntegration(
   config: CrossModuleConfig
 ): Promise<CrossModuleResult> {
-  const { guild, notice, originalTableType, contractsStore, servicesStore } = config;
+  const { guild, notice, originalTableType, contractsStore, servicesStore } =
+    config;
   const diceRoller =
     config.diceRoller || ((notation: string) => rollDice({ notation }).result);
 
@@ -63,24 +64,29 @@ export async function executeCrossModuleIntegration(
 
   // Verificar se deve disparar integração usando tipo original se disponível
   const typeToCheck = originalTableType || notice.type;
-  
+
   // Log para debug do tipo sendo verificado
   if (import.meta.env.DEV) {
     // eslint-disable-next-line no-console
-    console.log(`[CROSS-MODULE DEBUG] Verificando integração - originalTableType: "${originalTableType}", notice.type: "${notice.type}", typeToCheck: "${typeToCheck}"`);
+    console.log(
+      `[CROSS-MODULE DEBUG] Verificando integração - originalTableType: "${originalTableType}", notice.type: "${notice.type}", typeToCheck: "${typeToCheck}"`
+    );
   }
-  
+
   const integrationCheck = shouldTriggerCrossModuleIntegration(
     typeToCheck,
-    diceRoller
+    diceRoller,
+    undefined // Deixar rolar aqui para manter o comportamento original
   );
-  
+
   // Log para debug do resultado da verificação
   if (import.meta.env.DEV) {
     // eslint-disable-next-line no-console
-    console.log(`[CROSS-MODULE DEBUG] Resultado da verificação - shouldTrigger: ${integrationCheck.shouldTrigger}, moduleType: ${integrationCheck.moduleType}, quantity: ${integrationCheck.quantity}`);
+    console.log(
+      `[CROSS-MODULE DEBUG] Resultado da verificação - shouldTrigger: ${integrationCheck.shouldTrigger}, moduleType: ${integrationCheck.moduleType}, quantity: ${integrationCheck.quantity}`
+    );
   }
-  
+
   if (!integrationCheck.shouldTrigger || !integrationCheck.moduleType) {
     result.success = true; // Não precisa de integração, sucesso
     return result;
@@ -100,9 +106,11 @@ export async function executeCrossModuleIntegration(
       // Log para debug da quantidade
       if (import.meta.env.DEV) {
         // eslint-disable-next-line no-console
-        console.log(`[CROSS-MODULE DEBUG] Contratos - quantidade rolada: ${integrationCheck.quantity}, usando: ${integrationCheck.quantity || 1}`);
+        console.log(
+          `[CROSS-MODULE DEBUG] Contratos - quantidade rolada: ${integrationCheck.quantity}, usando: ${integrationCheck.quantity || 1}`
+        );
       }
-      
+
       const contractResult = await handleContractsIntegration(
         guild,
         contractsStore,
@@ -122,9 +130,11 @@ export async function executeCrossModuleIntegration(
       // Log para debug da quantidade
       if (import.meta.env.DEV) {
         // eslint-disable-next-line no-console
-        console.log(`[CROSS-MODULE DEBUG] Serviços - quantidade rolada: ${integrationCheck.quantity}, usando: ${integrationCheck.quantity || 1}`);
+        console.log(
+          `[CROSS-MODULE DEBUG] Serviços - quantidade rolada: ${integrationCheck.quantity}, usando: ${integrationCheck.quantity || 1}`
+        );
       }
-      
+
       const serviceResult = await handleServicesIntegration(
         guild,
         servicesStore,
@@ -283,11 +293,11 @@ function determineAlternativePayment(roll: number): AlternativePayment {
   const entry = ALTERNATIVE_PAYMENT_TABLE.find(
     (entry) => roll >= entry.min && roll <= entry.max
   );
-  
+
   if (!entry) {
     return AlternativePayment.NONE;
   }
-  
+
   // Mapear string do resultado para enum AlternativePayment
   switch (entry.result) {
     case "Não há pagamento":
@@ -319,7 +329,11 @@ function determineAlternativePayment(roll: number): AlternativePayment {
  * Utilitário para verificar se um aviso gerou integração cross-module
  */
 export function hasNoticeTriggeredIntegration(notice: Notice): boolean {
-  const check = shouldTriggerCrossModuleIntegration(notice.type);
+  const check = shouldTriggerCrossModuleIntegration(
+    notice.type,
+    undefined,
+    undefined // Não rolar, apenas verificar tipo
+  );
   return check.shouldTrigger;
 }
 
@@ -335,7 +349,11 @@ export function getNoticeIntegrationDetails(
   moduleType?: "contracts" | "services";
   expectedQuantity?: number;
 } {
-  const check = shouldTriggerCrossModuleIntegration(notice.type, diceRoller);
+  const check = shouldTriggerCrossModuleIntegration(
+    notice.type,
+    diceRoller,
+    undefined // Nova rolagem para preview
+  );
   return {
     willTrigger: check.shouldTrigger,
     moduleType: check.moduleType,
