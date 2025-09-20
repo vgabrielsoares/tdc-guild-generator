@@ -1,4 +1,6 @@
 import type { Guild } from "@/types/guild";
+import type { Contract } from "@/types/contract";
+import type { Service } from "@/types/service";
 import {
   NoticeType,
   NoticeStatus,
@@ -9,18 +11,24 @@ import { SettlementType } from "@/types/guild";
 import {
   INITIAL_AVAILABILITY_TABLE,
   NOTICE_TYPE_TABLE,
-  ALTERNATIVE_PAYMENT_TABLE,
   getSettlementSizeModifier,
   getSettlementSizeDice,
   getGuildHQSizeModifier,
-  getStaffConditionModifier,
 } from "@/data/tables/notice-base-tables";
 import { rollDice } from "@/utils/dice";
+import { executeCrossModuleIntegration } from "@/utils/integrations/notice-cross-module";
+import { calculateStaffModifier } from "@/utils/generators/noticeModifiers";
 
 export interface NoticeGenerationConfig {
   guild: Guild;
   settlementType: SettlementType;
   diceRoller?: (notation: string) => number;
+  contractsStore?: {
+    generateContracts: (config: Record<string, unknown>) => Promise<Contract[]>;
+  };
+  servicesStore?: {
+    generateServices: (config: Record<string, unknown>) => Promise<Service[]>;
+  };
 }
 
 /**
@@ -39,8 +47,8 @@ export class NoticeGenerator {
    * Gera avisos iniciais para o mural seguindo todas as regras
    * REGRA: "Sempre que uma pessoa for mencionada no quadro de avisos, determine sua espécie"
    */
-  generate(config: NoticeGenerationConfig): Notice[] {
-    const { guild, settlementType } = config;
+  async generate(config: NoticeGenerationConfig): Promise<Notice[]> {
+    const { guild, settlementType, contractsStore, servicesStore } = config;
 
     // 1. Verificar disponibilidade inicial (tabela 1d20 + modificadores)
     const hasInitialNotices = this.checkInitialAvailability(settlementType);
@@ -51,16 +59,53 @@ export class NoticeGenerator {
     // 2. Calcular quantidade base usando dados por tamanho
     const noticeCount = this.calculateNoticeCount(guild, settlementType);
 
-    // 3. Gerar avisos individuais
+    // 4. Gerar avisos individuais
     const notices: Notice[] = [];
     for (let i = 0; i < noticeCount; i++) {
       const notice = this.generateSingleNotice();
       if (notice) {
+        // Definir guildId
+        notice.guildId = guild.id;
+
+        // Integração cross-module para contratos e serviços
+        if (
+          notice.type === NoticeType.CONTRACTS ||
+          notice.type === NoticeType.SERVICES
+        ) {
+          const crossModuleResult = await executeCrossModuleIntegration({
+            guild,
+            notice,
+            originalTableType: this.getOriginalTableType(notice),
+            contractsStore,
+            servicesStore,
+            diceRoller: this.diceRoller,
+          });
+
+          // Aplicar resultado da integração cross-module
+          if (crossModuleResult.alternativePayment) {
+            notice.alternativePayment = crossModuleResult.alternativePayment;
+          }
+        }
+
         notices.push(notice);
       }
     }
 
     return notices;
+  }
+
+  /**
+   * Determina o tipo original da tabela baseado no tipo do aviso
+   */
+  private getOriginalTableType(notice: Notice): string {
+    switch (notice.type) {
+      case NoticeType.CONTRACTS:
+        return "1d4 contratos";
+      case NoticeType.SERVICES:
+        return "1d4 serviços";
+      default:
+        return notice.type;
+    }
   }
 
   /**
@@ -130,24 +175,9 @@ export class NoticeGenerator {
       }
     }
 
-    // Modificador por condição dos funcionários (se disponível)
-    // Assumimos funcionários "normais" se não especificado
-    const staffCondition =
-      guild.staff?.employees === "experientes"
-        ? "experientes"
-        : guild.staff?.employees === "despreparados"
-          ? "despreparados"
-          : "normal";
-    const staffModifier = getStaffConditionModifier(staffCondition);
-    if (staffModifier && staffModifier !== "+0" && staffModifier !== "-0") {
-      const diceNotation = staffModifier.replace(/[+-]/, ""); // Remove sinal
-      const modifierValue = this.diceRoller(diceNotation);
-      if (staffModifier.startsWith("-")) {
-        totalCount -= modifierValue;
-      } else {
-        totalCount += modifierValue;
-      }
-    }
+    // Modificador por condição dos funcionários
+    const staffModifier = calculateStaffModifier(guild.staff, this.diceRoller);
+    totalCount += staffModifier;
 
     return Math.max(0, totalCount);
   }
@@ -178,6 +208,7 @@ export class NoticeGenerator {
     );
 
     if (!entryFound) {
+      console.log("[NOTICE] No entry found - returning null");
       return null;
     }
 
@@ -185,27 +216,21 @@ export class NoticeGenerator {
 
     // Casos que não geram avisos
     if (noticeType === NoticeType.NOTHING) {
+      console.log("[NOTICE] Type is NOTHING - returning null");
       return null;
     }
 
-    // Gerar pagamento alternativo para contratos e serviços
-    let alternativePayment: AlternativePayment | undefined;
+    // Para contratos e serviços, o pagamento alternativo será determinado pela integração cross-module
+    // Para outros tipos, não há pagamento alternativo
+    const alternativePayment: AlternativePayment | undefined = undefined;
     let reducedReward = false;
 
     if (
       noticeType === NoticeType.SERVICES ||
       noticeType === NoticeType.CONTRACTS
     ) {
-      const paymentRoll = this.diceRoller("1d20");
-      const paymentEntry = ALTERNATIVE_PAYMENT_TABLE.find(
-        (entry) => paymentRoll >= entry.min && paymentRoll <= entry.max
-      );
-      if (paymentEntry) {
-        alternativePayment = this.mapAlternativePaymentFromResult(
-          paymentEntry.result
-        );
-      }
-      reducedReward = true; // Sempre marcar recompensa reduzida para contratos e serviços
+      // Marcar recompensa reduzida, mas deixar pagamento alternativo para a integração cross-module
+      reducedReward = true;
     }
 
     const notice = this.createBaseNotice(
@@ -234,27 +259,6 @@ export class NoticeGenerator {
       Pronunciamento: NoticeType.OFFICIAL_STATEMENT,
     };
     return mapping[resultType] || NoticeType.RESIDENTS_NOTICE;
-  }
-
-  /**
-   * Mapeia resultado da tabela para enum AlternativePayment
-   */
-  private mapAlternativePaymentFromResult(
-    resultType: string
-  ): AlternativePayment {
-    const mapping: Record<string, AlternativePayment> = {
-      "Não há pagamento": AlternativePayment.NONE,
-      "Ferro ou peças de cobre": AlternativePayment.IRON_COPPER,
-      "Cobre ou prata": AlternativePayment.COPPER_SILVER,
-      "Equivalente em animais": AlternativePayment.ANIMALS,
-      "Equivalente em terras": AlternativePayment.LAND,
-      "Equivalente em colheita": AlternativePayment.HARVEST,
-      Favores: AlternativePayment.FAVORS,
-      "Mapa ou localização de tesouro": AlternativePayment.TREASURE_MAP,
-      "Equivalente em especiarias": AlternativePayment.SPICES,
-      "Objetos valiosos": AlternativePayment.VALUABLE_OBJECTS,
-    };
-    return mapping[resultType] || AlternativePayment.NONE;
   }
 
   /**
