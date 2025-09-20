@@ -21,16 +21,17 @@ export function calculateStaffModifier(
     diceRoller || ((notation: string) => rollDice({ notation }).result);
 
   // Verificar condição dos funcionários conforme definido na guilda
-  const condition = staff.employees.toLowerCase();
+  // Usar lowercase para comparação mais robusta
+  const condition = staff.employees?.toLowerCase() || "";
 
   if (condition.includes("despreparados") || condition.includes("desprepara")) {
     const roll = roller("1d20");
-    return -roll;
+    return -roll; // Sempre negativo
   }
 
   if (condition.includes("experientes") || condition.includes("experiente")) {
     const roll = roller("1d20");
-    return roll;
+    return roll; // Sempre positivo
   }
 
   return 0; // Funcionários normais não aplicam modificador
@@ -70,10 +71,12 @@ export function applyAlternativePaymentReduction(
  *
  * @param noticeType - Tipo do aviso
  * @param diceRoller - Função de rolagem (opcional, usa rollDice por padrão)
+ * @param preRolledQuantity - Quantidade já rolada (para evitar double-rolling)
  */
 export function shouldTriggerCrossModuleIntegration(
   noticeType: string,
-  diceRoller?: (notation: string) => number
+  diceRoller?: (notation: string) => number,
+  preRolledQuantity?: number
 ): {
   shouldTrigger: boolean;
   moduleType?: "contracts" | "services";
@@ -88,14 +91,14 @@ export function shouldTriggerCrossModuleIntegration(
       return {
         shouldTrigger: true,
         moduleType: "contracts",
-        quantity: roller("1d4"),
+        quantity: preRolledQuantity || roller("1d4"),
       };
     case "1d4 serviços":
     case "services":
       return {
         shouldTrigger: true,
         moduleType: "services",
-        quantity: roller("1d4"),
+        quantity: preRolledQuantity || roller("1d4"),
       };
     default:
       return { shouldTrigger: false };
