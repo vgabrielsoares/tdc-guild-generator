@@ -62,11 +62,11 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
 
   describe("1. Disponibilidade Inicial de Avisos", () => {
     describe("Tabela 1d20 com Modificadores por Assentamento", () => {
-      it("deve retornar 'Não, nenhum' para rolagens 1-10 sem modificadores", () => {
+      it("deve retornar 'Não, nenhum' para rolagens 1-10 sem modificadores", async () => {
         const guild = createMockGuild();
         mockDiceRoller.mockReturnValue(5); // Resultado na faixa 1-10
 
-        const notices = generator.generate({
+        const notices = await generator.generate({
           guild,
           settlementType: SettlementType.LUGAREJO, // +0 modificador
         });
@@ -75,7 +75,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
         expect(mockDiceRoller).toHaveBeenCalledWith("1d20");
       });
 
-      it("DEBUG: deve testar disponibilidade básica isoladamente", () => {
+      it("DEBUG: deve testar disponibilidade básica isoladamente", async () => {
         const mockDice = vi
           .fn()
           .mockReturnValueOnce(20) // Disponibilidade: Sim (17-999)
@@ -101,14 +101,14 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
           settlementType: SettlementType.LUGAREJO,
         };
 
-        const notices = generator.generate(config);
+        const notices = await generator.generate(config);
 
         // Debug: Se falhar aqui, problema é na disponibilidade inicial
         expect(notices.length).toBeGreaterThan(0);
         expect(notices.length).toBe(19); // 20 - 1 = 19 avisos esperados
       });
 
-      it("deve aplicar modificadores por tamanho de assentamento corretamente", () => {
+      it("deve aplicar modificadores por tamanho de assentamento corretamente", async () => {
         const guild = createMockGuild();
 
         // Teste para Metrópole (+12 modificador)
@@ -118,7 +118,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
           // Adicionar rolagens para os 10 avisos individuais (tipos)
           .mockReturnValue(10); // Para todos os tipos subsequentes
 
-        const notices = generator.generate({
+        const notices = await generator.generate({
           guild,
           settlementType: SettlementType.METROPOLE,
         });
@@ -127,7 +127,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
         expect(notices.length).toBeGreaterThan(0);
       });
 
-      it("deve processar caso 'Talvez, -4d20' corretamente", () => {
+      it("deve processar caso 'Talvez, -4d20' corretamente", async () => {
         const guild = createMockGuild();
 
         // Configurar para resultado "Talvez" (11-13)
@@ -141,7 +141,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
           // Adicionar rolagens para os 15 avisos individuais
           .mockReturnValue(10); // Para todos os tipos subsequentes
 
-        const notices = generator.generate({
+        const notices = await generator.generate({
           guild,
           settlementType: SettlementType.LUGAREJO,
         });
@@ -151,7 +151,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
         expect(mockDiceRoller).toHaveBeenCalledTimes(6 + 15); // 1 inicial + 4 extras + 1 quantidade + 15 tipos
       });
 
-      it("deve processar caso 'Mais ou menos, -2d20' corretamente", () => {
+      it("deve processar caso 'Mais ou menos, -2d20' corretamente", async () => {
         const guild = createMockGuild();
 
         // Configurar para resultado "Mais ou menos" (14-16)
@@ -163,7 +163,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
           // Adicionar rolagens para os 12 avisos individuais
           .mockReturnValue(10); // Para todos os tipos subsequentes
 
-        const notices = generator.generate({
+        const notices = await generator.generate({
           guild,
           settlementType: SettlementType.LUGAREJO,
         });
@@ -177,7 +177,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
 
   describe("2. Cálculo de Quantidade de Avisos", () => {
     describe("Dados por Tamanho do Assentamento", () => {
-      it("deve usar dados corretos por tipo de assentamento", () => {
+      it("deve usar dados corretos por tipo de assentamento", async () => {
         const guild = createMockGuild();
 
         // Configurar disponibilidade = "Sim"
@@ -185,7 +185,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
           .mockReturnValueOnce(20) // Disponibilidade inicial -> "Sim"
           .mockReturnValueOnce(15); // Quantidade base
 
-        generator.generate({
+        await generator.generate({
           guild,
           settlementType: SettlementType.CIDADELA, // 5d20 conforme tabela
         });
@@ -205,14 +205,14 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
       ];
 
       settlementDiceTests.forEach(({ settlement, expectedDice }) => {
-        it(`deve usar ${expectedDice} para ${settlement}`, () => {
+        it(`deve usar ${expectedDice} para ${settlement}`, async () => {
           const guild = createMockGuild();
 
           mockDiceRoller
             .mockReturnValueOnce(20) // Disponibilidade -> "Sim"
             .mockReturnValueOnce(10); // Quantidade
 
-          generator.generate({
+          await generator.generate({
             guild,
             settlementType: settlement,
           });
@@ -223,7 +223,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
     });
 
     describe("Modificadores por Tamanho da Sede da Guilda", () => {
-      it("deve aplicar modificador negativo para sede minúscula", () => {
+      it("deve aplicar modificador negativo para sede minúscula", async () => {
         const guild = createMockGuild({
           structure: {
             ...createMockGuild().structure,
@@ -239,7 +239,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
           // Adicionar rolagens para os 15 avisos individuais esperados
           .mockReturnValue(10); // Para todos os tipos subsequentes (animals payment)
 
-        const notices = generator.generate({
+        const notices = await generator.generate({
           guild,
           settlementType: SettlementType.LUGAREJO,
         });
@@ -248,7 +248,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
         expect(notices).toHaveLength(15);
       });
 
-      it("deve aplicar modificador complexo para sede grande", () => {
+      it("deve aplicar modificador complexo para sede grande", async () => {
         const guild = createMockGuild({
           structure: {
             ...createMockGuild().structure,
@@ -264,7 +264,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
           // Adicionar rolagens para os 13 avisos individuais esperados
           .mockReturnValue(10); // Para todos os tipos subsequentes
 
-        const notices = generator.generate({
+        const notices = await generator.generate({
           guild,
           settlementType: SettlementType.LUGAREJO,
         });
@@ -275,7 +275,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
     });
 
     describe("Modificadores por Condição dos Funcionários", () => {
-      it("deve aplicar -1d20 para funcionários despreparados", () => {
+      it("deve aplicar -1d20 para funcionários despreparados", async () => {
         const guild = createMockGuild({
           staff: {
             employees: "despreparados",
@@ -289,7 +289,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
           // Adicionar rolagens para os 12 avisos individuais esperados
           .mockReturnValue(10); // Para todos os tipos subsequentes
 
-        const notices = generator.generate({
+        const notices = await generator.generate({
           guild,
           settlementType: SettlementType.LUGAREJO,
         });
@@ -298,7 +298,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
         expect(notices).toHaveLength(12);
       });
 
-      it("deve aplicar +1d20 para funcionários experientes", () => {
+      it("deve aplicar +1d20 para funcionários experientes", async () => {
         const guild = createMockGuild({
           staff: {
             employees: "experientes",
@@ -312,7 +312,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
           // Adicionar rolagens para os 17 avisos individuais esperados
           .mockReturnValue(10); // Para todos os tipos subsequentes
 
-        const notices = generator.generate({
+        const notices = await generator.generate({
           guild,
           settlementType: SettlementType.LUGAREJO,
         });
@@ -322,7 +322,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
       });
     });
 
-    it("deve garantir que quantidade nunca seja negativa", () => {
+    it("deve garantir que quantidade nunca seja negativa", async () => {
       const guild = createMockGuild({
         structure: {
           ...createMockGuild().structure,
@@ -339,7 +339,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
         .mockReturnValueOnce(10) // Penalidade sede: -10
         .mockReturnValueOnce(8); // Penalidade funcionários: -8
 
-      const notices = generator.generate({
+      const notices = await generator.generate({
         guild,
         settlementType: SettlementType.LUGAREJO,
       });
@@ -377,7 +377,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
       ];
 
       typeTests.forEach(({ roll, expectedType, expectedCount }) => {
-        it(`deve gerar ${expectedType} para rolagem ${roll}`, () => {
+        it(`deve gerar ${expectedType} para rolagem ${roll}`, async () => {
           const guild = createMockGuild();
 
           mockDiceRoller
@@ -393,7 +393,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
             mockDiceRoller.mockReturnValueOnce(10); // Pagamento alternativo
           }
 
-          const notices = generator.generate({
+          const notices = await generator.generate({
             guild,
             settlementType: SettlementType.LUGAREJO,
           });
@@ -409,7 +409,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
       });
     });
 
-    it("deve gerar múltiplos avisos conforme quantidade calculada", () => {
+    it("deve gerar múltiplos avisos conforme quantidade calculada", async () => {
       const guild = createMockGuild();
 
       mockDiceRoller
@@ -419,7 +419,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
         .mockReturnValueOnce(12) // Segundo aviso: Divulgação
         .mockReturnValueOnce(17); // Terceiro aviso: Contratos
 
-      const notices = generator.generate({
+      const notices = await generator.generate({
         guild,
         settlementType: SettlementType.LUGAREJO,
       });
@@ -447,18 +447,30 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
       ];
 
       paymentTests.forEach(({ roll, expectedPayment }) => {
-        it(`deve gerar pagamento ${expectedPayment} para rolagem ${roll}`, () => {
+        it(`deve gerar pagamento ${expectedPayment} para rolagem ${roll}`, async () => {
           const guild = createMockGuild();
 
           mockDiceRoller
             .mockReturnValueOnce(20) // Disponibilidade
             .mockReturnValueOnce(1) // Quantidade = 1
             .mockReturnValueOnce(17) // Tipo: Contratos (que usa pagamento alternativo)
+            .mockReturnValueOnce(4) // Cross-module: 1d4 para quantity
             .mockReturnValueOnce(roll); // Pagamento alternativo
 
-          const notices = generator.generate({
+          // Mock stores para integração cross-module
+          const mockContractsStore = {
+            generateContracts: vi.fn().mockResolvedValue([]),
+          };
+
+          const mockServicesStore = {
+            generateServices: vi.fn().mockResolvedValue([]),
+          };
+
+          const notices = await generator.generate({
             guild,
             settlementType: SettlementType.LUGAREJO,
+            contractsStore: mockContractsStore,
+            servicesStore: mockServicesStore,
           });
 
           expect(notices).toHaveLength(1);
@@ -468,7 +480,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
         });
       });
 
-      it("deve aplicar pagamento alternativo apenas para contratos e serviços", () => {
+      it("deve aplicar pagamento alternativo apenas para contratos e serviços", async () => {
         const guild = createMockGuild();
 
         mockDiceRoller
@@ -476,7 +488,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
           .mockReturnValueOnce(1) // Quantidade
           .mockReturnValueOnce(12); // Tipo: Divulgação (não deve ter pagamento alternativo)
 
-        const notices = generator.generate({
+        const notices = await generator.generate({
           guild,
           settlementType: SettlementType.LUGAREJO,
         });
@@ -487,20 +499,33 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
         expect(notices[0].reducedReward).toBe(false);
       });
 
-      it("deve marcar recompensa reduzida para contratos e serviços", () => {
+      it("deve marcar recompensa reduzida para contratos e serviços", async () => {
         const guild = createMockGuild();
 
         mockDiceRoller
           .mockReturnValueOnce(20) // Disponibilidade
           .mockReturnValueOnce(2) // Quantidade = 2
           .mockReturnValueOnce(7) // Primeiro: Serviços
+          .mockReturnValueOnce(4) // Cross-module: 1d4 para services
           .mockReturnValueOnce(15) // Pagamento alternativo para serviços
           .mockReturnValueOnce(17) // Segundo: Contratos
+          .mockReturnValueOnce(3) // Cross-module: 1d4 para contracts
           .mockReturnValueOnce(10); // Pagamento alternativo para contratos
 
-        const notices = generator.generate({
+        // Mock stores para integração cross-module
+        const mockContractsStore = {
+          generateContracts: vi.fn().mockResolvedValue([]),
+        };
+
+        const mockServicesStore = {
+          generateServices: vi.fn().mockResolvedValue([]),
+        };
+
+        const notices = await generator.generate({
           guild,
           settlementType: SettlementType.LUGAREJO,
+          contractsStore: mockContractsStore,
+          servicesStore: mockServicesStore,
         });
 
         expect(notices).toHaveLength(2);
@@ -519,7 +544,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
   });
 
   describe("5. Casos Especiais e Edge Cases", () => {
-    it("deve lidar com resultado 'Nada' corretamente", () => {
+    it("deve lidar com resultado 'Nada' corretamente", async () => {
       const guild = createMockGuild();
 
       mockDiceRoller
@@ -529,7 +554,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
         .mockReturnValueOnce(5) // Segundo: Aviso dos habitantes
         .mockReturnValueOnce(1); // Terceiro: Nada
 
-      const notices = generator.generate({
+      const notices = await generator.generate({
         guild,
         settlementType: SettlementType.LUGAREJO,
       });
@@ -539,7 +564,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
       expect(notices[0].type).toBe(NoticeType.RESIDENTS_NOTICE);
     });
 
-    it("deve funcionar com injeção de dependência de dice roller", () => {
+    it("deve funcionar com injeção de dependência de dice roller", async () => {
       const customDiceRoller = vi
         .fn()
         .mockReturnValueOnce(20) // Disponibilidade
@@ -549,7 +574,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
       const customGenerator = new NoticeGenerator(customDiceRoller);
       const guild = createMockGuild();
 
-      const notices = customGenerator.generate({
+      const notices = await customGenerator.generate({
         guild,
         settlementType: SettlementType.LUGAREJO,
       });
@@ -558,7 +583,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
       expect(customDiceRoller).toHaveBeenCalledTimes(3);
     });
 
-    it("deve gerar IDs únicos para cada aviso", () => {
+    it("deve gerar IDs únicos para cada aviso", async () => {
       const guild = createMockGuild();
 
       mockDiceRoller
@@ -568,7 +593,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
         .mockReturnValueOnce(12) // Segundo aviso
         .mockReturnValueOnce(17); // Terceiro aviso
 
-      const notices = generator.generate({
+      const notices = await generator.generate({
         guild,
         settlementType: SettlementType.LUGAREJO,
       });
@@ -586,7 +611,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
   });
 
   describe("6. Integração Completa", () => {
-    it("deve gerar avisos completos para guilda em metrópole", () => {
+    it("deve gerar avisos completos para guilda em metrópole", async () => {
       const guild = createMockGuild({
         structure: {
           ...createMockGuild().structure,
@@ -597,6 +622,27 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
         } as GuildStaff,
       });
 
+      // Mock stores para integração cross-module
+      const mockContractsStore = {
+        generateContracts: vi.fn().mockResolvedValue([
+          {
+            id: "contract-1",
+            type: "tracking",
+            value: { rewardValue: 100 },
+          },
+        ]),
+      };
+
+      const mockServicesStore = {
+        generateServices: vi.fn().mockResolvedValue([
+          {
+            id: "service-1",
+            type: "healing",
+            value: { rewardAmount: 50 },
+          },
+        ]),
+      };
+
       mockDiceRoller
         .mockReturnValueOnce(10) // Disponibilidade: 10 + 12 (metrópole) = 22 -> "Sim"
         .mockReturnValueOnce(40) // Base: 8d20 para metrópole
@@ -606,9 +652,11 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
         .mockReturnValueOnce(17) // Segundo aviso: Contratos
         .mockReturnValueOnce(15); // Pagamento alternativo para contratos
 
-      const notices = generator.generate({
+      const notices = await generator.generate({
         guild,
         settlementType: SettlementType.METROPOLE,
+        contractsStore: mockContractsStore,
+        servicesStore: mockServicesStore,
       });
 
       // Base 40 + 20 + 10 = 70 avisos seria muito para teste, limitamos a 2 por simplicidade
@@ -627,19 +675,44 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
       }
     });
 
-    it("deve aplicar todas as regras conforme especificação do .md", () => {
+    it("deve aplicar todas as regras conforme especificação do .md", async () => {
       const guild = createMockGuild();
+
+      // Mock stores para integração cross-module
+      const mockContractsStore = {
+        generateContracts: vi.fn().mockResolvedValue([
+          {
+            id: "contract-1",
+            type: "tracking",
+            value: { rewardValue: 100 },
+          },
+        ]),
+      };
+
+      const mockServicesStore = {
+        generateServices: vi.fn().mockResolvedValue([
+          {
+            id: "service-1",
+            type: "healing",
+            value: { rewardAmount: 50 },
+          },
+        ]),
+      };
 
       mockDiceRoller
         .mockReturnValueOnce(18) // Disponibilidade -> "Sim"
         .mockReturnValueOnce(2) // Quantidade = 2 avisos
         .mockReturnValueOnce(7) // Primeiro: Serviços
+        .mockReturnValueOnce(1) // Cross-module trigger para serviços
         .mockReturnValueOnce(18) // Pagamento: Especiarias
-        .mockReturnValueOnce(15); // Segundo: Cartaz de procurado
+        .mockReturnValueOnce(15) // Segundo: Cartaz de procurado
+        .mockReturnValue(10); // Para qualquer rolagem adicional necessária
 
-      const notices = generator.generate({
+      const notices = await generator.generate({
         guild,
         settlementType: SettlementType.VILAREJO,
+        contractsStore: mockContractsStore,
+        servicesStore: mockServicesStore,
       });
 
       expect(notices).toHaveLength(2);
@@ -658,7 +731,7 @@ describe("NoticeGenerator - Issue 7.14: Gerador Base de Avisos", () => {
       // Verificações gerais
       notices.forEach((notice) => {
         expect(notice.id).toBeDefined();
-        expect(notice.guildId).toBe(""); // Será preenchido na integração com store
+        expect(notice.guildId).toBe(guild.id); // Deve usar o ID da guilda passada
         expect(notice.createdDate).toBeInstanceOf(Date);
         expect(notice.createdAt).toBeInstanceOf(Date);
         expect(notice.updatedAt).toBeInstanceOf(Date);
