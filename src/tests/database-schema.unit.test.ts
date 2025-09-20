@@ -12,17 +12,25 @@ import {
   DBGuildSchema,
   DBContractSchema,
   DBServiceSchema,
+  DBNoticeSchema,
 } from "@/utils/database-schema";
 
 describe("Database Schema and Zod validations - Issue 6.2", () => {
   it("defines expected stores", () => {
     const names = DB_STORES.map((s) => s.name).sort();
     expect(names).toEqual(
-      ["contracts", "guilds", "services", "settings", "timeline"].sort()
+      [
+        "contracts",
+        "guilds",
+        "notices",
+        "services",
+        "settings",
+        "timeline",
+      ].sort()
     );
   });
 
-  it("validates sample guild, contract and service entries", () => {
+  it("validates sample guild, contract, service and notice entries", () => {
     const guild = createTestGuild({ id: "g1", name: "G1" });
     const sampleGuild = {
       id: "g1",
@@ -48,5 +56,15 @@ describe("Database Schema and Zod validations - Issue 6.2", () => {
       createdAt: new Date(),
     };
     expect(() => DBServiceSchema.parse(sampleService)).not.toThrow();
+
+    const sampleNotice = {
+      id: "n1",
+      guildId: "g1",
+      value: { title: "N" },
+      status: "active",
+      type: "residents_notice",
+      createdAt: new Date(),
+    };
+    expect(() => DBNoticeSchema.parse(sampleNotice)).not.toThrow();
   });
 });
