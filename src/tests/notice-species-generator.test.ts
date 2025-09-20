@@ -74,7 +74,7 @@ describe("Notice Species Generator - Issue 7.18", () => {
     it("deve identificar tipos context-dependent", () => {
       const contextDependentTypes = [
         NoticeType.RESIDENTS_NOTICE,
-        NoticeType.HUNT_PROPOSAL,
+        NoticeType.WANTED_POSTER,
       ];
 
       contextDependentTypes.forEach((type) => {
@@ -172,14 +172,14 @@ describe("Notice Species Generator - Issue 7.18", () => {
     it("deve distinguir pessoa vs animal em tipos MIXED", () => {
       // Teste com pessoa
       const personAnalysis = generator.analyzeMention(
-        NoticeType.WANTED_POSTER,
+        NoticeType.HUNT_PROPOSAL,
         "noble"
       );
       expect(personAnalysis.shouldGenerate).toBe(true);
 
       // Teste com animal
       const animalAnalysis = generator.analyzeMention(
-        NoticeType.WANTED_POSTER,
+        NoticeType.HUNT_PROPOSAL,
         "domestic_animal"
       );
       expect(animalAnalysis.shouldGenerate).toBe(false);
@@ -214,17 +214,17 @@ describe("Notice Species Generator - Issue 7.18", () => {
     });
 
     it("deve usar pesos específicos para criaturas context-dependent", () => {
-      // Gigantes têm 60% chance de serem inteligentes
+      // Undead têm 60% chance de serem inteligentes
       mockDiceRoller.mockReturnValue(50); // Menor que 60%
 
-      const giantAnalysis = generator.analyzeMention(
+      const undeadAnalysis = generator.analyzeMention(
         NoticeType.HUNT_PROPOSAL,
         "target",
-        "giants"
+        "undead"
       );
 
-      expect(giantAnalysis.shouldGenerate).toBe(true);
-      expect(giantAnalysis.reason).toContain("vs 60% chance de pessoa");
+      expect(undeadAnalysis.shouldGenerate).toBe(true);
+      expect(undeadAnalysis.reason).toContain("vs 60% chance de pessoa");
     });
 
     it("deve usar peso padrão para criaturas não mapeadas", () => {
@@ -256,8 +256,8 @@ describe("Notice Species Generator - Issue 7.18", () => {
 
     it("deve retornar null quando análise determina que não deve", () => {
       const species = generator.generateSpeciesForMention(
-        NoticeType.WANTED_POSTER,
-        "domestic_animal"
+        NoticeType.NOTHING,
+        "any_context"
       );
 
       expect(species).toBeNull();
