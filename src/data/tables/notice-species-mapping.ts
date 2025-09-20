@@ -23,7 +23,7 @@ export interface ContextualWeight {
 export const NOTICE_TYPE_SPECIES_CONTEXT: Record<NoticeType, CreatureContext> =
   {
     // Tipos que nunca geram conteúdo
-    [NoticeType.NOTHING]: CreatureContext.MIXED, // N/A - sem conteúdo
+    [NoticeType.NOTHING]: CreatureContext.ALWAYS_ANIMAL, // N/A - sem conteúdo
 
     // Tipos que sempre mencionam pessoas
     [NoticeType.COMMERCIAL_PROPOSAL]: CreatureContext.ALWAYS_PERSON, // Comerciantes são sempre pessoas
@@ -51,13 +51,16 @@ export const CONTEXTUAL_WEIGHTS: Record<NoticeType, ContextualWeight> = {
     personChance: 30, // 30% chance de ser humanoides inteligentes
     animalChance: 70, // 70% chance de ser bestas/monstros
   },
+  [NoticeType.WANTED_POSTER]: {
+    personChance: 80, // 80% chance de ser pessoas
+    animalChance: 20, // 20% chance de ser animais
+  },
   // Fallback para outros tipos
-  [NoticeType.NOTHING]: { personChance: 50, animalChance: 50 },
+  [NoticeType.NOTHING]: { personChance: 0, animalChance: 100 },
   [NoticeType.COMMERCIAL_PROPOSAL]: { personChance: 100, animalChance: 0 },
   [NoticeType.ANNOUNCEMENT]: { personChance: 100, animalChance: 0 },
   [NoticeType.EXECUTION]: { personChance: 100, animalChance: 0 },
   [NoticeType.OFFICIAL_STATEMENT]: { personChance: 100, animalChance: 0 },
-  [NoticeType.WANTED_POSTER]: { personChance: 80, animalChance: 20 }, // Maioria são pessoas
   [NoticeType.SERVICES]: { personChance: 100, animalChance: 0 },
   [NoticeType.CONTRACTS]: { personChance: 100, animalChance: 0 },
 };
