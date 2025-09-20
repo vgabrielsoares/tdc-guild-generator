@@ -62,8 +62,9 @@ export class NoticeGenerator {
     // 4. Gerar avisos individuais
     const notices: Notice[] = [];
     for (let i = 0; i < noticeCount; i++) {
-      const notice = this.generateSingleNotice();
-      if (notice) {
+      const generationResult = this.generateSingleNotice();
+      if (generationResult.notice) {
+        const notice = generationResult.notice;
         // Definir guildId
         notice.guildId = guild.id;
 
@@ -72,10 +73,14 @@ export class NoticeGenerator {
           notice.type === NoticeType.CONTRACTS ||
           notice.type === NoticeType.SERVICES
         ) {
+          // Usar o resultado original da tabela para integração
+          const originalTableType =
+            generationResult.originalTableType || notice.type;
+
           const crossModuleResult = await executeCrossModuleIntegration({
             guild,
             notice,
-            originalTableType: this.getOriginalTableType(notice),
+            originalTableType,
             contractsStore,
             servicesStore,
             diceRoller: this.diceRoller,
@@ -85,6 +90,14 @@ export class NoticeGenerator {
           if (crossModuleResult.alternativePayment) {
             notice.alternativePayment = crossModuleResult.alternativePayment;
           }
+
+          // Marcar aviso como originário do mural
+          if (
+            crossModuleResult.success &&
+            crossModuleResult.modulesTriggered.length > 0
+          ) {
+            notice.reducedReward = true; // Sempre reduzido para 1/3
+          }
         }
 
         notices.push(notice);
@@ -92,20 +105,6 @@ export class NoticeGenerator {
     }
 
     return notices;
-  }
-
-  /**
-   * Determina o tipo original da tabela baseado no tipo do aviso
-   */
-  private getOriginalTableType(notice: Notice): string {
-    switch (notice.type) {
-      case NoticeType.CONTRACTS:
-        return "1d4 contratos";
-      case NoticeType.SERVICES:
-        return "1d4 serviços";
-      default:
-        return notice.type;
-    }
   }
 
   /**
@@ -201,23 +200,32 @@ export class NoticeGenerator {
    * Gera um único aviso usando tabela de tipos (1d20)
    * APLICAÇÃO AUTOMÁTICA DE ESPÉCIES
    */
-  private generateSingleNotice(): Notice | null {
+  private generateSingleNotice(): {
+    notice: Notice | null;
+    originalTableType?: string;
+  } {
     const noticeTypeRoll = this.diceRoller("1d20");
     const entryFound = NOTICE_TYPE_TABLE.find(
       (entry) => noticeTypeRoll >= entry.min && noticeTypeRoll <= entry.max
     );
 
     if (!entryFound) {
-      console.log("[NOTICE] No entry found - returning null");
-      return null;
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.log("[NOTICE] No entry found - returning null");
+      }
+      return { notice: null };
     }
 
     const noticeType = this.mapNoticeTypeFromResult(entryFound.result.type);
 
     // Casos que não geram avisos
     if (noticeType === NoticeType.NOTHING) {
-      console.log("[NOTICE] Type is NOTHING - returning null");
-      return null;
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.log("[NOTICE] Type is NOTHING - returning null");
+      }
+      return { notice: null };
     }
 
     // Para contratos e serviços, o pagamento alternativo será determinado pela integração cross-module
@@ -239,7 +247,10 @@ export class NoticeGenerator {
       reducedReward
     );
 
-    return notice;
+    return {
+      notice,
+      originalTableType: entryFound.result.type, // Preservar o tipo original da tabela
+    };
   }
 
   /**
