@@ -420,7 +420,15 @@ export interface Notice {
   updatedAt: Date;
 }
 
-// Schemas Zod para validação
+// Interface para agrupamento de avisos por guilda
+export interface GuildNotices {
+  guildId: string;
+  notices: Notice[];
+  lastUpdate: Date | null;
+  generationCount: number;
+}
+
+// Schemas baseados nos enums
 
 export const NoticeTypeSchema = z.nativeEnum(NoticeType);
 export const NoticeStatusSchema = z.nativeEnum(NoticeStatus);
@@ -823,6 +831,14 @@ export const NoticeSchema = z.object({
   mentionedSpecies: z.array(SpeciesWithSubraceSchema),
   createdAt: z.date(),
   updatedAt: z.date(),
+});
+
+// Schema para GuildNotices (após NoticeSchema estar definido)
+export const GuildNoticesSchema = z.object({
+  guildId: z.string(),
+  notices: z.array(NoticeSchema),
+  lastUpdate: z.date().nullable(),
+  generationCount: z.number(),
 });
 
 // Funções de validação

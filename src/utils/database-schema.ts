@@ -63,6 +63,24 @@ export const DBServiceSchema = z.object({
     }),
 });
 
+export const DBNoticeSchema = z.object({
+  id: z.string().min(1),
+  guildId: z.string().min(1),
+  value: z.record(z.unknown()),
+  status: z.string(),
+  type: z.string(),
+  createdAt: z
+    .union([z.date(), z.string()])
+    .transform((val) => (typeof val === "string" ? new Date(val) : val)),
+  expirationDate: z
+    .union([z.date(), z.string()])
+    .optional()
+    .transform((val) => {
+      if (!val) return undefined;
+      return typeof val === "string" ? new Date(val) : val;
+    }),
+});
+
 export const DBTimelineSchema = z.object({
   id: z.string().min(1),
   guildId: z.string().min(1),
@@ -95,6 +113,11 @@ export const DB_STORES = [
     name: "services",
     keyPath: "id",
     indices: ["guildId", "status", "deadline", "createdAt", "complexity"],
+  },
+  {
+    name: "notices",
+    keyPath: "id",
+    indices: ["guildId", "status", "type", "createdAt", "expirationDate"],
   },
   {
     name: "timeline",
