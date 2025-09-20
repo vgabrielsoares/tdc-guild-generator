@@ -1,6 +1,7 @@
 import type { Guild } from "@/types/guild";
 import type { Contract } from "@/types/contract";
 import type { Service } from "@/types/service";
+import type { SpeciesWithSubrace } from "@/types/species";
 import {
   NoticeType,
   NoticeStatus,
@@ -18,6 +19,7 @@ import {
 import { rollDice } from "@/utils/dice";
 import { executeCrossModuleIntegration } from "@/utils/integrations/notice-cross-module";
 import { calculateStaffModifier } from "@/utils/generators/noticeModifiers";
+import { NoticeSpeciesGenerator } from "@/utils/generators/noticeSpeciesGenerator";
 
 export interface NoticeGenerationConfig {
   guild: Guild;
@@ -36,11 +38,17 @@ export interface NoticeGenerationConfig {
  */
 export class NoticeGenerator {
   private diceRoller: (notation: string) => number;
+  private speciesGenerator: NoticeSpeciesGenerator;
 
   constructor(diceRoller?: (notation: string) => number) {
     // Permite injeção de dependência para testes
     this.diceRoller =
       diceRoller || ((notation: string) => rollDice({ notation }).result);
+
+    // Inicializar gerador de espécies com o mesmo diceRoller
+    this.speciesGenerator = new NoticeSpeciesGenerator({
+      diceRoller: this.diceRoller,
+    });
   }
 
   /**
@@ -316,23 +324,28 @@ export class NoticeGenerator {
    * Sistema valida se é pessoa vs animal antes de aplicar espécie
    */
   private applySpeciesAutoAssignment(notice: Notice): void {
-    // Para Issue 7.14, preparamos a estrutura
-    // A implementação completa será feita nas Issues de conteúdo específico (7.15+)
+    // baseada no contexto do tipo de aviso
 
-    // Toda pessoa mencionada receberá espécie automaticamente
-    // Exceção: animais domésticos (já são animais, não precisam de espécie)
+    // Gerar espécies para contextos comuns do tipo de aviso
+    const commonSpecies =
+      this.speciesGenerator.generateSpeciesForCommonContexts(notice.type);
 
-    // Este método será expandido nas próximas Issues para:
-    // 1. Detectar menções de pessoas no conteúdo
-    // 2. Gerar espécie usando generateCompleteSpecies()
-    // 3. Validar se é pessoa vs animal
-    // 4. Aplicar espécie apenas para pessoas
+    // Adicionar espécies geradas ao array mentionedSpecies
+    const generatedSpecies = Object.values(commonSpecies).filter(
+      (species): species is SpeciesWithSubrace => species !== null
+    );
+    notice.mentionedSpecies.push(...generatedSpecies);
 
-    // Log apenas em desenvolvimento
+    // Log de desenvolvimento
     if (import.meta.env.DEV) {
       // eslint-disable-next-line no-console
       console.log(
-        `[NOTICE GENERATOR] Species auto-assignment prepared for notice ${notice.id} of type ${notice.type}`
+        `[NOTICE GENERATOR] Applied species auto-assignment for notice ${notice.id} of type ${notice.type}:`,
+        notice.mentionedSpecies.length > 0
+          ? notice.mentionedSpecies.map(
+              (s) => `${s.species}${s.subrace ? ` (${s.subrace})` : ""}`
+            )
+          : "No species generated"
       );
     }
   }
