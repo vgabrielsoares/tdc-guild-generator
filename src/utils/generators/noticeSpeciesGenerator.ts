@@ -119,7 +119,7 @@ export class NoticeSpeciesGenerator {
 
       case CreatureContext.ALWAYS_ANIMAL:
         shouldGenerate = false;
-        reason = `Caçada de ${creatureType} - sempre são animais/monstros`;
+        reason = `Caçada de ${creatureType} - sempre são criaturas sem espécie`;
         break;
 
       case CreatureContext.CONTEXT_DEPENDENT: {
