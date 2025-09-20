@@ -57,7 +57,7 @@ describe("Notice Multi-Roll Integration - Issue 7.15", () => {
   });
 
   describe("1. Integration Test - MultiRollHandler Usage", () => {
-    it("deve gerar avisos sem erros usando multiRollHandler internamente", () => {
+    it("deve gerar avisos sem erros usando multiRollHandler internamente", async () => {
       // Mock para forçar geração de avisos
       mockDiceRoller
         .mockReturnValueOnce(15) // Disponibilidade inicial: "Sim, +1d20"
@@ -66,7 +66,7 @@ describe("Notice Multi-Roll Integration - Issue 7.15", () => {
         .mockReturnValueOnce(15) // Tipo: wanted_poster (subtype será determinado internamente)
         .mockReturnValue(10); // Valores padrão para outras rolagens
 
-      const notices = generator.generate({
+      const notices = await generator.generate({
         guild: mockGuild,
         settlementType: SettlementType.CIDADELA,
       });
@@ -83,7 +83,7 @@ describe("Notice Multi-Roll Integration - Issue 7.15", () => {
       });
     });
 
-    it("deve gerar multiple avisos incluindo hunt_proposal", () => {
+    it("deve gerar multiple avisos incluindo hunt_proposal", async () => {
       // Mock para gerar múltiplos avisos incluindo hunt_proposal
       mockDiceRoller
         .mockReturnValueOnce(15) // Disponibilidade inicial: "Sim, +1d20"
@@ -93,7 +93,7 @@ describe("Notice Multi-Roll Integration - Issue 7.15", () => {
         .mockReturnValueOnce(9) // Segundo tipo: commercial_proposal
         .mockReturnValue(10); // Valores padrão para outras rolagens
 
-      const notices = generator.generate({
+      const notices = await generator.generate({
         guild: mockGuild,
         settlementType: SettlementType.METROPOLE,
       });
@@ -116,7 +116,7 @@ describe("Notice Multi-Roll Integration - Issue 7.15", () => {
   });
 
   describe("2. Performance and Safety Tests", () => {
-    it("deve completar geração mesmo com rolagens que poderiam causar multi-roll", () => {
+    it("deve completar geração mesmo com rolagens que poderiam causar multi-roll", async () => {
       // Mock para simular múltiplas rolagens altas (potenciais multi-rolls)
       mockDiceRoller
         .mockReturnValueOnce(15) // Disponibilidade inicial: "Sim, +1d20"
@@ -127,7 +127,7 @@ describe("Notice Multi-Roll Integration - Issue 7.15", () => {
       const startTime = performance.now();
 
       // Deve completar sem travamento ou timeout
-      const notices = generator.generate({
+      const notices = await generator.generate({
         guild: mockGuild,
         settlementType: SettlementType.CIDADELA,
       });
@@ -141,14 +141,14 @@ describe("Notice Multi-Roll Integration - Issue 7.15", () => {
       expect(duration).toBeLessThan(3000);
     });
 
-    it("deve tratar casos extremos com valores de borda", () => {
+    it("deve tratar casos extremos com valores de borda", async () => {
       // Mock para casos extremos - usar valores que garantam funcionalidade
       mockDiceRoller
         .mockReturnValueOnce(20) // Disponibilidade inicial alta para garantir sucesso
         .mockReturnValueOnce(10) // Quantidade base suficiente
         .mockReturnValue(10); // Valores consistentes para outras rolagens
 
-      const notices = generator.generate({
+      const notices = await generator.generate({
         guild: mockGuild,
         settlementType: SettlementType.LUGAREJO,
       });
@@ -160,7 +160,7 @@ describe("Notice Multi-Roll Integration - Issue 7.15", () => {
   });
 
   describe("3. Type Coverage Tests", () => {
-    it("deve conseguir gerar diferentes tipos de avisos", () => {
+    it("deve conseguir gerar diferentes tipos de avisos", async () => {
       const typesGenerated = new Set<NoticeType>();
 
       // Executar múltiplas gerações para cobrir diferentes tipos
@@ -173,7 +173,7 @@ describe("Notice Multi-Roll Integration - Issue 7.15", () => {
           .mockReturnValueOnce(2 + i) // Varia o tipo de aviso (2-21, mapeado para 1-20)
           .mockReturnValue(10); // Valores padrão
 
-        const notices = generator.generate({
+        const notices = await generator.generate({
           guild: mockGuild,
           settlementType: SettlementType.CIDADELA,
         });
@@ -187,14 +187,14 @@ describe("Notice Multi-Roll Integration - Issue 7.15", () => {
       expect(typesGenerated.size).toBeGreaterThan(1);
     });
 
-    it("deve gerar avisos com espécies mencionadas", () => {
+    it("deve gerar avisos com espécies mencionadas", async () => {
       // Usar valores altos para maximizar chances de gerar tipos com espécies
       mockDiceRoller
         .mockReturnValueOnce(20) // Disponibilidade inicial: "Sim"
         .mockReturnValueOnce(20) // Quantidade alta
         .mockReturnValue(20); // Valores altos para todas as rolagens (incluindo tipos com espécies)
 
-      const notices = generator.generate({
+      const notices = await generator.generate({
         guild: mockGuild,
         settlementType: SettlementType.CIDADELA,
       });
@@ -209,7 +209,7 @@ describe("Notice Multi-Roll Integration - Issue 7.15", () => {
   });
 
   describe("4. Business Logic Validation", () => {
-    it("deve respeitar regras de disponibilidade por tipo de assentamento", () => {
+    it("deve respeitar regras de disponibilidade por tipo de assentamento", async () => {
       // Teste com Lugarejo (deve ter menos avisos)
       mockDiceRoller
         .mockReturnValueOnce(18) // Disponibilidade inicial: "Sim" (17+ passa)
@@ -217,7 +217,7 @@ describe("Notice Multi-Roll Integration - Issue 7.15", () => {
         .mockReturnValueOnce(2) // Modificador baixo
         .mockReturnValue(10);
 
-      const noticesLugarejo = generator.generate({
+      const noticesLugarejo = await generator.generate({
         guild: mockGuild,
         settlementType: SettlementType.LUGAREJO,
       });
@@ -230,7 +230,7 @@ describe("Notice Multi-Roll Integration - Issue 7.15", () => {
         .mockReturnValueOnce(15) // Modificador alto
         .mockReturnValue(10);
 
-      const noticesMetropole = generator.generate({
+      const noticesMetropole = await generator.generate({
         guild: mockGuild,
         settlementType: SettlementType.METROPOLE,
       });
