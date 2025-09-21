@@ -40,10 +40,13 @@ export function rollNewNoticesSchedule(
     const variableRoll = roller(result.result.variableDice);
     let calculatedDays: number;
 
-    if (result.result.description.includes("meses")) {
+    if (result.result.multiplier) {
+      // Se há um multiplicador definido, use-o
+      calculatedDays = variableRoll * result.result.multiplier;
+    } else if (result.result.description.includes("meses")) {
       calculatedDays = variableRoll * 30; // Aproximação de 30 dias por mês
     } else {
-      calculatedDays = variableRoll; // Já está em dias ou semanas*7
+      calculatedDays = variableRoll; // Já está em dias
     }
 
     return {
@@ -134,7 +137,14 @@ export function rollNoticeExpiration(
 
     if (result.result.isVariable && result.result.variableDice) {
       const variableRoll = roller(result.result.variableDice);
-      calculatedDays = variableRoll;
+
+      if (result.result.multiplier) {
+        // Se há um multiplicador definido, use-o
+        calculatedDays = variableRoll * result.result.multiplier;
+      } else {
+        calculatedDays = variableRoll; // Já está em dias
+      }
+
       description = `Execução em ${result.result.description}`;
     } else {
       calculatedDays = result.result.days;
@@ -169,10 +179,18 @@ export function rollNoticeExpiration(
   if (result.result.isVariable && result.result.variableDice) {
     // Para casos como "2d4 semanas"
     const variableRoll = roller(result.result.variableDice);
+    let calculatedDays: number;
+
+    if (result.result.multiplier) {
+      // Se há um multiplicador definido, use-o
+      calculatedDays = variableRoll * result.result.multiplier;
+    } else {
+      calculatedDays = variableRoll; // Já está em dias
+    }
 
     return {
-      days: variableRoll,
-      description: `${result.result.description} (${variableRoll} dias, modificador: ${modifier >= 0 ? "+" : ""}${modifier})`,
+      days: calculatedDays,
+      description: `${result.result.description} (${calculatedDays} dias, modificador: ${modifier >= 0 ? "+" : ""}${modifier})`,
       immediateRemoval: false,
     };
   }

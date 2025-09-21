@@ -12,6 +12,7 @@ export const NEW_NOTICES_SCHEDULE_TABLE: TableEntry<{
   days: number;
   isVariable?: boolean;
   variableDice?: string;
+  multiplier?: number;
 }>[] = [
   {
     min: 1,
@@ -54,7 +55,8 @@ export const NEW_NOTICES_SCHEDULE_TABLE: TableEntry<{
       description: "2d4 semanas",
       days: 0, // Será calculado dinamicamente
       isVariable: true,
-      variableDice: "2d4*7", // 2d4 semanas em dias
+      variableDice: "2d4", // 2d4 semanas, será multiplicado por 7 no código
+      multiplier: 7, // Converte semanas em dias
     },
   },
   {
@@ -155,6 +157,7 @@ export const NOTICE_EXPIRATION_TABLE: TableEntry<{
   days: number;
   isVariable?: boolean;
   variableDice?: string;
+  multiplier?: number;
 }>[] = [
   {
     min: 1,
@@ -187,7 +190,8 @@ export const NOTICE_EXPIRATION_TABLE: TableEntry<{
       description: "2d4 semanas",
       days: 0, // Será calculado dinamicamente
       isVariable: true,
-      variableDice: "2d4*7", // 2d4 semanas em dias
+      variableDice: "2d4", // 2d4 semanas, será multiplicado por 7 no código
+      multiplier: 7, // Converte semanas em dias
     },
   },
   {

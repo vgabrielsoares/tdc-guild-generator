@@ -381,8 +381,19 @@ export const useNoticesStore = defineStore("notices", () => {
 
     const noticeIndex = notices.value.findIndex((n) => n.id === noticeId);
     if (noticeIndex >= 0) {
-      notices.value[noticeIndex].status = NoticeStatus.EXPIRED;
-      notices.value[noticeIndex].updatedAt = new Date();
+      const notice = notices.value[noticeIndex];
+
+      // Marcar como expirada (para todos os tipos, incluindo execuções)
+      notice.status = NoticeStatus.EXPIRED;
+      notice.updatedAt = new Date();
+
+      if (import.meta.env.DEV) {
+        const actionType =
+          notice.type === NoticeType.EXECUTION ? "completed" : "expired";
+        // eslint-disable-next-line no-console
+        console.log(`[NOTICES STORE] Notice ${noticeId} ${actionType}`);
+      }
+
       saveToStorage();
     }
   };
