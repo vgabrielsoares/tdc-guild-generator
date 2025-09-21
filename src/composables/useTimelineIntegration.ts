@@ -7,9 +7,9 @@ import { onMounted, onUnmounted, getCurrentInstance } from "vue";
 import { useTimelineStore } from "@/stores/timeline";
 import { useContractsStore } from "@/stores/contracts";
 import { useServicesStore } from "@/stores/services";
+import { useNoticesStore } from "@/stores/notices";
 // TODO: Descomentar conforme módulos são implementados
 // import { useMembersStore } from '@/stores/members';
-// import { useNoticesStore } from '@/stores/notices';
 // import { useRenownStore } from '@/stores/renown';
 import type { TimeAdvanceResult } from "@/types/timeline";
 
@@ -21,10 +21,10 @@ export function useTimelineIntegration() {
   const timelineStore = useTimelineStore();
   const contractsStore = useContractsStore();
   const servicesStore = useServicesStore();
+  const noticesStore = useNoticesStore();
 
   // TODO: Adicionar outros stores conforme implementados
   // const membersStore = useMembersStore();
-  // const noticesStore = useNoticesStore();
   // const renownStore = useRenownStore();
 
   /**
@@ -35,10 +35,10 @@ export function useTimelineIntegration() {
     // Processar mudanças de tempo no sistema
     contractsStore.processTimeAdvance(result);
     servicesStore.processTimeAdvance?.(result);
+    noticesStore.processTimeAdvance?.(result);
 
     // TODO: Adicionar processamento para outros módulos conforme implementados
     // membersStore.processTimeAdvance?.(result);
-    // noticesStore.processTimeAdvance?.(result);
     // renownStore.processTimeAdvance?.(result);
   };
 
@@ -92,19 +92,19 @@ export function createTimelineIntegration() {
   const timelineStore = useTimelineStore();
   const contractsStore = useContractsStore();
   const servicesStore = useServicesStore();
+  const noticesStore = useNoticesStore();
 
   // TODO: Adicionar outros stores conforme implementados
   // const membersStore = useMembersStore();
-  // const noticesStore = useNoticesStore();
   // const renownStore = useRenownStore();
 
   const handleTimeAdvance = (result: TimeAdvanceResult) => {
     contractsStore.processTimeAdvance(result);
     servicesStore.processTimeAdvance?.(result);
+    noticesStore.processTimeAdvance?.(result);
 
     // TODO: Adicionar processamento para outros módulos conforme implementados
     // membersStore.processTimeAdvance?.(result);
-    // noticesStore.processTimeAdvance?.(result);
     // renownStore.processTimeAdvance?.(result);
   };
 
