@@ -60,11 +60,11 @@ describe("Notice Execution Fix", () => {
     const mockRoller = vi
       .fn()
       .mockReturnValueOnce(6) // Rolagem inicial que resulta em "2d4 semanas"
-      .mockReturnValueOnce(6); // Rolagem do 2d4*7 = 42 dias
+      .mockReturnValueOnce(6); // Rolagem do 2d4 = 6 semanas
 
     const result = rollNoticeExpiration(NoticeType.EXECUTION, mockRoller);
 
-    expect(result.days).toBe(6); // Resultado do segundo mock
+    expect(result.days).toBe(42); // 6 semanas * 7 dias = 42 dias
     expect(result.description).toContain("Execução em 2d4 semanas");
     expect(result.isExecutionDay).toBe(true);
   });
