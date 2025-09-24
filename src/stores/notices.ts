@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ref, computed, watch, readonly } from "vue";
-import type { Notice } from "@/types/notice";
+import type { Notice, WantedPoster } from "@/types/notice";
 import { NoticeType, NoticeStatus } from "@/types/notice";
 import { SettlementType, type Guild } from "@/types/guild";
 import type { GameDate, TimeAdvanceResult } from "@/types/timeline";
@@ -43,6 +43,9 @@ export const useNoticesStore = defineStore("notices", () => {
     status: null as NoticeStatus | null,
     searchText: "",
     showExpired: false,
+    species: null as string | null,
+    dangerLevel: null as string | null,
+    guildId: null as string | null,
   });
 
   // Configuração do módulo para integração com timeline
@@ -82,24 +85,64 @@ export const useNoticesStore = defineStore("notices", () => {
   const filteredNotices = computed(() => {
     let filtered = notices.value;
 
+    // Filtro por tipo
     if (filters.value.type) {
       filtered = filtered.filter(
         (notice) => notice.type === filters.value.type
       );
     }
 
+    // Filtro por status
     if (filters.value.status) {
       filtered = filtered.filter(
         (notice) => notice.status === filters.value.status
       );
     }
 
+    // Filtro por expirados
     if (!filters.value.showExpired) {
       filtered = filtered.filter(
         (notice) => notice.status !== NoticeStatus.EXPIRED
       );
     }
 
+    // Filtro por espécie mencionada
+    if (filters.value.species) {
+      filtered = filtered.filter((notice) => {
+        // Verificar espécies mencionadas (array de SpeciesWithSubrace)
+        return notice.mentionedSpecies?.some((speciesWithSubrace) =>
+          speciesWithSubrace.species
+            .toLowerCase()
+            .includes(filters.value.species!.toLowerCase())
+        );
+      });
+    }
+
+    // Filtro por nível de periculosidade
+    if (filters.value.dangerLevel) {
+      filtered = filtered.filter((notice) => {
+        // Aplicar apenas para cartazes de procurado com condenados fugitivos
+        if (notice.type === NoticeType.WANTED_POSTER && notice.content) {
+          const content = notice.content as WantedPoster;
+          if (
+            content.type === "fugitive_convict" &&
+            "dangerLevel" in content.details
+          ) {
+            return content.details.dangerLevel === filters.value.dangerLevel;
+          }
+        }
+        return false;
+      });
+    }
+
+    // Filtro por guilda específica
+    if (filters.value.guildId) {
+      filtered = filtered.filter(
+        (notice) => notice.guildId === filters.value.guildId
+      );
+    }
+
+    // Filtro por texto de busca
     if (filters.value.searchText) {
       const searchLower = filters.value.searchText.toLowerCase();
       filtered = filtered.filter((notice) => {
@@ -108,12 +151,80 @@ export const useNoticesStore = defineStore("notices", () => {
 
         return (
           content.toString().toLowerCase().includes(searchLower) ||
-          notice.type.toString().toLowerCase().includes(searchLower)
+          notice.type.toString().toLowerCase().includes(searchLower) ||
+          // Buscar também em espécies mencionadas
+          notice.mentionedSpecies?.some(
+            (species) =>
+              species.species.toLowerCase().includes(searchLower) ||
+              species.subrace?.toLowerCase().includes(searchLower)
+          )
         );
       });
     }
 
     return filtered;
+  });
+
+  // Computed helpers para filtros avançados
+  const mentionedSpecies = computed(() => {
+    const speciesSet = new Set<string>();
+    notices.value.forEach((notice) => {
+      notice.mentionedSpecies?.forEach((species) => {
+        speciesSet.add(species.species);
+      });
+    });
+    return Array.from(speciesSet).sort();
+  });
+
+  const availableDangerLevels = computed(() => {
+    const dangerLevels = new Set<string>();
+    notices.value.forEach((notice) => {
+      if (notice.type === NoticeType.WANTED_POSTER && notice.content) {
+        const content = notice.content as WantedPoster;
+        if (
+          content.type === "fugitive_convict" &&
+          "dangerLevel" in content.details
+        ) {
+          dangerLevels.add(content.details.dangerLevel);
+        }
+      }
+    });
+    return Array.from(dangerLevels).sort();
+  });
+
+  const noticesCounters = computed(() => {
+    const counters = {
+      total: notices.value.length,
+      active: activeNotices.value.length,
+      expired: expiredNotices.value.length,
+      byType: {} as Record<NoticeType, number>,
+      withSpecies: notices.value.filter(
+        (n) => n.mentionedSpecies && n.mentionedSpecies.length > 0
+      ).length,
+      dangerous: notices.value.filter((notice) => {
+        if (notice.type === NoticeType.WANTED_POSTER && notice.content) {
+          const content = notice.content as WantedPoster;
+          if (
+            content.type === "fugitive_convict" &&
+            "dangerLevel" in content.details
+          ) {
+            return ["critical", "mortal_danger", "extremely_high"].includes(
+              content.details.dangerLevel
+            );
+          }
+        }
+        return false;
+      }).length,
+    };
+
+    // Contar por tipo
+    Object.values(NoticeType).forEach((type) => {
+      counters.byType[type] = notices.value.filter(
+        (n) => n.type === type
+      ).length;
+    });
+
+    return counters;
   });
 
   // ===== PERSISTÊNCIA =====
@@ -131,6 +242,14 @@ export const useNoticesStore = defineStore("notices", () => {
       lastUpdate.value = new Date();
     }
   };
+
+  // ===== COMPUTED ADICIONAL =====
+
+  // Estados derivados úteis para UI
+  const hasNotices = computed(() => notices.value.length > 0);
+  const hasActiveNotices = computed(() => activeNotices.value.length > 0);
+  const hasExpiredNotices = computed(() => expiredNotices.value.length > 0);
+  const isEmptyState = computed(() => !hasNotices.value && !isLoading.value);
 
   // ===== AÇÕES PRINCIPAIS =====
 
@@ -426,6 +545,70 @@ export const useNoticesStore = defineStore("notices", () => {
 
   // ===== AÇÕES DE GERENCIAMENTO =====
 
+  /**
+   * Renova um aviso específico, estendendo sua expiração
+   */
+  const renewNotice = (noticeId: string) => {
+    const notice = notices.value.find((n) => n.id === noticeId);
+    if (!notice) {
+      warning("Aviso não encontrado para renovação");
+      return;
+    }
+
+    // Verificar se o aviso pode ser renovado (não expirado)
+    if (notice.status === NoticeStatus.EXPIRED) {
+      warning("Não é possível renovar avisos expirados");
+      return;
+    }
+
+    const currentDate = timelineStore.currentGameDate;
+    if (!currentDate) {
+      warning("Data atual não disponível para renovação");
+      return;
+    }
+
+    // Calcular nova data de expiração
+    const expirationResult = rollNoticeExpiration(notice.type);
+    const newExpirationDate = addDays(currentDate, expirationResult.days);
+
+    // Converter GameDate para Date
+    const newExpirationDateJS = new Date(
+      newExpirationDate.year,
+      newExpirationDate.month - 1,
+      newExpirationDate.day
+    );
+
+    // Atualizar o aviso
+    notice.expirationDate = newExpirationDateJS;
+    notice.updatedAt = new Date();
+    notice.status = NoticeStatus.ACTIVE;
+
+    // Reagendar evento de expiração
+    timelineStore.scheduleEvent(
+      ScheduledEventType.NOTICE_EXPIRATION,
+      newExpirationDate,
+      expirationResult.isExecutionDay
+        ? `Execução programada: ${notice.type}`
+        : `Aviso ${notice.type} expira`,
+      {
+        guildId: currentGuildId.value,
+        noticeId: notice.id,
+        noticeType: notice.type,
+        isExecutionDay: expirationResult.isExecutionDay,
+      }
+    );
+
+    saveToStorage();
+    success("Aviso renovado com sucesso!");
+
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.log(
+        `[NOTICES STORE] Notice ${noticeId} renewed until ${newExpirationDateJS.toDateString()}`
+      );
+    }
+  };
+
   const removeNotice = (noticeId: string) => {
     const index = notices.value.findIndex((n) => n.id === noticeId);
     if (index >= 0) {
@@ -451,6 +634,46 @@ export const useNoticesStore = defineStore("notices", () => {
     isReady.value = false;
   };
 
+  // ===== AÇÕES AUXILIARES =====
+
+  /**
+   * Busca um aviso específico por ID
+   */
+  const getNoticeById = (noticeId: string): Notice | undefined => {
+    return notices.value.find((notice) => notice.id === noticeId);
+  };
+
+  /**
+   * Busca avisos por tipo específico
+   */
+  const getNoticesByType = (type: NoticeType): Notice[] => {
+    return notices.value.filter((notice) => notice.type === type);
+  };
+
+  /**
+   * Busca avisos que expiram em uma data específica
+   */
+  const getNoticesExpiringOn = (date: GameDate): Notice[] => {
+    const targetDate = new Date(date.year, date.month - 1, date.day);
+    return notices.value.filter((notice) => {
+      if (!notice.expirationDate) return false;
+      const expDate = notice.expirationDate;
+      return (
+        expDate.getFullYear() === targetDate.getFullYear() &&
+        expDate.getMonth() === targetDate.getMonth() &&
+        expDate.getDate() === targetDate.getDate()
+      );
+    });
+  };
+
+  /**
+   * Força atualização do storage (útil para debugging)
+   */
+  const forceSaveToStorage = () => {
+    saveToStorage();
+    info("Dados salvos manualmente");
+  };
+
   // ===== FILTROS =====
 
   const setTypeFilter = (type: NoticeType | null) => {
@@ -465,6 +688,18 @@ export const useNoticesStore = defineStore("notices", () => {
     filters.value.searchText = text;
   };
 
+  const setSpeciesFilter = (species: string | null) => {
+    filters.value.species = species;
+  };
+
+  const setDangerLevelFilter = (dangerLevel: string | null) => {
+    filters.value.dangerLevel = dangerLevel;
+  };
+
+  const setGuildIdFilter = (guildId: string | null) => {
+    filters.value.guildId = guildId;
+  };
+
   const toggleExpiredFilter = () => {
     filters.value.showExpired = !filters.value.showExpired;
   };
@@ -475,6 +710,9 @@ export const useNoticesStore = defineStore("notices", () => {
       status: null,
       searchText: "",
       showExpired: false,
+      species: null,
+      dangerLevel: null,
+      guildId: null,
     };
   };
 
@@ -511,20 +749,37 @@ export const useNoticesStore = defineStore("notices", () => {
     expiredNotices,
     noticesByType,
     filteredNotices,
+    mentionedSpecies,
+    availableDangerLevels,
+    noticesCounters,
+    hasNotices,
+    hasActiveNotices,
+    hasExpiredNotices,
+    isEmptyState,
 
     // ===== ACTIONS - Principais =====
     generateNotices,
     removeExpiredNotices,
 
     // ===== ACTIONS - Gerenciamento =====
+    renewNotice,
     removeNotice,
     clearNotices,
     clearNoticesForNewGuild,
+
+    // ===== ACTIONS - Auxiliares =====
+    getNoticeById,
+    getNoticesByType,
+    getNoticesExpiringOn,
+    forceSaveToStorage,
 
     // ===== ACTIONS - Filtros =====
     setTypeFilter,
     setStatusFilter,
     setSearchFilter,
+    setSpeciesFilter,
+    setDangerLevelFilter,
+    setGuildIdFilter,
     toggleExpiredFilter,
     clearFilters,
 
