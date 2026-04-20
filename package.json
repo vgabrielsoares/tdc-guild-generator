@@ -37,7 +37,7 @@
     "@vue/test-utils": "^2.4.1",
     "@vue/tsconfig": "^0.9.1",
     "audit-ci": "^7.1.0",
-    "autoprefixer": "^10.4.27",
+    "autoprefixer": "^10.5.0",
     "eslint": "^8.49.0",
     "eslint-plugin-vue": "^9.17.0",
     "jsdom": "^23.0.1",
